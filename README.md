@@ -1,196 +1,438 @@
 # Astra Codex Workbench
 
-프로젝트마다 **딱 두 개의 관리 문서만 유지**하는 방식입니다.
+여러 프로젝트에서 실제로 겪은 **개발·UX·빌드·배포·QA 경험을 서로 공유하기 위한 최상단 허브**입니다.
 
-## 내가 보는 파일 — `README.md`
-이 파일은 사람이 빠르게 현재 상황을 파악하기 위한 문서입니다.
+핵심은 단순합니다.
 
-항상 아래 정도만 유지합니다.
-- 이 프로젝트가 무엇인지
-- 지금 어디까지 됐는지
-- 현재 실제로 동작하는 것
-- 중요한 결정/변경사항
-- 다음에 할 일
-- GitHub, 실행 파일, 주요 경로처럼 다시 찾을 위치
-- 어떤 주요 도구·서비스를 쓰는지
-- 내가 미리 설치/로그인/연결/승인해야 하는 것
-- 다시 써먹을 만한 프로젝트별 팁과 주의점
+- 각 프로젝트는 관리 문서를 **`README.md` + `AGENTS.md` 두 개만** 유지합니다.
+- `README.md`는 **내가 보는 현재 상태/요약**입니다.
+- `AGENTS.md`는 **다음 AI/Codex가 바로 작업하기 위한 작업 매뉴얼**입니다.
+- 프로젝트마다 얻은 좋은 방법은 여기로 모으고, 다른 프로젝트에서 맞는 것만 골라 재사용합니다.
+- GitHub가 필요 없는 프로젝트에는 저장소를 억지로 만들지 않습니다.
+- 비밀번호·토큰·개인키 같은 비밀값은 문서에 기록하지 않습니다.
 
-예를 들어 APK 프로젝트라면 어떤 빌드 방식/도구를 썼는지, 어떤 기기에서 테스트했는지, 서명이나 Android SDK가 필요한지 정도를 사람이 다시 보기 쉽게 적습니다. 서버·웹 프로젝트라면 호스팅/DB/플러그인/OAuth 같은 의존성을 요약합니다.
+---
 
-비밀번호, API 토큰, 개인키 같은 **비밀값 자체는 절대 적지 않습니다.** 필요한 계정/권한이나 환경변수 이름만 기록합니다.
+## 전체 구조
 
-기술 로그나 에이전트용 장황한 규칙은 여기에 넣지 않습니다.
+```text
+Astra Codex Workbench
+│
+├─ README.md                 ← 내가 보는 최상단 요약
+├─ AGENTS.md                 ← AI/Codex가 보는 공통 작업 규칙
+│
+├─ GitHub가 있는 실제 개발 프로젝트
+│  ├─ 운동앱              → HealthAPK
+│  ├─ 주식자동매매        → Investment-Lab
+│  ├─ 청약                → ChungYack + stock/chungyack-apk
+│  ├─ 멀티의신            → PhoneLOL
+│  └─ 주식 앱 / Market Radar → stock
+│
+├─ GitHub가 없어도 되는 프로젝트
+│  ├─ 피규어만들기_01
+│  └─ 동물의숲 / Tiny Village
+│
+├─ 개발 경험을 추가로 회수한 프로젝트
+│  ├─ 사이드메모장
+│  ├─ FinanceOne 리뉴얼
+│  └─ 사이버 아쿠아리움 / ASCII Aquarium
+│
+└─ 공통으로 축적하는 것
+   ├─ UX / 편의성
+   ├─ 코드 수정 방식
+   ├─ 빌드 / 패키징
+   ├─ 한글 / Windows
+   ├─ 업데이트 / 마이그레이션
+   ├─ 로그 / 관제
+   ├─ 실제 기기 QA
+   └─ 복구 / 롤백 / 작업 정리
+```
 
-## AI가 보는 파일 — `AGENTS.md`
-Codex/ChatGPT 같은 작업 에이전트가 다음 세션에서 바로 일을 이어가기 위한 문서입니다.
+---
 
-여기에는 정확한 경로, 빌드/실행/테스트 명령, 기술 제약, 권한 범위, 구현 원칙, 검증 기준과 함께 아래를 자세히 둡니다.
-- 실제 사용한 언어·프레임워크·SDK·패키지 매니저·빌드/패키징 방식
-- APK/앱 빌드 도구, IDE, 스크립트, 필요한 버전
-- 사용한 플러그인, MCP, Skill, 외부 서비스, DB, 호스팅, CI/CD
-- 필요한 로그인/OAuth/API 접근/저장소 권한/기기 승인/환경변수/인증서/서명 조건
-- 재현에 필요한 PC·모바일·로컬 서비스 같은 환경 정보
-- 작업하며 발견한 팁, 안정적인 명령, 함정, 실패 원인, 우회법
-- 소스·산출물·배포 위치와 중요한 프로젝트 ID/링크
+## 현재 프로젝트 정리 현황
 
-즉 `README.md`는 **내가 보는 설명서**, `AGENTS.md`는 **AI가 바로 작업에 들어가기 위한 작업 매뉴얼**입니다.
+### GitHub가 확인된 프로젝트 — 정리 완료
 
-## 정리 규칙
-프로젝트 진행을 기록한다는 이유로 폴더와 문서를 계속 만들지 않습니다.
+- **운동앱** → `kimjae134679/HealthAPK`
+- **주식자동매매** → `kimjae134679/Investment-Lab`
+- **청약** → 허브 `kimjae134679/ChungYack`, 실제 live shell `kimjae134679/stock/chungyack-apk/`
+- **멀티의신** → `kimjae134679/PhoneLOL`
+- **주식 앱 / Market Radar** → `kimjae134679/stock`
 
-`PLAN.md`, `STATUS.md`, `NOTES.md`, `HANDOFF.md`, 중복 README, 날짜별 인수인계 파일 등을 여기저기 만들지 않고 필요한 내용은 위 두 파일에 합칩니다. 실제 프로그램 구조상 필요한 `src`, `assets`, `tests` 같은 폴더는 당연히 그대로 사용합니다.
+위 프로젝트는 루트 `README.md` + `AGENTS.md` 체계로 정리했습니다.
 
-임시 결과물은 저장소 밖이나 기존 임시/빌드 위치에 두고, 최종 산출물만 프로젝트의 원래 구조에 맞춰 둡니다.
-
-## 다른 프로젝트 채팅에서 받아오는 형식
-파일 첨부보다 **채팅의 복사 버튼으로 바로 클립보드에 가져오는 방식**을 기본으로 합니다.
-
-요청할 때 아래 형식으로 받습니다.
-1. `AGENTS.md` 제목
-2. AGENTS.md 전체가 들어간 Markdown 코드블록 1개
-3. `README.md` 제목
-4. README.md 전체가 들어간 Markdown 코드블록 1개
-
-한 파일을 여러 코드블록으로 쪼개지 않습니다. 두 파일을 한 코드블록에 합치지도 않습니다. 그러면 각 파일마다 복사 버튼 한 번으로 전체 내용을 바로 복사할 수 있습니다.
-
-## 다른 프로젝트 채팅에 정리를 부탁할 때
-다음 형태로 요청합니다.
-
-> 이 프로젝트의 기존 대화·파일·지침을 전체적으로 확인해서 앞으로 새 채팅에서도 바로 이어갈 수 있게 정리해줘. 결과는 루트에 둘 **AGENTS.md와 README.md 두 파일만** 만들어줘. AGENTS.md는 다음 AI가 읽을 실제 작업 인수인계로, 현재 목표/확정 요구사항/최근 진행상태/정확한 경로와 GitHub/빌드·실행·테스트 명령/사용한 언어·SDK·툴·APK 또는 패키징 방식/플러그인·MCP·외부 서비스/필요한 로그인·OAuth·권한·환경변수·인증서·서명 등 접근 조건(비밀값 자체는 쓰지 말 것)/기기·환경/알아낸 팁·주의점·실패하기 쉬운 부분·검증 방법/남은 작업을 포함해. README.md는 내가 읽을 요약으로 프로젝트 목적, 현재 상태, 실제 동작하는 것, 중요한 결정, 다음 할 일, 사용 중인 주요 도구·서비스, 내가 미리 준비하거나 로그인/승인해야 하는 것, 다시 쓸 만한 팁, 주요 링크·경로만 간결하게 정리해. **이 프로젝트에서 반복해서 잘 먹힌 UX·편의성·시각화·빌드·배포·한글/인코딩·로그·테스트·권한 관리 팁 중 다른 프로젝트에도 재사용할 만한 것 3~10개를 골라 두 문서에 반영해. 다른 프로젝트의 검증된 팁을 적용할 수 있다면 프로젝트 특성에 맞게 가져오되 무작정 복사하지 마.** 파일 첨부보다 채팅에서 바로 복사하기 쉽게 해줘. `AGENTS.md` 제목 아래에 파일 전체 내용을 하나의 Markdown 코드블록으로, `README.md` 제목 아래에 파일 전체 내용을 또 하나의 Markdown 코드블록으로 출력해. 각 코드블록은 복사 버튼 한 번으로 파일 전체를 클립보드에 넣을 수 있게 한 파일당 정확히 한 블록만 사용해. 별도 status/plan/handoff/notes 문서나 새 폴더는 만들지 말고, 확인되지 않은 내용은 추측하지 마.
-
-이 두 블록을 복사해서 기존 프로젝트의 같은 파일에 병합하면 되고, 별도의 인수인계 파일은 남기지 않습니다.
-
-## 프로젝트 정리 현황
-2026-09-09 기준으로 **확실히 매핑된 GitHub 프로젝트 5개는 루트 `AGENTS.md` + `README.md` 정리를 실제 반영**했습니다.
-
-- **운동앱** → `kimjae134679/HealthAPK` — 정리 완료
-- **주식자동매매** → `kimjae134679/Investment-Lab` — 정리 완료
-- **청약** → 프로젝트 허브 `kimjae134679/ChungYack`, 실제 live shell `kimjae134679/stock/chungyack-apk/` — 허브 문서 정리 완료
-- **멀티의신** → `kimjae134679/PhoneLOL` — 정리 완료
-- **주식 앱 / Market Radar** → `kimjae134679/stock` 루트 — 정리 완료
-
-### 아직 GitHub 매핑을 추측하지 않는 프로젝트
-아래 두 프로젝트는 채팅/파일에서 목표는 확인되지만 **기존 GitHub 저장소나 로컬 경로가 확정되지 않았습니다.** 비슷해 보이는 다른 저장소에 억지로 연결하거나 중복 저장소를 새로 만들지 않습니다.
+### GitHub가 없어도 되는 프로젝트
 
 **피규어만들기_01**
-- 목표: 첫 번째 레퍼런스 이미지와 최대한 흡사한 Blender 피규어/3D 오브젝트 제작.
-- 두 번째 Blender 초안의 형태는 보존 대상이 아니며 필요하면 싹 버리고 다시 시작.
-- 확정 작업 순서: blockout → 비율/실루엣 조정 → 디테일.
-- 아직 확정되지 않은 것: GitHub repo, `.blend` 경로, Blender 버전, 렌더러, 출력/3D프린트 용도, 스케일, STL/리깅/텍스처/폴리곤 목표.
-- 따라서 repo/path가 실제로 확인되는 순간 그 루트에 `AGENTS.md`와 `README.md`를 만들고 이 요약을 승격합니다.
+- 레퍼런스 이미지와 최대한 흡사한 Blender 피규어/3D 오브젝트 제작.
+- 기존 초안은 보존 대상이 아니며 필요하면 다시 시작 가능.
+- 기본 순서: `blockout → 비율/실루엣 → 디테일`.
+- GitHub가 확인되지 않았고, **저장소가 반드시 필요한 프로젝트로 취급하지 않습니다.**
 
-**동물의숲**
-- 확인 가능한 산출물: `Tiny Village`라는 표기의 동물의숲 감성 데스크톱 설정 UI 콘셉트.
-- 목표 스타일: 깔끔하고 직관적인 초록·베이지·목재 질감·둥근 패널 중심의 아늑한 UI.
-- 확인된 설정 항목: 언어(한국어), 시작 시 자동 실행, 주민과 함께 시작, 주민이 나타날 화면(주 모니터), 창 항상 위, 시작 시 창 최소화, 기본값 복원/취소/저장.
-- 좌측 영역: 일반 / 주민 / 상호작용 / 화면 / 소리 / 기타.
-- 아직 확정되지 않은 것: 실제 GitHub repo, 로컬 경로, 엔진/버전, 플러그인/MCP, 최근 구현 상태와 테스트 결과.
-- `SideMemojang_01`, `Ascii_Aquarium` 등 이름이 비슷하거나 연관돼 보이는 저장소로 **근거 없이 매핑하지 않습니다.**
+**동물의숲 / Tiny Village**
+- 동물의숲 감성의 아늑한 데스크톱 설정 UI 콘셉트.
+- 초록·베이지·목재 질감·둥근 패널 중심.
+- 일반 / 주민 / 상호작용 / 화면 / 소리 / 기타 설정 구조가 확인됨.
+- GitHub가 확인되지 않았고, **비슷한 저장소에 억지로 매핑하지 않습니다.**
 
-즉 현재는 “확인된 저장소는 모두 실제 반영 완료, 저장소가 확인되지 않은 두 프로젝트는 Workbench에 안전하게 보류 기록” 상태입니다.
+둘 다 나중에 사용자가 저장소 연결/생성을 직접 요청할 때만 GitHub 작업을 합니다.
 
-## 🔁 프로젝트끼리 서로 배운 꿀팁
-각 프로젝트에서 실제로 잘 먹혔거나 실패를 줄였던 방식을 서로 공유합니다. 앞으로 새 프로그램을 만들거나 기존 프로그램을 고칠 때 아래를 기본 후보로 먼저 검토합니다.
+---
 
-### 내가 좋아하는 방향으로 정리된 공통 기본값
-- **평소 쓰는 시작점은 하나가 좋음.** 실행 파일/버튼/URL을 여러 개 던지기보다 `RUN_START_HERE.cmd` 같은 대표 진입점 하나를 먼저 둡니다.
-- **기본 화면은 지금 필요한 것부터.** 현재 상태·다음 행동·중요 결과를 위에 두고 과거 로그/원자료/디버그 정보는 접거나 별도 상세로 둡니다.
-- **같은 기능 버튼을 여러 개 만들지 않음.** 저장/북마크/좋아요처럼 목적이 같은 기능은 가능하면 하나로 합칩니다.
-- **버튼을 눌렀는데 아무 반응 없는 상태를 싫어함.** 실제 동작, 대체 경로, 또는 왜 못 하는지 이유가 나와야 합니다.
-- **모바일이라고 중요한 정보를 빼지 않음.** PC와 모바일 모두 핵심 정보는 유지하고, 글씨를 너무 작게 줄이기보다 레이아웃/스크롤을 고칩니다.
-- **되는 기능을 통째로 다시 쓰지 않음.** 문제 난 부분만 최소 수정하고 기존 정상 흐름은 보존하는 쪽을 선호합니다.
-- **가능하면 앱 재설치 없이 업데이트.** HTML/데이터만 바뀌는 앱은 native APK를 매번 다시 만들지 않는 구조를 우선 검토합니다.
-- **완료 여부를 눈에 보이게.** `미검증 / 대기 / 막힘 / PASS`와 남은 작업을 분명히 나눠 표시합니다.
-- **파일·문서·폴더를 이유 없이 늘리지 않음.** 관리 문서는 `README.md` + `AGENTS.md` 중심으로 유지합니다.
+# 공통 개발 가이드
 
-### 🏋️ 운동앱에서 가져온 팁
-- 서버가 필요 없는 기능은 **로컬 우선**으로 만들면 로그인·결제·서버 장애에서 자유롭고 사용도 단순해집니다.
-- 화면 하나가 보이는 것보다 `운동 선택 → 세트 입력 → 휴식 → 완료 → 앱 다시 열기 → 기록 유지`처럼 **실제 사용자 흐름 끝까지 테스트**하는 게 중요했습니다.
-- 개발용 Metro/debug 앱과 실제 standalone/offline APK는 따로 검증해야 합니다.
-- 모르는 운동 metadata나 기본값을 적당히 지어 넣으면 나중에 오류가 커지므로, 확실하지 않으면 미확정 상태로 두는 쪽이 낫습니다. fileciteturn164file0
+여러 프로젝트를 합쳐서 현재 가장 재사용 가치가 높다고 판단한 기본값입니다.
 
-### 📈 주식자동매매에서 가져온 팁
-- Windows 프로그램은 **더블클릭 가능한 대표 실행파일 하나**가 있으면 사용하기 훨씬 편합니다. 고급 기능은 그 안의 메뉴나 `--menu`로 숨길 수 있습니다.
-- 한글 깨짐 방지는 CMD 시작 시 아래 패턴이 실용적입니다.
+## 1. 프로그램을 쓰는 시작점은 하나
+
+평소 사용자는 개발 구조를 몰라도 되게 합니다.
+
+```text
+좋음
+└─ AA_Test.exe
+
+또는
+└─ RUN_START_HERE.cmd
+
+피하고 싶은 상태
+├─ run-dev.cmd
+├─ run-real.cmd
+├─ run-new.cmd
+├─ start2.cmd
+└─ 어떤 걸 눌러야 하는지 설명 20줄
+```
+
+고급 기능은 필요하면 별도 메뉴/옵션으로 둡니다.
+
+## 2. 화면은 `현재 상태 → 지금 할 행동 → 결과 → 상세` 순서
+
+기본 화면에서 가장 먼저 보여야 하는 것은 지금 필요한 정보입니다.
+
+- 대표 행동 버튼은 가능하면 하나를 강하게 표시.
+- 같은 목적의 버튼을 여러 곳에 중복하지 않음.
+- 과거 로그·원자료·고급 설정은 숨기지 않되 상세 영역으로 내림.
+- 버튼을 눌렀는데 아무 반응이 없는 상태는 만들지 않음.
+
+## 3. 모바일이라고 기능을 삭제하지 않기
+
+PC와 모바일은 **기능을 공유하고 배치만 다르게** 합니다.
+
+```text
+PC
+└─ 사이드바 / 넓은 표 / 펼친 정보
+
+Mobile
+└─ 하단탭 / 카드 / 가로스크롤 / safe-area
+```
+
+작은 화면이라는 이유로 중요한 설정·백업·통계·정보를 없애지 않습니다.
+
+## 4. 잘되는 기능은 통째로 다시 쓰지 않기
+
+기존 정상 기능이 있다면 **검증된 정상판(Known-Good) + 최소 수정**을 기본으로 합니다.
+
+- 문제 난 함수/영역만 작게 수정.
+- 새 라이브러리보다 기존 코드·표준 기능을 먼저 검토.
+- 인증·서명·네트워크처럼 이미 안정화된 부분은 이유 없이 재설계하지 않음.
+- 새 버전이 실패하면 정상판으로 되돌릴 수 있게 유지.
+
+## 5. 완료는 코드 작성이 아니라 실제 사용 흐름
+
+```text
+코드 작성
+→ 정적 검사
+→ 자동 테스트
+→ 실제 빌드
+→ 패키지 확인
+→ 실제 설치/실행
+→ 핵심 사용자 흐름
+→ 재실행/데이터 유지
+→ 회귀 확인
+```
+
+`CI PASS`, `빌드 PASS`, `실기기 PASS`는 서로 다른 증거입니다.
+
+---
+
+# 프로젝트끼리 서로 배운 것
+
+## 🏋️ 운동앱 / HealthAPK
+
+**특기: local-first + 실제 사용자 흐름 검증**
+
+- 서버가 꼭 필요하지 않다면 로컬 우선으로 만들기.
+- 로그인/결제/네트워크가 없어도 핵심 기능이 작동하게 하기.
+- `운동 선택 → 세트 입력 → 휴식 → 완료 → 재실행 → 기록 확인`처럼 끝까지 테스트.
+- 개발용 debug/Metro 앱과 실제 standalone APK는 따로 검증.
+- 모르는 metadata를 임의의 값으로 채우지 않기.
+
+## 📈 주식자동매매 / Investment-Lab
+
+**특기: 실행 편의 + 안전 gate + Windows UTF-8**
+
+- `RUN_START_HERE.cmd` 같은 더블클릭 진입점 하나.
+- 과거 PASS를 새 HEAD의 PASS로 간주하지 않고 다시 검증.
+- `권한 없음 / 조건 미충족 / 안전 대기`와 실제 오류를 분리.
+- 실제 API 키는 로컬 secret에 두고 `.env.example`에는 이름만 기록.
+- Windows 한글 출력 기본 후보:
+
 ```cmd
+@echo off
 chcp 65001 >nul
 set PYTHONUTF8=1
 set PYTHONIOENCODING=utf-8
 ```
-- PowerShell이 파일을 만들 때는 `Set-Content -Encoding UTF8`, `Out-File -Encoding utf8`처럼 인코딩을 명시하는 편이 안전합니다.
-- 정상적으로 멈춘 safety gate와 실제 오류를 구분해야 합니다. `권한 없음`, `아직 조건 없음`, `검증 전`을 억지로 통과시키지 않습니다.
-- 예전 버전이 PASS했다고 새 HEAD도 PASS라고 생각하지 않고, 변경 후 다시 검증하는 습관이 좋았습니다.
-- API 키·계정값은 `.env.example`에는 **변수 이름만**, 실제 값은 로컬 secret 파일에 둡니다. fileciteturn165file0
 
-### 🏠 청약앱에서 가져온 팁
-- **원격 HTML shell + native APK 분리**가 편했습니다. UI/데이터만 바꾸면 Pages만 갱신하고, native bridge/package가 안 바뀌면 APK를 다시 만들 필요가 없습니다.
-- 저장/숨김/추적 같은 localStorage key와 공고 `id`는 사용자 기록의 주소처럼 취급해서 함부로 바꾸지 않는 게 좋습니다.
-- 서명이나 origin이 바뀌는 큰 전환 전에는 **백업 → 전환/재설치 → 복원** 흐름을 먼저 준비하면 기록 손실을 줄일 수 있습니다.
-- 기본 카드에는 판단에 필요한 정보만 두고 원자료를 전부 펼쳐 놓지 않는 것이 읽기 좋았습니다.
-- 같은 목적의 버튼 중복과 중첩 accordion은 UI를 빠르게 복잡하게 만들었습니다. fileciteturn166file0
+## 🏠 청약 / ChungYack
 
-### 🎮 멀티의신에서 가져온 팁
-- 정상 동작하던 APK/프로그램을 고칠 때 **정확한 기준 SHA와 최소 patch**를 쓰면 회귀를 크게 줄일 수 있습니다.
-- APK는 가능하면 `APK + ZIP + SHA-256/hash report`처럼 결과물이 무엇인지 바로 확인할 수 있게 묶어두면 다음 PC/다음 세션에서 편합니다.
-- self-hosted Windows 빌드는 최종 폴더에 바로 쓰다가 권한/잠금 문제가 나기 쉬워서, **임시 쓰기 가능한 폴더에서 build/sign/verify 후 최종 위치로 복사**하는 방식이 안전했습니다.
-- `정적검사 PASS`와 `실기기 PASS`는 별개입니다. 실제 설치된 APK SHA, signer, 기기/session, 시험 로그까지 묶어서 확인하는 게 좋습니다.
-- 관제 화면은 `현재 연결`과 `최근 종료 세션`, `게임 연결`과 `진단 채널`을 따로 보여주면 문제 위치를 훨씬 빨리 찾을 수 있습니다. fileciteturn167file0
+**특기: 자주 바뀌는 콘텐츠와 APK shell 분리**
 
-### 📊 Market Radar에서 가져온 팁
-- PC/모바일을 둘 다 실제 QA 대상으로 잡고, **가로 overflow / 잘림 / 작은 글씨 / modal 뒤로가기 / page error**를 자동 검사하면 UI 회귀를 잘 잡습니다.
-- 모바일에 맞춘다고 그래프나 정보를 너무 작게 압축하기보다 필요한 곳만 가로 스크롤하거나 레이아웃을 바꾸는 쪽이 낫습니다.
-- 매시간 바뀌는 **데이터와 손으로 다듬은 UI 코드를 분리**하면 자동화가 UI를 덮어쓰는 사고를 막을 수 있습니다.
-- `03시.json`, `04시.html`처럼 매시간 파일을 새로 만드는 대신 당일 live 파일 하나 + 날짜별 archive 하나 같은 방식이 저장소를 깔끔하게 유지합니다.
-- Known-Good 안정판을 남기고 새 버전 QA가 끝나기 전에는 제거하지 않는 것이 복구에 유리합니다. fileciteturn168file0
+- HTML/UI/데이터 변경만으로 native APK를 매번 다시 만들지 않는 구조.
+- persistent ID/localStorage key는 사용자 데이터 주소처럼 취급.
+- 큰 migration 전 `백업 → 전환/재설치 → 복원` 준비.
+- 기본 카드에는 판단에 필요한 정보만 두고 원자료는 상세로.
+- 같은 기능 버튼 중복과 중첩 accordion을 피하기.
 
-### 빌드/배포할 때 앞으로 기본으로 요청할 것
-- 결과 파일 위치를 명확히 하고 사용자가 폴더를 뒤질 필요 없게 하기
-- 버전이 있는 APK/EXE/ZIP 이름 사용
-- 설치/서명 파일이면 SHA-256 함께 기록
-- 한글 UI/로그는 UTF-8 기준, 오래된 툴이 한글 경로를 싫어하면 **임시 빌드 경로만 영문/ASCII**로 사용
-- CI 성공과 실제 기기 테스트 성공을 따로 표시
-- 데이터/UI 수정만으로 native APK를 다시 만들 필요가 있는지 먼저 판단
-- 실기기 또는 최소 desktop+mobile 화면 검증 없이 `완료`라고 하지 않기
-- 새 버전이 문제면 바로 돌아갈 Known-Good/backup 지점을 남기기
+## 🎮 멀티의신 / PhoneLOL
 
-앞으로 각 프로젝트에서 새롭게 발견한 좋은 방법도 이 섹션에 다시 가져와서 다른 프로젝트에 공유합니다.
+**특기: 정확한 기준판 + 최소 patch + 실제 기기 증거**
 
-## 🧰 꿀팁 링크함
-내가 나중에 다시 써먹기 좋은 도구·오픈소스·작업법을 모아두는 곳입니다. **여기에 있다고 실제 프로젝트에 설치되거나 채택된 것은 아닙니다.** 실제로 쓰게 되면 그 프로젝트의 `AGENTS.md`에 정확한 버전·설정·권한·명령만 승격해서 기록합니다.
+- 정상 APK를 고칠 때 기준 SHA를 정확히 기록.
+- 정적검사 PASS와 실제 폰 PASS를 구분.
+- Windows self-hosted build는 쓰기 가능한 임시경로에서 `build → sign → verify` 후 최종 위치로 복사.
+- 중요한 산출물은 필요하면 `APK + ZIP + SHA-256` 한 세트로 관리.
+- 로그/관제에서는 현재 연결과 과거 세션, 실제 게임 채널과 진단 채널을 분리.
 
-### AI 개발 / 에이전트
-- **OpenAI Plugins** — Skill + MCP + Agent + Command 같은 작업 구성을 참고하기 좋은 공식 예제 모음. https://github.com/openai/plugins
-- **AGENTS.md** — 코딩 에이전트에게 프로젝트 규칙과 작업법을 전달하는 공용 포맷 참고. https://agents.md/
-- **Ponytail** — 코딩 에이전트의 과잉 구현을 줄이고 작은 완성형 구현을 유도하는 참고 도구. 최소화 때문에 요구사항·QA까지 줄지 않게 주의. https://github.com/DietrichGebert/ponytail
-- **FrontierAgent** — 긴 조사·파일 작업을 이어서 수행하고 ReAct/Agent Team 모드로 역할을 나누는 에이전트 프레임워크 참고. https://github.com/ApodexAI/FrontierAgent
-- **Gentle-AI** — Codex/Claude Code/Cursor 등 기존 코딩 에이전트에 메모리, Skill, MCP, 검토 흐름 등을 구성하는 도구. https://github.com/Gentleman-Programming/gentle-ai
-- **sandbox-runtime** — AI 에이전트 작업을 파일/네트워크 수준에서 격리하는 샌드박스 참고. https://github.com/anthropics/sandbox-runtime
-- **Camofox Browser** — 에이전트용 headless 브라우저 후보. 웹 조사/테스트 자동화 참고용이며 사이트 약관·접근정책을 지키는 범위에서만 사용. https://github.com/jo-inc/camofox-browser
+## 📊 주식 앱 / Market Radar
 
-### 이미지 / 디자인 / Blender
-- **awesome-gpt-image-2** — GPT Image 2용 대규모 프롬프트 예시·미리보기 라이브러리. 이미지 만들 때 아이디어/프롬프트 참고용. https://github.com/YouMind-OpenLab/awesome-gpt-image-2
-- **Mimikyu** — 피그마 디자인을 코드로 가깝게 구현하는 Skill 참고. UI를 디자인 원본에 맞춰 재현할 때 후보. https://github.com/3x-haust/Mimikyu
-- **Blender MCP** — Blender 애드온에서 Streamable HTTP MCP 서버를 띄워 에이전트와 연결하는 방식. 기본 서버 주소는 `http://localhost:9876`; Blender 애드온 설치/활성화가 필요. https://github.com/emeryporter/blender-mcp
+**특기: 모바일·PC UI QA + 자동화 경계**
 
-### 영상 / 콘텐츠 제작
-- **JoyAI-Video-Edit** — autoregressive diffusion 기반 실시간·open-ended 영상 편집 연구/도구. 영상 프레임이 들어오는 흐름에서 지시 기반 편집을 검토할 때 참고. https://github.com/jd-opensource/JoyAI-Video-Edit
-- **Concat** — 로컬에서 돌아가는 오픈소스 CapCut 대체 편집기 후보. 멀티트랙, 자르기/합치기, 전환, 속도 조절, 로컬 자막/TTS 등을 참고. https://github.com/jub0t/Concat
-- **HyperFrames** — 자연어 요청을 바탕으로 에이전트가 HTML/CSS/JS 프로젝트를 만들고 영상으로 렌더하는 방식. 빠른 설명영상/제품영상 자동 제작 아이디어에 유용. https://github.com/heygen-com/hyperframes
-- **Ddalkkak Threads Community v1.11.7** — Windows 로컬 Threads 콘텐츠 제작·예약·미디어 처리·발행 도구. Community 버전에서 Threads API 연결을 하려면 본인의 Meta Developer 앱 설정이 필요. https://github.com/apache3563-bit/ddalkkak-threads-community/releases/tag/v1.11.7
+- desktop + phone viewport를 둘 다 QA 대상으로 잡기.
+- 가로 overflow, 잘림, 작은 글씨, modal/back, page error 검사.
+- 모바일에 맞추려고 차트/정보를 읽을 수 없게 축소하지 않기.
+- 자주 갱신되는 데이터와 사람이 다듬는 UI 코드를 분리.
+- 시간마다 새 파일을 무한 생성하기보다 live 파일 + archive 구조 사용.
 
-### 브라우저 / 생산성
-- **TabZipsa** — 크롬 탭이 너무 많을 때 업무/주제별로 정리하는 서비스 후보. 사용자 공유 링크 기준으로 저장했으며 실제 사용 전 현재 서비스 상태를 다시 확인. https://tabzipsa.com/
+## 📝 사이드메모장
 
-### AI 인프라 / 로컬 모델 참고
-- **OpenLLM** — 오픈소스 LLM을 OpenAI 호환 API 형태로 띄우는 서버 구성 참고. https://github.com/bentoml/OpenLLM
-- **BentoML** — 추론 스크립트/모델을 API 서비스로 패키징·배포하는 도구. https://github.com/bentoml/BentoML
-- **xFormers** — 메모리 효율 attention 등 최적화된 Transformer 구성요소 라이브러리. https://github.com/facebookresearch/xformers
-- **cuML** — scikit-learn 스타일 머신러닝을 NVIDIA GPU로 가속할 때 참고. https://github.com/NVIDIA/cuml
-- **Heretic** — 로컬 언어모델의 safety alignment 제거/abliteration 연구 도구. 연구 목적 참고용이며 일반 프로젝트 기본 도구로 채택하지 않는다. https://github.com/p-e-w/heretic
+**특기: 작은 데스크톱 툴의 편집 UX**
 
-### 관리 원칙
-- 같은 저장소/서비스는 URL 기준으로 한 번만 둡니다.
-- Threads/블로그/스크린샷보다 **원본 GitHub·공식 사이트 링크를 우선**합니다.
-- 링크가 유용해 보여도 설치·로그인·비용·보안·라이선스 조건은 실제 사용 직전에 다시 확인합니다.
-- 프로젝트에서 실제 사용하기 시작하면 그 프로젝트 `README.md`에는 사람이 알아야 할 요약을, `AGENTS.md`에는 정확한 설정·명령·권한을 기록합니다.
+- 좁은 화면에서는 저빈도 기능을 `...` 버튼으로 계속 늘리기보다 우클릭 메뉴 등으로 이동.
+- 편집영역과 툴바 사이의 불필요한 여백을 줄여 실제 작업공간 확보.
+- Delete/Backspace 같은 위험 행동은 **명시적으로 선택된 객체에만** 적용.
+- 복사/붙여넣기처럼 결과가 눈앞에 바로 보이면 성공 토스트를 남발하지 않음.
+- contenteditable 서식 버튼은 클릭 전에 selection range를 저장하고 다시 복원.
+- 한글 IME 단축키는 `event.key` 하나만 믿지 말고 `event.code`도 검토.
+- 프로그램 삭제와 사용자 데이터 삭제는 별개로 취급.
+
+## 💰 FinanceOne 리뉴얼
+
+**특기: 크로스플랫폼 데이터·반응형·마이그레이션·인증**
+
+- 큰 UI 개편은 `현재 화면 → 개선 도안 → 기능 누락 비교 → 구현 → 회귀 QA` 순서.
+- 같은 개념의 계산은 화면마다 따로 만들지 않고 하나의 Source of Truth 사용.
+- 반복 입력 편의용 기억값에는 필요하면 TTL 적용.
+- 데이터가 모르는 값이면 `0`으로 바꾸지 않고 `미확인/환산 불가/정산 대기`로 구분. **Unknown ≠ Zero.**
+- 글씨 확대는 font-size뿐 아니라 카드/버튼/행/입력칸도 함께 커져야 함.
+- Android system font scale과 앱 자체 zoom이 중복되지 않게 검증.
+- OAuth/서명 설정이 잘못됐으면 틀린 키로 성공 처리하지 말고 빌드를 실패시키기.
+- 비밀 설정은 빌드 시 임시 staging으로 주입하고 값은 로그에 출력하지 않기.
+- schema 변경 전 normalize/migration을 먼저 만들고 과거 백업 복원을 테스트.
+
+## 🐠 사이버 아쿠아리움 / ASCII Aquarium
+
+**특기: Windows Portable/Setup + self-update + 빌드 UX**
+
+- Setup과 Portable을 필요에 따라 둘 다 제공.
+- 사람에게는 짧은 진행상태, 개발자에게는 별도 raw log를 제공.
+- 사용자 직접 업데이트 확인은 진행상태를 보여주고, 백그라운드 자동 확인은 정상일 때 조용히.
+- Portable self-update는 별도 updater/helper를 사용하고 **READY handshake 후에만 기존 앱 종료**.
+- `프로세스 spawn 성공 ≠ 실제 updater 준비 완료`로 취급.
+- 한글 경로와 공백 포함 경로를 실제 업데이트 QA 항목에 포함.
+- 사용 가이드 이미지는 설명을 실제 버튼 가까이에 두고 1:1로 연결.
+- Wallpaper Engine 같은 파생판은 데스크톱 원본을 훼손하지 않고 별도 버전으로 분리.
+
+---
+
+# 데이터·저장·마이그레이션 기본값
+
+- 앱 설치파일과 사용자 데이터를 분리합니다.
+- 앱 삭제/재설치가 사용자 데이터 삭제를 자동 의미하지 않게 합니다.
+- 한번 배포된 DB key, record ID, localStorage key는 호환성 계약처럼 다룹니다.
+- schema 변경은 normalize/migration 후 과거 데이터 복원 테스트.
+- 모르는 값과 실제 0을 구분합니다.
+- 동기화는 첫 실행부터 강제하기보다 local-first + 선택적 연결을 우선 검토합니다.
+
+---
+
+# 빌드·배포 기본값
+
+가능한 경우 다음 흐름으로 통일합니다.
+
+```text
+대표 build/run 명령
+→ 환경/버전 확인
+→ 의존성 확인
+→ lint/typecheck/static check
+→ 자동 테스트
+→ 실제 빌드
+→ 패키징
+→ 설치/실행 확인
+→ SHA-256
+→ 최종 산출물 위치 표시
+```
+
+산출물 이름은 의미 있게 둡니다.
+
+```text
+MyApp-v1.4.2.apk
+MyApp-Setup-v1.4.2.exe
+MyApp-Portable-v1.4.2.exe
+MyApp-v1.4.2.zip
+SHA256SUMS.txt
+```
+
+파일명 버전 / 앱 내부 버전 / package 버전이 서로 어긋나지 않게 검증합니다.
+
+---
+
+# Windows / 한글 기본값
+
+- 텍스트·JSON·로그는 UTF-8을 기본으로 명시.
+- PowerShell 파일 출력도 UTF-8을 명시.
+- Python은 필요하면 `PYTHONUTF8=1`, `PYTHONIOENCODING=utf-8`.
+- 한글 IME 상태에서 단축키 실제 테스트.
+- 오래된 Android/Java/Unity/CLI가 한글 경로에 약하면 **임시 빌드 경로만 ASCII**로 사용.
+- 최종 프로그램 자체는 한글 경로와 공백 경로에서도 실행/업데이트되는지 가능하면 확인.
+
+---
+
+# 로그·관제 기본값
+
+```text
+사용자 화면
+├─ 현재 상태
+├─ 현재 단계
+├─ 진행률
+└─ 필요한 오류 요약
+
+상세 로그
+├─ timestamp
+├─ run/session ID
+├─ 실제 명령/stack
+├─ raw event
+└─ 상세 실패 이유
+```
+
+화면에 raw 로그를 수백 줄 쌓기보다 **사람용 상태판과 개발자용 상세로그를 분리**합니다.
+
+대형 로그는 가능하면 전체를 계속 다시 읽지 않고 incremental/tail 방식으로 처리합니다.
+
+---
+
+# 업데이트·복구 기본값
+
+가능하면 다음 구조를 검토합니다.
+
+```text
+새 버전 발견
+→ 다운로드
+→ 크기/hash/형식 검증
+→ 기존판 백업
+→ updater/helper READY 확인
+→ 기존 앱 종료
+→ 교체
+→ 새 버전 실행 확인
+→ 사용자 데이터 확인
+→ 성공 후 백업 정리
+```
+
+중간 실패 시 기존 정상판으로 돌아갈 수 있어야 합니다.
+
+---
+
+# 작업 후 정리 규칙
+
+특히 Desktop Remote/원격 PC에서 작업할 때는 **작업이 끝난 뒤 최종 사용에 필요 없는 찌꺼기를 남기지 않습니다.**
+
+삭제 후보:
+- 임시 build 폴더
+- 테스트용 복사본
+- 실패한 중간 산출물
+- 임시 ZIP/EXE/APK
+- 캐시
+- 필요 없는 디버그 로그
+- 일회성 스크립트
+
+하지만 다음은 지우면 안 됩니다.
+- 실제 프로젝트 소스
+- 다음 수정에 필요한 설정/스크립트
+- 사용자 데이터
+- 정상 rollback에 필요한 기준판
+- 최종 산출물
+- 재현에 필요한 최소 문서/검증정보
+
+즉 **“최종 작업 구조 + 다음 수정에 필요한 것”만 남기고 일회성 찌꺼기를 정리**합니다.
+
+---
+
+# 완료 상태 표시
+
+완료 여부는 다음처럼 구분합니다.
+
+```text
+미착수
+진행 중
+막힘
+코드 완료 / 미검증
+자동검증 PASS
+빌드 PASS
+설치 PASS
+실기기 PASS
+최종 ACCEPTED
+```
+
+AI가 `완료`라고 말한 것만으로 완료로 보지 않습니다.
+
+---
+
+# 🧰 꿀팁 링크함
+
+아래는 나중에 다시 쓸 수 있는 **참고 후보**입니다. 여기에 있다고 설치·채택된 것은 아닙니다.
+
+## AI 개발 / 에이전트
+- OpenAI Plugins — https://github.com/openai/plugins
+- AGENTS.md — https://agents.md/
+- Ponytail — https://github.com/DietrichGebert/ponytail
+- FrontierAgent — https://github.com/ApodexAI/FrontierAgent
+- Gentle-AI — https://github.com/Gentleman-Programming/gentle-ai
+- sandbox-runtime — https://github.com/anthropics/sandbox-runtime
+- Camofox Browser — https://github.com/jo-inc/camofox-browser
+
+## 이미지 / 디자인 / Blender
+- awesome-gpt-image-2 — https://github.com/YouMind-OpenLab/awesome-gpt-image-2
+- Mimikyu — https://github.com/3x-haust/Mimikyu
+- Blender MCP — https://github.com/emeryporter/blender-mcp
+
+## 영상 / 콘텐츠
+- JoyAI-Video-Edit — https://github.com/jd-opensource/JoyAI-Video-Edit
+- Concat — https://github.com/jub0t/Concat
+- HyperFrames — https://github.com/heygen-com/hyperframes
+- Ddalkkak Threads Community — https://github.com/apache3563-bit/ddalkkak-threads-community/releases/tag/v1.11.7
+
+## 브라우저 / 생산성
+- TabZipsa — https://tabzipsa.com/
+
+## AI 인프라 / 로컬 모델
+- OpenLLM — https://github.com/bentoml/OpenLLM
+- BentoML — https://github.com/bentoml/BentoML
+- xFormers — https://github.com/facebookresearch/xformers
+- cuML — https://github.com/NVIDIA/cuml
+- Heretic — https://github.com/p-e-w/heretic
+
+### 링크 관리 원칙
+- 같은 도구는 canonical URL 기준으로 한 번만 둡니다.
+- SNS/블로그/스크린샷보다 원본 GitHub/공식 사이트를 우선합니다.
+- 실제 사용 전 설치·로그인·비용·라이선스·보안·호환성을 다시 확인합니다.
+- 실제 프로젝트에 채택되면 정확한 버전·설정·권한·명령은 그 프로젝트 `AGENTS.md`에 기록합니다.
