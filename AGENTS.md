@@ -90,6 +90,29 @@ Never inherit an old PASS onto a changed HEAD without re-running the relevant ga
 
 ---
 
+## Remote Desktop Commander operating rule
+Remote Desktop Commander / Desktop Remote is the tool for work that must happen on the user's actual PC: local files, terminal commands, builds, packaging, program launch, device-side checks, and local runtime verification. GitHub is for repository state; Remote Desktop is for the real machine state.
+
+Use Remote Desktop only when local-machine interaction materially helps the task; do not waste calls on it when repository/file evidence is enough.
+
+When the user has already started/authorized the Remote Desktop connection and the device is online, **leave the connection service running and keep the machine available for continued work**. Finishing one task is not a reason to shut it down.
+
+Do not intentionally stop or disconnect the Remote Desktop bridge/agent/service, call remote shutdown, or kill the connectivity process unless:
+
+- the user explicitly asks to turn it off/disconnect,
+- a security problem requires it,
+- maintenance/restart of the remote service itself is necessary to restore operation.
+
+If a restart/disconnect is genuinely required, state the reason and restore the working connection when practical.
+
+It is fine to close or kill disposable child processes created for a build/test when they are no longer needed; **do not confuse those with the Remote Desktop connection service itself**.
+
+If the Remote Desktop device is offline, do not pretend local work or local verification happened. Mark the relevant step as `blocked / local verification not run` until the device is online again.
+
+After local work, clean disposable files as described below, but **leave the Remote Desktop connection itself running** so later work can continue without the user having to re-enable it.
+
+---
+
 ## Repository and remote-machine hygiene
 Preserve project architecture and keep disposable work out of long-term structure.
 
