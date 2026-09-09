@@ -69,9 +69,18 @@ Do not duplicate the same long explanation in both. `AGENTS.md` should be operat
 - Practical tips or lessons that are likely to matter again.
 - Avoid secret values, raw tokens, passwords, private keys, or unnecessary implementation noise.
 
-When asking another project chat to prepare handoff context, request exactly these two Markdown files. Prefer downloadable `.md` attachments; if that interface cannot create files, request two clearly labeled copyable Markdown code blocks. Merge them into the repository and do not keep a third handoff document.
+## Handoff transport
+When asking another project chat to prepare handoff context, request exactly two outputs and prefer **two fenced Markdown code blocks** over file attachments. Each block should contain the complete file body for one file so the chat UI exposes a copy button and the content can be copied directly to the clipboard.
+
+Required format:
+1. Heading `AGENTS.md`
+2. One fenced Markdown code block containing only the full AGENTS.md contents
+3. Heading `README.md`
+4. One fenced Markdown code block containing only the full README.md contents
+
+Do not wrap both files into one block, do not split one file across multiple blocks, and do not add prose inside the blocks. File attachments are optional, not preferred.
 
 ## Standard handoff request
 Use this request in project chats unless a project needs a narrower version:
 
-> 이 프로젝트의 기존 대화·파일·지침을 전체적으로 확인해서 앞으로 새 채팅에서도 바로 이어갈 수 있게 정리해줘. 결과는 루트에 둘 `AGENTS.md`와 `README.md` 두 파일만 만들어줘. `AGENTS.md`는 다음 AI가 읽을 실제 작업 인수인계로, 현재 목표/확정 요구사항/최근 진행상태/정확한 경로와 GitHub/빌드·실행·테스트 명령/사용한 언어·SDK·툴·APK 또는 패키징 방식/플러그인·MCP·외부 서비스/필요한 로그인·OAuth·권한·환경변수·인증서·서명 등 접근 조건(비밀값 자체는 쓰지 말 것)/기기·환경/알아낸 팁·주의점·실패하기 쉬운 부분·검증 방법/남은 작업을 포함해. `README.md`는 내가 읽을 요약으로 프로젝트 목적, 현재 상태, 실제 동작하는 것, 중요한 결정, 다음 할 일, 사용 중인 주요 도구·서비스, 내가 미리 준비하거나 로그인/승인해야 하는 것, 다시 쓸 만한 팁, 주요 링크·경로만 간결하게 정리해. 가능하면 다운로드 가능한 `.md` 파일 2개로 주고, 파일 생성이 안 되면 각각 복사 가능한 Markdown 코드블록으로 줘. 별도 status/plan/handoff/notes 문서나 새 폴더는 만들지 말고, 확인되지 않은 내용은 추측하지 마.
+> 이 프로젝트의 기존 대화·파일·지침을 전체적으로 확인해서 앞으로 새 채팅에서도 바로 이어갈 수 있게 정리해줘. 결과는 루트에 둘 `AGENTS.md`와 `README.md` 두 파일만 만들어줘. `AGENTS.md`는 다음 AI가 읽을 실제 작업 인수인계로, 현재 목표/확정 요구사항/최근 진행상태/정확한 경로와 GitHub/빌드·실행·테스트 명령/사용한 언어·SDK·툴·APK 또는 패키징 방식/플러그인·MCP·외부 서비스/필요한 로그인·OAuth·권한·환경변수·인증서·서명 등 접근 조건(비밀값 자체는 쓰지 말 것)/기기·환경/알아낸 팁·주의점·실패하기 쉬운 부분·검증 방법/남은 작업을 포함해. `README.md`는 내가 읽을 요약으로 프로젝트 목적, 현재 상태, 실제 동작하는 것, 중요한 결정, 다음 할 일, 사용 중인 주요 도구·서비스, 내가 미리 준비하거나 로그인/승인해야 하는 것, 다시 쓸 만한 팁, 주요 링크·경로만 간결하게 정리해. **파일 첨부보다 채팅에서 바로 복사하기 쉽게 해줘. `AGENTS.md` 제목 아래에 파일 전체 내용을 하나의 Markdown 코드블록으로, `README.md` 제목 아래에 파일 전체 내용을 또 하나의 Markdown 코드블록으로 출력해. 각 코드블록은 복사 버튼 한 번으로 파일 전체를 클립보드에 넣을 수 있게 한 파일당 정확히 한 블록만 사용해.** 별도 status/plan/handoff/notes 문서나 새 폴더는 만들지 말고, 확인되지 않은 내용은 추측하지 마.
