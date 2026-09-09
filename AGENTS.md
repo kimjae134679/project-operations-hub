@@ -69,6 +69,16 @@ Do not duplicate the same long explanation in both. `AGENTS.md` should be operat
 - Practical tips or lessons that are likely to matter again.
 - Avoid secret values, raw tokens, passwords, private keys, or unnecessary implementation noise.
 
+## User tip-link library policy
+The user may save tools, repos, websites, workflows, or social-post discoveries that are useful to them even when the agent is not currently using them.
+
+- Keep these in the root `README.md` under the friendly section `꿀팁 링크함`.
+- A saved link is a **reference candidate**, not evidence that the tool is installed, trusted, approved, or part of the current architecture.
+- Deduplicate by canonical repository/site URL and repository name. Prefer the original GitHub/project page over a repost or screenshot.
+- Give each item a short plain-Korean note: what it is, when it may be useful, and any important login/install/cost/risk caveat.
+- If a saved tool is later actually adopted by a project, copy only the operational facts that matter (exact commands, versions, permissions, config, paths, verification) into that project's `AGENTS.md`; keep the friendly reference in `README.md` if it remains useful.
+- Do not create a separate links folder, bookmarks file, or tips document just for these references.
+
 ## Handoff transport
 When asking another project chat to prepare handoff context, request exactly two outputs and prefer **two fenced Markdown code blocks** over file attachments. Each block should contain the complete file body for one file so the chat UI exposes a copy button and the content can be copied directly to the clipboard.
 
