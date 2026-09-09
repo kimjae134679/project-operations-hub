@@ -1,161 +1,292 @@
 # AGENTS.md
 
-## Purpose
-This is the single agent-facing source of truth for the Workbench. Read it together with `README.md` before doing project work.
+이 문서는 **AI/Codex가 실제 개발 작업에 사용하는 개발자용 실행 문서**입니다.
 
-The Workbench exists to keep project handoff simple, preserve verified working behavior, and transfer useful development lessons between projects without blindly copying project-specific assumptions.
+반드시 `README.md`를 먼저 읽고 이 문서를 읽습니다.
 
-Do not create extra planning, status, notes, handoff, archive, or instruction documents unless the user explicitly asks or the actual toolchain requires them.
-
----
-
-## Two-file project memory protocol
-Each real project should keep exactly two root management files when practical:
-
-- `README.md` — user-facing: purpose, current state, what works, important decisions, next work, major tools/services, access requirements, practical tips, key paths/links.
-- `AGENTS.md` — agent-facing: exact commands, paths, architecture, SDK/tooling, permissions, build/package rules, failure modes, verification gates, device/environment facts, remaining work, reusable lessons.
-
-Do not duplicate the same long explanation in both files.
-
-Do not scatter `PLAN.md`, `STATUS.md`, `NOTES.md`, `HANDOFF.md`, `TODO*.md`, duplicate READMEs, date-stamped handoff files, or note-only folders. Necessary source folders such as `src`, `assets`, `tests`, `android`, `scripts`, or existing architecture folders are fine.
-
-When context arrives from another chat or prior handoff, merge useful facts into `README.md` and `AGENTS.md` instead of preserving another overlapping handoff file.
+`README.md`는 사용자가 직접 읽고 수정하는 정책/의도 원본이고, 이 `AGENTS.md`는 그 내용을 실제 개발에 적용할 수 있도록 기술적으로 풀어쓴 실행 규칙입니다.
 
 ---
 
-## Default authorization
-Proceed without re-asking for reversible local project work that is clearly required by the task, including:
+# 1. 최우선 문서 동기화 규칙
 
-- reading project files
-- editing project files
-- builds, linting, typechecks, tests
-- non-destructive debugging and log inspection
-- local packaging and verification
-- temporary build/test setup
+작업 시작 전 우선순위는 다음과 같습니다.
 
-Ask before:
+```text
+1. 현재 채팅에서 사용자가 직접 내린 최신 지시
+2. 해당 프로젝트 README의 사용자 규칙
+3. Workbench README의 공통 사용자 규칙
+4. 해당 프로젝트 AGENTS의 기술 규칙
+5. Workbench AGENTS의 공통 기술 기본값
+```
 
-- destructive deletion of user/project data
-- irreversible migration
-- production deployment or production-data modification
-- spending money
-- changing account/repository permissions
-- exposing or transmitting credentials
-- sending external messages not already requested
+README와 AGENTS가 충돌하면 **README가 우선**입니다.
 
----
+사용자가 README를 직접 수정한 흔적이 있거나 내용이 AGENTS와 어긋나면:
 
-## Working style
-- Finish the requested task end-to-end; partial implementation is not completion.
-- Prefer the smallest complete implementation that satisfies every requirement.
-- Minimalism applies to code/architecture complexity, not to requirements, QA, security, migration safety, or error handling.
-- Reuse working project code, platform-native capabilities, standard libraries, and already-installed dependencies before adding new abstractions/packages.
-- Protect working behavior. Prefer a small verified change over a broad rewrite when fixing compatibility, removing one dependency, or repairing one workflow.
-- Do not hide failure with placeholders, fake data, fake success states, swallowed errors, or unverified claims.
-- If ambiguity is reversible and low-risk, choose a sensible default and continue.
-- Ask only when different answers materially change the result or create meaningful risk.
+1. 변경된 사용자 의도를 먼저 파악합니다.
+2. AGENTS의 관련 기술 규칙을 새 의도에 맞게 수정합니다.
+3. 그 다음 실제 개발 작업을 시작합니다.
+
+AGENTS는 README를 단순 복사하지 않습니다. 사용자 문장을 실제 실행 가능한 규칙으로 구체화합니다.
+
+반대로 개발 중 새로운 기술 사실을 발견하면:
+
+- 정확한 명령, 경로, SDK, 실패 원인, 권한, 검증법 → AGENTS에 기록
+- 사용자가 알아야 하거나 앞으로 정책으로 컨트롤할 가치가 있는 내용 → README에도 짧게 승격
+
+두 문서는 역할은 다르지만 서로 어긋난 채 방치하지 않습니다.
 
 ---
 
-## State / completion model
-Use this mental model:
+# 2. 두 문서의 역할
 
-`ASSIGNED -> EXEC -> CLAIMED -> GATED -> ACCEPTED`
+## README.md — 사용자 버전
+사용자가 직접 읽고 수정하는 원본입니다.
 
-An agent saying “done” is only `CLAIMED`.
+포함 대상:
+- 프로젝트 목적
+- 현재 상태
+- 실제로 되는 것
+- 다음 할 일
+- 사용자가 원하는 작업 방식
+- UX/빌드/원격/정리/QA 정책
+- 주요 도구와 준비 조건
+- 다시 쓸 팁
+- 주요 경로/링크
 
-A task is `ACCEPTED` only when all applicable evidence is satisfied:
+## AGENTS.md — 개발자 버전
+AI/Codex가 실제로 작업을 수행하기 위한 세부 문서입니다.
 
-1. Every explicit user requirement is accounted for.
-2. Relevant static checks pass.
-3. Focused automated tests or direct workflow checks pass.
-4. The actual build/package succeeds where practical.
-5. The built artifact is the one that was actually tested.
-6. The touched user workflow works end-to-end.
-7. Persistence/restart/re-entry is verified where relevant.
-8. No obvious regression remains in adjacent working functionality.
-9. No temporary fake result or known broken path remains.
-10. Any external dependency that cannot be verified is clearly marked as unverified/blocked.
+포함 대상:
+- 정확한 경로
+- build/run/test/lint/package 명령
+- 언어/SDK/framework/tool version
+- native/package/signing 방식
+- plugin/MCP/service/CI/CD
+- OAuth/API/권한/env/certificate/signing 조건
+- 기기/PC/runtime 정보
+- 실패 원인과 우회법
+- 검증 gate
+- known-good baseline
+- 실제 작업 중 발견된 재사용 가능한 기술 팁
 
-Keep evidence classes separate:
+별도 `PLAN.md`, `STATUS.md`, `NOTES.md`, `HANDOFF.md`, `TODO*.md`, 날짜별 인수인계 파일, note-only 폴더를 만들지 않습니다.
+
+---
+
+# 3. 기본 권한
+
+사용자가 이미 요청한 작업을 수행하기 위해 필요한 다음 작업은 재확인 없이 진행할 수 있습니다.
+
+- 프로젝트 파일 읽기
+- 코드/설정 수정
+- build / lint / typecheck / test
+- 비파괴 디버깅
+- 로그 확인
+- local packaging
+- 실행/검증
+- 임시 build/test setup
+
+다음은 사용자 확인이 필요합니다.
+
+- 사용자/프로젝트 데이터의 파괴적 삭제
+- 되돌리기 어려운 migration
+- production 배포 또는 production data 변경
+- 비용 발생
+- 계정/저장소 권한 변경
+- credential 노출/전송
+- 사용자가 요청하지 않은 외부 메시지 전송
+
+---
+
+# 4. 작업 방식
+
+- 요청된 일을 끝까지 수행합니다. 부분 구현은 완료가 아닙니다.
+- 모든 요구사항을 만족하는 범위에서 가장 작은 완성형 구현을 선호합니다.
+- 최소화는 코드/구조 복잡도에만 적용합니다. 요구사항, QA, 보안, migration safety, error handling을 줄이지 않습니다.
+- 기존 정상 코드, platform-native 기능, 표준 라이브러리, 이미 설치된 dependency를 새 package보다 먼저 사용합니다.
+- 이미 잘되는 동작은 보호합니다. 버그 수정/호환성 작업은 broad rewrite보다 small verified patch를 우선합니다.
+- placeholder, fake data, fake success, swallowed error로 실패를 숨기지 않습니다.
+- 되돌릴 수 있고 위험이 작은 애매함은 합리적인 기본값으로 진행합니다.
+- 답에 따라 결과가 크게 달라지거나 위험이 생길 때만 질문합니다.
+
+---
+
+# 5. 상태 / 완료 판정
+
+기본 상태 모델:
+
+```text
+ASSIGNED -> EXEC -> CLAIMED -> GATED -> ACCEPTED
+```
+
+AI가 `완료`라고 말하는 것은 `CLAIMED`일 뿐입니다.
+
+가능한 경우 다음 증거를 분리해서 확인합니다.
 
 - code complete
 - static/CI PASS
 - package/build PASS
 - install PASS
-- physical/manual workflow PASS
+- real user workflow PASS
+- physical/manual device PASS
 - final ACCEPTED
 
-Never inherit an old PASS onto a changed HEAD without re-running the relevant gate.
+ACCEPTED 조건:
+
+1. 사용자의 명시 요구사항이 모두 반영됨
+2. 관련 static check 통과
+3. focused automated test 또는 direct workflow check 통과
+4. 실제 build/package 성공
+5. 테스트한 artifact가 실제 최종 artifact와 동일
+6. 핵심 사용자 흐름 end-to-end 성공
+7. 필요한 경우 restart/re-entry 후 persistence 확인
+8. 주변 정상 기능에 명백한 회귀 없음
+9. fake result / known broken path / disposable implementation 없음
+10. 외부 의존성 때문에 확인 못 한 것은 명확히 blocked/unverified 표시
+
+변경된 HEAD에 과거 PASS를 그대로 상속하지 않습니다.
 
 ---
 
-## Remote Desktop Commander operating rule
-Remote Desktop Commander / Desktop Remote is the tool for work that must happen on the user's actual PC: local files, terminal commands, builds, packaging, program launch, device-side checks, and local runtime verification. GitHub is for repository state; Remote Desktop is for the real machine state.
+# 6. Remote Desktop Commander 운영 규칙
 
-Use Remote Desktop only when local-machine interaction materially helps the task; do not waste calls on it when repository/file evidence is enough.
+Remote Desktop Commander / Desktop Remote는 사용자의 **실제 PC 상태**를 다룰 때 사용합니다.
 
-When the user has already started/authorized the Remote Desktop connection and the device is online, **leave the connection service running and keep the machine available for continued work**. Finishing one task is not a reason to shut it down.
+사용 범위:
+- local file 확인/수정
+- terminal command
+- build/package
+- 프로그램 실행
+- 설치
+- 실제 runtime 확인
+- device-side check
+- local verification
 
-Do not intentionally stop or disconnect the Remote Desktop bridge/agent/service, call remote shutdown, or kill the connectivity process unless:
+GitHub는 repository 상태, Remote Desktop은 실제 PC 상태를 담당합니다.
 
-- the user explicitly asks to turn it off/disconnect,
-- a security problem requires it,
-- maintenance/restart of the remote service itself is necessary to restore operation.
+## 연결 유지
+사용자가 한번 연결을 켜고 승인했고 device가 online이면:
 
-If a restart/disconnect is genuinely required, state the reason and restore the working connection when practical.
+- **작업 하나가 끝났다는 이유로 원격 연결 서비스를 끄지 않습니다.**
+- 다음 작업을 바로 이어갈 수 있게 계속 작업 가능한 상태로 둡니다.
+- 사용자가 끄라고 명시하기 전에는 bridge/agent/service를 종료하지 않습니다.
+- remote shutdown을 임의로 호출하지 않습니다.
+- connectivity process를 임의로 kill하지 않습니다.
 
-It is fine to close or kill disposable child processes created for a build/test when they are no longer needed; **do not confuse those with the Remote Desktop connection service itself**.
+예외:
+- 사용자가 직접 disconnect/off 요청
+- security 문제
+- remote service 자체를 재시작해야 연결이 복구되는 maintenance 상황
 
-If the Remote Desktop device is offline, do not pretend local work or local verification happened. Mark the relevant step as `blocked / local verification not run` until the device is online again.
+재시작이 필요하면 이유를 밝히고 가능한 경우 연결을 다시 복구합니다.
 
-After local work, clean disposable files as described below, but **leave the Remote Desktop connection itself running** so later work can continue without the user having to re-enable it.
+build/test용 child process는 작업이 끝나면 종료해도 됩니다. **child process와 remote connection service를 혼동하지 않습니다.**
+
+Device가 offline이면 실제 local 작업/검증을 했다고 주장하지 않습니다. 해당 단계는 `blocked / local verification not run`으로 표시합니다.
+
+실제 PC 조작이 필요하지 않은데 Remote Desktop을 불필요하게 반복 호출하지 않습니다.
 
 ---
 
-## Repository and remote-machine hygiene
-Preserve project architecture and keep disposable work out of long-term structure.
+# 7. 원격 PC / 저장소 정리 규칙
 
-### During work
-Temporary files, build folders, logs, staging credentials, test copies, archives, or helper scripts may be created when useful.
+작업 중에는 필요하면 temp/build/log/staging/test copy/helper를 만들 수 있습니다.
 
-### At the end of work
-Especially when using Desktop Remote / Remote Desktop Commander, remove **disposable leftovers** that are no longer needed:
+작업 종료 후 특히 원격 PC에서는 필요 없는 찌꺼기를 정리합니다.
 
-- temporary build directories
-- failed/intermediate artifacts
-- one-off test copies
-- obsolete temp ZIP/APK/EXE files
-- disposable caches
-- debug logs no longer needed for diagnosis
-- temporary staging secrets/configs
-- one-off scripts that have no future operational value
+삭제 후보:
+- temporary build directory
+- failed/intermediate artifact
+- one-off test copy
+- obsolete temp ZIP/APK/EXE
+- disposable cache
+- diagnosis가 끝난 debug log
+- temporary staging secret/config
+- 다시 쓰지 않을 one-off helper script
 
-Do **not** delete:
-
-- actual source code needed for future edits
-- project configuration/build scripts needed to reproduce the app
+삭제 금지:
+- 실제 source code
+- 다음 수정에 필요한 project config/build script
 - user data
-- required credentials/keystores stored in their approved private location
-- final deliverables
-- known-good rollback baselines that are still useful
-- minimal verification records required to prove what was built
+- 승인된 private location의 credential/keystore
+- final deliverable
+- 아직 유용한 Known-Good rollback baseline
+- 무엇을 빌드/검증했는지 증명하는 최소 verification record
 
-Target final state: **the working project + final deliverables + only the support files needed to modify/rebuild/verify it later**.
+목표 최종상태:
 
-Do not confuse cleanup with destructive simplification.
+**작업 가능한 프로젝트 + 최종 산출물 + 다음 수정/재빌드/검증에 필요한 최소 지원파일**
+
+Remote Desktop 연결 자체는 찌꺼기가 아니므로 계속 켜둡니다.
 
 ---
 
-# Cross-project lesson exchange
-Reuse these patterns when they fit the project. Never apply them blindly.
+# 8. 공통 UX 규칙
 
-## 1. One obvious normal-use entry point — Investment-Lab
-For Windows tools, normal use should have one obvious launcher when practical, e.g. `RUN_START_HERE.cmd` or the final EXE.
+프로젝트에 맞을 때 다음을 우선 검토합니다.
 
-Advanced maintenance can live behind a menu/flag/secondary script, but the user should not need to choose among many similar launchers.
+- 화면 순서: `현재 상태 -> 다음 행동 -> 결과 -> 상세`
+- 화면당 strong primary CTA 하나
+- 같은 목적의 duplicate control 최소화
+- clickable control은 실제 동작 / fallback / 불가 이유 중 하나를 제공
+- 모바일에서 중요한 기능을 삭제하지 말고 layout/scroll로 해결
+- background 작업은 정상일 때 조용히, user-triggered 작업은 visible progress 제공
+- 이미 선택된 설정을 다시 누르면 no-op 가능
+- destructive action은 explicit selection 대상으로 제한
+- raw diagnostic detail은 유지하되 기본 화면을 지배하지 않게 함
 
-Korean-safe CMD/Python output pattern when relevant:
+---
+
+# 9. 공통 데이터 / persistence 규칙
+
+- installed app file과 user data 분리
+- deployed ID/key/storage name은 compatibility contract로 취급
+- schema version + normalization/migration 사용
+- old backup/data restore 확인
+- `Unknown != Zero`
+- product requirement가 허용하면 local-first onboarding + optional cloud/sync
+- 같은 metric/concept는 Source of Truth 하나에서 계산
+
+---
+
+# 10. 공통 build / package 규칙
+
+가능하면 다음 flow를 사용합니다.
+
+```text
+environment check
+-> dependency check
+-> static check
+-> test
+-> build
+-> package
+-> install/run verify
+-> SHA-256
+-> final output path
+```
+
+운영 기본값:
+
+1. normal-use entry point 하나를 명확히
+2. predictable output directory
+3. artifact filename에 version/build identity 포함
+4. file/app/package version 일치 검증
+5. 설치/서명/전송 artifact는 필요하면 SHA-256 기록
+6. CI/static PASS와 physical/manual PASS 분리
+7. data/UI-only 변경은 안전한 architecture라면 native rebuild를 강제하지 않음
+8. secret value commit 금지, variable name/requirement만 문서화
+9. 실제 성공한 command를 기록
+10. release readiness는 source가 아니라 packaged artifact로 검증
+
+---
+
+# 11. Windows / 한글 규칙
+
+- text/JSON/log는 UTF-8 기본
+- PowerShell output encoding 명시
+- 필요하면:
 
 ```cmd
 @echo off
@@ -164,235 +295,194 @@ set PYTHONUTF8=1
 set PYTHONIOENCODING=utf-8
 ```
 
-For PowerShell text/log output, explicitly use UTF-8 (`Set-Content -Encoding UTF8`, `Out-File -Encoding utf8`).
-
-For old Android/Java/Unity/CLI tools that are path-sensitive, use a short ASCII-only temp build/signing path while keeping user-visible Korean names/UI intact.
-
-## 2. Local-first and real user loop — HealthAPK
-- If the core product does not need a server, prefer local storage/assets and avoid making login/payment/network a prerequisite.
-- Test the full real workflow, not just isolated screens.
-- Include persistence after restart/re-entry.
-- Debug/Metro-connected builds and standalone/offline packages are separate contracts; test them separately.
-- Unknown metadata should remain unknown rather than be invented.
-
-## 3. Content/native split and storage compatibility — ChungYack
-- If frequent UI/data/content changes do not require native changes, separate the web/content layer from the installed native shell.
-- Rebuild APK only when package/native bridge/permissions/signing/native assets actually change.
-- Treat persistent IDs, DB keys, and localStorage keys as compatibility contracts.
-- Before signing/origin/storage migrations, prepare `backup/export -> migrate/reinstall -> restore/import`.
-- Keep active/actionable information first and verification source detail behind a secondary layer.
-
-## 4. Exact baseline + physical evidence — PhoneLOL
-- When patching a known-good binary/app lineage, bind the work to exact SHA/expected baseline and fail closed if it differs.
-- Static validation is not a physical-device pass.
-- Bind artifact SHA, signer, installed build, device/session identity, and trial evidence before promotion when applicable.
-- On Windows self-hosted build machines, prefer `temp -> build/sign/verify -> final copy` to avoid permissions/locks.
-- Release bundles may include the primary artifact plus archive/hash report where that improves traceability.
-- Monitors should separate current state from historical context, and primary channel health from diagnostics/logging health.
-- Large logs should be incrementally tailed where possible instead of reparsed from the beginning repeatedly.
-
-## 5. Visual QA + automation boundaries — Market Radar
-- Treat desktop and mobile as explicit QA targets.
-- Check clipping, horizontal overflow, unreadable text, modal/back behavior, and page/runtime errors.
-- Do not shrink dense information until it becomes unreadable merely to fit mobile; use responsive rearrangement/local scrolling.
-- Keep frequently regenerated data separate from hand-tuned UI/source so automation cannot overwrite UI work.
-- Avoid timestamp-file explosion; use a canonical live state + archive model when appropriate.
-- Keep a known-good rollback point until the new version is verified.
-
-## 6. Explicit selection, compact editor UX, restrained feedback — SideMemojang
-- Destructive object actions such as Delete/Backspace should apply only to explicitly selected objects, not guessed neighbors.
-- In dense desktop tools, move low-frequency actions to context menus rather than filling every row/tab with permanent buttons.
-- Preserve working space; reduce unnecessary whitespace between editor content and toolbars.
-- If success is already visually obvious (copy/paste/resize result), avoid redundant success toasts. Reserve stronger feedback for failure, destructive outcomes, or hidden asynchronous work.
-- For contenteditable formatting controls, save selection on toolbar interaction and restore the range before applying formatting.
-- Korean IME/Shift shortcuts may need both `event.key` and `event.code` consideration.
-- Program uninstall and user-data deletion are separate concepts. Preserve user data unless explicit deletion is requested.
-
-## 7. Shared data model, Unknown != Zero, migration-first — FinanceOne
-- For major visual rewrites use `current UI -> target mock/design -> feature-preservation check -> implementation -> regression QA`.
-- The same concept/metric should come from one source-of-truth function/model across dashboard, list, chart, calendar, statistics, etc.
-- Repeated-entry convenience values may need TTL instead of permanent persistence.
-- `Unknown != 0`. Use explicit states such as unknown, not priced, conversion unavailable, pending calculation.
-- When font size increases, expand surrounding layout/rows/buttons/inputs too; do not scale text alone.
-- Verify that system font scaling and app-level scaling do not compound unexpectedly.
-- Do not redesign a stable auth/signing flow merely because a newer SDK exists.
-- If required signing/OAuth configuration is missing, fail the build instead of silently using a wrong debug/default key.
-- Inject private build configuration through an approved private source/staging path; validate presence without printing secret values; remove staging secrets after build.
-- Create normalization/migration before changing schema and verify old backups restore correctly.
-
-## 8. Human status vs raw logs, self-update handshake, path QA — ASCII Aquarium
-- Separate a concise human-facing progress/status area from a full raw log file.
-- User-initiated update checks should show immediate progress; background automatic checks should stay quiet when nothing needs attention.
-- Portable self-update should use an updater/helper when necessary; process spawn alone is not readiness.
-- Require an explicit READY/handshake before closing the running app and replacing its executable.
-- Validate downloaded replacement before overwrite; keep backup until new version is proven to start.
-- Include space-containing paths and Korean paths in Windows updater/install QA when applicable.
-- Instructional images should place labels close to the actual controls with clear 1:1 mapping.
-- Derived variants (e.g. Wallpaper Engine) should not damage the working desktop baseline; separate variant-specific entry points/folders/builds.
+- Korean IME shortcut 실제 테스트
+- space-containing path 테스트
+- Korean path 테스트
+- fragile legacy toolchain에는 ASCII-only temp path fallback 사용
+- 내부 toolchain 문제 때문에 user-visible Korean name/UI를 제거하지 않음
 
 ---
 
-# Shared UX defaults
-Use these as candidates, not rigid rules:
+# 12. 로그 / 관제 규칙
 
-- Show `current state -> next action -> result -> detail` in that order.
-- Prefer one strong primary CTA per screen.
-- Avoid duplicate controls for the same purpose.
-- A clickable control must do something, offer a fallback, or explain why it cannot proceed.
-- On mobile, preserve important functionality; change layout/scrolling instead of deleting features.
-- Background work should be quiet when healthy; user-triggered work should provide visible progress.
-- Re-clicking an already-selected setting can be a no-op.
-- Dangerous actions should target explicit selections and require appropriate confirmation when irreversible.
-- Keep raw diagnostic detail available but do not make it dominate the default UI.
+Human-facing status와 raw evidence를 분리합니다.
 
----
+Human status가 답해야 하는 것:
+- 지금 무엇을 하는가
+- waiting / blocked / failed / passed 중 무엇인가
+- 사용자가 다음에 무엇을 해야 하는가
 
-# Shared data / persistence defaults
-- Separate installed app files from user data.
-- Treat deployed IDs/keys/storage names as compatibility contracts.
-- Use schema versioning + normalization/migration for persistence changes.
-- Verify old data/backup restoration after migration.
-- Do not convert missing/unknown values into zero unless zero is the true measured value.
-- Prefer local-first onboarding and optional cloud/sync connection when product requirements allow it.
-
----
-
-# Shared build / package defaults
-When project type allows, aim for:
-
-`environment check -> dependency check -> static checks -> tests -> build -> package -> install/run verify -> SHA-256 -> final output path`
-
-Operational defaults:
-
-1. One obvious normal-use entry point.
-2. Predictable output directory.
-3. Artifact names include meaningful version/build identity.
-4. File/app/package versions should match or be validated intentionally.
-5. Signed/installed/transferred artifacts should record SHA-256 when useful.
-6. CI/static PASS and physical/manual PASS stay separate.
-7. Data/UI-only changes should not force native rebuilds when architecture safely allows separation.
-8. Do not commit secret values; document variable names/requirements only.
-9. After a meaningful build, record the exact command that actually worked.
-10. Before claiming release readiness, verify the actual packaged artifact, not just source code.
-
----
-
-# Shared Windows / Korean defaults
-When relevant:
-
-- UTF-8 for text/JSON/logs.
-- Explicit UTF-8 in PowerShell output.
-- Korean IME shortcut testing.
-- Space-path testing.
-- Korean-path testing.
-- ASCII-only temp path fallback for fragile legacy toolchains.
-- User-visible Korean names/UI do not need to be removed just because the toolchain is fragile internally.
-
----
-
-# Shared logging / observability defaults
-Human-facing status and raw evidence should be separated.
-
-Human status should answer:
-
-- What is happening now?
-- Is it waiting, blocked, failed, or passed?
-- What should the user do next?
-
-Raw logs may carry:
-
+Raw log에 들어갈 수 있는 것:
 - timestamp
 - run/session ID
-- command/stack trace
-- raw event/protocol details
+- command / stack trace
+- raw event/protocol
 - exact reason/error
 
-Where practical, use incremental/tail parsing for large logs.
+대형 로그는 가능하면 incremental/tail parsing을 사용합니다.
 
 ---
 
-# Shared update / rollback defaults
-For self-updating desktop apps or similar flows, consider:
+# 13. 업데이트 / rollback 규칙
 
-`discover -> download -> validate -> backup -> helper READY -> close old app -> replace -> start new app -> verify -> cleanup backup`
+Self-update 등에서는 다음 구조를 우선 검토합니다.
 
-Do not delete rollback backup before the new version is proven to start and retain required user data.
+```text
+discover
+-> download
+-> validate
+-> backup
+-> helper READY
+-> close old app
+-> replace
+-> start new app
+-> verify
+-> cleanup backup
+```
+
+새 버전이 실제로 시작되고 user data가 정상임을 확인하기 전에 rollback backup을 삭제하지 않습니다.
 
 ---
 
-# Verified project registry
-Use only confirmed mappings. Never guess a repository because its name looks related.
+# 14. 프로젝트에서 가져온 검증된 패턴
 
-Confirmed mappings as of 2026-09-09:
+## Investment-Lab
+- one-click Windows launcher
+- safe idle / blocked / error 구분
+- changed HEAD는 재검증
+- UTF-8 launcher 기본화
 
+## HealthAPK
+- local-first
+- full real user loop
+- restart/re-entry persistence
+- debug/Metro와 standalone/offline package 분리
+- unknown metadata invent 금지
+
+## ChungYack
+- content/data layer와 native shell 분리
+- persistent ID/storage key 보호
+- migration 전 backup/export -> migrate/reinstall -> restore/import
+- active/actionable info first
+
+## PhoneLOL
+- exact baseline SHA + minimal patch
+- static PASS != physical-device PASS
+- temp -> build/sign/verify -> final copy
+- artifact SHA/signer/device/session evidence
+
+## Market Radar
+- desktop + phone viewport QA
+- clipping/overflow/unreadable text/modal/back/runtime error 확인
+- regenerated data와 hand-tuned UI 분리
+- canonical live state + archive
+
+## SideMemojang
+- Delete/Backspace는 explicit selected object에만 적용
+- low-frequency action은 context menu 고려
+- 불필요한 toolbar whitespace 제거
+- visually obvious success toast 절제
+- contenteditable selection save/restore
+- Korean IME shortcut에서 event.key + event.code 검토
+- uninstall과 user-data deletion 분리
+
+## FinanceOne
+- major visual rewrite: `current -> mock/design -> feature preservation -> implementation -> regression QA`
+- Source of Truth
+- repeated-entry convenience value에 TTL 고려
+- Unknown != Zero
+- font scaling 시 container/row/button/input도 함께 조정
+- stable auth/signing flow 이유 없이 재작성 금지
+- missing signing/OAuth config는 wrong default로 성공시키지 말고 fail
+- private build config는 approved staging으로 주입, secret value 출력 금지, build 후 staging 제거
+- schema migration-first
+
+## ASCII Aquarium
+- human progress/status와 raw log 분리
+- user-initiated update와 background update feedback 차등
+- updater/helper READY handshake
+- replacement validate 후 overwrite
+- Korean/space path updater QA
+- derived variant가 working desktop baseline을 훼손하지 않게 분리
+
+---
+
+# 15. 확인된 프로젝트 레지스트리
+
+GitHub가 확인된 프로젝트:
 - `운동앱` -> `kimjae134679/HealthAPK`
 - `주식자동매매` -> `kimjae134679/Investment-Lab`
-- `청약` -> hub `kimjae134679/ChungYack`; live shell under `kimjae134679/stock/chungyack-apk/`
+- `청약` -> hub `kimjae134679/ChungYack`; live shell `kimjae134679/stock/chungyack-apk/`
 - `멀티의신` -> `kimjae134679/PhoneLOL`
-- `주식 앱 / Market Radar` -> `kimjae134679/stock` root
+- `주식 앱 / Market Radar` -> `kimjae134679/stock`
 
-Projects without a confirmed GitHub mapping are **not automatically incomplete** and may intentionally have no repository:
-
+GitHub가 없어도 되는 프로젝트:
 - `피규어만들기_01`
 - `동물의숲 / Tiny Village`
 
-Do not map `동물의숲` to `SideMemojang_01`, `Ascii_Aquarium`, or another repo without direct evidence.
+비슷해 보인다는 이유로 repo를 추측해 연결하지 않습니다.
 
-Do not create a replacement/new repository merely to make the registry look complete. Only create/connect one if the user explicitly asks or the project workflow genuinely requires it.
+사용자가 명시하지 않았는데 registry를 채우기 위해 새 repo를 만들지 않습니다.
 
-Additional projects used as experience sources (not necessarily part of the main GitHub-mapped project registry):
-
+경험 소스로 사용하는 추가 프로젝트:
 - `사이드메모장`
 - `FinanceOne 리뉴얼`
 - `사이버 아쿠아리움 / ASCII Aquarium`
 
-Their verified lessons may be promoted here even when the user does not want GitHub handling for them.
+---
+
+# 16. 링크/도구 관리 규칙
+
+친화적인 링크 목록은 Workbench `README.md`의 `🧰 꿀팁 링크함`에 둡니다.
+
+- saved link는 candidate일 뿐 installed/trusted/adopted 증거가 아님
+- canonical repo/site URL 기준 dedupe
+- repost/screenshot보다 original project docs 우선
+- 실제 사용 전 current version, install, compatibility, security, license, login, cost 재확인
+- 실제 프로젝트에 채택되면 exact version/command/permission/config/path를 해당 프로젝트 AGENTS에 승격
+- 별도 links/bookmarks/tips 파일 생성 금지
 
 ---
 
-# Tip-link library policy
-The user may save useful tools, repos, websites, workflows, or social-post discoveries even when they are not adopted.
+# 17. 각 프로젝트 인수인계 규칙
 
-Keep friendly references in root `README.md` under `🧰 꿀팁 링크함`.
+각 프로젝트도 가능하면 root에 두 파일만 유지합니다.
 
-Rules:
+```text
+README.md  = 사용자 버전 / 사용자가 직접 읽고 수정하는 정책·상태
+AGENTS.md  = AI 개발자 버전 / README를 실행 가능한 기술 규칙으로 번역
+```
 
-- A saved link is a reference candidate, not proof it is installed/trusted/approved/currently used.
-- Deduplicate by canonical repo/site URL.
-- Prefer original GitHub/project docs over reposts/screenshots.
-- Before actual use, re-check install steps, current version, compatibility, security, license, login, and cost.
-- When actually adopted in a project, promote operational facts (exact version/commands/permissions/config/paths) into that project's `AGENTS.md`.
-- Do not create a separate links folder/bookmarks file/tips document.
+다른 채팅에서 인수인계를 받을 때는 두 파일 전체를 각각 하나의 Markdown code block으로 받는 방식을 우선합니다.
 
----
-
-# Handoff transport
-When asking another project chat to prepare context, prefer two fenced Markdown blocks so each file can be copied with one UI copy action.
-
-Required output shape:
-
-1. Heading `AGENTS.md`
-2. One fenced Markdown block containing the complete AGENTS.md body
-3. Heading `README.md`
-4. One fenced Markdown block containing the complete README.md body
-
-Do not split one file across multiple blocks. Do not combine both files into one block.
+프로젝트 README를 사용자가 수정하면 다음 AI는 먼저 그 변경을 파악하고 project AGENTS를 동기화한 뒤 작업해야 합니다.
 
 ---
 
-# Standard handoff request
-Use this unless the project needs a narrower variant:
+# 18. 팁 승격 규칙
 
-> 이 프로젝트의 기존 대화·파일·지침을 전체적으로 확인해서 앞으로 새 채팅에서도 바로 이어갈 수 있게 정리해줘. 결과는 루트에 둘 `AGENTS.md`와 `README.md` 두 파일만 만들어줘. `AGENTS.md`는 다음 AI가 읽을 실제 작업 인수인계로, 현재 목표/확정 요구사항/최근 진행상태/정확한 경로와 GitHub/빌드·실행·테스트 명령/사용한 언어·SDK·툴·APK 또는 패키징 방식/플러그인·MCP·외부 서비스/필요한 로그인·OAuth·권한·환경변수·인증서·서명 등 접근 조건(비밀값 자체는 쓰지 말 것)/기기·환경/알아낸 팁·주의점·실패하기 쉬운 부분·검증 방법/남은 작업을 포함해. `README.md`는 내가 읽을 요약으로 프로젝트 목적, 현재 상태, 실제 동작하는 것, 중요한 결정, 다음 할 일, 사용 중인 주요 도구·서비스, 내가 미리 준비하거나 로그인/승인해야 하는 것, 다시 쓸 만한 팁, 주요 링크·경로만 간결하게 정리해. 이 프로젝트에서 반복해서 잘 먹힌 UX·편의성·시각화·빌드·배포·한글/인코딩·로그·테스트·권한 관리 팁 중 다른 프로젝트에도 재사용할 만한 것 3~10개를 골라 두 문서에 반영해. 다른 프로젝트의 검증된 팁을 적용할 수 있다면 프로젝트 특성에 맞게 가져오되 무작정 복사하지 마. 작업 중 임시 빌드·테스트 복사본·불필요 로그/캐시/중간 산출물이 생겼다면 최종 작업 뒤 실제 프로젝트/재빌드/검증에 필요 없는 찌꺼기는 정리하고, 실제 소스·사용자 데이터·rollback 기준판·최종 산출물은 보존해. 파일 첨부보다 채팅에서 바로 복사하기 쉽게 해줘. `AGENTS.md` 제목 아래에 파일 전체 내용을 하나의 Markdown 코드블록으로, `README.md` 제목 아래에 파일 전체 내용을 또 하나의 Markdown 코드블록으로 출력해. 각 코드블록은 복사 버튼 한 번으로 파일 전체를 클립보드에 넣을 수 있게 한 파일당 정확히 한 블록만 사용해. 별도 status/plan/handoff/notes 문서나 새 폴더는 만들지 말고, 확인되지 않은 내용은 추측하지 마.
+의미 있는 작업 후:
+
+1. 다른 프로젝트에도 재사용 가능한 lesson 1~3개를 찾습니다.
+2. project-specific operational detail은 project AGENTS에 기록합니다.
+3. 사용자가 알아야 할 내용은 project README에 짧게 기록합니다.
+4. 범용성이 입증되면 Workbench README/AGENTS에 승격합니다.
+5. 별도 tips 파일은 만들지 않습니다.
+6. 사용자 선호와 일반적인 engineering practice를 구분해서 표현합니다.
 
 ---
 
-# Lesson contribution protocol
-After meaningful work:
+# 19. 최종 원칙
 
-1. Identify 1–3 lessons that are genuinely reusable elsewhere.
-2. Record project-specific operational detail in that project's `AGENTS.md`.
-3. Put only user-useful summaries in that project's `README.md`.
-4. Promote a lesson here only if it has broad reuse value.
-5. Do not create a separate tips file.
-6. Do not label a preference as a universal engineering truth; distinguish user-specific preference from generally useful engineering practice where possible.
+사용자가 모든 정책을 컨트롤할 수 있어야 합니다.
+
+따라서:
+
+- 사용자 의도는 README에서 사람이 읽을 수 있게 보존
+- AI는 README를 먼저 읽음
+- AI는 AGENTS를 실제 개발에 맞게 유지
+- README 변경을 AGENTS에 기술적으로 반영
+- AGENTS에서 새로 발견된 사용자 영향 정보를 README에 다시 올림
+- 두 문서가 충돌하면 사용자 버전인 README가 우선
+
+**사용자는 README만 수정해도 전체 개발 규칙을 컨트롤할 수 있고, AI는 그 변경을 개발자용 AGENTS에 정확히 번역해서 적용해야 합니다.**
