@@ -69,6 +69,22 @@ Do not duplicate the same long explanation in both. `AGENTS.md` should be operat
 - Practical tips or lessons that are likely to matter again.
 - Avoid secret values, raw tokens, passwords, private keys, or unnecessary implementation noise.
 
+## Verified project registry
+Use only confirmed mappings. Never guess a repository because its name looks related.
+
+Confirmed mappings as of 2026-09-09:
+- `운동앱` → `kimjae134679/HealthAPK`
+- `주식자동매매` → `kimjae134679/Investment-Lab`
+- `청약` → hub `kimjae134679/ChungYack`; live shell lives under `kimjae134679/stock/chungyack-apk/`
+- `멀티의신` → `kimjae134679/PhoneLOL`
+- `주식 앱 / Market Radar` → `kimjae134679/stock` root
+
+Unmapped and must remain unguessed until evidence appears:
+- `피규어만들기_01` — goal is confirmed, but no GitHub repo/local `.blend` path is confirmed.
+- `동물의숲` — `Tiny Village` settings UI concept is confirmed, but no GitHub repo/local engine path is confirmed.
+
+Do not map `동물의숲` to `SideMemojang_01`, `Ascii_Aquarium`, or another repo without direct evidence. Do not create a replacement repo for an unmapped project merely to make the registry look complete; first recover/confirm the intended existing project location.
+
 ## User tip-link library policy
 The user may save tools, repos, websites, workflows, or social-post discoveries that are useful to them even when the agent is not currently using them.
 
