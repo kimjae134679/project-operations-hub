@@ -48,9 +48,30 @@ If an authorized local check fails, fix it and re-run it instead of stopping aft
 ## Two-file project memory protocol
 At the end of meaningful work, keep project memory synchronized in exactly two root files:
 
-- `AGENTS.md` — for the next agent: commands, exact paths, technical constraints, permissions, architecture notes, verification rules, and machine-actionable current state.
-- `README.md` — for the user: what the project is, current status, what works, important decisions, next work, and key links/locations.
+- `AGENTS.md` — for the next agent: commands, exact paths, technical constraints, permissions, architecture notes, verification rules, tooling, access requirements, lessons learned, and machine-actionable current state.
+- `README.md` — for the user: what the project is, current status, what works, important decisions, next work, major tools/services used, access requirements, practical tips, and key links/locations.
 
 Do not duplicate the same long explanation in both. `AGENTS.md` should be operational and precise; `README.md` should be concise and readable.
 
+### AGENTS.md must capture when applicable
+- Exact build/run/test/lint/package commands and where to run them.
+- Languages, frameworks, SDK/tool versions, package managers, build systems, APK/app packaging tools, scripts, and IDE/toolchain actually used.
+- Plugins, connectors, MCP servers, skills, agents, browser/desktop automation, CI/CD, hosting, database, analytics, or third-party services actually used.
+- Required accounts/logins, OAuth connections, API access, repository permissions, device authorization, local services, environment variables, certificates, signing keys, or paid-plan requirements. Record requirements and variable/key names, never secret values.
+- Important machine/device/environment facts needed to reproduce the work.
+- Known failure modes, gotchas, workarounds, commands that proved reliable, and project-specific tips discovered during development.
+- Exact locations of source-of-truth files, generated artifacts, local repos, deploy targets, and external project IDs/URLs when safe and useful.
+- What was tried and rejected only when that prevents repeating an expensive or dangerous mistake.
+
+### README.md should summarize for the user
+- What major tools/services are being used and why.
+- What the user must have connected, logged in, approved, installed, or paid for before work can continue.
+- Practical tips or lessons that are likely to matter again.
+- Avoid secret values, raw tokens, passwords, private keys, or unnecessary implementation noise.
+
 When asking another project chat to prepare handoff context, request exactly these two Markdown files. Prefer downloadable `.md` attachments; if that interface cannot create files, request two clearly labeled copyable Markdown code blocks. Merge them into the repository and do not keep a third handoff document.
+
+## Standard handoff request
+Use this request in project chats unless a project needs a narrower version:
+
+> 이 프로젝트의 기존 대화·파일·지침을 전체적으로 확인해서 앞으로 새 채팅에서도 바로 이어갈 수 있게 정리해줘. 결과는 루트에 둘 `AGENTS.md`와 `README.md` 두 파일만 만들어줘. `AGENTS.md`는 다음 AI가 읽을 실제 작업 인수인계로, 현재 목표/확정 요구사항/최근 진행상태/정확한 경로와 GitHub/빌드·실행·테스트 명령/사용한 언어·SDK·툴·APK 또는 패키징 방식/플러그인·MCP·외부 서비스/필요한 로그인·OAuth·권한·환경변수·인증서·서명 등 접근 조건(비밀값 자체는 쓰지 말 것)/기기·환경/알아낸 팁·주의점·실패하기 쉬운 부분·검증 방법/남은 작업을 포함해. `README.md`는 내가 읽을 요약으로 프로젝트 목적, 현재 상태, 실제 동작하는 것, 중요한 결정, 다음 할 일, 사용 중인 주요 도구·서비스, 내가 미리 준비하거나 로그인/승인해야 하는 것, 다시 쓸 만한 팁, 주요 링크·경로만 간결하게 정리해. 가능하면 다운로드 가능한 `.md` 파일 2개로 주고, 파일 생성이 안 되면 각각 복사 가능한 Markdown 코드블록으로 줘. 별도 status/plan/handoff/notes 문서나 새 폴더는 만들지 말고, 확인되지 않은 내용은 추측하지 마.
