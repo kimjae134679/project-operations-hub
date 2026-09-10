@@ -19,6 +19,7 @@
 - 검증은 변경 영향에 맞게 선택합니다. 문서 작업에 앱 빌드를 강제하지 않습니다.
 - GitHub 상태와 실제 PC/실기기 상태를 분리합니다.
 - Remote Desktop 연결은 사용자가 켜둔 경우 임의 종료하지 않습니다.
+- **Remote Desktop Commander/데스크톱 원격을 사용한 작업은 종료 전에 그 회차가 만든 임시 빌드 산출물·중간 APK/ZIP/IDSIG·cache/probe·`__pycache__`·불필요 로그를 정리하고, 최종 산출물과 재현에 필요한 소스/스크립트만 남기는 것까지 완료 조건으로 봅니다.** 사용자 데이터·Known-Good·원본/reference 자료는 임의 삭제하지 않습니다.
 - 비밀값은 GitHub/문서/채널에 기록하지 않습니다.
 - AGENTS는 현재 실행본입니다. stale/duplicate/temp 규칙은 정리하고 Git/Archive에서 과거를 찾습니다.
 
