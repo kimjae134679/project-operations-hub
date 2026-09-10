@@ -32,4 +32,4 @@
 - Remote Desktop이 online이면 작업 종료를 이유로 연결 서비스를 끄지 않습니다.
 - child process 정리와 connection service 종료를 구분합니다.
 - 실제 PC가 offline이면 local verification을 했다고 주장하지 않습니다.
-- 작업 후 임시 산출물/캐시/불필요 로그는 정리하되 소스·데이터·Known-Good·최종산출물은 보존합니다.
+- **Remote Desktop Commander/데스크톱 원격을 사용한 회차는 임시 빌드 산출물, 중간 APK/ZIP/IDSIG, cache, probe, `__pycache__`, 불필요 로그 등 그 작업이 만든 찌꺼기를 종료 전에 정리하는 것까지 완료 조건입니다.** 최종 산출물과 재현에 필요한 소스/스크립트는 남기고, 사용자 데이터·Known-Good·원본/reference 자료는 임의로 삭제하지 않습니다.
