@@ -61,5 +61,6 @@ AGENTS는 과거 규칙 창고가 아니라 **현재 실행용 라우터/규칙*
 
 ## 현재 이름
 
-이 허브의 표시명은 **Project Operations Hub**입니다.
-기존 GitHub 저장소 slug `astra-codex-workbench`는 레거시 주소로 남아 있으며, 저장소 이름을 실제 변경할 수 있는 권한/도구가 확보되면 `project-operations-hub`로 맞추는 것을 권장합니다.
+- 표시명: **Project Operations Hub**
+- GitHub: `kimjae134679/project-operations-hub`
+- 로컬 checkout도 같은 이름으로 맞춥니다.
