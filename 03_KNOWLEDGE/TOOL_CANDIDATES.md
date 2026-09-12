@@ -56,6 +56,13 @@ Plugin
 ### 사용 흐름
 필요한 Plugin을 Codex의 Plugin/Marketplace 흐름으로 설치합니다. Plugin 자체가 외부 App이나 MCP를 포함하면 그 서비스의 로그인/OAuth/API 설정이 추가될 수 있습니다.
 
+### 설치 방법
+1. Codex를 최신 상태로 준비하고 로그인합니다.
+2. Codex의 Plugin/Marketplace 화면(또는 /plugins)에서 원하는 플러그인을 찾습니다.
+3. 해당 플러그인을 설치합니다. 저장소 전체를 설치하는 게 아니라 필요한 플러그인만 고르는 방식입니다.
+4. 플러그인이 Figma·Notion 같은 외부 App/MCP를 요구하면 설치 후 로그인/OAuth 연결을 진행합니다.
+5. 새 세션에서 플러그인이 표시되고 관련 명령/Skill이 보이는지 확인합니다.
+
 ---
 
 ## AGENTS.md
@@ -79,6 +86,13 @@ AI 코딩 도구가 프로젝트에 들어왔을 때 읽는 **AI 전용 작업�
 
 ### 중요한 점
 AGENTS.md 자체는 실행 프로그램이 아닙니다. AI가 읽는 **문서형 제어 장치**입니다. 따라서 오래된 명령이나 과거 우회법이 남아 있으면 AI가 그걸 현재 규칙으로 오해할 수 있습니다.
+
+### 설치 방법
+설치 프로그램은 없습니다.
+1. 프로젝트 루트에 AGENTS.md 파일을 만듭니다.
+2. 빌드/테스트 명령, 수정 금지 영역, 작업 규칙 등을 적습니다.
+3. 하위 폴더만 다른 규칙이 필요하면 그 폴더 안에도 AGENTS.md를 둘 수 있습니다.
+4. AI 코딩 도구를 새 세션으로 열어 파일을 읽는지 확인하면 끝입니다.
 
 ---
 
@@ -128,6 +142,13 @@ Claude Code, Codex 계열뿐 아니라 OpenCode, Gemini/Antigravity, Hermes, Dev
 ### 알아둘 점
 Ponytail은 “요구사항을 줄이는 도구”가 아니라 **구현 방법을 덜 복잡하게 만드는 방향의 지침**입니다. 다만 강한 축약 모드를 쓰면 실제 요구사항까지 과하게 줄이는 결과가 날 수 있으므로 모드별 차이를 확인해야 합니다.
 
+### 설치 방법
+Codex 기준으로는 플러그인 마켓을 등록한 뒤 설치합니다.
+```bash
+codex plugin marketplace add DietrichGebert/ponytail
+```
+그다음 Codex를 다시 열고 /plugins에서 Ponytail을 선택해 설치합니다. lifecycle hook을 쓰는 구성은 Node.js가 PATH에 있어야 합니다. 설치 후 review/audit/debt 같은 제공 기능이 보이는지 확인합니다.
+
 ---
 
 ## FrontierAgent
@@ -171,6 +192,12 @@ Coordinator
 ### 사용 방식
 별도 TUI 프로그램을 실행해 LLM endpoint를 연결하고 작업시킵니다. macOS/Linux의 간단한 설치 경로와 Docker/Compose 문서가 제공됩니다.
 
+### 설치 방법
+1. 공식 GitHub README의 최신 Quickstart를 먼저 확인합니다. 이 프로젝트는 버전에 따라 설치 스크립트와 모델 연결 방식이 바뀔 수 있습니다.
+2. macOS/Linux라면 upstream one-command 설치 또는 clone 후 의존성 설치 흐름을 따릅니다.
+3. Windows에서는 네이티브 지원 여부를 먼저 확인하고, 안 맞으면 WSL2 안에 별도 설치하는 편이 안전합니다.
+4. 사용할 LLM endpoint/API key를 설정하고, 테스트용 빈 폴더에서 Agent가 파일/명령을 정상 처리하는지 확인합니다.
+
 ---
 
 ## Gentle-AI
@@ -204,6 +231,13 @@ Receipt-Driven Development는 “했다”는 말만 믿는 게 아니라 작업
 ### 설치 후 사용 개념
 원문은 설치 후 사용자가 매번 SDD 단계나 내부 설정을 외울 필요 없이 평소처럼 Agent를 열어 작업하면 되게 만드는 것을 목표로 합니다. `gentle-ai doctor`로 설치 상태를 확인하는 흐름도 제공합니다.
 
+### 설치 방법
+Go가 설치되어 있어야 합니다. upstream 기준 설치 예시는 다음 계열입니다.
+```bash
+go install github.com/Gentleman-Programming/gentle-ai/v2/cmd/gentle-ai@latest
+```
+설치 후 gentle-ai를 실행해 사용할 Agent와 구성요소를 선택하고, 마지막에 `gentle-ai doctor`로 설정 상태를 점검합니다. 전역 규칙을 바로 덮어쓰기 전에 테스트 프로젝트에서 먼저 실행합니다.
+
 ---
 
 ## Anthropic Sandbox Runtime (`srt`)
@@ -231,6 +265,13 @@ Anthropic은 이를 “OS level에서 arbitrary process의 filesystem/network re
 
 따라서 단순히 “AI에게 읽지 말라고 말하는 것”보다 더 아래 계층에서 권한을 막는 도구입니다.
 
+### 설치 방법
+Node.js/npm이 필요합니다.
+```bash
+npm install -g @anthropic-ai/sandbox-runtime
+```
+설치 후 srt 명령으로 실행할 프로그램을 감싸고 파일/네트워크 허용 범위를 설정합니다. Windows 네이티브보다 macOS/Linux가 주 대상이므로 Windows에서는 WSL2 안에서 시험하는 편이 현실적입니다.
+
 ---
 
 ## Camofox Browser
@@ -256,6 +297,13 @@ AI Agent용 **headless browser automation server**입니다. Camoufox/Firefox �
 
 ### 요구환경
 현재 npm package는 Node 22 이상을 요구합니다.
+
+### 설치 방법
+Node.js가 필요합니다. 패키지로 설치하려면:
+```bash
+npm install @askjo/camofox-browser
+```
+소스에서 돌리려면 저장소를 clone한 뒤 `npm install` → `npm start` 흐름을 사용합니다. 최근 버전은 Node 22+ 요구 여부를 README에서 확인합니다. 서버가 뜨면 REST/MCP 주소를 사용하는 Agent 쪽에 연결합니다.
 
 ---
 
@@ -306,6 +354,13 @@ PRD, Git 학습, workspace 도구, 병렬 workflow 등 여러 플러그인이 �
 - `insane-review` → 로그인된 ChatGPT 웹 세션
 - `pumasi` → 호스트의 Codex CLI
 
+### 설치 방법
+1. Claude Code를 먼저 설치하고 정상 실행되는지 확인합니다.
+2. GPTaku 저장소를 Claude Code의 Plugin Marketplace로 등록합니다.
+3. 마켓에서 필요한 플러그인(insane-search, insane-research, docs-guide 등)만 골라 설치합니다.
+4. 플러그인별 README에 추가 요구사항이 있으면 그때 설치합니다. 예: Google OAuth, Codex CLI, 브라우저 로그인 세션 등.
+5. Claude Code를 다시 시작하고 해당 명령/기능이 보이는지 확인합니다.
+
 ---
 
 ## GPTaku Plugins — Codex
@@ -335,6 +390,13 @@ Search / Docs / Design / ...
 ```
 
 Plugin마다 필요한 외부 CLI/브라우저/런타임은 다를 수 있으므로 하위 README를 따로 봐야 합니다.
+
+### 설치 방법
+Codex에서 마켓을 등록합니다.
+```bash
+codex plugin marketplace add https://github.com/fivetaku/gptaku-plugins-codex.git
+```
+Codex를 재시작한 뒤 `/plugins`에서 docs-guide-codex, insane-search-codex, insane-design-codex 등 필요한 것만 설치합니다. 각 플러그인의 선택 의존성(git, gh, node, python3, tmux 등)은 해당 README를 보고 추가합니다. Windows에서는 upstream 권장대로 WSL2가 필요한 플러그인이 있는지 확인합니다.
 
 ---
 
@@ -392,6 +454,13 @@ Claude / Codex / Cursor / OpenCode / ...
 
 ### 범위
 Project scope로 프로젝트 폴더 아래에 설치하거나 사용자 범위로 배치하는 흐름이 있습니다. GitHub뿐 아니라 GitLab 등 일반 Git 서비스도 원본 repo로 사용할 수 있게 설명되어 있습니다.
+
+### 설치 방법
+Node.js/npm이 필요합니다.
+```bash
+npm install -g teamai-cli
+```
+설치 후 빈 테스트 저장소에서 먼저 `teamai init ...` 흐름을 실행합니다. 공유할 TeamAI Git 저장소를 지정하고, Codex/Claude/Cursor 등 연결할 Agent를 선택합니다. 그다음 pull/push/recall/contribute 같은 명령으로 규칙·Skill·MCP·지식을 동기화합니다. 처음에는 실제 Hub가 아니라 테스트 repo에서 생성되는 .codex/.claude/hooks 파일을 확인합니다.
 
 ---
 
@@ -451,6 +520,15 @@ Node 20+, Git, cloudflared를 준비하고 repo build → Skill 설치 → `c2c 
 ### 중요한 성격
 OpenAI 공식 프로젝트가 아니라 **커뮤니티 프로젝트**입니다.
 
+### 설치 방법
+준비물은 Git, Node.js 20+, cloudflared입니다. upstream의 자동 설치 흐름은 대략 다음 순서입니다.
+1. 저장소를 `~/codex-with-chatgpt`에 clone(이미 있으면 pull).
+2. 폴더에서 `corepack pnpm install` 후 `corepack pnpm build`.
+3. `skill/SKILL.md`를 `~/.codex/skills/codex-with-chatgpt/SKILL.md`로 복사하고 checkout 경로를 실제 경로로 수정.
+4. `c2c setup` 실행.
+5. 내장 브라우저에서 ChatGPT Connector를 만들고 pairing code를 입력.
+6. 마지막에 파일 읽기 테스트가 PASS인지 확인합니다. ChatGPT/Cloudflare 로그인·2FA가 나오면 그 부분만 사람이 처리합니다.
+
 ---
 
 # 2. 이미지 / 디자인 / Blender
@@ -466,6 +544,9 @@ GPT Image 계열로 만든 이미지 결과와 프롬프트를 모아둔 **예�
 
 ### 중요한 점
 이건 Blender MCP처럼 무언가를 실행하는 도구가 아니라 **레퍼런스/아이디어 모음**에 가깝습니다. 설치 없이 GitHub에서 예시를 보는 것이 주 사용법입니다.
+
+### 설치 방법
+설치는 필요 없습니다. GitHub 저장소를 열어 카테고리별 프롬프트와 결과 예시를 찾아보면 됩니다. 저장소 자체의 생성/관리 스크립트를 수정하려는 경우에만 README에 적힌 Node/pnpm 개발환경을 준비하면 됩니다.
 
 ---
 
@@ -529,6 +610,13 @@ README는 Agent가 멈추기 전에 다음 같은 gate를 통과하도록 설계
 ### 설치 구성
 Node 20+, pnpm, Python/Pillow, Playwright Chromium, Figma MCP 또는 PAT가 필요합니다. Claude Code, Codex, pi 등에 Skill 형태로 설치할 수 있게 되어 있습니다.
 
+### 설치 방법
+가장 간단한 설치는 upstream의 one-command installer입니다.
+```bash
+curl -fsSL https://raw.githubusercontent.com/3x-haust/Mimikyu/main/install.sh | bash
+```
+이 스크립트가 Claude Code, Codex, pi 환경을 감지해 Skill을 복사하고 `~/.mimikyu/scripts/`에 파이프라인 스크립트를 둡니다. Windows에서는 WSL/Git Bash 또는 수동 설치가 더 안전할 수 있습니다. 수동 설치 시 Codex는 `~/.codex/skills/mimikyu/`에 Skill을 복사합니다. Node 20+, pnpm, Python3+Pillow, Playwright Chromium, Figma MCP 또는 Figma token이 필요합니다.
+
 ---
 
 ## Blender MCP
@@ -556,6 +644,14 @@ MCP client가 Blender scene/오브젝트 정보를 읽고, add-on이 제공하�
 
 즉 사용법을 설명해주는 챗봇이 아니라 **Blender를 직접 조작하는 연결층**입니다.
 
+### 설치 방법
+1. GitHub Releases에서 `blender_mcp.zip`을 받습니다.
+2. Blender → Edit → Preferences → Add-ons → Install from Disk에서 ZIP을 선택합니다.
+3. 애드온을 활성화합니다.
+4. Blender의 N 패널에서 MCP 탭을 열고 Server를 시작합니다.
+5. Codex/Claude 등 사용하는 AI client에 이 MCP 서버를 등록합니다.
+6. 간단한 장면 읽기/오브젝트 조회부터 시험한 뒤 수정 명령을 테스트합니다. 기본적으로 localhost 연결을 유지합니다.
+
 ---
 
 # 3. 영상 / 콘텐츠
@@ -574,6 +670,14 @@ Python/CUDA 환경, model checkpoint, inference server 구성이 필요한 연�
 
 ### 하드웨어
 공개 예시/테스트가 대형 NVIDIA GPU 환경을 중심으로 설명되어 있어 소비자 12GB GPU에서 바로 가볍게 돌리는 종류는 아닙니다.
+
+### 설치 방법
+공식 배포가 Linux/CUDA 중심입니다.
+1. Python 3.10 계열 Conda 환경을 만듭니다.
+2. 프로젝트를 clone하고 CUDA 버전에 맞는 PyTorch와 requirements를 설치합니다.
+3. README에서 지정한 checkpoint/model 파일을 내려받아 위치를 맞춥니다.
+4. `deploy/run_server.sh` 계열 스크립트로 서버를 실행합니다.
+5. 예제 입력으로 추론이 되는지 확인합니다. Windows에서는 WSL/Linux GPU 환경을 별도로 잡는 편이 현실적입니다.
 
 ---
 
@@ -604,6 +708,13 @@ Windows, macOS, Linux를 지원한다고 명시하며 현재는 Beta/pre-release
 
 ### 출력/제한
 README 비교표 기준 현재 export format, effect 수, keyframe 기능 등은 CapCut보다 제한적인 부분이 있고 안정성도 beta 단계라고 명시합니다.
+
+### 설치 방법
+가장 쉬운 방법은 GitHub Releases의 Windows 빌드/portable 패키지를 받는 것입니다.
+1. 최신 Release에서 Windows용 압축파일 또는 설치파일을 받습니다.
+2. Portable이면 원하는 폴더에 압축을 풀고 실행합니다. 설치형이면 일반 프로그램처럼 설치합니다.
+3. 처음 실행 후 FFmpeg/모델 같은 추가 구성요소를 요구하면 안내에 따라 설치합니다.
+4. 테스트 영상 하나를 넣어 재생·컷 편집·내보내기까지 확인합니다.
 
 ---
 
@@ -655,6 +766,14 @@ AI coding agent는 HTML/CSS/JS를 잘 작성하므로 별도의 독특한 timeli
 ### 렌더 엔진
 engine은 headless Chrome에서 frame-by-frame으로 원하는 시간으로 seek하고 screenshot을 캡처한 뒤 FFmpeg로 encode합니다. 병렬 worker, audio mix, streaming encode 같은 구성도 있습니다.
 
+### 설치 방법
+Node.js와 FFmpeg 계열 환경이 필요합니다.
+1. 저장소를 clone하거나 공식 CLI/package 설치 방법을 따릅니다.
+2. repo 개발형이라면 Git LFS를 먼저 설치하고 clone하는 편이 안전합니다. Windows 예시는 `winget install GitHub.GitLFS`.
+3. 패키지 의존성을 설치한 뒤 예제 composition을 실행합니다.
+4. HTML/CSS/JS 장면을 만든 뒤 renderer/CLI로 MP4를 생성합니다.
+5. 브라우저와 FFmpeg가 정상 인식되는지 샘플 렌더로 확인합니다.
+
 ---
 
 ## Ddalkkak Threads Community
@@ -671,6 +790,12 @@ SNS 게시물 작성과 반복작업을 보조하는 데스크톱 프로그램 �
 
 ### 라이선스
 현재 저장소는 AGPL-3.0으로 표시됩니다.
+
+### 설치 방법
+1. GitHub의 최신 Releases 페이지로 갑니다.
+2. Windows용 설치파일/배포물을 받습니다. 저장된 v1.11.7 링크보다 최신 버전이 있으면 최신 설명을 먼저 확인합니다.
+3. 실행 후 Threads/Meta 로그인이나 별도 설정이 필요한지 프로그램 안내를 따릅니다.
+4. 실제 계정 자동화 전에 테스트 계정 또는 수동 검토 모드로 게시물 생성까지만 먼저 확인합니다.
 
 ---
 
@@ -700,6 +825,14 @@ OpenAI-compatible API
 
 ### 사용 시작
 `pip install openllm` 후 `openllm hello`, 모델별 serve 명령으로 시작하는 흐름입니다.
+
+### 설치 방법
+Python 환경에서 설치합니다.
+```bash
+pip install openllm
+openllm hello
+```
+그다음 원하는 모델에 맞춰 `openllm serve ...`를 실행해 OpenAI-compatible endpoint를 띄웁니다. gated model이면 Hugging Face token이 필요할 수 있습니다. GPU 모델은 CUDA/VRAM 요구량을 먼저 확인합니다.
 
 ---
 
@@ -737,6 +870,13 @@ Docker / Kubernetes / Cloud
 
 LLM뿐 아니라 일반 ML/vision 모델도 대상으로 합니다.
 
+### 설치 방법
+Python 환경에서 설치합니다.
+```bash
+pip install -U bentoml
+```
+Python으로 service를 정의한 뒤 `bentoml serve`로 로컬 실행, 필요하면 `bentoml build`와 `bentoml containerize`로 패키징/컨테이너화합니다. GPU/Docker 조합은 WSL/Linux가 더 편할 수 있습니다.
+
 ---
 
 ## xFormers
@@ -763,6 +903,14 @@ xFormers는 사용자가 직접 실행하는 프로그램이 아니라 PyTorch �
 ### 설치 특징
 PyTorch/CUDA 버전에 맞는 wheel을 사용해야 하며 Linux와 Windows용 CUDA wheel이 제공되는 버전이 있습니다.
 
+### 설치 방법
+xFormers는 현재 PyTorch/CUDA 버전과 맞춰 설치해야 합니다.
+1. 프로젝트 전용 venv/conda 환경을 만듭니다.
+2. 먼저 사용할 PyTorch와 CUDA 조합을 확정합니다.
+3. xFormers README의 공식 wheel/index 명령에서 그 조합에 맞는 버전을 설치합니다.
+4. 설치 후 Python에서 `import xformers`와 사용하는 모델의 attention 경로를 테스트합니다.
+Windows wheel이 없는 조합이면 억지 빌드보다 지원되는 버전 조합으로 맞추는 편이 안전합니다.
+
 ---
 
 ## NVIDIA cuML
@@ -786,6 +934,13 @@ NVIDIA GPU 계산
 ### 사용환경
 CUDA/Python 버전에 맞춰 RAPIDS 공식 설치 matrix를 확인해야 하며 일반적으로 Linux/WSL/컨테이너 환경과 강하게 연결되어 있습니다.
 
+### 설치 방법
+cuML은 RAPIDS 설치 matrix를 따라야 합니다.
+1. NVIDIA driver/CUDA와 Python 버전을 확인합니다.
+2. RAPIDS 공식 설치 페이지에서 버전에 맞는 conda/pip/container 명령을 생성합니다.
+3. Windows라면 네이티브보다 WSL2/Linux 환경에 설치하는 것을 우선 검토합니다.
+4. 설치 후 작은 sklearn 대응 예제로 CPU 결과와 값이 맞는지, GPU 가속이 실제 되는지 확인합니다.
+
 ---
 
 ## Heretic
@@ -802,6 +957,13 @@ Transformer LLM의 **refusal/safety alignment를 약화시키는 연구 도구**
 
 ### 실행
 Python/PyTorch와 실제 model weight를 받아 로컬에서 처리합니다. 결과 모델은 원 모델과 다른 안전행동을 보일 수 있습니다.
+
+### 설치 방법
+격리된 Python 환경에서 설치합니다.
+```bash
+pip install -U heretic-llm
+```
+그다음 지원되는 transformer 모델을 별도로 내려받고 README의 실행 예제를 따릅니다. 모델 크기에 따라 CUDA/PyTorch와 큰 VRAM이 필요할 수 있습니다. 일반 Agent 기본환경에 설치하지 말고 별도 venv/폴더에서만 시험합니다.
 
 ---
 
@@ -831,6 +993,14 @@ MoE(Mixture-of-Experts) 구조라 전체 파라미터는 매우 크지만 한 to
 ### OpenRouter route
 OpenRouter에 올라온 `:free` route를 이용하면 로컬에 수백 GB weight를 직접 설치하지 않고 API 방식으로 호출할 수 있습니다. 무료 정책, rate limit, context 표시는 OpenRouter 정책에 따라 바뀔 수 있습니다.
 
+### 설치 방법
+로컬 설치보다 OpenRouter API로 쓰는 방법이 간단합니다.
+1. OpenRouter 계정을 만들고 API key를 준비합니다.
+2. 모델 ID로 `inclusionai/ling-3.0-flash-vl:free`를 선택합니다.
+3. OpenAI-compatible API를 지원하는 앱/스크립트에 OpenRouter base URL과 key, model ID를 넣습니다.
+4. 텍스트 → 이미지 → 영상 입력 순으로 작은 테스트부터 합니다.
+로컬 weight를 직접 받는 방법도 있지만 모델 규모가 매우 커서 일반 12GB GPU PC용 설치법으로 보기는 어렵습니다.
+
 ---
 
 # 5. 생산성 / 참고자료
@@ -856,6 +1026,14 @@ GitHub / 개발문서 / 청약 / 주식 / 쇼핑
 
 ### 확인할 점
 브라우저 확장은 탭 URL/제목 같은 browsing metadata에 접근할 수 있으므로 실제 설치 전 개인정보 처리방침과 외부 전송 범위를 확인해야 합니다.
+
+### 설치 방법
+Chrome 확장프로그램이라 설치는 간단합니다.
+1. tabzipsa.com 또는 Chrome Web Store에서 TabZipsa를 엽니다.
+2. Chrome에 추가를 눌러 확장프로그램을 설치합니다.
+3. 필요하면 확장 아이콘을 고정합니다.
+4. 테스트용 탭 몇 개를 열고 그룹화 기능을 시험합니다.
+업무용/로그인 탭이 많은 브라우저 프로필에 바로 넣기 전에 권한과 개인정보처리방침을 확인합니다.
 
 ---
 
