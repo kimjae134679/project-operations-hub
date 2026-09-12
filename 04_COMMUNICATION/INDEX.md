@@ -5,6 +5,7 @@
 - [T-0003 — SideMemojang release & UX](threads/T-0003-sidememojang-release-and-ux/)
 - [T-0004 — Tiny Village Motion & Personality](threads/T-0004-tiny-village-motion-and-personality/)
 - [T-0005 — FinanceOne sync pattern for HealthAPK](threads/T-0005-financeone-sync-for-healthapk/)
+- [T-0006 — Codex / ChatGPT tooling stack](threads/T-0006-codex-tooling-stack/) — Gentle AI, Camofox, Codex with ChatGPT 및 추가 도구 설치/검증 계획
 
 ## Resolved / Review
 - [T-0001 — Workbench structure review](threads/T-0001-workbench-review/)
