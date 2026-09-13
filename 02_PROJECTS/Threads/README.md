@@ -4,16 +4,21 @@
 - 방향: 허용된 공식 API/RSS/직접 링크/공개 검색 메타데이터로 화제를 탐지하고, AI+사람 검토로 원본성 있는 멀티플랫폼 콘텐츠를 만든 뒤 실제 게시 성과로 학습
 - 운영 구조: `00_START_HERE → 01_DISCOVERY → 02_EDITORIAL_SCORING → 03_PRODUCTION → 04_REVIEW_PUBLISH → 05_EXPERIMENTS_ACCOUNTS`
 - 역할 경계: 01 소재 수집, 02 조사/사실/점수, 03 실제 콘텐츠 제작, 04 검수/승인/게시, 05 다계정 실험/성과 학습. 뒤 단계가 앞 단계 소유 데이터를 임의 수정하지 않음
-- 현재 상태: 실행형 `Trend Inbox MVP`가 `수집 → Viral Finder/불쾌감 필터 → 다중선택 → 자료 보강 → 조사 → Community Card Factory/Draft Studio → Content Warehouse → Rights/Safety Gate → 사람 승인 → Threads 공식 텍스트 게시 → Insights → Experiment Lab`까지 연결됨
+- 현재 상태: 실행형 `Trend Inbox MVP`가 `수집 → Viral Finder/불쾌감 필터 → 테마 분류 → 다중선택 → 자료 보강 → 조사 → Community Card Factory/Draft Studio → Content Warehouse → Rights/Safety Gate → 사람 승인 → Threads 공식 텍스트 게시 → Insights → Experiment Lab`까지 연결됨
 - 기본 입력: Google Trends KR RSS + 수동 URL/메모 + `data/viral-discovery-latest.json` 실제 공개 발견 묶음
 - 선택 입력: YouTube Data API + NAVER API HUB 뉴스/블로그/카페/Search Trend
 - Viral Finder: popularity/discussion/sourceStrength/freshness/cardability 기반 `STRONG/CANDIDATE/REVIEW/BLOCK/LOW`, URL/제목 중복, 여러 후보 동시 선택/상태 이동
 - Audience Comfort: 동물학대/고어/잔혹/성폭력·아동성착취/자살 영상·사진/신상털이 등은 조회 가능성과 무관하게 BLOCK. 폭행/사망/괴롭힘 등은 주의 검토
+- 테마 분류: `item.themeClassification`에 primary/secondary/tags/confidence/source 저장. 현재 직장/연애/돈/군대·학교/인터넷유머/황당실화/AI·IT·게임/생활논쟁/연예/동물/사회/스포츠/음식여행/기타 바이럴. Viral Finder와 Warehouse에서 테마 chip/filter 제공
+- Theme ≠ Safety: 동물/자연 같은 정상 테마와 동물학대·고어 차단은 분리. Safety/Comfort가 최종 위험 여부를 결정
 - 실제 discovery test: 공개 검색 metadata 기반 Reddit 고반응/저반응/댓글반응/BLOCK 샘플을 feed와 문서에 기록. 원문 전체/미디어는 bulk copy하지 않음
 - Community Card Factory: 후보/Research Bundle → Hook/원문 캡처/핵심/후속/반응/마지막 카드 storyboard → Canvas 1080×1350 PNG. Dark Viral/Paper Story/Signal News template
 - Card asset rule: 사용자가 고른 원문 screenshot은 세션 Object URL로만 사용하고 localStorage/GitHub에 바이너리 저장하지 않음. 현재 OCR/PII 자동 마스킹 완료로 간주하지 않음
 - Content Warehouse: Draft/Card 완제품 자동 표시, `HOT/EVERGREEN`, priority 1~5, active/hold, notBefore/expiresAt, 다음 게시 우선 후보 계산. 실제 Scheduler 실행기는 아직 미연결
 - Warehouse queue: Gate+현재 승인 완료만 eligible, HOT/priority/유효기한/대기시간을 이용해 우선순위 계산
+- 앱 구조 정리: `app/bootstrap/feature-loader.js`가 동적 feature load 순서를 중앙 관리. 신규 기능은 `app/features/<domain>/`에 taxonomy/config → model → UI → CSS로 분리
+- 구조 문서: `app/ARCHITECTURE.md`, `app/features/README.md`, `app/features/themes/README.md`
+- 물리적 이관은 단계식: themes ✅ → discovery/viral → production/cards → warehouse → experiments → editorial → publish → 마지막에 app.js를 core/state+ui로 분해. 대량 경로 변경으로 전체 앱을 깨지 않도록 각 단계마다 CI green 확인
 - AI: 선택적 `OPENAI_API_KEY`로 Responses API + web search 조사/멀티플랫폼 초안. AI 결과는 자동 승인하지 않음
 - 게시: 선택적 `THREADS_ACCESS_TOKEN`. 사람 승인 체인을 모두 통과한 텍스트만 공식 Threads API 2단계 publish 가능. 이미지/carousel 공식 게시 adapter는 아직 미완료
 - 성과: `publications[]` + Threads Insights를 원본으로 `LEARN / SCALE / KEEP / KILL`; 클릭/전환/실수익은 실제 값만 수동 입력
@@ -30,11 +35,12 @@
 - Experiment Lab: 계정 필터 + account/hypothesis/variant/username/goal + 포맷/훅 메타/필터 + 별도 메타 CSV
 - 권리 guard: `A10 Unknown rights`는 Safety Gate rights BLOCK + 실제 게시 click 차단. 권리 확인 뒤 자산 분류/Gate 재검토 필요
 - 실행: 저장소 루트 `npm start` → `http://127.0.0.1:4173/app/`
-- package: 현재 `0.11.0`; `npm run check`에 Experiment/Viral/Card storyboard/Warehouse regression 포함
+- package: 현재 `0.12.0`; Experiment/Viral/Card/Warehouse/Theme/Layout regression 포함
+- 최신 CI: GitHub Actions `34767503985` SUCCESS. Node 24 + syntax/regression + local server smoke + credential-less fail-closed 통과
 - 실제 E2E 미검증: 사용자 실제 NAVER/OpenAI/Threads credential이 없어 live 외부 호출 및 공개 게시/Insights 성공은 아직 기록하지 않음
-- 재개 시: repo `00_START_HERE/README.md` → `docs/VIRAL_FINDER_BATCH_REVIEW.md` → `docs/COMMUNITY_CARD_FACTORY.md` → `docs/CONTENT_WAREHOUSE.md` → 현재 역할 README
-- 다음: Card screenshot crop/mask → Scheduler planner/server persistence → image/carousel official publish → 실제 Threads 계정 E2E
+- 재개 시: repo `app/ARCHITECTURE.md` → `app/features/README.md` → `app/features/themes/README.md` → 기존 Viral/Card/Warehouse docs
+- 다음: 기존 Viral files를 `features/discovery/viral/`로 물리 이관 → Card → Warehouse 순으로 폴더 migration, 이후 Scheduler가 같은 theme 연속 게시를 피하도록 planner 구현 → theme별 성과 분석 → screenshot crop/mask → image/carousel official publish → 실제 Threads 계정 E2E
 - 검증 핵심: 소스 약관/권리, 원본성, 일반인 안전, 사람 승인, 역할 소유권, 실제 성과·수익, fake success 금지
 - Room: `04_COMMUNICATION/rooms/Threads/`
 - Main thread: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/`
-- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/014-sol.md`
+- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/015-sol.md`
