@@ -11,15 +11,20 @@
 - 게시: 선택적 `THREADS_ACCESS_TOKEN`. 사람 승인 체인을 모두 통과한 텍스트만 공식 Threads API 2단계 publish 가능
 - 성과: `publications[]` + Threads Insights를 원본으로 `LEARN / SCALE / KEEP / KILL`; 클릭/전환/실수익은 실제 값만 수동 입력
 - 다계정 전략: 계정을 복붙 슬롯이 아니라 전략 실험군으로 사용. 현재 planned = `TH-A Hot/Issue`, `TH-B Useful/Product/Money`, `TH-C Internet Story/Culture`. 실제 계정 생성 확인 전 active로 표시하지 않음
-- 앱 다계정 추적 구현: 후보 상세에서 `accountId / hypothesisId / variantId / experiment goal` 배정. 배정 변경은 candidate `updatedAt`을 바꿔 기존 publish approval을 stale 처리
-- 게시 스냅샷: 실제 Threads 게시 성공 시 `publication.experiment`에 account/hypothesis/variant/goal을 고정 저장하고 실제 연결 계정 username도 `publication.platformAccount.username`으로 저장
-- Experiment Lab: 계정 필터 + account/hypothesis/variant/username/goal 표시 + CSV 열 추가. 게시 당시 snapshot을 우선 사용
+- 앱 다계정 추적: 후보에 `accountId / hypothesisId / variantId / experiment goal`, 게시 시 `publication.experiment` + 실제 username snapshot
+- 실전 벤치마크: Meta/Threads 공식 guidance, Buffer 대규모 format/reply 데이터, 실제 creator/brand 성장 사례, 한국 Threads public snapshot, YouTube Shorts 원본성/분석 기준 정리
+- 벤치마크 문서: `docs/BENCHMARK_2026-09.md`
+- 제작 Playbook: `03_PRODUCTION/FORMAT_PLAYBOOK.md` — F01~F20 포맷, H01~H10 Hook, C00~C08 CTA, A01~A10 asset, R0~R2 reply mode
+- 실험 Matrix: `05_EXPERIMENTS_ACCOUNTS/EXPERIMENT_MATRIX.md` — TH-A/B/C 초기 30건 실험안, hook/reply/image/video 변수
+- 앱 제작 메타: `contentFormat / hookType / ctaType / sourceAssetType / replyMode / hasTopicTag / note` 저장, 새 publication에 strategy snapshot 고정
+- Experiment Lab: 계정 필터 + account/hypothesis/variant/username/goal + 포맷/훅 메타/필터 + 별도 메타 CSV
+- 권리 guard: `A10 Unknown rights`는 Safety Gate rights BLOCK + 실제 게시 click 차단. 권리 확인 뒤 자산 분류/Gate 재검토 필요
 - 실행: 저장소 루트 `npm start` → `http://127.0.0.1:4173/app/`
-- 검증: `npm run check` = syntax + Experiment regression. GitHub Actions는 서버 smoke/browser script load/keyless fail-closed까지 확인. account tracking 포함 최신 run 34761239085 SUCCESS
+- 검증: `npm run check` = syntax + Experiment regression. GitHub Actions는 서버 smoke/browser asset/bootstrap/keyless fail-closed까지 확인
 - 실제 E2E 미검증: 사용자 실제 NAVER/OpenAI/Threads credential이 없어 live 외부 호출 및 공개 게시/Insights 성공은 아직 기록하지 않음
-- 재개 시: repo `00_START_HERE/README.md` → 현재 역할 폴더 README → `docs/HANDOFF_CONTRACTS.md` → `docs/ACCOUNT_EXPERIMENT_TRACKING.md`
-- 다음: 실제 Threads 계정 1개 E2E → actual username ↔ logical account_id 확인 → 게시/Insights 왕복 → 실제 계정 2개 이상이면 Account Manager/credential profile → account/variant 성과 비교 강화
+- 재개 시: repo `00_START_HERE/README.md` → 현재 역할 폴더 README → `docs/BENCHMARK_2026-09.md` → `03_PRODUCTION/FORMAT_PLAYBOOK.md` → `05_EXPERIMENTS_ACCOUNTS/EXPERIMENT_MATRIX.md`
+- 다음: 실제 Threads 계정 1개 E2E → publication experiment/strategy snapshot + Insights 확인 → 5~10건 결과로 benchmark 가설 검증 → image/card/carousel/short-video renderer 확장
 - 검증 핵심: 소스 약관/권리, 원본성, 일반인 안전, 사람 승인, 역할 소유권, 실제 성과·수익, fake success 금지
 - Room: `04_COMMUNICATION/rooms/Threads/`
 - Main thread: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/`
-- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/011-sol.md`
+- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/012-sol.md`
