@@ -11,13 +11,15 @@
 - 게시: 선택적 `THREADS_ACCESS_TOKEN`. 사람 승인 체인을 모두 통과한 텍스트만 공식 Threads API 2단계 publish 가능
 - 성과: `publications[]` + Threads Insights를 원본으로 `LEARN / SCALE / KEEP / KILL`; 클릭/전환/실수익은 실제 값만 수동 입력
 - 다계정 전략: 계정을 복붙 슬롯이 아니라 전략 실험군으로 사용. 현재 planned = `TH-A Hot/Issue`, `TH-B Useful/Product/Money`, `TH-C Internet Story/Culture`. 실제 계정 생성 확인 전 active로 표시하지 않음
-- 계정 규칙: account_id / hypothesis_id / variant_id를 기준으로 관리, 동일 콘텐츠 계정 간 복붙 금지, 정책/제재 회피 목적으로 다계정 사용 금지
+- 앱 다계정 추적 구현: 후보 상세에서 `accountId / hypothesisId / variantId / experiment goal` 배정. 배정 변경은 candidate `updatedAt`을 바꿔 기존 publish approval을 stale 처리
+- 게시 스냅샷: 실제 Threads 게시 성공 시 `publication.experiment`에 account/hypothesis/variant/goal을 고정 저장하고 실제 연결 계정 username도 `publication.platformAccount.username`으로 저장
+- Experiment Lab: 계정 필터 + account/hypothesis/variant/username/goal 표시 + CSV 열 추가. 게시 당시 snapshot을 우선 사용
 - 실행: 저장소 루트 `npm start` → `http://127.0.0.1:4173/app/`
-- 검증: `npm run check` = syntax + Experiment regression. GitHub Actions는 서버 smoke/browser script load/keyless fail-closed까지 확인
+- 검증: `npm run check` = syntax + Experiment regression. GitHub Actions는 서버 smoke/browser script load/keyless fail-closed까지 확인. account tracking 포함 최신 run 34761239085 SUCCESS
 - 실제 E2E 미검증: 사용자 실제 NAVER/OpenAI/Threads credential이 없어 live 외부 호출 및 공개 게시/Insights 성공은 아직 기록하지 않음
-- 재개 시: repo `00_START_HERE/README.md` → 현재 역할 폴더 README → `docs/HANDOFF_CONTRACTS.md` → 필요 세부 문서
-- 다음: 앱 데이터 모델에 account_id/hypothesis_id/variant_id 추가 → 실제 계정 소량 E2E → account/variant Insights 비교 → 잘 되는 전략 SCALE → 자체 이미지/영상 → 타 플랫폼 adapter → DB 동기화
+- 재개 시: repo `00_START_HERE/README.md` → 현재 역할 폴더 README → `docs/HANDOFF_CONTRACTS.md` → `docs/ACCOUNT_EXPERIMENT_TRACKING.md`
+- 다음: 실제 Threads 계정 1개 E2E → actual username ↔ logical account_id 확인 → 게시/Insights 왕복 → 실제 계정 2개 이상이면 Account Manager/credential profile → account/variant 성과 비교 강화
 - 검증 핵심: 소스 약관/권리, 원본성, 일반인 안전, 사람 승인, 역할 소유권, 실제 성과·수익, fake success 금지
 - Room: `04_COMMUNICATION/rooms/Threads/`
 - Main thread: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/`
-- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/010-sol.md`
+- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/011-sol.md`
