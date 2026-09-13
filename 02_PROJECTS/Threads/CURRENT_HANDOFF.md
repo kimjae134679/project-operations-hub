@@ -9,25 +9,20 @@ Canonical execution order for the next worker:
 3. `04_COMMUNICATION/threads/T-0008-ai-content-monetization/024-sol.md`
 4. continue the first unfinished backlog item; do not stop at planning
 
-Current implementation checkpoint before the handoff-only commit:
+Current verified implementation checkpoint:
 
 ```text
 29a9b996e3513e4c8d9d1b8e6cc5ebeffc789c81
+GitHub Actions 34785739288 / job 103800763036
+JavaScript syntax/regression SUCCESS + local server smoke SUCCESS
 ```
 
-Last fully observed green implementation checkpoint during this run:
-
-```text
-45643af2d8c2702cdefc74f7f329291cc02754fa
-GitHub Actions 34785653796 — syntax/regression SUCCESS + local server smoke SUCCESS
-```
-
-`4c3e724...` had a regression-guard-only failure caused by an overstrict layout assertion; production functionality was not the failing target. The guard was corrected at `29a9b996...`; verify its final Actions result first on the next read if this pointer has not been updated again.
+The earlier `4c3e724...` failure was a regression-guard-only mistake caused by an overstrict layout assertion; the guard was corrected at `29a9b996...` and the corrected checkpoint is green.
 
 Latest Threads handoff update commit:
 
 ```text
-09efc0daa357024cb69c195b0af9dee2b8240d57
+25f915585237e4399251071d9cb957283cd41a18
 ```
 
 Latest operations-hub sequential note:
@@ -35,5 +30,7 @@ Latest operations-hub sequential note:
 ```text
 04_COMMUNICATION/threads/T-0008-ai-content-monetization/024-sol.md
 ```
+
+P3 bulk candidate review is materially complete for the current workflow. P4 Community Card Factory manual image privacy masking is ACTIVE. Continue with browser interaction verification when available, undo-last-mask/per-image status, exact image identity binding, privacy envelope integration into saved manifest/storyboard metadata, and visibility in final 04 REVIEW_PUBLISH before moving to P5.
 
 Repository tip wins if this pointer becomes stale.
