@@ -3,49 +3,32 @@
 - Repo: https://github.com/kimjae134679/Threads
 - 방향: 허용된 공식 API/RSS/직접 링크/공개 검색 메타데이터로 화제를 탐지하고, AI+사람 검토로 원본성 있는 멀티플랫폼 콘텐츠를 만든 뒤 실제 게시 성과로 학습
 - 운영 구조: `00_START_HERE → 01_DISCOVERY → 02_EDITORIAL_SCORING → 03_PRODUCTION → 04_REVIEW_PUBLISH → 05_EXPERIMENTS_ACCOUNTS`
-- 역할 경계: 01 소재 수집, 02 조사/사실/점수, 03 실제 콘텐츠 제작, 04 검수/승인/게시, 05 다계정 실험/성과 학습. 뒤 단계가 앞 단계 소유 데이터를 임의 수정하지 않음
-- 현재 상태: 실행형 `Trend Inbox MVP`가 `수집 → Viral Finder/불쾌감 필터 → 테마 분류 → 테마별 Discovery Lane/플랫폼 필터 → 다중선택 → 자료 보강 → 조사 → Community Card Factory/Draft Studio → Content Warehouse → Rights/Safety Gate → 사람 승인 → Threads 공식 텍스트 게시 → Insights → Experiment Lab`까지 연결됨
-- 기본 입력: Google Trends KR RSS + 수동 URL/메모 + `data/viral-discovery-latest.json` 실제 공개 발견 묶음
-- 선택 입력: YouTube Data API + NAVER API HUB 뉴스/블로그/카페/Search Trend
-- Viral Finder: popularity/discussion/sourceStrength/freshness/cardability 기반 `STRONG/CANDIDATE/REVIEW/BLOCK/LOW`, URL/제목 중복, 여러 후보 동시 선택/상태 이동
-- Audience Comfort: 동물학대/고어/잔혹/성폭력·아동성착취/자살 영상·사진/신상털이 등은 조회 가능성과 무관하게 BLOCK. 폭행/사망/괴롭힘 등은 주의 검토
-- 테마 분류: `item.themeClassification`에 primary/secondary/tags/confidence/source 저장. 현재 직장/연애/돈/군대·학교/인터넷유머/황당실화/AI·IT·게임/생활논쟁/연예/동물/사회/스포츠/음식여행/기타 바이럴. Viral Finder와 Warehouse에서 테마 chip/filter 제공
-- Theme ≠ Safety: 동물/자연 같은 정상 테마와 동물학대·고어 차단은 분리. Safety/Comfort가 최종 위험 여부를 결정
-- Discovery Lane: `웃긴 짤/밈`, `커뮤니티 논란`, `소식/이슈`, `직장/취업`, `연애/관계`, `돈/소비`, `군대/학교`, `황당/반전`, `AI/IT/게임`, `연예/문화`, `스포츠/e스포츠`, `음식/여행`, `동물/자연`로 탐색을 분리
+- 현재 상태: `수집 → Viral Finder/Audience Comfort → 테마·Discovery Lane/플랫폼 분류 → bulk review → Research → Draft/Card Factory → 이미지 privacy gate → Content Warehouse READY/HOT/EVERGREEN → Rights/Safety Gate → 사람 승인 → Direct Threads 또는 선택형 Buffer 전달 → Insights/Experiment Lab` 구조
+- Discovery Lane: 웃긴 짤/밈, 커뮤니티 논란, 소식/이슈, 직장/취업, 연애/관계, 돈/소비, 군대/학교, 황당/반전, AI/IT/게임, 연예/문화, 스포츠/e스포츠, 음식/여행, 동물/자연
 - Discovery Source Registry: Google Trends, NAVER 뉴스/블로그/카페, Daum 카페, YouTube, Reddit, X/Twitter, Threads, Instagram, DCInside, Blind, FMKorea, 더쿠, 인스티즈, 클리앙, 루리웹, 인벤, 뽐뿌, 아카라이브, Tistory/공개 블로그, 기타 뉴스/웹
-- Source adapter 상태는 `connected / connected-when-credentialed / manual-only / planned / planned-discovery`로 실제 구현 여부를 명확히 분리. Registry 등록만으로 자동수집 완료라고 취급하지 않음
+- Source adapter 상태는 `connected / connected-when-credentialed / manual-only / planned / planned-discovery`로 실제 구현 여부를 분리. Registry 등록만으로 자동수집 완료라고 취급하지 않음
 - DCInside/Blind 등은 bulk body crawler를 두지 않고 공개 검색/인덱스 metadata + 사용자 URL/스크린샷 Capture 경로 사용
-- Discovery UI: `DISCOVERY LANES / SOURCES` 패널 + lane filter + platform filter + 후보별 source/lane chip + source adapter matrix
-- 실제 discovery test: 공개 검색 metadata 기반 Reddit 고반응/저반응/댓글반응/BLOCK 샘플을 feed와 문서에 기록. 원문 전체/미디어는 bulk copy하지 않음
-- Community Card Factory: 후보/Research Bundle → Hook/원문 캡처/핵심/후속/반응/마지막 카드 storyboard → Canvas 1080×1350 PNG. Dark Viral/Paper Story/Signal News template
-- Card asset rule: 사용자가 고른 원문 screenshot은 세션 Object URL로만 사용하고 localStorage/GitHub에 바이너리 저장하지 않음. 캡처 이미지가 있으면 이미지 마스킹 필요 상태를 별도로 유지
-- Content Warehouse: Draft/Card 완제품 자동 표시, `HOT/EVERGREEN`, priority 1~5, active/hold, notBefore/expiresAt, 다음 게시 우선 후보 계산. 실제 Scheduler 실행기는 아직 미연결
-- Warehouse queue: Gate+현재 승인 완료만 eligible, HOT/priority/유효기한/대기시간을 이용해 우선순위 계산
-- 앱 구조 정리: `app/bootstrap/feature-loader.js`가 동적 feature load 순서를 중앙 관리. 신규 기능은 `app/features/<domain>/`에 taxonomy/config → model → UI → CSS로 분리
-- 구조 문서: `app/ARCHITECTURE.md`, `app/features/README.md`, `app/features/themes/README.md`, `app/features/discovery/sources/README.md`
-- 물리적 이관은 단계식: themes ✅ → discovery/sources ✅ → discovery/viral → production/cards → warehouse → experiments → editorial → publish → 마지막에 app.js를 core/state+ui로 분해. 대량 경로 변경으로 전체 앱을 깨지 않도록 각 단계마다 CI green 확인
-- AI: 선택적 `OPENAI_API_KEY`로 Responses API + web search 조사/멀티플랫폼 초안. AI 결과는 자동 승인하지 않음
-- 게시: 선택적 `THREADS_ACCESS_TOKEN`. 사람 승인 체인을 모두 통과한 텍스트만 공식 Threads API 2단계 publish 가능. 이미지/carousel 공식 게시 adapter는 아직 미완료
-- 성과: `publications[]` + Threads Insights를 원본으로 `LEARN / SCALE / KEEP / KILL`; 클릭/전환/실수익은 실제 값만 수동 입력
-- 다계정 전략: 계정을 복붙 슬롯이 아니라 전략 실험군으로 사용. 현재 planned = `TH-A Hot/Issue`, `TH-B Useful/Product/Money`, `TH-C Internet Story/Culture`. 실제 계정 생성 확인 전 active로 표시하지 않음
-- 앱 다계정 추적: 후보에 `accountId / hypothesisId / variantId / experiment goal`, 게시 시 `publication.experiment` + 실제 username snapshot
-- 실전 벤치마크: Meta/Threads 공식 guidance, Buffer 대규모 format/reply 데이터, 실제 creator/brand 성장 사례, 한국 Threads public snapshot, YouTube Shorts 원본성/분석 기준 정리
-- 벤치마크 문서: `docs/BENCHMARK_2026-09.md`
-- Viral Finder 문서: `docs/VIRAL_FINDER_BATCH_REVIEW.md`, `docs/VIRAL_DISCOVERY_TEST_2026-09-14.md`
-- Card Factory 문서: `docs/COMMUNITY_CARD_FACTORY.md`
-- Warehouse 문서: `docs/CONTENT_WAREHOUSE.md`
-- 제작 Playbook: `03_PRODUCTION/FORMAT_PLAYBOOK.md` — F01~F20 포맷, H01~H10 Hook, C00~C08 CTA, A01~A10 asset, R0~R2 reply mode
-- 실험 Matrix: `05_EXPERIMENTS_ACCOUNTS/EXPERIMENT_MATRIX.md` — TH-A/B/C 초기 30건 실험안, hook/reply/image/video 변수
-- 앱 제작 메타: `contentFormat / hookType / ctaType / sourceAssetType / replyMode / hasTopicTag / note` 저장, 새 publication에 strategy snapshot 고정
-- Experiment Lab: 계정 필터 + account/hypothesis/variant/username/goal + 포맷/훅 메타/필터 + 별도 메타 CSV
-- 권리 guard: `A10 Unknown rights`는 Safety Gate rights BLOCK + 실제 게시 click 차단. 권리 확인 뒤 자산 분류/Gate 재검토 필요
-- 실행: 저장소 루트 `npm start` → `http://127.0.0.1:4173/app/`
-- package: discovery source expansion 기준 `0.13.0`; Experiment/Viral/Card/Warehouse/Theme/DiscoverySource/Layout regression 포함
-- 검증: discovery source 코드/테스트 포함 커밋 `3e0903f5852bdcf1a0370e80794a995db7393f3e` → GitHub Actions `34767974421` SUCCESS. 이후 문서/소통 포인터 갱신은 같은 기능 세트에 대한 후속 커밋
-- 실제 E2E 미검증: 사용자 실제 NAVER/OpenAI/Threads credential이 없어 live 외부 호출 및 공개 게시/Insights 성공은 아직 기록하지 않음
-- 재개 시: repo `app/ARCHITECTURE.md` → `app/features/discovery/sources/README.md` → `app/features/themes/README.md` → Viral/Card/Warehouse docs
-- 다음: planned discovery source adapters를 공식/안전한 경로부터 연결 → lane별 quota planner → `lane × source × format` 성과 학습 → 기존 Viral files를 `features/discovery/viral/`로 물리 이관 → Scheduler spacing → screenshot mask → image/carousel publisher → 실제 Threads 계정 E2E
-- 검증 핵심: 소스 약관/권리, 원본성, 일반인 안전, 사람 승인, 역할 소유권, 실제 성과·수익, fake success 금지
+- Viral Finder: popularity/discussion/sourceStrength/freshness/cardability + Audience Comfort. 고반응이어도 동물학대/고어/잔혹/성폭력·아동성착취/그래픽 자해/신상털이/심한 불쾌 시각 소재는 BLOCK
+- Bulk review: 여러 후보 선택/보류/태그/편집 검토 handoff를 지원하며 Comfort clearance를 우회하지 않음
+- Theme classification: `item.themeClassification` primary/secondary/tags/confidence/source. Theme와 Safety는 별도
+- Community Card Factory: 후보/Research Bundle → Hook/캡처/핵심/후속/반응/마지막 카드 storyboard → Canvas 1080×1350. Dark Viral/Paper Story/Signal News template
+- Card privacy: 텍스트 PII 마스킹 + 캡처 이미지 수동 drag rectangle mask + 이미지 identity-bound review. OCR/얼굴 자동탐지를 완료한 척하지 않음
+- Content Warehouse: READY/HOT/EVERGREEN, priority, hold, notBefore/expiresAt, freshness, theme/format tags, provenance, bounded history. `지금 게시 가능`은 Warehouse READY 분류와 별도이며 Comfort/production/privacy/Safety/current human approval을 모두 통과해야 함
+- 게시 경로 A — Direct Threads: `THREADS_ACCESS_TOKEN`; 사람 승인 체인을 모두 통과한 텍스트만 공식 Threads API 2단계 publish. 실제 ID가 있을 때만 `item.publications[]`
+- 게시 경로 B — Optional Buffer: `BUFFER_API_KEY`; Threads 채널을 조회/선택하고 `addToQueue / customScheduled / shareNow`. 동일한 서버-side 승인 검증 후만 전달. 결과는 우선 `item.bufferDeliveries[]`에 기록하며 실제 sent 확인 전에는 publication으로 간주하지 않음
+- Buffer secret/config: `.env*`와 `config/buffer.local.json`은 gitignore. 브라우저에 API key 노출 금지. 선택 채널은 local config 또는 `BUFFER_THREADS_CHANNEL_ID`
+- Buffer thread backend contract: `metadata.threads.thread` 지원, 첫 segment = top-level text. 현재 UI는 승인 후 몰래 분할하지 않기 위해 단일 post만 노출하고 500자 초과는 Draft Studio 재편집/재승인 요구
+- Buffer 참고/검증: DevDesign Threads 자동 발행 글의 역할 분리·사람 최종확인·예약 발행 아이디어를 반영하되 Buffer 공식 GraphQL 문서로 현재 request shape를 별도 확인
+- 이미지/carousel 실제 게시: 아직 미완료. Direct 공식 API capability/dry-run + 안전한 media hosting/upload 단계가 필요하며 local Canvas 이미지를 바로 외부 URL인 것처럼 취급하지 않음
+- 성과: 실제 `publications[]` + Threads Insights를 기준으로 LEARN/SCALE/KEEP/KILL; 클릭/전환/실수익은 실제 값만
+- 앱 구조: `app/bootstrap/feature-loader.js`가 중앙 load 순서를 관리. 신규 기능은 `app/features/<domain>/` 아래 model/ui/style/docs로 분리. Buffer feature는 `app/features/publish/buffer/`에 처음부터 신규 구조로 구현
+- 데이터 소유권 핵심: `publications[]` = 확인된 실제 게시, `bufferDeliveries[]` = 외부 예약/전달, `warehouse` = 운영 메타, `publishApproval` = 사람 승인. 서로 의미를 섞지 않음
+- package: `0.18.0`
+- 최신 Buffer 통합 검증 checkpoint: `06e53ae50ddb608f9abfa62d13381ae5281434f6`
+- GitHub Actions: run `34793505552` SUCCESS — syntax/regression + local server smoke + credential-less fail-closed 포함
+- 실제 E2E 미검증: Buffer key/channel 및 실제 Threads token/scopes가 이 환경에 연결되지 않았으므로 실제 외부 성공을 기록하지 않음
+- 다음: Buffer delivery status sync → P6 image/carousel capability+dry-run → P7 scheduler HOT/theme/source/format spacing + pause/stop/post-now/reorder → DB/server persistence/migrations → multi-account credential mapping
+- 검증 핵심: 소스 약관/권리, 원본성, 일반인 안전, 사람 승인, 실제 게시 여부와 예약 여부 구분, fake success 금지
 - Room: `04_COMMUNICATION/rooms/Threads/`
 - Main thread: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/`
-- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/017-sol.md`
+- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/026-sol.md`
