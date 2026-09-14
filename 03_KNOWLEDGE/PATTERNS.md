@@ -23,3 +23,10 @@
 - 한글 IME
 - 한글/공백 경로
 - 취약한 toolchain은 임시 ASCII path로만 우회
+
+## Windows 터미널 진행 표시
+- Windows 빌드/설치 진행은 가능하면 Unicode `━` + ANSI/VT + 같은 줄 redraw 형태의 terminal progress bar 사용
+- 항목 진행은 `2/3 [package]`, 측정 가능한 경우 percent/rate/ETA 표시
+- child subprocess가 직접 출력할 때는 부모 bar를 suspend해서 출력 충돌 방지
+- 비TTY/ANSI·Unicode 미지원 환경은 ASCII bar 또는 일반 로그로 fallback
+- 상세 기준: [`WINDOWS_TERMINAL_PROGRESS.md`](WINDOWS_TERMINAL_PROGRESS.md)

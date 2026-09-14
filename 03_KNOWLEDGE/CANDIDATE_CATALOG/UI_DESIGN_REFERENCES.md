@@ -126,3 +126,31 @@ SceneAI나 디자인 비평 글은 설치할 프로그램이 아닙니다.
 따라서 `ACTIVE/PROJECT` 도구로 승격하지 않고 `REFERENCE`로 유지합니다.
 
 반대로 이 참고에서 실제 reusable rule이 검증되면 그때 `PATTERNS.md`나 `USER_POLICIES.md`로 승격합니다.
+
+---
+
+## 5. Scrolltide
+
+- 사이트: https://www.scrolltide.co/
+- 종류: **scroll-driven 웹 UI prompt / template reference library**
+- 상태: `REFERENCE`
+
+### 확인된 정체
+Scrolltide는 스스로를 **scroll-driven templates and prompts의 curated library**로 설명합니다.
+프롬프트를 AI에 붙여 넣어 motion이 있는 웹사이트를 빠르게 만드는 흐름이며, 현재 사이트에는 Hero Section, Landing Page, Portfolio, Ecommerce, 3D Scene, Background 범주가 있습니다.
+
+사이트에서 함께 언급하는 기술은 Next.js, GSAP, Three.js, Framer Motion, Tailwind, React, WebGL, Lenis, Shaders 등입니다.
+
+### 우리한테 의미
+SceneAI와 비슷하게 설치형 개발도구라기보다 **AI가 만든 웹이 뻔한 카드/정적 레이아웃으로 굳는 것을 막기 위한 motion/UI 레퍼런스**로 보는 게 맞습니다.
+특히 scroll interaction, hero motion, 3D/background 연출을 만들 때 참고 가치가 있습니다.
+
+### 쓰는 방식
+1. 정보구조와 실제 사용자 흐름을 먼저 정함
+2. Scrolltide에서 가까운 motion/section을 고름
+3. prompt/template의 효과를 통째로 복제하기보다 필요한 interaction만 가져옴
+4. 성능, 모바일, reduced-motion, 스크롤 조작성까지 실제 화면에서 검증
+
+### 알아둘 점
+무료와 Premium 템플릿이 섞여 있고 사이트는 one-time lifetime access 상품도 판매합니다.
+시각적으로 멋진 scroll effect가 UX를 자동으로 좋게 만드는 것은 아니므로 장식보다 사용성/성능을 우선합니다.

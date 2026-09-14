@@ -26,3 +26,7 @@
 `CANDIDATE_CATALOG/SOURCE_BOOKMARKS.md`에는 사용자가 준 원문 링크도 보존하고, 현재 조사 환경에서 본문을 읽지 못한 링크는 `SOURCE-UNVERIFIED`로 명시합니다.
 
 새 팁을 의무적으로 추가하지 않습니다. 구체적인 실패를 막거나 다시 재사용된 경우에만 공통 패턴으로 승격합니다.
+
+## 추가 공통 패턴
+- [`WINDOWS_TERMINAL_PROGRESS.md`](WINDOWS_TERMINAL_PROGRESS.md) — Windows 빌드/설치용 Unicode `━` Rich 스타일 터미널 진행 표시와 fallback 규칙
+- [`CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md`](CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md) — SceneAI, Scrolltide 등 UI/motion 참고자료
