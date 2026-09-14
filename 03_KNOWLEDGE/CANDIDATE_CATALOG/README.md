@@ -14,6 +14,7 @@
 | [FINANCE_AND_OSINT.md](FINANCE_AND_OSINT.md) | TradingAgents, Fincept Terminal, Flowsint |
 | [UI_DESIGN_REFERENCES.md](UI_DESIGN_REFERENCES.md) | SceneAI, dashboard 디자인 참고자료, AGENTS/Skills 경량화 참고 |
 | [SOURCE_BOOKMARKS.md](SOURCE_BOOKMARKS.md) | 사용자가 준 원문 링크와 확인 상태 |
+| [AMBIGUITIES.md](AMBIGUITIES.md) | 정확한 원본을 아직 특정하지 못한 이름/링크와 처리 원칙 |
 
 ## 상태 표기
 
