@@ -17,9 +17,24 @@
 | SOURCE-UNVERIFIED | https://x.com/Aura_lixx/status/2099285949268279353 | X 원문은 현재 web cache에서 본문 조회 실패. 사용자가 준 링크 그대로 보관 |
 | VERIFIED | https://kucharski.substack.com/p/ten-reasons-your-vibe-coded-dashboard | Adam Kucharski, 2026-09-02. vibe-coded dashboard의 사용자 여정/시각 위계 문제 등 디자인 비평 |
 | SOURCE-UNVERIFIED | https://x.com/shanyanggm/status/2099196413649490398 | X 원문은 현재 web cache에서 본문 조회 실패. 사용자가 준 링크 그대로 보관 |
+| BOOKMARKED | https://x.com/ayush26291/status/2099345366005244288 | 사용자가 전달한 `7 GitHub Repos / LLM Stack` 게시물. X 본문보다 각 공식 GitHub 원본을 기준으로 기능·비용·라이선스 재검증 |
 
 ### X 링크 처리 원칙
 스크린샷에 보이는 주장과 URL을 연결해 임의로 “이 글이 정확히 이 내용을 말했다”고 단정하지 않습니다. X 본문을 나중에 직접 읽을 수 있을 때 author/date/body를 다시 채웁니다.
+
+---
+
+# 공식 GitHub — 7-repo LLM stack 재검증
+
+- Ollama — https://github.com/ollama/ollama
+- Dify — https://github.com/langgenius/dify
+- Firecrawl — https://github.com/firecrawl/firecrawl
+- prompts.chat — https://github.com/f/prompts.chat
+- AutoGPT — https://github.com/Significant-Gravitas/AutoGPT
+- Hermes Agent — https://github.com/NousResearch/hermes-agent
+- ECC — https://github.com/affaan-m/ECC
+
+상세 비교: `LLM_STACK_7_REPOS.md`
 
 ---
 
