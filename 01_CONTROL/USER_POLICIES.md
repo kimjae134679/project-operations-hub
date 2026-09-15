@@ -33,3 +33,11 @@
 - child process 정리와 connection service 종료를 구분합니다.
 - 실제 PC가 offline이면 local verification을 했다고 주장하지 않습니다.
 - **Remote Desktop Commander/데스크톱 원격을 사용한 회차는 임시 빌드 산출물, 중간 APK/ZIP/IDSIG, cache, probe, `__pycache__`, 불필요 로그 등 그 작업이 만든 찌꺼기를 종료 전에 정리하는 것까지 완료 조건입니다.** 최종 산출물과 재현에 필요한 소스/스크립트는 남기고, 사용자 데이터·Known-Good·원본/reference 자료는 임의로 삭제하지 않습니다.
+
+## AI 설치/작업 위치
+- AI가 새로 설치하거나 직접 만드는 프로그램·도구·실험 프로젝트의 기본 관리 루트는 `C:\Program Files\_My\AI`입니다.
+- 새 항목은 루트에 흩어놓지 않고 `Applications`, `Installers`, `Scripts`, `Launchers`, `Projects`, `Workspace`, `External`처럼 역할별 폴더에 정리합니다.
+- 패키지 매니저나 공식 업데이터가 기본 위치를 요구하거나 이동 시 업데이트/런타임이 깨질 가능성이 있으면 기본 설치 위치를 유지할 수 있습니다.
+- 기본 위치를 유지한 예외는 실제 경로와 이유를 설치 레지스트리/인수인계에 기록합니다.
+- 기존 안정 프로젝트를 이유 없이 대규모 이동하지 않습니다. 새 AI 작업부터 새 루트를 기본값으로 쓰고, 단순·안전하게 옮길 수 있는 기존 AI 설치물은 정리해 옮깁니다.
+- 모든 프로젝트 인수인계에는 AI가 설치한 프로그램/도구/작업 폴더의 실제 위치와 `C:\Program Files\_My\AI` 정책 준수 여부를 적습니다.
