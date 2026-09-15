@@ -9,6 +9,7 @@
 | 문서 | 내용 |
 |---|---|
 | [AI_AGENTS_AND_DEV.md](AI_AGENTS_AND_DEV.md) | OpenHands, Hermes Agent, CrewAI, Aider, LangGraph, browser-use, awesome-mcp-servers, Task Master, LibreChat, Anthropic Agent Skills |
+| [AGENT_SKILLS_10_REPOS.md](AGENT_SKILLS_10_REPOS.md) | Vercel Skills, Superpowers, ECC, Hermes, Scientific Agent Skills, Agency Agents, Anthropic Skills, Awesome Agent Skills, OpenViking, Learn Claude Code |
 | [LLM_STACK_7_REPOS.md](LLM_STACK_7_REPOS.md) | Ollama, Dify, Firecrawl, prompts.chat, AutoGPT, Hermes Agent, ECC — SNS 홍보문구와 실제 기능/비용/라이선스/우리 적용성 비교 |
 | [AUTOMATION_AND_INTEGRATIONS.md](AUTOMATION_AND_INTEGRATIONS.md) | n8n, Agentic Inbox, Nango |
 | [CONTENT_MEDIA.md](CONTENT_MEDIA.md) | MoneyPrinterTurbo, HyperFrames, VoxCPM |
@@ -34,6 +35,10 @@
 - **AutoGPT**의 현재 주력은 Platform이며 `autogpt_platform/`은 Polyform Shield, Classic/기타는 MIT입니다.
 - **Hermes Agent**의 self-improving은 모델 자체를 계속 재훈련한다는 뜻보다는 작업 경험을 Skill/기억으로 축적·재사용하는 구조에 가깝습니다.
 - **ECC**의 `Agent Harness OS`는 포지셔닝 표현이며 실제로는 Codex/Claude Code 등에 붙는 Skill·Hook·Rule·MCP·검증 체계 묶음입니다.
+- **Vercel Skills**는 Skill 자체의 품질/안전성을 보증하는 앱스토어가 아니라 여러 Agent에 Skill을 찾고 설치·업데이트하는 CLI입니다. 설치 대상 원본은 별도 검토가 필요합니다.
+- **Superpowers**는 단순 Skill 모음보다 강한 개발 방법론에 가깝습니다. 전체 전역 적용 시 현재 Hub의 action-first 규칙과 절차 충돌 가능성이 있습니다.
+- **OpenViking**은 일반적인 메모 앱이 아니라 Resource/Memory/Skill을 통합 관리하는 Agent용 context database입니다. 동기화 범위와 민감정보 경계를 먼저 검증해야 합니다.
+- **Learn Claude Code**는 완성형 코딩 Agent 제품이라기보다 Agent loop·tool·memory·skills·subagents·MCP 등을 단계별로 배우는 교육/참고 구현입니다.
 - **n8n**은 흔히 “오픈소스 Zapier”라고 불리지만 공식 설명은 **fair-code workflow automation**입니다. self-host는 가능하지만 일반적인 OSI 오픈소스와 동일하다고 적지 않습니다.
 - **Fincept Terminal**은 “무료 Bloomberg”라고 부르기보다 **오픈 에디션 금융 리서치 터미널**로 보는 게 정확합니다. 오픈 에디션은 AGPL-3.0이고 데이터/LLM 비용은 별도일 수 있습니다.
 - **HyperFrames**는 영상 생성 모델이 아니라 **HTML/CSS/애니메이션을 결정론적으로 MP4로 렌더링하는 프레임워크**입니다.
@@ -52,13 +57,16 @@
 6. `browser-use` — 웹 작업 자동화 후보. 로그인/약관/사이트 안정성 때문에 별도 격리 테스트 필수
 
 ### 개발환경 쪽
-1. `ECC` — Codex/Agent 작업 규율·Skill·quality gate 후보. 기존 AGENTS/Project Operations Hub와 충돌 가능성이 커 minimal 격리 테스트 우선
-2. `Anthropic Agent Skills` — Skill 구조/트리거 설계 참고용
-3. `OpenHands` — 여러 코딩 Agent를 한 화면/백엔드에서 운영하는 control-center 후보
-4. `Hermes Agent` — 지속 기억·Skill 생성/개선·스케줄 자동화가 강한 독립 Agent 후보
-5. `Aider` — 기존 저장소를 빠르게 수정하는 터미널 pair programmer 후보
-6. `CrewAI` / `LangGraph` — 직접 멀티 Agent 시스템을 만들 때 검토
-7. `Task Master` — AI 작업을 task/dependency 구조로 관리할 때 검토
+1. `Vercel Skills` — 여러 Agent의 Skill을 검색·선택·설치·업데이트하는 관리 계층. 가장 작은 격리 실험부터
+2. `OpenViking` — Hub의 장기 memory/context/search 계층 후보. private 데이터 경계 확인 후 테스트
+3. `ECC` — Codex/Agent 작업 규율·Skill·quality gate 후보. 전체 설치보다 일부 기능 격리 테스트 우선
+4. `Learn Claude Code` — permission, memory, context compaction, task/subagent/worktree 구조 참고
+5. `Anthropic Agent Skills` — Skill 구조/트리거 설계 기준 참고
+6. `OpenHands` — 여러 코딩 Agent를 한 화면/백엔드에서 운영하는 control-center 후보
+7. `Hermes Agent` — 지속 기억·Skill 생성/개선·스케줄 자동화가 강한 독립 Agent 후보
+8. `Aider` — 기존 저장소를 빠르게 수정하는 터미널 pair programmer 후보
+9. `Superpowers` / `Agency Agents` — 전체 전역 적용보다 필요한 Skill/역할만 선별
+10. `CrewAI` / `LangGraph` / `Task Master` — 구체적인 멀티 Agent·장기 workflow·task graph가 필요할 때 검토
 
 ### 로컬 AI 쪽
 1. `Ollama` — 로컬 모델 runtime 후보. 12GB VRAM 기준 실제 모델 1~2개를 골라 속도/품질/메모리부터 측정
