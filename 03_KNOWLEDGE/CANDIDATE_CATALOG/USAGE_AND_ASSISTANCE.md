@@ -48,7 +48,12 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 |---|---|---|---|---|---|
 | ripgrep (`rg`) | INSTALL | FULL | FREE_OSS | 🟢 | MIT/UNLICENSE. 로컬 검색은 AI가 독립 운용하기 좋음 |
 | Gitleaks CLI | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 CLI 기준. `gitleaks-action`의 라이선스/runner 조건과 분리해서 봄 |
+| uv | INSTALL | FULL | FREE_OSS | 🟢 | MIT OR Apache-2.0. Windows/macOS/Linux. Python 자체 설치, venv, lock/sync, Python CLI tool 실행까지 통합. 제3자 패키지/API 비용은 별도 |
 | Context7 public docs | CONNECT/INSTALL | AFTER_SETUP | FREE_TIER | ⚪~🟢 | 공식 Free: 월 1,000 API calls. 한도 도달 시 월 reset 전까지 차단되며 일 20 bonus calls. 카드 없이 가입 가능. Private repo는 유료라 기본 제외 |
+
+### uv 메모
+
+`uv`는 Python package/project manager이며 standalone installer로 Python/Rust가 없는 환경에서도 설치할 수 있습니다. `pip`, `pip-tools`, `pipx`, `poetry`, `pyenv`, `virtualenv` 등이 나눠 맡던 상당 부분을 한 CLI에서 처리하고 Python 버전도 설치할 수 있어, AI가 여러 프로젝트의 Python 환경을 반복 재현하는 용도에 적합합니다. 프로그램 자체는 무료 오픈소스지만 `uv`가 설치/실행하는 제3자 패키지와 외부 API의 비용·라이선스는 별도입니다. Python package build 과정에서 임의 코드가 실행될 수 있으므로 신뢰되지 않은 dependency를 자동 설치하는 근거로 사용하지 않습니다.
 
 ### 2026-09-16 주의 — Gitleaks Action
 
@@ -92,4 +97,4 @@ GitHub-hosted runner의 Node 20 제거 일정 때문에 `gitleaks-action@v2`는 
 
 가격은 공식 pricing/README/license를 우선하며 SNS의 `무료`, `free`, `$0`만으로 확정하지 않습니다. 같은 도구가 여러 목록에 반복되면 기존 항목을 갱신합니다.
 
-마지막 정리: **2026-09-16**
+마지막 정리: **2026-09-17**
