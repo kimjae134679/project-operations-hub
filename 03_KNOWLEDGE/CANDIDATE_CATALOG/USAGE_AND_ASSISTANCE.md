@@ -49,17 +49,20 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 | ripgrep (`rg`) | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 문자열 검색은 AI가 독립 운용하기 좋음 |
 | fd | INSTALL | FULL | FREE_OSS | 🟢 | MIT/Apache-2.0. 파일·폴더 경로 검색용. rg와 보완 관계 |
 | jq | INSTALL | FULL | FREE_OSS | 🟢 | MIT. JSON을 CLI에서 slice/filter/map/transform. 공식 prebuilt standalone binary 제공 |
+| yq (Mike Farah) | INSTALL | FULL | FREE_OSS | 🟢 | MIT. YAML/JSON/XML/INI/properties/CSV/TSV 처리. Windows winget 및 standalone binary 지원 |
 | Gitleaks CLI | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 CLI 기준. `gitleaks-action` 조건과 분리 |
 | uv | INSTALL | FULL | FREE_OSS | 🟢 | MIT OR Apache-2.0. Python 환경/패키지/도구 관리. 제3자 패키지/API 비용 별도 |
 | just | INSTALL | FULL | FREE_OSS | 🟢 | CC0-1.0 command runner. Windows에서 PowerShell/cmd shell 지정 가능. 처음 보는 justfile recipe는 실행 전 검토 |
 | mise | INSTALL | FULL | FREE_OSS | 🟢~🟡 | 여러 언어/SDK 버전+env+task 재현. Windows winget 지원. 외부 `mise.toml`은 trust/실행 전 검토 |
 | Context7 public docs | CONNECT/INSTALL | AFTER_SETUP | FREE_TIER | ⚪~🟢 | Free 월 1,000 API calls. 카드 없이 가입 가능. Private repo는 유료라 기본 제외 |
 
-### jq
+### jq + yq
 
-`jq`는 JSON 전용 CLI processor입니다. portable C로 작성되고 runtime dependency가 없으며 공식 release에서 플랫폼별 standalone executable을 제공합니다. 설정 파일, API 응답, package metadata처럼 JSON이 많은 자동화 작업에서 Python/PowerShell 임시 스크립트를 매번 만드는 대신 필요한 필드 추출·필터·변환을 한 줄 CLI로 처리하기 좋습니다. MIT 무료 오픈소스이며 로그인·API key·GUI가 필요 없어 AI 단독 운용성이 높습니다.
+`jq`는 JSON 전용 CLI processor이고, `yq`는 YAML을 중심으로 JSON/XML/INI/properties/CSV/TSV까지 읽고 변환할 수 있는 CLI입니다. 둘 다 GUI·로그인·API key가 필요 없고 standalone binary로 쓸 수 있어 AI 단독 운용성이 높습니다. GitHub Actions, Docker Compose, Kubernetes, CI 설정처럼 YAML이 많은 프로젝트에서는 `yq`가 사람이 직접 긴 파일을 통째로 고치는 것보다 필요한 키만 읽거나 수정하는 데 유용합니다.
 
-`jq`는 데이터를 읽고 변환하는 도구일 뿐 입력 JSON이나 그 안의 명령/URL이 안전하다는 보장은 하지 않습니다. 외부 데이터의 값을 후속 shell 명령에 넣을 때는 별도 검증/escaping을 유지합니다.
+Mike Farah의 `yq`는 MIT 무료 오픈소스이며 Windows용 binary와 `winget install --id MikeFarah.yq` 경로가 있습니다. 이름이 같은 다른 `yq` 구현이 있으므로 자동화 문서에서는 가능하면 `MikeFarah.yq` 또는 `mikefarah/yq`로 식별합니다. `-i`는 파일을 직접 수정하므로 Known-Good/외부 설정 파일에서는 먼저 조회 또는 diff 후 적용합니다.
+
+`jq`/`yq`가 데이터를 읽고 변환한다고 해서 입력값이나 그 안의 명령·URL이 안전하다는 뜻은 아닙니다. 외부 데이터 값을 후속 shell 명령에 넣을 때는 별도 검증/escaping을 유지합니다.
 
 ### mise
 
