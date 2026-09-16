@@ -48,11 +48,18 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 |---|---|---|---|---|---|
 | ripgrep (`rg`) | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 문자열 검색은 AI가 독립 운용하기 좋음 |
 | fd | INSTALL | FULL | FREE_OSS | 🟢 | MIT/Apache-2.0. 파일·폴더 경로 검색용. rg와 보완 관계 |
+| jq | INSTALL | FULL | FREE_OSS | 🟢 | MIT. JSON을 CLI에서 slice/filter/map/transform. 공식 prebuilt standalone binary 제공 |
 | Gitleaks CLI | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 CLI 기준. `gitleaks-action` 조건과 분리 |
 | uv | INSTALL | FULL | FREE_OSS | 🟢 | MIT OR Apache-2.0. Python 환경/패키지/도구 관리. 제3자 패키지/API 비용 별도 |
 | just | INSTALL | FULL | FREE_OSS | 🟢 | CC0-1.0 command runner. Windows에서 PowerShell/cmd shell 지정 가능. 처음 보는 justfile recipe는 실행 전 검토 |
 | mise | INSTALL | FULL | FREE_OSS | 🟢~🟡 | 여러 언어/SDK 버전+env+task 재현. Windows winget 지원. 외부 `mise.toml`은 trust/실행 전 검토 |
 | Context7 public docs | CONNECT/INSTALL | AFTER_SETUP | FREE_TIER | ⚪~🟢 | Free 월 1,000 API calls. 카드 없이 가입 가능. Private repo는 유료라 기본 제외 |
+
+### jq
+
+`jq`는 JSON 전용 CLI processor입니다. portable C로 작성되고 runtime dependency가 없으며 공식 release에서 플랫폼별 standalone executable을 제공합니다. 설정 파일, API 응답, package metadata처럼 JSON이 많은 자동화 작업에서 Python/PowerShell 임시 스크립트를 매번 만드는 대신 필요한 필드 추출·필터·변환을 한 줄 CLI로 처리하기 좋습니다. MIT 무료 오픈소스이며 로그인·API key·GUI가 필요 없어 AI 단독 운용성이 높습니다.
+
+`jq`는 데이터를 읽고 변환하는 도구일 뿐 입력 JSON이나 그 안의 명령/URL이 안전하다는 보장은 하지 않습니다. 외부 데이터의 값을 후속 shell 명령에 넣을 때는 별도 검증/escaping을 유지합니다.
 
 ### mise
 
