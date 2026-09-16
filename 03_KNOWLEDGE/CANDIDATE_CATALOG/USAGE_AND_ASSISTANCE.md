@@ -51,7 +51,16 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 | Gitleaks CLI | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 CLI 기준. `gitleaks-action` 조건과 분리 |
 | uv | INSTALL | FULL | FREE_OSS | 🟢 | MIT OR Apache-2.0. Python 환경/패키지/도구 관리. 제3자 패키지/API 비용 별도 |
 | just | INSTALL | FULL | FREE_OSS | 🟢 | CC0-1.0 command runner. Windows에서 PowerShell/cmd shell 지정 가능. 처음 보는 justfile recipe는 실행 전 검토 |
+| mise | INSTALL | FULL | FREE_OSS | 🟢~🟡 | 여러 언어/SDK 버전+env+task 재현. Windows winget 지원. 외부 `mise.toml`은 trust/실행 전 검토 |
 | Context7 public docs | CONNECT/INSTALL | AFTER_SETUP | FREE_TIER | ⚪~🟢 | Free 월 1,000 API calls. 카드 없이 가입 가능. Private repo는 유료라 기본 제외 |
+
+### mise
+
+`mise`는 Node.js/Python/Go 등 개발 도구 버전, 환경변수, task를 `mise.toml`에 선언하고 같은 환경을 shell/editor/CI에서 재현하는 CLI입니다. Windows 공식 설치 경로에 `winget install jdx.mise`가 있고 shell activation 없이도 `mise exec`/`mise run`을 사용할 수 있어 AI 자동화와 잘 맞습니다.
+
+프로젝트마다 Node/Python 버전이나 build/test 명령이 달라 환경 재현 문제가 반복될 때 후보 가치가 높습니다. 반대로 단순 Python 프로젝트에서는 이미 기록한 `uv`, 단순 command alias만 필요하면 `just`가 더 작은 선택일 수 있으므로 무조건 도입하지 않습니다.
+
+`mise.toml`은 SDK 설치와 임의 task 실행을 유도할 수 있으므로 외부 저장소 설정은 내용을 확인한 뒤 trust/install/run 합니다. `mise` 자체의 무료 여부와 설치되는 SDK/API/패키지의 비용·라이선스는 분리합니다.
 
 ### fd + rg
 
