@@ -10,11 +10,15 @@
 
 - `ADOPTION` — 실제로 채택했는가: `ACTIVE / PROJECT / CANDIDATE / REFERENCE / RETIRED`
 - `INSTALLED` — 실제 PC에 설치되어 있는가: `YES / NO / UNKNOWN`
+- `ACCESS` — 현재 바로 사용 가능한가: `READY / CONNECT / INSTALL / REFERENCE`
+- `OPERATOR` — 주 사용 주체: `AI / USER / BOTH`
+- `ASSISTANCE` — 사용자 개입: `NONE / ONCE / FREQUENT`
 - `BURDEN` — 설치·운영 부담: `⚪ NONE / 🟢 LIGHT / 🟡 MEDIUM / 🟠 HEAVY / 🔴 VERY_HEAVY`
 
 실제 채택 상태의 원본은 `01_CONTROL/TOOLS.md`입니다.
 실제 설치 버전/위치의 원본은 `01_CONTROL/AI_INSTALLATIONS.md`입니다.
-이 파일은 그 둘을 **후보 조사 문서와 연결하는 인덱스**입니다.
+사용 가능 여부·누가 쓰는지·사용자 도움이 필요한지는 `USAGE_AND_ASSISTANCE.md`에서 관리합니다.
+이 파일은 그 원본들과 **후보 조사 문서를 연결하는 인덱스**입니다.
 
 ---
 
@@ -166,16 +170,19 @@
 
 ## 상세 문서 지도
 
+- `USAGE_AND_ASSISTANCE.md` — 지금 바로 사용 가능 여부, AI/사용자 중 누가 쓰는지, 사용자 1회 도움, 연결/설치/GUI 구분
+- `INSTALLATION_BURDEN.md` — 설치/운영 무게 기준
 - `AGENT_SKILLS_10_REPOS.md` — Agent Skills/Harness 10개
-- `50_USEFUL_REPOS.md` — 이번 50개 게시물 검증본
+- `50_USEFUL_REPOS.md` — 50개 GitHub 목록 검증본
 - `LLM_STACK_7_REPOS.md` — Ollama/Dify/Firecrawl/AutoGPT/Hermes/ECC 등
 - `AI_AGENTS_AND_DEV.md` — OpenHands/Hermes/CrewAI/Aider/LangGraph/browser-use 등
 - `AUTOMATION_AND_INTEGRATIONS.md` — n8n/Nango/Agentic Inbox
 - `CONTENT_MEDIA.md` — MoneyPrinterTurbo/HyperFrames/VoxCPM
 - `FINANCE_AND_OSINT.md` — TradingAgents/Fincept/Flowsint
-- `INSTALLATION_BURDEN.md` — 설치/운영 무게 기준
 - `SOURCE_BOOKMARKS.md` — 사용자가 준 원문 링크와 공식 원본
 - `AMBIGUITIES.md` — 원본 특정 실패/이름 충돌
+
+사용자에게 보여줄 요약은 `000_사용자용/03_후보_도구_요약.md`와 `000_사용자용/06_AI_도구_플러그인_사용구분.md`에 동기화합니다.
 
 ## 정리 원칙
 
@@ -183,15 +190,19 @@
 
 ```text
 원문 링크 보관
-→ 공식 repo 확인
+→ 공식 repo/Plugin 원본 확인
 → canonical 이름/redirect 확인
 → 실제 정체 확인
-→ ADOPTION과 INSTALLED를 분리
+→ ACCESS / OPERATOR / ASSISTANCE 구분
+→ ADOPTION과 INSTALLED 분리
 → BURDEN 표기
-→ 상세 주제 문서에 기록
-→ MASTER_INDEX에 한 줄 연결
+→ Cloud/self-host 차이 기록
+→ 비용·권한·보안·라이선스 확인
+→ 상세 문서 기록
+→ MASTER_INDEX 연결
+→ 사용자에게 필요한 변화만 000_사용자용에 한글 동기화
 ```
 
 같은 도구가 여러 SNS 목록에 다시 나오면 상세 설명을 복제하지 않고 기존 항목으로 연결합니다.
 
-마지막 정리: **2026-09-15**
+마지막 정리: **2026-09-16**
