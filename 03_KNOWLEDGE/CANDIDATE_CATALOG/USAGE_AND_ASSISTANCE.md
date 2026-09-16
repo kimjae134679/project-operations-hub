@@ -50,11 +50,20 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 | fd | INSTALL | FULL | FREE_OSS | 🟢 | MIT/Apache-2.0. 파일·폴더 경로 검색용. rg와 보완 관계 |
 | jq | INSTALL | FULL | FREE_OSS | 🟢 | MIT. JSON을 CLI에서 slice/filter/map/transform. 공식 prebuilt standalone binary 제공 |
 | yq (Mike Farah) | INSTALL | FULL | FREE_OSS | 🟢 | MIT. YAML/JSON/XML/INI/properties/CSV/TSV 처리. Windows winget 및 standalone binary 지원 |
+| GitHub CLI (`gh`) | INSTALL | AFTER_SETUP | FREE_OSS | 🟢 | GitHub의 repo/issue/PR/release/workflow/API를 CLI/스크립트로 처리. 최초 `gh auth login` 또는 token 준비 필요 |
 | Gitleaks CLI | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 CLI 기준. `gitleaks-action` 조건과 분리 |
 | uv | INSTALL | FULL | FREE_OSS | 🟢 | MIT OR Apache-2.0. Python 환경/패키지/도구 관리. 제3자 패키지/API 비용 별도 |
 | just | INSTALL | FULL | FREE_OSS | 🟢 | CC0-1.0 command runner. Windows에서 PowerShell/cmd shell 지정 가능. 처음 보는 justfile recipe는 실행 전 검토 |
 | mise | INSTALL | FULL | FREE_OSS | 🟢~🟡 | 여러 언어/SDK 버전+env+task 재현. Windows winget 지원. 외부 `mise.toml`은 trust/실행 전 검토 |
 | Context7 public docs | CONNECT/INSTALL | AFTER_SETUP | FREE_TIER | ⚪~🟢 | Free 월 1,000 API calls. 카드 없이 가입 가능. Private repo는 유료라 기본 제외 |
+
+### GitHub CLI (`gh`)
+
+GitHub 공식 CLI로 repository, issue, pull request, release, workflow/run, search, API 호출 등을 terminal/script에서 처리할 수 있습니다. GUI 브라우저를 반복 조작하지 않아도 되므로 Remote Desktop/로컬 PC에서 GitHub 작업을 자동화할 때 AI 운용성이 높습니다.
+
+인증 전에는 `AFTER_SETUP`입니다. 최초 `gh auth login`의 browser/device flow는 사용자의 1회 승인이 필요할 수 있고, headless 자동화에서는 `GH_TOKEN`/`GITHUB_TOKEN` 환경변수를 사용할 수 있습니다. 토큰은 문서/로그/저장소에 기록하지 않습니다.
+
+`gh extension`은 core와 별개입니다. GitHub 공식 문서도 extension은 GitHub가 검증·서명·보증하지 않는다고 안내하므로, extension을 자동 설치하지 않고 source/provenance를 검토합니다. 또한 `gh copilot`처럼 별도 서비스/요금 조건이 붙는 하위 기능은 `gh` 자체가 무료라는 이유로 무료 취급하지 않습니다.
 
 ### jq + yq
 
