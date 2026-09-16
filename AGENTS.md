@@ -34,6 +34,23 @@
 - 비밀값은 GitHub/문서/채널에 기록하지 않습니다.
 - AGENTS는 현재 실행본입니다. stale/duplicate/temp 규칙은 정리하고 Git/Archive에서 과거를 찾습니다.
 
+## AI 도구/Plugin 후보 정리 규칙
+
+Plugin, Skill, MCP, CLI, Agent, 자동화 도구를 조사할 때 단순히 `좋아 보임`으로 적지 않습니다. 가능한 한 다음을 분리합니다.
+
+- 지금 바로 사용 가능한지
+- 연결/OAuth만 필요한지, PC 설치가 필요한지
+- AI가 사용자 도움 없이 설치·설정할 수 있는지
+- 로그인/OAuth/UAC/API key/2FA/결제 등 사용자 1회 도움이 필요한지
+- 사용자가 직접 GUI를 써야 하는 도구인지
+- 주 사용자가 AI인지, 사용자 본인인지, 둘 다인지
+- 실제 설치 여부와 실제 채택 여부
+- 설치·운영 부담 `⚪/🟢/🟡/🟠/🔴`
+- Cloud와 self-host의 부담 차이
+- 비용·보안·권한·라이선스 주의점
+
+내부 상세 기준은 `03_KNOWLEDGE/CANDIDATE_CATALOG/USAGE_AND_ASSISTANCE.md`, 설치 부담은 `INSTALLATION_BURDEN.md`를 봅니다. ComfyUI, vLLM, RAGFlow, 대형 로컬 모델처럼 무거운 도구는 가벼운 Plugin/Skill과 같은 종류의 “그냥 설치 후보”로 취급하지 않습니다.
+
 ## 문서 갱신
 
 내부 원본을 갱신했으면 같은 작업 안에서 대응되는 사용자용 문서도 갱신합니다.
@@ -43,6 +60,7 @@
 - 실제 설치/버전/위치 변경 → `01_CONTROL/AI_INSTALLATIONS.md` + `000_사용자용/02_설치_도구_현황.md`
 - 프로젝트 등록/위치 변경 → `01_CONTROL/PROJECT_REGISTRY.md` + 해당 `02_PROJECTS/` + `000_사용자용/01_프로젝트_현황.md`
 - 후보 조사/설치 부담 변경 → `03_KNOWLEDGE/CANDIDATE_CATALOG/` + `000_사용자용/03_후보_도구_요약.md`
+- Plugin/Skill/MCP/CLI/Agent의 사용 가능 여부·사용 주체·사용자 도움 조건 변경 → `03_KNOWLEDGE/CANDIDATE_CATALOG/USAGE_AND_ASSISTANCE.md` + `000_사용자용/06_AI_도구_플러그인_사용구분.md`
 - 소통창구의 주요 열린 주제/구조 변경 → `04_COMMUNICATION/` + `000_사용자용/04_소통창구.md`
 - 재사용이 실제로 확인된 패턴 → `03_KNOWLEDGE/`
 - 세부 build/run/test/path → 실제 프로젝트 AGENTS
