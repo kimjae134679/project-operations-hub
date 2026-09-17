@@ -48,6 +48,7 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 |---|---|---|---|---|---|
 | ripgrep (`rg`) | INSTALL | FULL | FREE_OSS | 🟢 | 로컬 문자열 검색은 AI가 독립 운용하기 좋음 |
 | fd | INSTALL | FULL | FREE_OSS | 🟢 | MIT/Apache-2.0. 파일·폴더 경로 검색용. rg와 보완 관계 |
+| bat (`sharkdp/bat`) | INSTALL | FULL | FREE_OSS | 🟢 | MIT/Apache-2.0 선택. 파일 내용+줄번호+syntax/Git 변경 표시. Windows winget/prebuilt 지원; 일부 paging/색상 환경 이슈 가능 |
 | jq | INSTALL | FULL | FREE_OSS | 🟢 | MIT. JSON을 CLI에서 slice/filter/map/transform. 공식 prebuilt standalone binary 제공 |
 | yq (Mike Farah) | INSTALL | FULL | FREE_OSS | 🟢 | MIT. YAML/JSON/XML/INI/properties/CSV/TSV 처리. Windows winget 및 standalone binary 지원 |
 | GitHub CLI (`gh`) | INSTALL | AFTER_SETUP | FREE_OSS | 🟢 | GitHub의 repo/issue/PR/release/workflow/API를 CLI/스크립트로 처리. 최초 `gh auth login` 또는 token 준비 필요 |
@@ -56,6 +57,12 @@ AI/Plugin/Skill/MCP/CLI/Agent 후보를 단순히 `좋다/나쁘다`나 `설치�
 | just | INSTALL | FULL | FREE_OSS | 🟢 | CC0-1.0 command runner. Windows에서 PowerShell/cmd shell 지정 가능. 처음 보는 justfile recipe는 실행 전 검토 |
 | mise | INSTALL | FULL | FREE_OSS | 🟢~🟡 | 여러 언어/SDK 버전+env+task 재현. Windows winget 지원. 외부 `mise.toml`은 trust/실행 전 검토 |
 | Context7 public docs | CONNECT/INSTALL | AFTER_SETUP | FREE_TIER | ⚪~🟢 | Free 월 1,000 API calls. 카드 없이 가입 가능. Private repo는 유료라 기본 제외 |
+
+### bat
+
+`bat`는 `cat` 계열 파일 뷰어에 syntax highlighting, 줄번호, Git modification 표시 등을 더한 CLI입니다. MIT 또는 Apache-2.0 중 선택 가능한 무료 오픈소스이고 Windows에서는 `winget install sharkdp.bat` 및 공식 prebuilt binary 경로가 있습니다. GUI·로그인·API key가 필요하지 않아 AI가 코드/설정 파일을 읽고 위치를 설명하는 작업에서 단독 운용하기 쉽습니다.
+
+기본 `type`/PowerShell `Get-Content`를 대체해야 하는 필수 도구는 아니며, 사람이 원격 터미널 출력을 함께 볼 때 가독성 향상 가치가 큽니다. 일부 Windows/PowerShell paging·색상 환경 이슈가 보고된 적이 있으므로 자동화 파이프에서는 색상/페이저를 끄거나 기본 텍스트 명령으로 fallback할 수 있게 둡니다. `bat`가 보여주는 파일 내용 자체의 신뢰성은 별개입니다.
 
 ### GitHub CLI (`gh`)
 
