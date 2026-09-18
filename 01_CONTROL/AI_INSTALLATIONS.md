@@ -21,6 +21,7 @@
 | n8n | 2.38.7 | `%APPDATA%\npm` + npm global modules | npm 기본 관리 위치 유지 |
 | HyperFrames | 0.8.40 | `%APPDATA%\npm` + npm global modules | npm 기본 관리 위치 유지 |
 | Aider | 0.86.2 | `%USERPROFILE%\.local\bin` + installer-managed Python env | updater/환경 관리 경로 유지 |
+| jev-router | 0.2.0 | `C:\Users\user\AppData\Roaming\npm` | npm 전역 기본 위치 유지. `jev-codex.cmd`, `jev-claude.cmd` 설치 확인. API 키 미설정으로 비활성·실제 라우팅 미검증 |
 
 ## 인수인계 필수 항목
 모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.
