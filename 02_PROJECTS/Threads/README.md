@@ -1,34 +1,36 @@
 # Threads — AI 콘텐츠 수익화
 
-- Repo: https://github.com/kimjae134679/Threads
-- 방향: 허용된 공식 API/RSS/직접 링크/공개 검색 메타데이터로 화제를 탐지하고, AI+사람 검토로 원본성 있는 멀티플랫폼 콘텐츠를 만든 뒤 실제 게시 성과로 학습
-- 운영 구조: `00_START_HERE → 01_DISCOVERY → 02_EDITORIAL_SCORING → 03_PRODUCTION → 04_REVIEW_PUBLISH → 05_EXPERIMENTS_ACCOUNTS`
-- 현재 상태: `수집 → Viral Finder/Audience Comfort → 테마·Discovery Lane/플랫폼 분류 → bulk review → Research → Draft/Card Factory → 이미지 privacy gate → Content Warehouse READY/HOT/EVERGREEN → Rights/Safety Gate → 사람 승인 → Direct Threads 또는 선택형 Buffer 전달 → Insights/Experiment Lab` 구조
-- Discovery Lane: 웃긴 짤/밈, 커뮤니티 논란, 소식/이슈, 직장/취업, 연애/관계, 돈/소비, 군대/학교, 황당/반전, AI/IT/게임, 연예/문화, 스포츠/e스포츠, 음식/여행, 동물/자연
-- Discovery Source Registry: Google Trends, NAVER 뉴스/블로그/카페, Daum 카페, YouTube, Reddit, X/Twitter, Threads, Instagram, DCInside, Blind, FMKorea, 더쿠, 인스티즈, 클리앙, 루리웹, 인벤, 뽐뿌, 아카라이브, Tistory/공개 블로그, 기타 뉴스/웹
-- Source adapter 상태는 `connected / connected-when-credentialed / manual-only / planned / planned-discovery`로 실제 구현 여부를 분리. Registry 등록만으로 자동수집 완료라고 취급하지 않음
-- DCInside/Blind 등은 bulk body crawler를 두지 않고 공개 검색/인덱스 metadata + 사용자 URL/스크린샷 Capture 경로 사용
-- Viral Finder: popularity/discussion/sourceStrength/freshness/cardability + Audience Comfort. 고반응이어도 동물학대/고어/잔혹/성폭력·아동성착취/그래픽 자해/신상털이/심한 불쾌 시각 소재는 BLOCK
-- Bulk review: 여러 후보 선택/보류/태그/편집 검토 handoff를 지원하며 Comfort clearance를 우회하지 않음
-- Theme classification: `item.themeClassification` primary/secondary/tags/confidence/source. Theme와 Safety는 별도
-- Community Card Factory: 후보/Research Bundle → Hook/캡처/핵심/후속/반응/마지막 카드 storyboard → Canvas 1080×1350. Dark Viral/Paper Story/Signal News template
-- Card privacy: 텍스트 PII 마스킹 + 캡처 이미지 수동 drag rectangle mask + 이미지 identity-bound review. OCR/얼굴 자동탐지를 완료한 척하지 않음
-- Content Warehouse: READY/HOT/EVERGREEN, priority, hold, notBefore/expiresAt, freshness, theme/format tags, provenance, bounded history. `지금 게시 가능`은 Warehouse READY 분류와 별도이며 Comfort/production/privacy/Safety/current human approval을 모두 통과해야 함
-- 게시 경로 A — Direct Threads: `THREADS_ACCESS_TOKEN`; 사람 승인 체인을 모두 통과한 텍스트만 공식 Threads API 2단계 publish. 실제 ID가 있을 때만 `item.publications[]`
-- 게시 경로 B — Optional Buffer: `BUFFER_API_KEY`; Threads 채널을 조회/선택하고 `addToQueue / customScheduled / shareNow`. 동일한 서버-side 승인 검증 후만 전달. 결과는 우선 `item.bufferDeliveries[]`에 기록하며 실제 sent 확인 전에는 publication으로 간주하지 않음
-- Buffer secret/config: `.env*`와 `config/buffer.local.json`은 gitignore. 브라우저에 API key 노출 금지. 선택 채널은 local config 또는 `BUFFER_THREADS_CHANNEL_ID`
-- Buffer thread backend contract: `metadata.threads.thread` 지원, 첫 segment = top-level text. 현재 UI는 승인 후 몰래 분할하지 않기 위해 단일 post만 노출하고 500자 초과는 Draft Studio 재편집/재승인 요구
-- Buffer 참고/검증: DevDesign Threads 자동 발행 글의 역할 분리·사람 최종확인·예약 발행 아이디어를 반영하되 Buffer 공식 GraphQL 문서로 현재 request shape를 별도 확인
-- 이미지/carousel 실제 게시: 아직 미완료. Direct 공식 API capability/dry-run + 안전한 media hosting/upload 단계가 필요하며 local Canvas 이미지를 바로 외부 URL인 것처럼 취급하지 않음
-- 성과: 실제 `publications[]` + Threads Insights를 기준으로 LEARN/SCALE/KEEP/KILL; 클릭/전환/실수익은 실제 값만
-- 앱 구조: `app/bootstrap/feature-loader.js`가 중앙 load 순서를 관리. 신규 기능은 `app/features/<domain>/` 아래 model/ui/style/docs로 분리. Buffer feature는 `app/features/publish/buffer/`에 처음부터 신규 구조로 구현
-- 데이터 소유권 핵심: `publications[]` = 확인된 실제 게시, `bufferDeliveries[]` = 외부 예약/전달, `warehouse` = 운영 메타, `publishApproval` = 사람 승인. 서로 의미를 섞지 않음
-- package: `0.18.0`
-- 최신 Buffer 통합 검증 checkpoint: `06e53ae50ddb608f9abfa62d13381ae5281434f6`
-- GitHub Actions: run `34793505552` SUCCESS — syntax/regression + local server smoke + credential-less fail-closed 포함
-- 실제 E2E 미검증: Buffer key/channel 및 실제 Threads token/scopes가 이 환경에 연결되지 않았으므로 실제 외부 성공을 기록하지 않음
-- 다음: Buffer delivery status sync → P6 image/carousel capability+dry-run → P7 scheduler HOT/theme/source/format spacing + pause/stop/post-now/reorder → DB/server persistence/migrations → multi-account credential mapping
-- 검증 핵심: 소스 약관/권리, 원본성, 일반인 안전, 사람 승인, 실제 게시 여부와 예약 여부 구분, fake success 금지
+- 실제 저장소: https://github.com/kimjae134679/Threads
+- 사용자 목표: 한국 커뮤니티 중심 소재를 찾아 검증하고, 원문 기반 카드·영상으로 제작한 뒤 사람 승인과 실제 성과 분석까지 연결
+- 운영 흐름: `01_DISCOVERY → 02_EDITORIAL_SCORING → 03_PRODUCTION → 04_REVIEW_PUBLISH → 05_EXPERIMENTS_ACCOUNTS`
+
+## 재개할 때
+
+1. 실제 저장소의 `00_START_HERE/README.md`
+2. `00_START_HERE/NEXT_RUN_HANDOFF.md`
+3. 현재 `main` tip과 최근 변경
+4. 필요한 경우에만 이 허브의 최신 T-0008 기록
+
+실제 저장소 상태가 이 문서나 과거 소통 기록보다 우선합니다.
+
+## 현재 허브가 확인한 방향
+
+- 검은 배경의 요약형 데모는 최종 사용자 결과물로 보지 않음
+- 첫 장은 원문 제목과 커버, 다음 장부터 원문 전체 스크린샷을 순서대로 사용하는 카드
+- 원문 전체 캡처·본문 보존·실제 파일 확보 전에는 `ASSETS_PENDING`
+- 생성 이미지로 원문 자산 부족을 대신해 완료 처리하지 않음
+- 공개 검색·인덱스·허용된 브라우저 경로와 사용자 제공 자료 사용
+- 제한 소스의 로그인·접근 제한을 우회하지 않음
+- 실제 게시 권한은 `04_REVIEW_PUBLISH`에만 있음
+- 구현, dry-run, 예약, 외부 게시 성공을 서로 구분
+
+## 최신 확인 지점
+
+허브의 최신 순차 기록은 `04_COMMUNICATION/threads/T-0008-ai-content-monetization/177-sol.md`입니다. 이 기록에서는 실제 TheQoo 전체 페이지 스크린샷을 확보했지만 최종 1080×1080 카드와 실제 게시는 아직 완료로 기록하지 않았습니다.
+
+최신 상태는 항상 실제 Threads 저장소의 handoff에서 다시 확인합니다. 이 포인터에는 변동이 잦은 package 버전이나 고정 checkpoint를 보관하지 않습니다.
+
 - Room: `04_COMMUNICATION/rooms/Threads/`
 - Main thread: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/`
-- Latest handoff: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/026-sol.md`
+
+마지막 정리: **2026-09-18**
