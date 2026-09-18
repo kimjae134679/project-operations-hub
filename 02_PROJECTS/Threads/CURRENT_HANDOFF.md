@@ -1,36 +1,12 @@
 # Threads — current execution handoff
 
-Updated: 2026-09-14 KST
+이 파일은 현재 작업 내용의 복사본이 아니라 실제 저장소로 가는 포인터입니다.
 
-Canonical execution order for the next worker:
+1. 현재 사용자의 작업 요청을 먼저 확인합니다.
+2. `kimjae134679/Threads/00_START_HERE/README.md`를 읽습니다.
+3. 실제 저장소의 `00_START_HERE/NEXT_RUN_HANDOFF.md`, 현재 main 및 열린 PR을 확인합니다.
+4. 필요한 경우에만 이 허브 T-0008의 관련 순차 기록을 확인합니다.
 
-1. `kimjae134679/Threads/00_START_HERE/NEXT_RUN_HANDOFF.md`
-2. inspect current `kimjae134679/Threads` main/recent commits and CI
-3. `04_COMMUNICATION/threads/T-0008-ai-content-monetization/024-sol.md`
-4. continue the first unfinished backlog item; do not stop at planning
+코드·검증·현재 우선순위는 Threads 저장소가 원본입니다. 오래된 commit/CI 번호나 메시지 번호를 이 파일에서 현재 상태로 취급하지 않습니다.
 
-Current verified implementation checkpoint:
-
-```text
-29a9b996e3513e4c8d9d1b8e6cc5ebeffc789c81
-GitHub Actions 34785739288 / job 103800763036
-JavaScript syntax/regression SUCCESS + local server smoke SUCCESS
-```
-
-The earlier `4c3e724...` failure was a regression-guard-only mistake caused by an overstrict layout assertion; the guard was corrected at `29a9b996...` and the corrected checkpoint is green.
-
-Latest Threads handoff update commit:
-
-```text
-25f915585237e4399251071d9cb957283cd41a18
-```
-
-Latest operations-hub sequential note:
-
-```text
-04_COMMUNICATION/threads/T-0008-ai-content-monetization/024-sol.md
-```
-
-P3 bulk candidate review is materially complete for the current workflow. P4 Community Card Factory manual image privacy masking is ACTIVE. Continue with browser interaction verification when available, undo-last-mask/per-image status, exact image identity binding, privacy envelope integration into saved manifest/storyboard metadata, and visibility in final 04 REVIEW_PUBLISH before moving to P5.
-
-Repository tip wins if this pointer becomes stale.
+이번 사용자 요청은 검수 없이 누적된 기능의 검토와 수정입니다. 과거의 반복 수집·후보량 확대 작업을 자동 재개하지 않습니다. 실제 브라우저 검수, 파일 복원, 제작물에서 게시 검수까지의 연결을 먼저 확인합니다.

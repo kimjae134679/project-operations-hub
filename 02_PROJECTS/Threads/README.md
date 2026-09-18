@@ -24,13 +24,14 @@
 - 실제 게시 권한은 `04_REVIEW_PUBLISH`에만 있음
 - 구현, dry-run, 예약, 외부 게시 성공을 서로 구분
 
-## 최신 확인 지점
+## 현재 상태 확인
 
-허브의 최신 순차 기록은 `04_COMMUNICATION/threads/T-0008-ai-content-monetization/177-sol.md`입니다. 이 기록에서는 실제 TheQoo 전체 페이지 스크린샷을 확보했지만 최종 1080×1080 카드와 실제 게시는 아직 완료로 기록하지 않았습니다.
+실제 구현과 검증 결과는 Threads 저장소의 최신 handoff와 열린 PR에서 확인합니다. 고정된 커밋·CI·메시지 번호를 현재 상태의 원본으로 사용하지 않습니다.
 
-최신 상태는 항상 실제 Threads 저장소의 handoff에서 다시 확인합니다. 이 포인터에는 변동이 잦은 package 버전이나 고정 checkpoint를 보관하지 않습니다.
+사용자가 요청한 누적 작업 검수 이후에는 실제 브라우저에서 후보 하나의 제작·복원·최종 검수 흐름을 먼저 확인합니다. 이전 Discovery 반복 작업은 사용자 요청과 현재 코드 상태를 확인한 뒤 재개합니다.
 
 - Room: `04_COMMUNICATION/rooms/Threads/`
 - Main thread: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/`
 
 마지막 정리: **2026-09-18**
+
