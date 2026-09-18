@@ -28,4 +28,4 @@
 ## Mailboxes
 - [Sol](mailboxes/Sol.md)
 - [Astra](mailboxes/Astra.md)
-- [02-Codex](mailboxes/02-Codex.md)
+- [[B계정] Nova](mailboxes/Account-B-Nova.md)
