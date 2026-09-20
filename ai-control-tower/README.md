@@ -45,3 +45,8 @@ dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --
 
 %LocalAppData%\AIControlTower\queue\inbox에 작업당 하나의 .txt 파일을 만들면 관제탑이 5초 이내에 processing으로 원자적으로 이동한 뒤 Jev 작업으로 전달합니다. 완료 이력은 rchive, 결과는 esult에 남기도록 확장할 수 있습니다. 단일 파일을 덮어쓰거나 즉시 삭제하지 않아 중복 실행과 이력 유실을 막습니다.
 
+
+## 실제 설치 검증 기록
+
+2026-09-20에 %LocalAppData%\AIControlTower 설치, 현재 사용자 자동 시작, AIControlTower-DesktopCommanderSilent.vbs 생성 및 기존 Desktop Commander 시작 CMD 백업을 확인했습니다. 설치를 다시 실행하면 원본 CMD가 이미 없으므로 전환 대상이 없다는 안내가 나올 수 있습니다.
+

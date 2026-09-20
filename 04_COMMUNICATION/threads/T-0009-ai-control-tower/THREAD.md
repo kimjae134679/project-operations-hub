@@ -34,3 +34,10 @@
 - 상태 표의 셀·행·헤더 색을 명시해 흰 바탕/흰 글씨 문제를 수정했다.
 - %LocalAppData%\AIControlTower\queue\inbox의 작업당 TXT 파일을 processing으로 원자 이동해 Jev 작업으로 연결하는 큐를 추가했다.
 
+
+### 실제 설치·시작 전환 검증 (2026-09-20)
+- 사용자 설치 버튼 실행 결과: %LocalAppData%\AIControlTower 설치 확인.
+- Startup의 AIControlTower-DesktopCommanderSilent.vbs 확인.
+- 기존 DesktopCommanderRemote.cmd 백업 DesktopCommanderRemote.cmd.20260920114518.bak 확인.
+- 설치 재실행 시 원본 CMD가 이미 없어 ‘기존 시작 파일을 찾지 못함’ 메시지가 나올 수 있으나, 이는 최초 전환이 이미 성공했다는 상태다.
+
