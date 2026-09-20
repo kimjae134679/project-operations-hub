@@ -35,6 +35,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public string TaskInput { get => _taskInput; set => SetProperty(ref _taskInput, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public bool IsRefreshing { get => _isRefreshing; private set => SetProperty(ref _isRefreshing, value); }
+    public bool IsLocalJevExecutionAllowed => LocalExecutionPolicy.AllowLocalJevExecution;
+    public string LocalJevPolicyMessage => LocalExecutionPolicy.LocalJevDisabledMessage;
     public string ActivitySummary
     {
         get

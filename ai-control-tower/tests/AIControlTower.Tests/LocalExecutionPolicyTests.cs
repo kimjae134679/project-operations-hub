@@ -12,6 +12,14 @@ public sealed class LocalExecutionPolicyTests
     }
 
     [Fact]
+    public void MainViewModel_ExposesDisabledJevPolicy()
+    {
+        using var viewModel = new MainViewModel();
+        Assert.False(viewModel.IsLocalJevExecutionAllowed);
+        Assert.Equal(LocalExecutionPolicy.LocalJevDisabledMessage, viewModel.LocalJevPolicyMessage);
+    }
+
+    [Fact]
     public void RunJevTask_WhenLocalExecutionIsDisabled_ShowsPolicyMessage()
     {
         var originalPath = Environment.GetEnvironmentVariable("PATH");
