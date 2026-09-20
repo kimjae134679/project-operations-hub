@@ -8,6 +8,7 @@
 - [T-0006 — Codex / ChatGPT tooling stack](threads/T-0006-codex-tooling-stack/THREAD.md) — Gentle AI, Camofox, Codex with ChatGPT 및 추가 도구 설치/검증 계획
 - [T-0007 — Burgundy Online](threads/T-0007-burgundy-online/THREAD.md) — 실제 규칙 검증 기반 웹/AI/멀티플레이 구현
 - [T-0008 — AI Content Monetization](threads/T-0008-ai-content-monetization/THREAD.md) — 2026 최신 플랫폼 정책 기반 AI 콘텐츠 수익화 파이프라인
+- [T-0009 — AI Control Tower](threads/T-0009-ai-control-tower/THREAD.md) — Windows 로컬 AI 도구 상태 확인·Jev 작업 제어 관제탑
 
 ## Resolved / Review
 - [T-0001 — Workbench structure review](threads/T-0001-workbench-review/THREAD.md)
