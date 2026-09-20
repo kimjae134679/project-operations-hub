@@ -36,3 +36,5 @@
 - Helper: staging `C:\KJ\Tools\AI\Scripts\Runtime\Send-N8nTask.ps1`
 - 검증: n8n 재시작 후 helper POST → `{ ok: true, source: local-n8n-bridge }` 응답 확인
 - 보안: localhost 전용. 외부 tunnel/public webhook은 별도 승인·인증 설계 전에는 열지 않습니다.
+
+| AI Control Tower | 0.1.0 | 소스: project-operations-hub\\ai-control-tower, publish: rtifacts\\win-x64\\AIControlTower.exe | .NET 9 WPF로 생성. 앱 설치 시 C:\\Program Files\\_My\\AI\\Applications\\AIControlTower 우선, 권한 부족 시 %LocalAppData%\\AIControlTower 사용 |
