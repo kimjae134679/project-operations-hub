@@ -19,6 +19,10 @@ public partial class MainWindow : Window
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private void RunJev_Click(object sender, RoutedEventArgs e) => _viewModel.RunJevTask();
     private async void CancelJev_Click(object sender, RoutedEventArgs e) => await _viewModel.CancelJevTaskAsync();
+    private void Home_Click(object sender, RoutedEventArgs e) => DashboardScroll.ScrollToTop();
+    private void Status_Click(object sender, RoutedEventArgs e) => StatusSection.BringIntoView();
+    private void Jev_Click(object sender, RoutedEventArgs e) => OpenJevWindow();
+    private void InstallSection_Click(object sender, RoutedEventArgs e) => InstallSection.BringIntoView();
     private void OpenJevWindow()
     {
         if (_jevWindow is { IsLoaded: true })
