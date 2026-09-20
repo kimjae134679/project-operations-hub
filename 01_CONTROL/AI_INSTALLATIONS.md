@@ -21,7 +21,8 @@
 | n8n | 2.38.7 | `%APPDATA%\npm` + npm global modules | npm 기본 관리 위치 유지 |
 | HyperFrames | 0.8.40 | `%APPDATA%\npm` + npm global modules | npm 기본 관리 위치 유지 |
 | Aider | 0.86.2 | `%USERPROFILE%\.local\bin` + installer-managed Python env | updater/환경 관리 경로 유지 |
-| jev-router | 0.2.0 | `C:\Users\user\AppData\Roaming\npm` | npm 전역 기본 위치 유지. `jev-codex.cmd`, `jev-claude.cmd` 설치 확인. API 키 미설정으로 비활성·실제 라우팅 미검증 |
+| jev-router | 0.2.0 | `C:\Users\user\AppData\Roaming\npm` | npm 전역 기본 위치 유지. `jev-codex.cmd`, `jev-claude.cmd` 설치 확인. 사용자 OpenAI/ChatGPT 계정 사용 방침에 따라 AI Control Tower에서는 실행·큐 수신·상태 명령을 모두 차단하며 실제 라우팅은 미검증 |
+| AI Control Tower | 0.1.0 | 실제 설치 `%LocalAppData%\AIControlTower`; 소스 `project-operations-hub\ai-control-tower`; publish `ai-control-tower\artifacts\win-x64\AIControlTower.exe` | 2026-09-20 사용자 설치 실행·자동 시작 전환을 검증했고 최신 EXE 해시 일치를 확인했다. Program Files 우선 정책의 권한 부족 fallback 경로를 실제 사용 중이며, 로컬 Jev 실행은 계정 사용 방침에 따라 하드 차단 |
 
 ## 인수인계 필수 항목
 모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.

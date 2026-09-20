@@ -49,3 +49,5 @@
 GitHub: `kimjae134679/project-operations-hub`
 
 마지막 정리: **2026-09-18**
+
+- [AI 관제탑](000_사용자용/08_AI_관제탑.md)

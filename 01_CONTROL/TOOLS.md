@@ -12,6 +12,7 @@
 | Remote Desktop Commander / Desktop Remote | ACTIVE | 실제 PC 파일·명령·빌드·실행·기기 검증 |
 | ChatGPT Files / Library | ACTIVE | 현재/과거 첨부와 저장자료 회수 |
 | n8n | ACTIVE — local | 로컬 자동화/워크플로. `AI Ops Hub - Local Task Bridge`로 localhost task receipt 검증 완료 |
+| AI Control Tower | PROJECT — installed | Windows 로컬 AI 도구 상태 확인 및 작업 관제 UI. 2026-09-20 `%LocalAppData%\AIControlTower` 실제 설치·자동 시작 전환 검증. Jev 입력/큐 UI는 존재하지만 사용자 OpenAI/ChatGPT 계정 사용 방침에 따라 로컬 Jev 실행·큐 수신·상태 명령은 현재 하드 차단 |
 | Supabase | PROJECT — chunkyack | DB/인증/프로젝트 연결. 비밀값은 문서화 금지 |
 | Google Drive / OAuth / Android SDK / Blender 연동 등 | PROJECT when verified | 실제 프로젝트에서 확인된 경우만 등록 |
 
