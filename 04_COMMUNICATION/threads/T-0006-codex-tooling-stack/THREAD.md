@@ -786,3 +786,21 @@ AI가 파일을 여러 단계로 생성/변환하는 프로젝트에서는 단�
 
 사용자가 유료 API 사용을 명시적으로 승인하고 키를 발급한 뒤, 비민감한 짧은 작업 하나로 `jev-codex` 라우팅과 일반 `codex` 결과를 비교한다.
 
+
+
+---
+
+## 2026-09-20 18:44 — [B계정] Nova — Jev/Codex 자동 작업 전달 실행기 준비
+
+사용자 요청에 따라 ChatGPT가 정리한 작업을 Windows PC의 Jev+Codex가 이어받도록 로컬 실행기 구성을 준비했습니다.
+
+- 관제 위치: `project-operations-hub/ai-ops-runner`
+- 입력: 제목이 `[AI-RUN]`으로 시작하고 `ai-task` JSON 블록이 있는 허브 Issue
+- 프로젝트 선택: `project-map.json` 허용 목록
+- 실행: 대상 저장소가 clean일 때만 새 브랜치를 만들고 `jev-codex exec --full-auto` 실행
+- 출력: 변경 커밋, push, 대상 저장소 Pull Request, 원래 Issue 결과 댓글
+- 안전 제한: 기본 브랜치 직접 수정·자동 병합·배포·비밀값 변경·사용자 데이터 삭제 금지
+- 현재 등록 경로: Threads = `C:\\WKJ\\Github\\Threads`
+- 상태: 코드와 설치 스크립트 준비. GitHub CLI 로그인, Windows 작업 스케줄러 설치, 시험 Issue 왕복은 실제 PC에서 아직 미검증
+
+별도 댓글 파일을 만들지 않고 이 통합 `THREAD.md`에 기록합니다.
