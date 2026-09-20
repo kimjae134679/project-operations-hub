@@ -99,7 +99,7 @@ function Get-PendingIssues {
     $issues = ($json -join [Environment]::NewLine) | ConvertFrom-Json
     return @($issues | Where-Object {
         $_.title -like "[[]AI-RUN[]]*" -and
-        (($_.comments.body -join "`n") -notlike "*$ClaimMarker*")
+        ((@($_.comments | ForEach-Object { $_.body }) -join "`n") -notlike "*$ClaimMarker*")
     })
 }
 
