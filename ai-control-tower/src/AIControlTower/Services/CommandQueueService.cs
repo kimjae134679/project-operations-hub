@@ -11,8 +11,10 @@ public sealed class CommandQueueService
     public string ArchivePath => Path.Combine(RootPath, "archive");
     public string ResultPath => Path.Combine(RootPath, "result");
     public void EnsureDirectories() { Directory.CreateDirectory(InboxPath); Directory.CreateDirectory(ProcessingPath); Directory.CreateDirectory(ArchivePath); Directory.CreateDirectory(ResultPath); }
-    public QueueTask? TryClaimNext()
+    public QueueTask? TryClaimNext() => TryClaimNext(true);
+    public QueueTask? TryClaimNext(bool allowExecution)
     {
+        if (!allowExecution) return null;
         EnsureDirectories();
         var source = Directory.GetFiles(InboxPath, "*.txt").OrderBy(File.GetCreationTimeUtc).FirstOrDefault();
         if (source is null) return null;

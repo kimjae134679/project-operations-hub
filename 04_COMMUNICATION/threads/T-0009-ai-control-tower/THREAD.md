@@ -41,3 +41,9 @@
 - 기존 DesktopCommanderRemote.cmd 백업 DesktopCommanderRemote.cmd.20260920114518.bak 확인.
 - 설치 재실행 시 원본 CMD가 이미 없어 ‘기존 시작 파일을 찾지 못함’ 메시지가 나올 수 있으나, 이는 최초 전환이 이미 성공했다는 상태다.
 
+### 디자인 개선 및 로컬 Jev 실행 차단 (2026-09-20)
+- 바탕화면 `AA_01.png`, `AA_02.png`를 참고해 기능·이벤트 바인딩은 유지하면서 화이트·블루 대시보드, 요약 카드, 상태 배지, 다크 실시간 작업 콘솔로 화면을 개선했다.
+- 사용자 OpenAI/ChatGPT 계정 사용 방침을 구현에 반영했다. `LocalExecutionPolicy`가 기본적으로 false이며, 화면의 Jev 실행 버튼·직접 실행 경로·TXT 큐 수신·Jev 상태 명령 실행을 모두 차단한다.
+- TDD: 직접 실행 차단 테스트를 먼저 실패시킨 뒤 수정했고, 현재 9개 단위 테스트가 통과한다.
+- 기존 `artifacts\\win-x64\\AIControlTower.exe`는 사용자 실행 프로세스가 점유 중이라 덮어쓰지 않았다. 새 디자인 미리보기는 `ai-control-tower\\artifacts\\win-x64-design-preview\\AIControlTower.exe`에 생성·실행했다.
+

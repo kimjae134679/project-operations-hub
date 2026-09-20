@@ -56,7 +56,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 var existing = Statuses.FirstOrDefault(status => status.DisplayName == result.DisplayName);
                 if (existing is null) Statuses.Add(new ToolStatusViewModel(result)); else existing.Update(result);
             }
-            var queued = _queue.TryClaimNext();
+            var queued = _queue.TryClaimNext(LocalExecutionPolicy.AllowLocalJevExecution);
             if (queued is not null) { TaskInput = queued.Instruction; RunJevTask(); Message = "큐 작업을 수신해 Jev 실행을 요청했습니다: " + queued.Id; }
             else Message = "상태를 " + DateTime.Now.ToString("HH:mm:ss") + "에 갱신했습니다.";
             OnPropertyChanged(nameof(ActivitySummary));
@@ -67,6 +67,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public void RunJevTask()
     {
+        if (!LocalExecutionPolicy.AllowLocalJevExecution) { Message = LocalExecutionPolicy.LocalJevDisabledMessage; return; }
         if (string.IsNullOrWhiteSpace(TaskInput)) { Message = "실행할 작업 내용을 입력하세요."; return; }
         var launcher = EnvironmentProbe.FindCommand("jev-codex");
         if (launcher is null) { Message = "Jev 실행 파일을 찾지 못했습니다."; return; }

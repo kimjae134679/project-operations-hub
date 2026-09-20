@@ -8,6 +8,7 @@ public sealed class JevStatusProvider : CommandStatusProvider
     public override string Id => "jev";
     public override async Task<ToolStatus> CheckAsync(CancellationToken cancellationToken)
     {
+        if (!LocalExecutionPolicy.AllowLocalJevExecution) return Status(Id, "Jev Router", StatusKind.NotConfigured, LocalExecutionPolicy.LocalJevDisabledMessage);
         var launcher = EnvironmentProbe.FindCommand("jev-codex");
         if (launcher is null) return Status(Id, "Jev Router", StatusKind.NotInstalled, "jev-codex 실행 파일을 찾지 못했습니다.");
         if (!EnvironmentProbe.HasAnyEnvironmentVariable("JEV_API_KEY", "TYPESAFE_API_KEY")) return Status(Id, "Jev Router", StatusKind.NotConfigured, "API 키 설정 여부를 확인하지 못했습니다.");

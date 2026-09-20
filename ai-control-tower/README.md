@@ -15,7 +15,8 @@ Release 단일 EXE: `artifacts/win-x64/AIControlTower.exe`
 - 5초 간격 상태 자동 갱신 및 수동 갱신
 - Desktop Commander, Jev, Codex, GitHub CLI, n8n, AI Ops Runner 상태 표시
 - 외부 GPT 세션처럼 로컬에서 증명할 수 없는 구간은 `Unknown`으로 표시
-- 현재 사용자에게 보이는 Jev 콘솔에서 작업 실행·관제탑이 시작한 작업만 취소
+- AA_01·AA_02 참고의 화이트·블루 대시보드, 상태 배지, 다크 실시간 작업 콘솔
+- 로컬 Jev 실행은 사용자 OpenAI 계정 사용 방침에 따라 기본적으로 차단
 - 비밀번호·API 키·토큰 값 비표시
 - 설치, 제거, Desktop Commander 시작 구성 복구
 
@@ -30,7 +31,7 @@ Release 단일 EXE: `artifacts/win-x64/AIControlTower.exe`
 ## 알려진 한계
 
 - GPT 외부 세션에서 Desktop Commander/Jev로 실제 메시지가 전달됐는지는 로컬 PC만으로 증명할 수 없어 `Unknown`으로 표시됩니다.
-- Jev 래퍼가 PowerShell 실행 정책에 의해 막히면 앱은 `Ready`로 표시하지 않고 오류로 보고합니다.
+- Jev는 로컬 OpenAI/ChatGPT 계정 사용을 막기 위해 명령·환경 확인과 작업 실행을 하지 않고 비활성 상태로 표시합니다.
 - 각 도구의 CLI 로그인 상태는 현재 PC의 비대화형 명령 결과에 의존합니다.
 
 ## 개발 검증
@@ -43,7 +44,7 @@ dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --
 
 ## GPT 작업 큐
 
-%LocalAppData%\AIControlTower\queue\inbox에 작업당 하나의 .txt 파일을 만들면 관제탑이 5초 이내에 processing으로 원자적으로 이동한 뒤 Jev 작업으로 전달합니다. 완료 이력은 rchive, 결과는 esult에 남기도록 확장할 수 있습니다. 단일 파일을 덮어쓰거나 즉시 삭제하지 않아 중복 실행과 이력 유실을 막습니다.
+`%LocalAppData%\AIControlTower\queue\inbox`에 작업당 하나의 `.txt` 파일을 만들 수 있습니다. 단, 현재 로컬 Jev 실행 정책이 비활성화되어 있으므로 관제탑은 파일을 `processing`으로 이동하거나 실행하지 않습니다. 정책을 별도로 변경할 때에만 원자 이동·완료 이력(`archive`)·결과(`result`) 흐름을 사용합니다.
 
 
 ## 실제 설치 검증 기록
