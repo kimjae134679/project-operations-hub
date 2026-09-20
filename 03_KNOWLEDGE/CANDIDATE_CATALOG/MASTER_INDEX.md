@@ -13,11 +13,14 @@
 - `ACCESS` — 현재 바로 사용 가능한가: `READY / CONNECT / INSTALL / REFERENCE`
 - `OPERATOR` — 주 사용 주체: `AI / USER / BOTH`
 - `ASSISTANCE` — 사용자 개입: `NONE / ONCE / FREQUENT`
+- `AUTONOMY` — 핵심 기능을 AI가 끝까지 운용 가능한가: `AI 단독 가능 / 1회 준비 후 가능 / 부분 가능 / 사용자 중심 / 미확인`
 - `BURDEN` — 설치·운영 부담: `⚪ NONE / 🟢 LIGHT / 🟡 MEDIUM / 🟠 HEAVY / 🔴 VERY_HEAVY`
+- `COST` — `무료/오픈소스 / 기간 제한 없는 무료 플랜 / 기존 요금제 포함 / 무료체험 / 유료 / 미확인`
 
 실제 채택 상태의 원본은 `01_CONTROL/TOOLS.md`입니다.
 실제 설치 버전/위치의 원본은 `01_CONTROL/AI_INSTALLATIONS.md`입니다.
 사용 가능 여부·누가 쓰는지·사용자 도움이 필요한지는 `USAGE_AND_ASSISTANCE.md`에서 관리합니다.
+사용자 비용·도구 선택 정책의 원본은 `01_CONTROL/USER_POLICIES.md`입니다.
 이 파일은 그 원본들과 **후보 조사 문서를 연결하는 인덱스**입니다.
 
 ---
@@ -33,6 +36,7 @@
 | MoneyPrinterTurbo | 별도 프로젝트용 | YES — staging | 🟡 | 설치 위치는 AI_INSTALLATIONS 참조 |
 | HyperFrames | 별도 프로젝트용 | YES | 🟢~🟡 | npm global |
 | Aider | 설치됨, 채택 범위는 별도 | YES | 🟢~🟡 | installer-managed Python env |
+| Jev Router | 미채택 / 비활성 | YES | 🟢 | API key 미설정·실제 라우팅 미검증. 추가 API 비용 때문에 사용자 승인 전 활성화 금지 |
 
 > `설치됨 = ACTIVE`가 아닙니다. 실제 채택 상태는 반드시 `01_CONTROL/TOOLS.md` 기준으로 판단합니다.
 
@@ -55,6 +59,27 @@
 | Supermemory | CANDIDATE / HIGH-FIT | 🟢 Cloud/MCP / 🟡 local | `50_USEFUL_REPOS.md` |
 | OpenHands | CANDIDATE / HIGH-FIT | 🟡~🟠 | `AI_AGENTS_AND_DEV.md` |
 | Hermes Agent | CANDIDATE / HIGH-FIT | 🟡 | `AI_AGENTS_AND_DEV.md`, `AGENT_SKILLS_10_REPOS.md` |
+
+### B-1. 가벼운 검증/개발 보조 후보
+
+이 계열은 **전부 설치하는 목록이 아니라 저장소 파일 종류와 실제 문제에 맞춰 최소 세트만 고르는 후보군**입니다.
+
+| Tool | 상태 | BURDEN | 역할 |
+|---|---|---|---|
+| Ruff / ty | CANDIDATE | 🟢 | Python lint·format / type check |
+| ShellCheck / shfmt | CANDIDATE | 🟢 | Bash/sh 분석·포맷 |
+| PSScriptAnalyzer | CANDIDATE | 🟢 | PowerShell 정적 분석 |
+| actionlint / zizmor | CANDIDATE | 🟢 | GitHub Actions 정합성 / 보안 |
+| yamllint | CANDIDATE | 🟢 | 일반 YAML 검사 |
+| Tombi | CANDIDATE | 🟢 | TOML format/lint/schema |
+| markdownlint-cli2 | CANDIDATE | 🟢 | Markdown 구조·스타일 |
+| lychee / typos | CANDIDATE | 🟢 | 링크 / 오타 검사 |
+| dprint | CANDIDATE | 🟢 | 여러 언어 formatter 통합 |
+| OSV-Scanner | CANDIDATE | 🟢 | dependency/lockfile 취약점 검사 |
+| Trivy | CANDIDATE / SELECTIVE | 🟡 | dependency/container/IaC/secret/SBOM 통합 검사 |
+| pre-commit / reviewdog | CANDIDATE | 🟢 | 검사 gate / diff·PR 결과 통합 |
+
+기본 운용은 `저장소 구조 확인 → 필요한 3~6개 정도 선택 → 검사 → 수정 → diff → 실제 build/test → 재검사` 순서를 우선합니다. 기존 후보와 역할이 사실상 겹치는 새 linter/formatter는 특별한 장점이 없으면 추가하지 않습니다.
 
 ---
 
@@ -97,6 +122,8 @@
 | Aider | installed | 🟢~🟡 | terminal pair programmer |
 | OpenClaw | CANDIDATE / PROJECT-FIT | 🟡 | local gateway + channels + host tools |
 | Bumblebee | CANDIDATE / PROJECT-FIT | 🟢 | read-only dev endpoint inventory; macOS/Linux 중심 |
+
+유료 API/추가 결제가 필요한 Agent 서비스는 기본 후보·자동 연결 대상에서 제외하고, 사용자가 명시적으로 요청한 경우에만 검토합니다.
 
 ---
 
@@ -181,6 +208,7 @@
 - `FINANCE_AND_OSINT.md` — TradingAgents/Fincept/Flowsint
 - `SOURCE_BOOKMARKS.md` — 사용자가 준 원문 링크와 공식 원본
 - `AMBIGUITIES.md` — 원본 특정 실패/이름 충돌
+- 개별 후보 문서 — `DPRINT.md`, `OSV_SCANNER.md`, `TOMBI.md`, `MARKDOWNLINT_CLI2.md`, `YAMLLINT.md`, `JEV_ROUTER.md` 등
 
 사용자에게 보여줄 요약은 `000_사용자용/03_후보_도구_요약.md`와 `000_사용자용/06_AI_도구_플러그인_사용구분.md`에 동기화합니다.
 
@@ -193,10 +221,11 @@
 → 공식 repo/Plugin 원본 확인
 → canonical 이름/redirect 확인
 → 실제 정체 확인
-→ ACCESS / OPERATOR / ASSISTANCE 구분
+→ ACCESS / OPERATOR / ASSISTANCE / AUTONOMY 구분
 → ADOPTION과 INSTALLED 분리
 → BURDEN 표기
 → Cloud/self-host 차이 기록
+→ COST와 외부 실행비용 분리
 → 비용·권한·보안·라이선스 확인
 → 상세 문서 기록
 → MASTER_INDEX 연결
@@ -205,4 +234,4 @@
 
 같은 도구가 여러 SNS 목록에 다시 나오면 상세 설명을 복제하지 않고 기존 항목으로 연결합니다.
 
-마지막 정리: **2026-09-16**
+마지막 정리: **2026-09-20**
