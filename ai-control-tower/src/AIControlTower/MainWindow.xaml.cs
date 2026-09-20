@@ -8,6 +8,7 @@ public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel = new();
     private readonly InstallationService _installationService = new();
+    private JevControlWindow? _jevWindow;
     public MainWindow()
     {
         InitializeComponent();
@@ -18,6 +19,18 @@ public partial class MainWindow : Window
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private void RunJev_Click(object sender, RoutedEventArgs e) => _viewModel.RunJevTask();
     private async void CancelJev_Click(object sender, RoutedEventArgs e) => await _viewModel.CancelJevTaskAsync();
+    private void OpenJevWindow()
+    {
+        if (_jevWindow is { IsLoaded: true })
+        {
+            _jevWindow.Activate();
+            return;
+        }
+
+        _jevWindow = new JevControlWindow(_viewModel) { Owner = this };
+        _jevWindow.Closed += (_, _) => _jevWindow = null;
+        _jevWindow.Show();
+    }
     private async void Install_Click(object sender, RoutedEventArgs e)
     {
         var result = await _installationService.InstallAsync(Environment.ProcessPath ?? string.Empty, CancellationToken.None);
