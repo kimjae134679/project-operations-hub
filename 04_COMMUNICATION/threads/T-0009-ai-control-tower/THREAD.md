@@ -54,3 +54,10 @@
 - 최종 검증: Release 단위 테스트 11개 통과, Release solution build 경고 0·오류 0, 단일 파일 publish 성공. `artifacts\\win-x64\\AIControlTower.exe`와 `%LocalAppData%\\AIControlTower\\AIControlTower.exe`의 SHA-256은 `89A4B961CA2F92EFBE53B1B872E18F843BB6478BDB418071BDA2A4B7DBCD4C3B`로 동일하며 설치본 실행 프로세스 PID `29428`를 확인했다.
 - CUA에는 native app surface가 없어 자동 화면 캡처를 수행할 수 없었다. 따라서 좌측 메뉴·단일 전체 스크롤·별도 Jev 창·비활성 실행 버튼·금지된 GPT 스케줄러/예약/브라우저/권한 자동 클릭 UI 부재라는 화면 모양은 사용자 직접 확인이 남아 있다.
 
+### 추가 AA_01 확인 및 최종 코드 검토 (2026-09-20)
+- 바탕화면 `AA_01.png`의 생성 시각은 22:28:45이며, 별도 Jev 창 커밋 `c037cc7`(22:45)과 좌측 탐색·전체 스크롤 커밋 `a89513b`(23:01)보다 앞선다. 따라서 이 이미지는 최신 설치본이 아니라 수정 전 UI 기록이다.
+- 설치본 `%LocalAppData%\AIControlTower\AIControlTower.exe`는 23:21에 교체되었고 PID `29428`은 23:23에 시작했다. 자동화 세션에서 기존 창 활성화를 시도했으나 다른 데스크톱 세션 때문에 활성화되지 않아 화면 모양을 대신 확인할 수는 없었다.
+- 최종 독립 코드 리뷰에서 Critical 및 코드상 배포 차단 Important 이슈는 없었다. 후속 권장 사항은 키보드 포커스 시각화와 Jev 입력 레이블의 접근성 연결이다.
+- 최종 재검증 결과 Release 단위 테스트 11/11 통과, Release solution build 경고 0·오류 0이다.
+- 사용자 확인은 23:21 이후 설치본에서 좌측 메뉴, 하나의 전체 스크롤, 별도 Jev 창, 비활성 실행 버튼과 정책 안내를 보는 것으로 한다.
+
