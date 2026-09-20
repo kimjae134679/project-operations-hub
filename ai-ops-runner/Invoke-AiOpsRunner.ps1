@@ -167,7 +167,7 @@ At the end, summarize changed files, tests run, failures, and remaining risks.
 
     Invoke-External -Command "jev-codex" -Arguments @(
         "exec",
-        "--full-auto",
+        "--approve-for-me",
         "-C", $resolvedRepoPath,
         "-o", $resultPath,
         $prompt
