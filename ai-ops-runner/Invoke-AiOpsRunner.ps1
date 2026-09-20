@@ -6,6 +6,10 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[Console]::OutputEncoding = $Utf8NoBom
+$OutputEncoding = $Utf8NoBom
+
 $HubRepository = "kimjae134679/project-operations-hub"
 $RunnerRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectMapPath = Join-Path $RunnerRoot "project-map.json"
