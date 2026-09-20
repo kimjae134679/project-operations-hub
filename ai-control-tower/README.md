@@ -4,7 +4,7 @@ Windows에서 Desktop Commander Remote, Jev, Codex, GitHub CLI, n8n, AI Ops Runn
 
 ## 현재 배포 상태
 
-최신 소스에는 좌측 탐색 메뉴, 한 개의 전체 세로 스크롤 영역, 별도 Jev 작업 제어 창이 포함되어 있습니다. 이 변경을 포함한 단일 EXE publish·설치본 교체·SHA-256 대조·수동 UI 확인은 컨트롤러의 권한 작업으로 남아 있습니다. 완료 전에는 기존 `artifacts/win-x64/AIControlTower.exe`와 `%LocalAppData%\AIControlTower\AIControlTower.exe`가 최신 탐색 화면을 포함한다고 주장하지 않습니다.
+최신 소스에는 좌측 탐색 메뉴, 한 개의 전체 세로 스크롤 영역, 별도 Jev 작업 제어 창이 포함되어 있습니다. 2026-09-20 최종 단일 EXE publish와 `%LocalAppData%\AIControlTower\AIControlTower.exe` 설치본 교체를 완료했고, 두 파일의 SHA-256은 동일합니다: `89A4B961CA2F92EFBE53B1B872E18F843BB6478BDB418071BDA2A4B7DBCD4C3B`. 설치본 실행 프로세스 PID `29428`도 확인했습니다.
 
 배포 대상 경로:
 
@@ -56,7 +56,7 @@ dotnet build AIControlTower.sln -c Release
 dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\win-x64
 ```
 
-탐색 화면 변경 기준으로 `dotnet test tests\AIControlTower.Tests\AIControlTower.Tests.csproj -c Release`는 11개 통과, `dotnet build AIControlTower.sln -c Release`는 경고·오류 0개를 기록했습니다. publish 이후에는 설치본 hash 대조와 다음 수동 UI 범위를 다시 확인해야 합니다.
+탐색 화면 변경 기준으로 `dotnet test tests\AIControlTower.Tests\AIControlTower.Tests.csproj -c Release`는 11개 통과, `dotnet build AIControlTower.sln -c Release`는 경고·오류 0개를 기록했고 최종 publish도 성공했습니다. artifact와 설치본의 SHA-256 일치는 위 배포 상태에 기록했습니다. CUA에는 native app surface가 없어 자동 화면 캡처는 하지 못했으므로, 다음 화면 모양은 사용자가 직접 확인해야 합니다.
 
 - 좌측 메뉴가 보이고 모든 주 구역이 하나의 세로 스크롤에서 접근되는지
 - Jev 작업 제어가 별도 창으로 열리고 실행 버튼이 정책 설명과 함께 비활성인지
@@ -69,5 +69,5 @@ dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --
 
 ## 실제 설치 검증 기록
 
-2026-09-20에 %LocalAppData%\AIControlTower 설치, 현재 사용자 자동 시작, AIControlTower-DesktopCommanderSilent.vbs 생성 및 기존 Desktop Commander 시작 CMD 백업을 확인했습니다. 설치를 다시 실행하면 원본 CMD가 이미 없으므로 전환 대상이 없다는 안내가 나올 수 있습니다. 이는 이전 설치 검증 기록이며, 최신 탐색 화면의 설치본 검증은 아직 수행하지 않았습니다.
+2026-09-20에 %LocalAppData%\AIControlTower 설치, 현재 사용자 자동 시작, AIControlTower-DesktopCommanderSilent.vbs 생성 및 기존 Desktop Commander 시작 CMD 백업을 확인했습니다. 설치를 다시 실행하면 원본 CMD가 이미 없으므로 전환 대상이 없다는 안내가 나올 수 있습니다. 최신 탐색 화면 단일 EXE로 설치본을 교체하고 SHA-256 일치 및 PID `29428` 실행까지 확인했으며, 화면 모양은 사용자가 직접 확인해야 합니다.
 
