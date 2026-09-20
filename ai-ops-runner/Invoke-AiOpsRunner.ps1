@@ -37,9 +37,18 @@ function Invoke-External {
             Set-Location -LiteralPath $WorkingDirectory
         }
 
-        $output = & $Command @Arguments 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            throw "$Command failed with exit code $LASTEXITCODE.`n$($output -join [Environment]::NewLine)"
+        $previousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = "Continue"
+            $output = & $Command @Arguments 2>&1
+            $exitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
+        }
+
+        if ($exitCode -ne 0) {
+            throw "$Command failed with exit code $exitCode.`n$($output -join [Environment]::NewLine)"
         }
         return $output
     }
