@@ -22,6 +22,7 @@
 | HyperFrames | 0.8.40 | `%APPDATA%\npm` + npm global modules | npm 기본 관리 위치 유지 |
 | Aider | 0.86.2 | `%USERPROFILE%\.local\bin` + installer-managed Python env | updater/환경 관리 경로 유지 |
 | jev-router | 0.2.0 | `C:\Users\user\AppData\Roaming\npm` | npm 전역 기본 위치 유지. `jev-codex.cmd`, `jev-claude.cmd` 설치 확인. API 키 미설정으로 비활성·실제 라우팅 미검증 |
+| AI Control Tower | 0.1.0 | 실제 설치 `%LocalAppData%\AIControlTower`; 소스 `project-operations-hub\ai-control-tower`; publish `ai-control-tower\artifacts\win-x64\AIControlTower.exe` | 2026-09-20 사용자 설치 실행 및 자동 시작 전환 검증. Program Files 우선 정책의 권한 부족 fallback 경로를 실제 사용 중 |
 
 ## 인수인계 필수 항목
 모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.
@@ -36,5 +37,3 @@
 - Helper: staging `C:\KJ\Tools\AI\Scripts\Runtime\Send-N8nTask.ps1`
 - 검증: n8n 재시작 후 helper POST → `{ ok: true, source: local-n8n-bridge }` 응답 확인
 - 보안: localhost 전용. 외부 tunnel/public webhook은 별도 승인·인증 설계 전에는 열지 않습니다.
-
-| AI Control Tower | 0.1.0 | 소스: project-operations-hub\\ai-control-tower, publish: rtifacts\\win-x64\\AIControlTower.exe | .NET 9 WPF로 생성. 앱 설치 시 C:\\Program Files\\_My\\AI\\Applications\\AIControlTower 우선, 권한 부족 시 %LocalAppData%\\AIControlTower 사용 |
