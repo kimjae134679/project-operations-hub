@@ -144,7 +144,7 @@ function Invoke-Task {
     }
 
     $branchName = "ai-ops/issue-$($Issue.number)"
-    Add-IssueComment -IssueNumber $Issue.number -Body "$ClaimMarker`n[B계정] Nova 작업 실행기가 요청을 접수했습니다.`n`n- 프로젝트: $projectName`n- 대상 저장소: $repository`n- 작업 브랜치: $branchName"
+    Add-IssueComment -IssueNumber $Issue.number -Body "$ClaimMarker`n[B-account] Nova runner claimed this request.`n`n- Project: $projectName`n- Target repository: $repository`n- Task branch: $branchName"
 
     Invoke-External -Command "git" -Arguments @("fetch", "origin", $baseBranch) -WorkingDirectory $resolvedRepoPath | Out-Null
     Invoke-External -Command "git" -Arguments @("checkout", $baseBranch) -WorkingDirectory $resolvedRepoPath | Out-Null
@@ -177,7 +177,7 @@ At the end, summarize changed files, tests run, failures, and remaining risks.
     $changed = Invoke-External -Command "git" -Arguments @("status", "--porcelain") -WorkingDirectory $resolvedRepoPath
     if (($changed -join "").Trim().Length -eq 0) {
         $summary = if (Test-Path -LiteralPath $resultPath) { Get-Content -LiteralPath $resultPath -Raw } else { "Codex completed without file changes." }
-        Add-IssueComment -IssueNumber $Issue.number -Body "$DoneMarker`n작업은 실행됐지만 커밋할 파일 변경이 없습니다.`n`n$summary"
+        Add-IssueComment -IssueNumber $Issue.number -Body "$DoneMarker`nThe task ran, but there are no file changes to commit.`n`n$summary"
         Invoke-External -Command "gh" -Arguments @("issue", "close", [string]$Issue.number, "--repo", $HubRepository) | Out-Null
         return
     }
@@ -200,7 +200,7 @@ At the end, summarize changed files, tests run, failures, and remaining risks.
         $summaryText = $summaryText.Substring(0, 5000) + "`n`n[truncated]"
     }
 
-    Add-IssueComment -IssueNumber $Issue.number -Body "$DoneMarker`n[B계정] Nova 실행 완료.`n`n- Pull Request: $($prUrl -join '')`n- 자동 병합·배포: 수행하지 않음`n`n$summaryText"
+    Add-IssueComment -IssueNumber $Issue.number -Body "$DoneMarker`n[B-account] Nova completed the task.`n`n- Pull Request: $($prUrl -join '')`n- Automatic merge/deployment: not performed`n`n$summaryText"
     Invoke-External -Command "gh" -Arguments @("issue", "close", [string]$Issue.number, "--repo", $HubRepository) | Out-Null
 }
 
@@ -238,7 +238,7 @@ try {
             }
             Write-RunnerLog "Failed issue #$($issue.number): $message"
             try {
-                Add-IssueComment -IssueNumber $issue.number -Body "$FailMarker`n[B계정] Nova 실행 실패.`n`n오류: $message"
+                Add-IssueComment -IssueNumber $issue.number -Body "$FailMarker`n[B-account] Nova failed to execute the task.`n`nError: $message"
             }
             catch {
                 Write-RunnerLog "Could not report failure for issue #$($issue.number): $($_.Exception.Message)"
