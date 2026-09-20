@@ -158,6 +158,7 @@ You are executing GitHub issue #$($Issue.number) through the local AI Ops Runner
 Follow the repository's current AGENTS.md and README instructions.
 Modify only what the task requires. Do not deploy, publish, merge, delete user data, or change secrets.
 Run relevant tests. Do not claim checks that were not run.
+Do not run git add, git commit, git push, or create a pull request. The runner handles all version-control steps after you exit.
 
 Task:
 $($task.instruction)
