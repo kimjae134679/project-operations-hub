@@ -2,9 +2,21 @@
 
 Windows에서 Desktop Commander Remote, Jev, Codex, GitHub CLI, n8n, AI Ops Runner와 전달 체인의 상태를 실제 확인 근거로 표시하는 .NET 9 WPF 관제탑입니다.
 
-## 실행 파일
+## 현재 배포 상태
 
-Release 단일 EXE: `artifacts/win-x64/AIControlTower.exe`
+최신 소스에는 좌측 탐색 메뉴, 한 개의 전체 세로 스크롤 영역, 별도 Jev 작업 제어 창이 포함되어 있습니다. 이 변경을 포함한 단일 EXE publish·설치본 교체·SHA-256 대조·수동 UI 확인은 컨트롤러의 권한 작업으로 남아 있습니다. 완료 전에는 기존 `artifacts/win-x64/AIControlTower.exe`와 `%LocalAppData%\AIControlTower\AIControlTower.exe`가 최신 탐색 화면을 포함한다고 주장하지 않습니다.
+
+배포 대상 경로:
+
+- 빌드 출력: `artifacts/win-x64/AIControlTower.exe`
+- 권한 제한 시 설치 대상: `%LocalAppData%\AIControlTower\AIControlTower.exe`
+
+최종 publish 뒤에는 다음 명령으로 아티팩트와 설치본의 SHA-256이 같은지 확인합니다.
+
+```powershell
+Get-FileHash artifacts\win-x64\AIControlTower.exe -Algorithm SHA256
+Get-FileHash "$env:LocalAppData\AIControlTower\AIControlTower.exe" -Algorithm SHA256
+```
 
 ```powershell
 .\AIControlTower.exe
@@ -16,6 +28,8 @@ Release 단일 EXE: `artifacts/win-x64/AIControlTower.exe`
 - Desktop Commander, Jev, Codex, GitHub CLI, n8n, AI Ops Runner 상태 표시
 - 외부 GPT 세션처럼 로컬에서 증명할 수 없는 구간은 `Unknown`으로 표시
 - AA_01·AA_02 참고의 화이트·블루 대시보드, 상태 배지, 다크 실시간 작업 콘솔
+- 고정 좌측 메뉴와 하나의 전체 세로 스크롤로 대시보드·도구 상태·설치/복구 구역 이동
+- Jev 작업 제어는 대시보드에서 분리된 단일 별도 창으로 열림
 - 로컬 Jev 실행은 사용자 OpenAI 계정 사용 방침에 따라 기본적으로 차단
 - 비밀번호·API 키·토큰 값 비표시
 - 설치, 제거, Desktop Commander 시작 구성 복구
@@ -42,6 +56,12 @@ dotnet build AIControlTower.sln -c Release
 dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\win-x64
 ```
 
+탐색 화면 변경 기준으로 `dotnet test tests\AIControlTower.Tests\AIControlTower.Tests.csproj -c Release`는 11개 통과, `dotnet build AIControlTower.sln -c Release`는 경고·오류 0개를 기록했습니다. publish 이후에는 설치본 hash 대조와 다음 수동 UI 범위를 다시 확인해야 합니다.
+
+- 좌측 메뉴가 보이고 모든 주 구역이 하나의 세로 스크롤에서 접근되는지
+- Jev 작업 제어가 별도 창으로 열리고 실행 버튼이 정책 설명과 함께 비활성인지
+- GPT 스케줄러·예약·브라우저·권한 자동 클릭 UI가 없는지
+
 ## GPT 작업 큐
 
 `%LocalAppData%\AIControlTower\queue\inbox`에 작업당 하나의 `.txt` 파일을 만들 수 있습니다. 단, 현재 로컬 Jev 실행 정책이 비활성화되어 있으므로 관제탑은 파일을 `processing`으로 이동하거나 실행하지 않습니다. 정책을 별도로 변경할 때에만 원자 이동·완료 이력(`archive`)·결과(`result`) 흐름을 사용합니다.
@@ -49,5 +69,5 @@ dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --
 
 ## 실제 설치 검증 기록
 
-2026-09-20에 %LocalAppData%\AIControlTower 설치, 현재 사용자 자동 시작, AIControlTower-DesktopCommanderSilent.vbs 생성 및 기존 Desktop Commander 시작 CMD 백업을 확인했습니다. 설치를 다시 실행하면 원본 CMD가 이미 없으므로 전환 대상이 없다는 안내가 나올 수 있습니다.
+2026-09-20에 %LocalAppData%\AIControlTower 설치, 현재 사용자 자동 시작, AIControlTower-DesktopCommanderSilent.vbs 생성 및 기존 Desktop Commander 시작 CMD 백업을 확인했습니다. 설치를 다시 실행하면 원본 CMD가 이미 없으므로 전환 대상이 없다는 안내가 나올 수 있습니다. 이는 이전 설치 검증 기록이며, 최신 탐색 화면의 설치본 검증은 아직 수행하지 않았습니다.
 

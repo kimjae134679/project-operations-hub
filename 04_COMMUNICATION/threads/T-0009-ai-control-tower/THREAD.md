@@ -47,3 +47,10 @@
 - TDD: 직접 실행 차단 테스트를 먼저 실패시킨 뒤 수정했고, 현재 9개 단위 테스트가 통과한다.
 - 기존 `artifacts\\win-x64\\AIControlTower.exe`는 사용자 실행 프로세스가 점유 중이라 덮어쓰지 않았다. 새 디자인 미리보기는 `ai-control-tower\\artifacts\\win-x64-design-preview\\AIControlTower.exe`에 생성·실행했다.
 
+### 탐색 화면 인수인계 (2026-09-20)
+- 소스 기준 최신 커밋: `a89513b` (`feat: add control tower navigation`). 고정 좌측 메뉴와 고정 헤더, 하나의 `DashboardScroll` 안의 요약·도구 상태·실시간 콘솔·설치/복구·보안 안내를 구성했다. 상태 표 최소 높이는 280px, 콘솔 최소 높이는 190px이다.
+- Jev 입력·실행 편집기는 메인 대시보드에서 제거했고, 메뉴와 요약 카드가 단일 인스턴스의 별도 Jev 작업 제어 창을 연다. `LocalExecutionPolicy`의 기본 false 및 직접 실행·큐 수신·상태 명령 차단은 변경하지 않았다.
+- 후속 소규모 정리: 더 이상 XAML에 연결되지 않는 `MainWindow` Jev 실행/취소 핸들러를 제거했고, 고정된 활성 메뉴 표시를 없애 이동 대상과 다른 활성 상태가 보이지 않게 했으며, `CONTROL/TOWER`, `LIVE STATUS` 레이블을 한국어로 바꿨다.
+- 소스 검증 기록: Release 단위 테스트 11개 통과, Release solution build 경고 0·오류 0, `git diff --check` 통과(Task 3). 이번 문서·정리 변경은 publish 전 소스 검증을 다시 수행해야 한다.
+- **외부 권한 작업 잔여:** 최신 단일 파일 publish, `%LocalAppData%\\AIControlTower\\AIControlTower.exe` 설치본 교체, artifact/설치본 SHA-256 일치 대조, 설치본 수동 UI 확인, `git pull --rebase` 및 GitHub push. 이들이 끝나기 전 최신 소스가 설치본/원격 main에 반영됐다고 기록하지 않는다.
+

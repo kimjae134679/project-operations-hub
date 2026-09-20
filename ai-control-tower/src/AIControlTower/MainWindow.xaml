@@ -75,10 +75,6 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="SidebarPrimaryButton" TargetType="Button" BasedOn="{StaticResource SidebarButton}">
-            <Setter Property="Background" Value="#EAF2FF"/>
-            <Setter Property="Foreground" Value="{StaticResource Blue}"/>
-        </Style>
         <Style x:Key="StatusBadge" TargetType="Border">
             <Setter Property="Background" Value="#E6F0FF"/>
             <Setter Property="CornerRadius" Value="12"/>
@@ -132,14 +128,14 @@
                         <TextBlock Text="AI" Foreground="White" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="CONTROL" FontSize="11" FontWeight="Bold" Foreground="#7890B3"/>
-                        <TextBlock Text="TOWER" FontSize="17" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+                        <TextBlock Text="AI 관제" FontSize="11" FontWeight="Bold" Foreground="#7890B3"/>
+                        <TextBlock Text="타워" FontSize="17" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1">
                     <TextBlock Text="메뉴" Foreground="#91A1BB" FontSize="11" FontWeight="Bold" Margin="12,0,0,9"/>
-                    <Button Style="{StaticResource SidebarPrimaryButton}" Content="⌂   대시보드" Click="Home_Click"/>
+                    <Button Style="{StaticResource SidebarButton}" Content="⌂   대시보드" Click="Home_Click"/>
                     <Button Style="{StaticResource SidebarButton}" Content="●   도구 상태" Click="Status_Click"/>
                     <Button Style="{StaticResource SidebarButton}" Content="▶   Jev 작업 제어" Click="Jev_Click"/>
                     <Button Style="{StaticResource SidebarButton}" Content="↓   설치 및 복구" Click="InstallSection_Click"/>
@@ -276,7 +272,7 @@
                                     <TextBlock Text="실시간 작업 콘솔" Foreground="White" FontSize="17" FontWeight="Bold"/>
                                     <TextBlock Text="  ·  민감한 값은 표시하지 않습니다" Foreground="#91A7C7" VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Grid.Column="1" Text="LIVE STATUS" Foreground="#58A6FF" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="실시간 상태" Foreground="#58A6FF" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
                             </Grid>
                             <StackPanel Grid.Row="1" Margin="0,18,0,0">
                                 <TextBlock Text="{Binding ActivitySummary}" Foreground="#E7F0FF" FontFamily="Consolas" FontSize="13" TextWrapping="Wrap"/>
