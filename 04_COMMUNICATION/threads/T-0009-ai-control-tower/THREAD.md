@@ -48,14 +48,14 @@
 - 기존 `artifacts\\win-x64\\AIControlTower.exe`는 사용자 실행 프로세스가 점유 중이라 덮어쓰지 않았다. 새 디자인 미리보기는 `ai-control-tower\\artifacts\\win-x64-design-preview\\AIControlTower.exe`에 생성·실행했다.
 
 ### 탐색 화면 인수인계 (2026-09-20)
-- 소스 기준 최신 커밋: `a89513b` (`feat: add control tower navigation`). 고정 좌측 메뉴와 고정 헤더, 하나의 `DashboardScroll` 안의 요약·도구 상태·실시간 콘솔·설치/복구·보안 안내를 구성했다. 상태 표 최소 높이는 280px, 콘솔 최소 높이는 190px이다.
+- GitHub `main` 반영 뒤 탐색 구현 커밋: `400e7d5` (`feat: add control tower navigation`). 고정 좌측 메뉴와 고정 헤더, 하나의 `DashboardScroll` 안의 요약·도구 상태·실시간 콘솔·설치/복구·보안 안내를 구성했다. 상태 표 최소 높이는 280px, 콘솔 최소 높이는 190px이다.
 - Jev 입력·실행 편집기는 메인 대시보드에서 제거했고, 메뉴와 요약 카드가 단일 인스턴스의 별도 Jev 작업 제어 창을 연다. `LocalExecutionPolicy`의 기본 false 및 직접 실행·큐 수신·상태 명령 차단은 변경하지 않았다.
 - 후속 소규모 정리: 더 이상 XAML에 연결되지 않는 `MainWindow` Jev 실행/취소 핸들러를 제거했고, 고정된 활성 메뉴 표시를 없애 이동 대상과 다른 활성 상태가 보이지 않게 했으며, `CONTROL/TOWER`, `LIVE STATUS` 레이블을 한국어로 바꿨다.
 - 최종 검증: Release 단위 테스트 11개 통과, Release solution build 경고 0·오류 0, 단일 파일 publish 성공. `artifacts\\win-x64\\AIControlTower.exe`와 `%LocalAppData%\\AIControlTower\\AIControlTower.exe`의 SHA-256은 `89A4B961CA2F92EFBE53B1B872E18F843BB6478BDB418071BDA2A4B7DBCD4C3B`로 동일하며 설치본 실행 프로세스 PID `29428`를 확인했다.
 - CUA에는 native app surface가 없어 자동 화면 캡처를 수행할 수 없었다. 따라서 좌측 메뉴·단일 전체 스크롤·별도 Jev 창·비활성 실행 버튼·금지된 GPT 스케줄러/예약/브라우저/권한 자동 클릭 UI 부재라는 화면 모양은 사용자 직접 확인이 남아 있다.
 
 ### 추가 AA_01 확인 및 최종 코드 검토 (2026-09-20)
-- 바탕화면 `AA_01.png`의 생성 시각은 22:28:45이며, 별도 Jev 창 커밋 `c037cc7`(22:45)과 좌측 탐색·전체 스크롤 커밋 `a89513b`(23:01)보다 앞선다. 따라서 이 이미지는 최신 설치본이 아니라 수정 전 UI 기록이다.
+- 바탕화면 `AA_01.png`의 생성 시각은 22:28:45이며, 당시 로컬에서 별도 Jev 창 커밋(22:45, GitHub 반영 뒤 `02ea6da`)과 좌측 탐색·전체 스크롤 커밋(23:01, GitHub 반영 뒤 `400e7d5`)보다 앞선다. 따라서 이 이미지는 최신 설치본이 아니라 수정 전 UI 기록이다.
 - 설치본 `%LocalAppData%\AIControlTower\AIControlTower.exe`는 23:21에 교체되었고 PID `29428`은 23:23에 시작했다. 자동화 세션에서 기존 창 활성화를 시도했으나 다른 데스크톱 세션 때문에 활성화되지 않아 화면 모양을 대신 확인할 수는 없었다.
 - 최종 독립 코드 리뷰에서 Critical 및 코드상 배포 차단 Important 이슈는 없었다. 후속 권장 사항은 키보드 포커스 시각화와 Jev 입력 레이블의 접근성 연결이다.
 - 최종 재검증 결과 Release 단위 테스트 11/11 통과, Release solution build 경고 0·오류 0이다.
