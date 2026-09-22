@@ -1,36 +1,18 @@
 # Threads — current execution handoff
 
-Updated: 2026-09-14 KST
+이 파일은 현재 작업 내용의 복사본이 아니라 실제 저장소로 가는 포인터입니다.
 
-Canonical execution order for the next worker:
+1. 현재 사용자의 작업 요청을 먼저 확인합니다.
+2. `kimjae134679/Threads/00_START_HERE/README.md`를 읽습니다.
+3. 실제 저장소의 `00_START_HERE/NEXT_RUN_HANDOFF.md`, 현재 main 및 열린 PR을 확인합니다.
+4. 필요한 경우에만 이 허브 T-0008의 관련 순차 기록을 확인합니다.
 
-1. `kimjae134679/Threads/00_START_HERE/NEXT_RUN_HANDOFF.md`
-2. inspect current `kimjae134679/Threads` main/recent commits and CI
-3. `04_COMMUNICATION/threads/T-0008-ai-content-monetization/024-sol.md`
-4. continue the first unfinished backlog item; do not stop at planning
+코드·검증·현재 우선순위는 Threads 저장소가 원본입니다. 오래된 commit/CI 번호나 메시지 번호를 이 파일에서 현재 상태로 취급하지 않습니다.
 
-Current verified implementation checkpoint:
+현재 사용자 요청은 원문 컷 편집기로 표지 범위와 본문 페이지 경계를 직접 지정하는 방식입니다. 긴 캡처의 스크롤·확대, 분할선 이동/삭제, 두꺼운 제목 테두리와 단어별 색상 강조, 편집 저장/복원 및 PNG ZIP 내보내기를 구현했습니다. Canva는 사용자 요청으로 보류합니다.
 
-```text
-29a9b996e3513e4c8d9d1b8e6cc5ebeffc789c81
-GitHub Actions 34785739288 / job 103800763036
-JavaScript syntax/regression SUCCESS + local server smoke SUCCESS
-```
+공개 HTTPS 링크 캡처를 편집기에 여는 Windows 앱을 설치하고 실행했습니다. 각 장 여백·의견, OFL 폰트/실제 굵기/스타일 프리셋, 원본과 편집 좌표·비율·전후 값·사용자 이유의 PC 로그 보관을 추가했습니다. 소재 탐색 지침에는 중간 문구 초안을 함께 기록하도록 반영했습니다.
 
-The earlier `4c3e724...` failure was a regression-guard-only mistake caused by an overstrict layout assertion; the guard was corrected at `29a9b996...` and the corrected checkpoint is green.
+실행·설치 위치·사용법은 Threads의 `docs/SOURCE_CUT_DESKTOP.md`와 최신 handoff, 진행 상태는 `docs/PRODUCTION_PROGRESS.md`가 원본입니다. 실제 Windows의 긴 페이지·공개 링크 캡처와 편집기 열기, 스타일/프리셋/로그 저장을 검증했습니다. 다음은 사용자 결과물 검수와 기존 게시 검수 연결입니다. 자동 학습은 아직 구현하지 않았습니다. 변경은 열린 PR에서 검토하며 main에는 병합하지 않았습니다.
 
-Latest Threads handoff update commit:
-
-```text
-25f915585237e4399251071d9cb957283cd41a18
-```
-
-Latest operations-hub sequential note:
-
-```text
-04_COMMUNICATION/threads/T-0008-ai-content-monetization/024-sol.md
-```
-
-P3 bulk candidate review is materially complete for the current workflow. P4 Community Card Factory manual image privacy masking is ACTIVE. Continue with browser interaction verification when available, undo-last-mask/per-image status, exact image identity binding, privacy envelope integration into saved manifest/storyboard metadata, and visibility in final 04 REVIEW_PUBLISH before moving to P5.
-
-Repository tip wins if this pointer becomes stale.
+이번 소통 기록은 `04_COMMUNICATION/threads/T-0008-ai-content-monetization/THREAD.md`에서 이어갑니다. 기존 번호별 기록은 과거 이력으로 보존합니다.

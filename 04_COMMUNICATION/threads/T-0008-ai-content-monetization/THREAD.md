@@ -9757,3 +9757,39 @@ No live publish.
 No P1.
 Only 04_REVIEW_PUBLISH may ever handle real publication after human review.
 
+---
+
+## 2026-09-20 · 컷메이트 · 컷 편집기 마무리
+
+사용자는 승인한 컷 편집기의 분할선 설명, 긴 원문 스크롤, 제목 테두리 강화와 단어별 색상 강조를 요청했습니다. Canva는 나중으로 미뤘습니다.
+
+- 실제 변경: `app/source-cut-editor.html`과 모델·편집기·ZIP 코드, 기존 원문 입력 화면 연결. 표지/본문 선택·원본 좌표 분할·스크롤/확대·경계 드래그 자동 스크롤, 여러 원문 순서, 제목 테두리 기본 8px(2~20px), 기본색/강조색과 강조 단어.
+- 저장/출력: 원본을 포함한 편집 JSON 복원, 전체 PNG ZIP. 출력 너비 1080px, 선택 비율 유지. 이미지당/합계 메모리 제한과 너무 긴 컷의 추가 분할 안내.
+- 코드 기준: Threads `bc9cac17833c596168c67449ccbb87969a2f2bdf`, [기존 PR #1](https://github.com/kimjae134679/Threads/pull/1). main 병합하지 않음.
+- 검증: 로컬 `npm run check` 47개 suite 및 142개 JS 구문 검사 통과. 실제 스크립트와 native Canvas/DOM 더블로 스크롤·분할·제목·저장/복원·ZIP 생성 확인. 독립 Python ZIP 판독과 실제 HTTP 경로 200 확인. 최종 커밋의 GitHub Actions syntax 작업 통과 (run 35526470782). 최신 main bc255bd의 후보 동기화·WebP·Discovery 기록을 검토 브랜치에 통합하고 충돌을 정리함.
+- 미검증: 실제 브라우저 E2E/Windows 설치·다운로드. 미구현: URL 전체 자동 캡처, 기존 04 검수에 결과 되돌려 쓰기. 외부 계정 게시 없음. Canva 미연결.
+- 첨부 원문 기반 예시 PNG의 공개 GitHub 업로드는 자동 승인 검토에서 외부 공개 승인 부족으로 차단되어 제외함. 코드는 사용자 요청 범위에서 PR에 반영.
+- 다음 작업: 실제 브라우저에서 긴 원문 하나를 편집하고 ZIP 다운로드와 편집 JSON 복원 확인 → 기존 검수 단계 연결.
+- 사용법 원본: Threads `docs/SOURCE_CUT_EDITOR.md`. 진행표: `docs/PRODUCTION_PROGRESS.md`.
+
+작업 위치: 관리형 Linux `/workspace/scratch/7dc461d71eca/Threads`. Windows PC에 프로그램을 설치하거나 이동하지 않았으므로 `C:\Program Files\_My\AI` 경로 변경 없음. 새 외부 프로그램 설치 없음. 실행은 저장소 루트 `npm start`, 페이지는 `/app/source-cut-editor.html`; 이동 시 저장소 상대경로를 유지합니다.
+
+
+---
+
+## 2026-09-20 · 컷메이트 · Windows 앱 설치와 편집 레퍼런스 기록 완료
+
+사용자 추가 요청: URL 캡처 후 열기/HTML 대신 앱, 각 컷 여백과 작성 의견, 탐색 때 중간 문구 초안, 상업 사용 가능한 폰트/실제 굵기/프리셋, 편집 기준을 남겨 향후 자동화에 활용.
+
+- 코드: Threads `592434f25d783d96ecb6ef3c19410a3497f958af`; 설치 검증 문서 `8d35f79e9316e92786b48ee18adb896221c61c52`. 기존 PR #1 갱신, main 미병합.
+- 공개 HTTPS 페이지를 격리된 Electron 창으로 캡처하고 긴 원문을 연속 타일로 편집기에 전달. 로그인/접근 제한 우회 없음. 가상/무한 스크롤은 수동 확인 필요.
+- 장별 위/아래/좌우 여백, 배경, 위/아래 의견, 실제 폰트/굵기와 스타일 프리셋. Noto Sans KR 파생 400/900, Cut Gothic 800와 OFL 동봉. Regular Cut Gothic 파일 업로드는 자동 승인 검토에서 거절되어 제외했고 재시도하지 않음.
+- 원본 좌표/정규화 비율, 분할선, 설정 전후, 제목/문구/폰트, 직접 입력한 이유를 기록. 원본 바이트/해시와 append-only JSONL 및 최종 상태를 PC 전용 폴더에 자동 보관. '기준 예시'는 사용자 선택이며 수정하면 해제. 자동 학습/자동 게시/Canva는 미구현.
+- Discovery 지침·후보 파서·원문 입력 전달에 중간 문구 초안 연결. 기존 후보 사실/점수/C-A-P 상태 수정 없음.
+- 검증: 로컬 전체 50 suites/153 JS syntax, 마지막 보완 후 history/syntax 검사, 코드 commit GitHub Actions syntax 통과. 실제 Windows 18000px→3장 누락 없는 테스트 캡처, example.com 캡처, 앱 버튼→편집기, 여백/의견/Cut Gothic 800 프리셋/원본해시/로그 저장 통과. x64 ZIP 빌드 및 배포 앱 실행/응답 확인.
+- 설치: `C:\\Users\\user\\AppData\\Local\\Programs\\ThreadsCutEditor\\app\\Threads Cut Editor.exe`, 바탕화면 `원문 컷 편집기.lnk`. 소스는 같은 프로그램 폴더의 `source`, 최종 ZIP과 `verification-report.json` 보관. `C:\\Program Files\\_My\\AI`가 없어 관리자 권한이 필요 없는 표준 per-user Programs 경로 사용. 기존 프로젝트 이동 없음. 이동할 때 바로가기 대상/시작 위치 갱신, EXE와 resources 함께 유지.
+- ZIP SHA-256: `95F4F65F3D41485C06675627AAC54560A5154462CEBE246B5F5E47C1730B9BD7`.
+- 임시 smoke 프로필/테스트 이미지/setup probe 정리. 실제 사용자 데이터와 원격 연결 서비스 유지. 사용자 첨부/편집 로그는 GitHub에 올리지 않음.
+- 다음: 사용자가 실제 소재 결과를 검수 → 04 자산 전달. 이후 축적된 기준 예시를 확인하며 자동화 규칙 제안. 현재 기록만으로 사용자 의도를 추측해 자동 학습했다고 표시하지 않음.
+
+로컬 Git 작업 경로: `/workspace/scratch/7dc461d71eca/Threads`. 사용법과 최신 상태 원본은 Threads 저장소의 desktop guide/handoff.
