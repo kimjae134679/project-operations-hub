@@ -5,7 +5,7 @@
 | 운동앱 / HealthAPK | `kimjae134679/HealthAPK` | `02_PROJECTS/HealthAPK/` |
 | 주식자동매매 / Investment-Lab | `kimjae134679/Investment-Lab` | `02_PROJECTS/Investment-Lab/` |
 | 청약 / ChungYack | `kimjae134679/ChungYack` + `stock/chungyack-apk/` | `02_PROJECTS/ChungYack/` |
-| 멀티의신 / PhoneLOL | `kimjae134679/PhoneLOL` | `02_PROJECTS/PhoneLOL/` |
+| 멀티의신 / PhoneLOL | `kimjae134679/PhoneLoL_02` (ARM64), `kimjae134679/PhoneLOL` (reference) | `02_PROJECTS/PhoneLOL/` |
 | 주식 앱 / Market Radar | `kimjae134679/stock` | `02_PROJECTS/Market-Radar/` |
 | 피규어만들기_01 | GitHub 필수 아님 | `02_PROJECTS/Figure-01/` |
 | 동물의숲 / Tiny Village | GitHub 필수 아님 | `02_PROJECTS/Tiny-Village/` |

@@ -1,6 +1,7 @@
 # Communication Index
 
 ## Open
+- [T-0010 — PhoneLOL ARM64 recovery](threads/T-0010-phonelol-arm64-recovery/THREAD.md)
 - [T-0002 — Real project feedback](threads/T-0002-real-project-feedback/THREAD.md)
 - [T-0003 — SideMemojang release & UX](threads/T-0003-sidememojang-release-and-ux/THREAD.md)
 - [T-0004 — Tiny Village Motion & Personality](threads/T-0004-tiny-village-motion-and-personality/THREAD.md)
