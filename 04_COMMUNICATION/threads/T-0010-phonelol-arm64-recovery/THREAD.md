@@ -1,6 +1,6 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — 1.16.8 후보 전달, 실기기 확인 대기.
+상태: OPEN — 1.16.9 로컬 후보·서버 반영 완료, 실기기 확인 및 GitHub 업로드 승인 대기.
 현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/RECOVERY_STATUS.md).
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
@@ -45,3 +45,16 @@
 - 생성한 probe/진단 임시 파일과 이 빌드의 중복 C++/managed 출력 폴더를 정리했다. APK, 실제 서버 로그/백업, 기준 원본과 사용자 UnityConnectSettings 변경은 보존했다.
 
 다음은 사용자의 아이콘·챔피언 선택·1인/2인 진행·맵/HUD·종료/랭킹 피드백을 받고, 같은 진단 ID의 서버 로그로 좁혀 수정하는 단계다.
+
+## 2026-09-24 — [B계정] Nova / Codex Work — 1.16.9 구현·빌드·서버 완료, GitHub 업로드 보류
+
+- 실제 로컬 소스: D:\A_KJ\AI\PhoneLoL_02, work/v1164-unity6-recovery, 구현 커밋 a64e535670e2bc2ca0517737c628a1b563172fae. 기존 원격 최신은 786409c이며 이번 소스는 아직 push하지 못했다.
+- APK: D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-v1.16.9-arm64-candidate.apk. 1.16.9/195, 136944006 bytes, SHA-256 8d8afbe292385af089a2fac69fbcb4241e2189e42e7ab2f9d9fbf17e3513788c. Build succeeded: 0 errors/760 warnings, native libraries 6개 모두 ARM64/ELF64.
+- 전투: bounded Eve session으로 맵 오브젝트 번호 충돌과 Int32 overflow 방지. 양방향 팀 이동, 원본 walkable polygon 기반 두 맵 NavMesh 복구.
+- 원본 조명: 두 맵 각각 2 lightmaps, 296/638 bindings, atlas UV2/ST 보정. 애니메이션 44개 복구 controller의 316 states/178 transitions/누락 motion 0. 숨겨진 main-controller flag도 수정했다.
+- 일반대전은 모드대전(mode 10)으로 변경. 아이템 8칸 및 shop/HUD/use/result UI·전송, unique 장비 중복 허용, passive gold 2배, 팀당 미니언 8마리, 정글 리젠 시간 절반. 랭크·친선 규칙 유지. 모든 참가자는 1.16.9 설치 필요.
+- 검증: Unity의 모드별 inventory round-trip·UI 배열·조명·spawn sample·애니메이션 참조, disposable server의 1인/2인·team move·direct/broadcast relay·8-item result·ranking/duplicate settlement. 실기기 전투·시각 일치·터치 사용성 검증은 사용자 담당이며 미확인.
+- 기존 서버 소스와 SQLite를 before-v1169-20260924-212259에 백업하고 managed_battle_v1167.py / managed_results_v1168.py만 반영. 기존 launcher/DB/tunnel 유지. 29000 listen 및 로컬·공개 진단 HTTP 204 확인.
+- 자동 승인 심사가 공개 저장소로 이번 소스·복구자료·운영기록을 게시하는 명시적 승인 부족으로 push를 거절했다. 동일 기존 승인 대상과 ADMIN 권한까지 확인 후에도 재거절됐다. 우회하지 않았고 이 허브 기록도 현재 로컬에만 저장한다.
+- 다음: 사용자는 APK 테스트. 공개 업로드에 대한 명시적 승인 후 실제 저장소 및 이 스레드·사용자 요약을 push한다. 상세 원본은 로컬 RECOVERY_STATUS.md 최신 구역이며 원격 문서는 아직 1.16.8이다.
+- 새 프로그램 설치 없음. 기존 사용자 지정 프로젝트/Unity/Python 경로 재사용. 이번 임시 probe와 중복 debug build 폴더는 제거했다. 사용자 UnityConnectSettings.asset 별도 변경은 보존·커밋 제외.
