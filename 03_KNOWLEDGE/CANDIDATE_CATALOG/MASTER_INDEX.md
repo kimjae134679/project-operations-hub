@@ -78,6 +78,7 @@
 | OSV-Scanner | CANDIDATE | 🟢 | dependency/lockfile 취약점 검사 |
 | Trivy | CANDIDATE / SELECTIVE | 🟡 | dependency/container/IaC/secret/SBOM 통합 검사 |
 | pre-commit / reviewdog | CANDIDATE | 🟢 | 검사 gate / diff·PR 결과 통합 |
+| mise | CANDIDATE | 🟢~🟡 | 다중 런타임·환경변수·반복 task 재현; 상세 `MISE.md` |
 
 기본 운용은 `저장소 구조 확인 → 필요한 3~6개 정도 선택 → 검사 → 수정 → diff → 실제 build/test → 재검사` 순서를 우선합니다. 기존 후보와 역할이 사실상 겹치는 새 linter/formatter는 특별한 장점이 없으면 추가하지 않습니다.
 
@@ -234,4 +235,4 @@
 
 같은 도구가 여러 SNS 목록에 다시 나오면 상세 설명을 복제하지 않고 기존 항목으로 연결합니다.
 
-마지막 정리: **2026-09-20**
+마지막 정리: **2026-09-24**
