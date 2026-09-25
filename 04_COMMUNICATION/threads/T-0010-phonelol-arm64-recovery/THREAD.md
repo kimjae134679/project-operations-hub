@@ -1,6 +1,6 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — 1.16.9 로컬 후보·서버 반영 완료, 실기기 확인 및 GitHub 업로드 승인 대기.
+상태: OPEN — 1.18.1 APK/서버 반영 완료; 실제 폰의 오프라인 전투·채팅·카타리나·알리스타 확인 대기.
 현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/RECOVERY_STATUS.md).
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
@@ -181,3 +181,13 @@ PhoneLoL_02 소스6106467이 GitHub 작업 브랜치에 push되었고 Draft PR #
 - 알리스타 체력10000 및 부활 뒤 재타게팅, 카타리나 스킬 중 이동 방향·바라보는 방향 동기화, 클라이언트 고빈도 진단 업로드 억제. 이전 63MB 로그·큐 초과는 ping 악화의 후보이며 외부망 RTT 원인은 미확정.
 - 운영 서버 DB 및5개 소스 백업 후 재배포; 계정21개·무결성ok·29000 공지 GET200. Android PhoneLOL-1.18.0.apk/code204 빌드 성공(오류0/경고762), ARM64 및 CRC 확인, SHA256 385f0769768f33608f95b606a8380d45f7a2c5400ab3800665963eda5e96ccce.
 - 휴대폰4인 ping/카타리나 방향과 공지·전체 채팅 사용성 검증은 아직 필요. Mac iOS IPA, 원본 랭킹·계정 보상은 종전 미완료. 사용자 UnityConnectSettings.asset 변경과 원격 연결은 건드리지 않았다.
+
+
+## 2026-09-26 — Codex Work — 1.18.1 서버 실패 시 로컬 솔로 모드 및 회귀 수정
+
+- 사용자 요청: URF 모드 명칭·시작 레벨3, 좌측 상단 랭킹/전체 전적 분리, 카타리나 방향, 알리스타 부활 후 재타게팅, 전체 채팅 입력·전송 UI, 서버 미접속 시 동의받아 로컬 혼자 플레이.
+- 앱 작업 브랜치 `work/v1164-unity6-recovery`; 최종 Android APK `D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-1.18.1.apk`, 1.18.1/code205, ARM64, 143291138 bytes, SHA256 FAF19628027188F13A88BC4378ADC728FD3D235C7473BDFD3612FF878F67E186, ZIP CRC 정상. 빌드 오류0/경고764.
+- 로그인에서 서버 연결 실패 시 안내 후 선택적으로 단말 내 임시 계정/목록/방/챔피언 선택/1인 전투를 실행. 서버 연결 시 기존 온라인 경로 유지. 오프라인 진행은 온라인 전적·채팅·계정으로 동기화하지 않는다.
+- 검증: Unity 로비·알리스타 재처치 테스트, 원본 서버 프로필 바이너리 일치, localhost 실제 3포트/영향 받지 않는 주소로 방부터 전투 로딩까지 패킷 검사 통과. 카타리나 화면, 실제 휴대폰 IME 및 오프라인 전투 완료/결과는 사용자 단말 미검증.
+- 라이브 서버 두 모듈 배포, 백업 `recovery/04_runtime/backups/v1181_20260926_034738`, 29000 listen, 계정21개 및 DB integrity ok. 파일·절차: 실제 저장소 `Recovery/V1181Release.md` 및 `HANDOFF.md` 상단.
+- 새 프로그램 설치 없음. 기존 사용자 지정 Unity/Python/프로젝트/서버 경로를 그대로 사용했으며 AI 기본 설치 루트 외 기존 위치라는 예외를 유지했다. 사용자 UnityConnectSettings.asset과 기존 Known-Good/운영 DB 보호.
