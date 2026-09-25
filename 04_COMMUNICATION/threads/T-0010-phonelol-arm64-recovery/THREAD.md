@@ -101,3 +101,16 @@
 - 새 독립 도구 설치 없음. 기존 D:/A_KJ/AI/PhoneLoL_02, 사용자 Unity/Python/서버 경로 유지(기존 위치 예외). 이번 중복 빌드 폴더, 임시 probe/스크립트/로그, 실패한 iOS 설치 다운로드를 정리했다. APK·원본·운영 백업·Remote Desktop 연결은 보존했다.
 - 사용자 UnityConnectSettings.asset 별도 변경을 보존하고 커밋에서 제외했다. 이전 자동 승인 심사가 거절한 공개 GitHub 업로드는 재시도하거나 우회하지 않았다. 소스와 허브 기록은 로컬 저장 상태다.
 - 최신 원본: 실제 저장소 RECOVERY_STATUS.md 상단. 다음은 1.7.0 폰 피드백 및 iOS 모듈 승인/Mac 빌드 환경 확보다.
+
+## 2026-09-25 — [B계정] Nova / Codex Work — iOS 내보내기 및 통합 ZIP
+
+- iOS Build Support6000.3.14f1을 공식 설치로 완료했다. 기존 Unity 편집기 내부 설치로 기본 도구 루트의 예외를 설치 목록에 기록했다.
+- 설치 직후 열린 편집기는 iOS 후처리 오류2개에도 성공으로 보고했고 실제 프로젝트는 없었다. 출력 파일과 오류 수를 확인하는 빌드 검증을 추가했다.
+- 재실행 중 Package Manager Retry 창은 원격 실행 환경에서 누락된 Windows 환경변수 때문이었다. 기존 Automation/OpenUnity.ps1로 정상 실행했고 Editor 준비 완료를 확인했다. 보안/방화벽 설정은 변경하지 않았다.
+- 실제 iOS Xcode 내보내기 성공: 오류0/경고35, 40500ms. Info.plist 및 Xcode 프로젝트, 1.7.0/197, ARM64/Metal/가로 화면 확인. 후속 C# 재컴파일 오류0.
+- 사용자 요청에 따라 버전 뒤 문구를 제거했다. 기존 테스트 폴더의 PhoneLOL-1.7.0.zip에는 Android/PhoneLOL-1.7.0.apk와 iOS/PhoneLOL-1.7.0/ 프로젝트 및 한국어 안내가 들어 있다.
+- ZIP648469575바이트, SHA-256 d0307a14902138020384cf92f72eaa0b7d7f9e111bdc0b116ecf9c3014750522. 압축 전체 CRC 검사와 내부 APK 원본 해시 일치 검증 통과. Mac 실행 스크립트 실행 권한 보존.
+- Mac 연결이 없어 Xcode 컴파일/링크, Apple 서명, IPA 생성, 아이폰 실행은 미완료다. 현재 ZIP을 iOS 설치 앱으로 설명하지 않는다. Mac과 사용자 서명 환경이 다음 필요사항이다.
+- 원본 저장소 로컬 커밋: 2136213a576b1b440ccb098ac8156300bc63b05c. 최신 근거: RECOVERY_STATUS.md, Recovery/V170IOSStatus.md, V170IOSExport.json/txt.
+- 라이브 서버/계정 DB는 변경하지 않았다. 사용자 UnityConnectSettings.asset 변경은 보존·커밋 제외. 공개 업로드 자동 승인 거절을 우회하지 않았다.
+- 이번 설치 캐시와 임시 진단 스크립트/로그는 정리한다. 새로 만든 별도 iOS ZIP은 통합 ZIP 검증 후 제거했고, 원본/운영 백업/최종 산출물과 Remote Desktop 연결은 유지한다.
