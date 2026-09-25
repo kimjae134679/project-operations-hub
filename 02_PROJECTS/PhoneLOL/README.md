@@ -8,3 +8,6 @@
 - 구현/빌드/서버 배포/실제 플레이를 구분한다.
 - [PhoneLOL Room](../../04_COMMUNICATION/rooms/PhoneLOL/README.md)
 - [통합 인수인계 T-0010](../../04_COMMUNICATION/threads/T-0010-phonelol-arm64-recovery/THREAD.md)
+
+- 버전·파일명 원본: [VERSIONING.md](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/VERSIONING.md)
+- [인수인계](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/HANDOFF.md) / [열린 이슈](https://github.com/kimjae134679/PhoneLoL_02/issues)
