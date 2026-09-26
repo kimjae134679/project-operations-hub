@@ -1,6 +1,6 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — 1.18.1 APK/서버 반영 완료; 실제 폰의 오프라인 전투·채팅·카타리나·알리스타 확인 대기.
+상태: OPEN — 1.18.2 APK/새 인터넷 터널 확인 완료; 실제 폰의 다른 통신사 접속과 전투 확인 대기.
 현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/RECOVERY_STATUS.md).
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
@@ -191,3 +191,13 @@ PhoneLoL_02 소스6106467이 GitHub 작업 브랜치에 push되었고 Draft PR #
 - 검증: Unity 로비·알리스타 재처치 테스트, 원본 서버 프로필 바이너리 일치, localhost 실제 3포트/영향 받지 않는 주소로 방부터 전투 로딩까지 패킷 검사 통과. 카타리나 화면, 실제 휴대폰 IME 및 오프라인 전투 완료/결과는 사용자 단말 미검증.
 - 라이브 서버 두 모듈 배포, 백업 `recovery/04_runtime/backups/v1181_20260926_034738`, 29000 listen, 계정21개 및 DB integrity ok. 파일·절차: 실제 저장소 `Recovery/V1181Release.md` 및 `HANDOFF.md` 상단.
 - 새 프로그램 설치 없음. 기존 사용자 지정 Unity/Python/프로젝트/서버 경로를 그대로 사용했으며 AI 기본 설치 루트 외 기존 위치라는 예외를 유지했다. 사용자 UnityConnectSettings.asset과 기존 Known-Good/운영 DB 보호.
+
+
+## 2026-09-27 KST — Codex Work — 인터넷 이전 점검 및 1.18.2 APK
+
+- 새 서버 PC 내부 주소 192.168.0.3/게이트웨이 192.168.0.1, 운영 서버 0.0.0.0:29000. 기존 Portwarp 터널 124fd86a가 live/local ok이고 공개 도메인 `uko9ef6n.free.pwrp.cc:10045`이 여전히 `127.0.0.1:29000`으로 연결됨. 공유기 포트포워딩/운영 서버 재시작 불필요.
+- 공개·로컬 진단 POST 각각 HTTP 204, 실제 게임 버전4 HELLO/HELLO_OK·PING/PONG 소켓 검사 통과. 계정 DB 21개와 SQLite integrity ok, 운영 소스 2개 저장소 해시 일치.
+- Android `D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-1.18.2.apk`, 1.18.2/code206 ARM64, 143291438 bytes, SHA-256 BF072CD37D2470F981FC46969469BA96C8AFB08B720A3CD2651B1844A4223905. Build Succeeded/errors0/warnings26, manifest·ZIP CRC 검증.
+- 기존 1.18.1 수정사항(URF·전적·채팅·카타리나·알리스타 및 서버 연결 실패 시 선택형 오프라인 솔로 모드) 포함. 다른 통신사 실제 폰 접속 및 인게임 플레이 검증은 사용자 단말 필요. 수동 저장한 옛 LAN/WAN 주소가 있으면 기본 공개 도메인으로 수정.
+- 빌드 중 에디터의 이전 버전 상수로 1.18.1 APK가 다시 생성되어 그 경로의 현재 파일 해시는 최초 전달본과 달라짐. 해당 차이를 실제 저장소 `Recovery/V1182NetworkMove.md`에 기록. 사용자 별도 UnityConnectSettings.asset과 이전 BuildJob JSON 변경 보존.
+- 공인 IP 조회는 외부 서비스에 새 IP를 공개한다는 이유로 자동 승인 검토가 거절해 실행하지 않았다. 승인된 기존 터널의 실제 접속 검증으로 필요한 경로를 확인했다. 새 프로그램 설치·경로 변경 없음.
