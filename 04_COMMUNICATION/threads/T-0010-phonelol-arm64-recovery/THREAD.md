@@ -195,7 +195,7 @@ PhoneLoL_02 소스6106467이 GitHub 작업 브랜치에 push되었고 Draft PR #
 
 ## 2026-09-27 KST — Codex Work — 인터넷 이전 점검 및 1.18.2 APK
 
-- 새 서버 PC 내부 주소 192.168.0.3/게이트웨이 192.168.0.1, 운영 서버 0.0.0.0:29000. 기존 Portwarp 터널 124fd86a가 live/local ok이고 공개 도메인 `uko9ef6n.free.pwrp.cc:10045`이 여전히 `127.0.0.1:29000`으로 연결됨. 공유기 포트포워딩/운영 서버 재시작 불필요.
+- 새 인터넷에서도 기존 운영 서버와 공개 터널 하나가 정상 연결됩니다. 앱의 기본 서버 주소 변경, 공유기 포트포워딩, 서버 재시작은 필요하지 않았습니다. 내부 주소와 터널 설정은 운영 PC의 비공개 기록에 보관합니다.
 - 공개·로컬 진단 POST 각각 HTTP 204, 실제 게임 버전4 HELLO/HELLO_OK·PING/PONG 소켓 검사 통과. 계정 DB 21개와 SQLite integrity ok, 운영 소스 2개 저장소 해시 일치.
 - Android `D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-1.18.2.apk`, 1.18.2/code206 ARM64, 143291438 bytes, SHA-256 BF072CD37D2470F981FC46969469BA96C8AFB08B720A3CD2651B1844A4223905. Build Succeeded/errors0/warnings26, manifest·ZIP CRC 검증.
 - 기존 1.18.1 수정사항(URF·전적·채팅·카타리나·알리스타 및 서버 연결 실패 시 선택형 오프라인 솔로 모드) 포함. 다른 통신사 실제 폰 접속 및 인게임 플레이 검증은 사용자 단말 필요. 수동 저장한 옛 LAN/WAN 주소가 있으면 기본 공개 도메인으로 수정.
