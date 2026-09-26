@@ -1,6 +1,6 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — 1.16.9 로컬 후보·서버 반영 완료, 실기기 확인 및 GitHub 업로드 승인 대기.
+상태: OPEN — 1.18.3 APK/로컬 결과 경로 검증 완료; 휴대폰에서 실제 온라인·오프라인 전투 완료 확인 대기.
 현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/RECOVERY_STATUS.md).
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
@@ -171,3 +171,41 @@
 - 소스1250cb8. 아군 대상 선택·실제 평타/스킬·소환수 소유자 진영·복제 피해 메시지 및 보상에서 차단합니다. 적 챔피언에 처치당1000골드 한 번만 지급.
 - 사망 모션과 기존 Alistar death.mp3를 사용하고1초 뒤 scene owner가 부활 RPC를 보냅니다. 양 진영3회씩 검사, 사망 기간 중복 보상/조기 부활 금지 확인. 실제 폰 청취 및 멀티플레이는 별도입니다.
 - 근거 Recovery/V1175PracticeVerification.txt, 기존 위치와18계정/운영서버 유지. 새 설치/경로 이동/바탕화면 복사/ZIP 없음. 사용자 UnityConnectSettings.asset 변경 보존.
+
+## 2026-09-26 — Codex Work — 1.18.0 서버 공지·전체 채팅·모드 개편
+
+PhoneLoL_02 소스6106467이 GitHub 작업 브랜치에 push되었고 Draft PR #4와 실기기 이슈 #1을 갱신했다. 실제 상태 원본은 프로젝트 RECOVERY_STATUS.md 및 Recovery/V1180Release.md.
+- 서버 공지 제목·본문은 기존 TCP 포트29000의 HTTP GET으로 로비마다 읽는다. 서버의 lobby-notice.json을 SetLobbyNotice.ps1로 변경하면 앱 재설치 없이 다음 로비 진입에 반영된다.
+- 친구/길드 옆 전체 채팅 탭, 사용자 닉네임 표시, SQLite 영구 저장과 이전 대화50개씩 조회를 구현했다. 121건 페이지와 다른 계정, 서버 재시작 지속성을 검사했다.
+- 모드1은 기존 모드2 5대5, 모드2는 기존 모드3 수정 전투, 모드3은 URF(시작7000골드·정글60초·최종 남은 쿨타임20%). 친선3모드 공통 레벨40·부활 증가량 절반·포탑HP2배·넥서스4배.
+- 알리스타 체력10000 및 부활 뒤 재타게팅, 카타리나 스킬 중 이동 방향·바라보는 방향 동기화, 클라이언트 고빈도 진단 업로드 억제. 이전 63MB 로그·큐 초과는 ping 악화의 후보이며 외부망 RTT 원인은 미확정.
+- 운영 서버 DB 및5개 소스 백업 후 재배포; 계정21개·무결성ok·29000 공지 GET200. Android PhoneLOL-1.18.0.apk/code204 빌드 성공(오류0/경고762), ARM64 및 CRC 확인, SHA256 385f0769768f33608f95b606a8380d45f7a2c5400ab3800665963eda5e96ccce.
+- 휴대폰4인 ping/카타리나 방향과 공지·전체 채팅 사용성 검증은 아직 필요. Mac iOS IPA, 원본 랭킹·계정 보상은 종전 미완료. 사용자 UnityConnectSettings.asset 변경과 원격 연결은 건드리지 않았다.
+
+
+## 2026-09-26 — Codex Work — 1.18.1 서버 실패 시 로컬 솔로 모드 및 회귀 수정
+
+- 사용자 요청: URF 모드 명칭·시작 레벨3, 좌측 상단 랭킹/전체 전적 분리, 카타리나 방향, 알리스타 부활 후 재타게팅, 전체 채팅 입력·전송 UI, 서버 미접속 시 동의받아 로컬 혼자 플레이.
+- 앱 작업 브랜치 `work/v1164-unity6-recovery`; 최종 Android APK `D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-1.18.1.apk`, 1.18.1/code205, ARM64, 143291138 bytes, SHA256 FAF19628027188F13A88BC4378ADC728FD3D235C7473BDFD3612FF878F67E186, ZIP CRC 정상. 빌드 오류0/경고764.
+- 로그인에서 서버 연결 실패 시 안내 후 선택적으로 단말 내 임시 계정/목록/방/챔피언 선택/1인 전투를 실행. 서버 연결 시 기존 온라인 경로 유지. 오프라인 진행은 온라인 전적·채팅·계정으로 동기화하지 않는다.
+- 검증: Unity 로비·알리스타 재처치 테스트, 원본 서버 프로필 바이너리 일치, localhost 실제 3포트/영향 받지 않는 주소로 방부터 전투 로딩까지 패킷 검사 통과. 카타리나 화면, 실제 휴대폰 IME 및 오프라인 전투 완료/결과는 사용자 단말 미검증.
+- 라이브 서버 두 모듈 배포, 백업 `recovery/04_runtime/backups/v1181_20260926_034738`, 29000 listen, 계정21개 및 DB integrity ok. 파일·절차: 실제 저장소 `Recovery/V1181Release.md` 및 `HANDOFF.md` 상단.
+- 새 프로그램 설치 없음. 기존 사용자 지정 Unity/Python/프로젝트/서버 경로를 그대로 사용했으며 AI 기본 설치 루트 외 기존 위치라는 예외를 유지했다. 사용자 UnityConnectSettings.asset과 기존 Known-Good/운영 DB 보호.
+
+
+## 2026-09-27 KST — Codex Work — 인터넷 이전 점검 및 1.18.2 APK
+
+- 새 인터넷에서도 기존 운영 서버와 공개 터널 하나가 정상 연결됩니다. 앱의 기본 서버 주소 변경, 공유기 포트포워딩, 서버 재시작은 필요하지 않았습니다. 내부 주소와 터널 설정은 운영 PC의 비공개 기록에 보관합니다.
+- 공개·로컬 진단 POST 각각 HTTP 204, 실제 게임 버전4 HELLO/HELLO_OK·PING/PONG 소켓 검사 통과. 계정 DB 21개와 SQLite integrity ok, 운영 소스 2개 저장소 해시 일치.
+- Android `D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-1.18.2.apk`, 1.18.2/code206 ARM64, 143291438 bytes, SHA-256 BF072CD37D2470F981FC46969469BA96C8AFB08B720A3CD2651B1844A4223905. Build Succeeded/errors0/warnings26, manifest·ZIP CRC 검증.
+- 기존 1.18.1 수정사항(URF·전적·채팅·카타리나·알리스타 및 서버 연결 실패 시 선택형 오프라인 솔로 모드) 포함. 다른 통신사 실제 폰 접속 및 인게임 플레이 검증은 사용자 단말 필요. 수동 저장한 옛 LAN/WAN 주소가 있으면 기본 공개 도메인으로 수정.
+- 빌드 중 에디터의 이전 버전 상수로 1.18.1 APK가 다시 생성되어 그 경로의 현재 파일 해시는 최초 전달본과 달라짐. 해당 차이를 실제 저장소 `Recovery/V1182NetworkMove.md`에 기록. 사용자 별도 UnityConnectSettings.asset과 이전 BuildJob JSON 변경 보존.
+- 공인 IP 조회는 외부 서비스에 새 IP를 공개한다는 이유로 자동 승인 검토가 거절해 실행하지 않았다. 승인된 기존 터널의 실제 접속 검증으로 필요한 경로를 확인했다. 새 프로그램 설치·경로 변경 없음.
+
+
+## 2026-09-27 KST — Codex Work — 1.18.3 로컬 1인 전투 종료 결과
+
+- 1.18.2의 오프라인 로컬 전투가 시작 이후 종료 결과 조회 요청을 처리하지 못하는 누락을 확인했다. 1.18.3은 로컬 경기의 월드 준비·결과 제출 뒤 클라이언트가 기대하는 85바이트 결과 응답을 생성한다. 온라인 랭킹이나 서버 전적 DB로 동기화하지 않는다.
+- 중앙 서버가 닿지 않는 상태의 실제 로컬 소켓 검사에서 로그인 → 프로필·챔피언 목록 → URF 방·선택 → 전투 시작·월드 준비 → 종료 결과 제출 → 85바이트 결과 조회, 잘못된 경기 ID 거부까지 확인했다. 실제 휴대폰 한 판 플레이와 종료 화면 시각 확인은 미실행.
+- Android `D:\A_KJ\AI\PhoneLoL_02\PhoneLOL-02\Builds\PhoneLOL-1.18.3.apk`, versionName 1.18.3/code207, 143292982 bytes, SHA-256 EEA7ECEC4D7D9BBA07DC59B769453FA3FBBF5B41AA01E87A1646ED0A1FC1F159. Unity 빌드 오류 0/경고 764, ARM64 6개, ZIP CRC 정상. 운영 서버·기존 계정 DB 변경 없음.
+- 실제 저장소 기준 `Recovery/V1183OfflineResult.md` 및 `HANDOFF.md` 맨 위. 기존 사용자 설정 변경은 보존·커밋 제외. 내부 네트워크 주소와 터널 식별자를 새 공개 기록에 추가하지 않았다.
