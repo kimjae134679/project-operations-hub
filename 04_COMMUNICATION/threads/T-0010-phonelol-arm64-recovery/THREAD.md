@@ -1,7 +1,7 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — 1.16.9 로컬 후보·서버 반영 완료, 실기기 확인 및 GitHub 업로드 승인 대기.
-현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/work/v1164-unity6-recovery/RECOVERY_STATUS.md).
+상태: OPEN — 1.18.5 소스 main 통합 및 사용자 기기 동작 확인. 1.18.6 수정은 Draft PR, 빌드 전.
+현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/main/RECOVERY_STATUS.md).
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
 ## 2026-09-23 — [B계정] Nova — [B계정] 전체 작업 인수인계
@@ -171,3 +171,10 @@
 - 소스1250cb8. 아군 대상 선택·실제 평타/스킬·소환수 소유자 진영·복제 피해 메시지 및 보상에서 차단합니다. 적 챔피언에 처치당1000골드 한 번만 지급.
 - 사망 모션과 기존 Alistar death.mp3를 사용하고1초 뒤 scene owner가 부활 RPC를 보냅니다. 양 진영3회씩 검사, 사망 기간 중복 보상/조기 부활 금지 확인. 실제 폰 청취 및 멀티플레이는 별도입니다.
 - 근거 Recovery/V1175PracticeVerification.txt, 기존 위치와18계정/운영서버 유지. 새 설치/경로 이동/바탕화면 복사/ZIP 없음. 사용자 UnityConnectSettings.asset 변경 보존.
+
+## 2026-09-27 — Codex Work — 1.18.5 main 통합과 1.18.6 화면 수정 준비
+
+- 현재 개발 저장소는 [PhoneLoL_02/main](https://github.com/kimjae134679/PhoneLoL_02/tree/main/PhoneLOL-02)이다. 복구 브랜치의 1.18.5 소스를 [PR #4](https://github.com/kimjae134679/PhoneLoL_02/pull/4)로 main에 병합했고, [PR #5](https://github.com/kimjae134679/PhoneLoL_02/pull/5)로 README/인수인계의 브랜치 안내를 고쳤다. 기존 PhoneLOL의 [PR #53](https://github.com/kimjae134679/PhoneLOL/pull/53)은 이전 안정판 저장소에서 새 작업 위치를 안내한다.
+- 사용자가 1.18.5가 기기에서 잘 동작한다고 확인했다. 이는 두 기기 단절·재접속과 iOS 설치까지 확인했다는 뜻은 아니다. 1.18.5 APK/iOS Xcode 프로젝트/ZIP은 기존 Windows Builds에 있고 이번 GitHub 작업에서 재빌드하거나 업로드하지 않았다.
+- 사용자 추가 사진의 게임 정보창은 16칸 아이템이 매우 작고 미니언 수 옆 공간을 쓰지 못하는 상태다. 두 맵의 직렬화 배치를 확인해 기본 5칸은 원위치, 8/16칸은 아이템 크기·미니언 위치를 조정한 [1.18.6 Draft PR #6](https://github.com/kimjae134679/PhoneLoL_02/pull/6)을 만들었다. URF 4000골드 시작, 기본 쿨타임 50% 및 저장소 공지 원본도 이 PR에 포함된다.
+- 현재 실행 환경에는 사용자의 Windows Unity 에디터와 운영 서버 접속이 없어 1.18.6 컴파일/APK/iOS 산출/폰 화면/운영 공지는 미실행이다. PR을 릴리스로 취급하지 않는다. 멀티·승패·핑의 실기기 검증과 iOS 서명·원본 랭킹/보상은 프로젝트 이슈 #1~#3에서 추적한다. 설치·작업 경로 변경과 기존 서버/DB 수정 없음.
