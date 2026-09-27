@@ -9757,3 +9757,16 @@ No live publish.
 No P1.
 Only 04_REVIEW_PUBLISH may ever handle real publication after human review.
 
+
+---
+
+## 2026-09-27 — Codex Work — 원문 선별 프로그램 0.2.4
+
+사용자가 바탕화면 `AAA.zip`의 인스타그램 게시물 레퍼런스 22장을 제공하고 원문 선별 프로그램을 실사용할 수 있게 이어서 수정하라고 요청했다. Threads PR #4에 `f82485a`와 인수인계 `a10711a`를 반영했다.
+
+- HTML 본문의 연속 글자를 문단으로 묶고 원문 순서대로 이미지와 위치를 제시한다. 미확보 이미지는 누락으로 표시한다. BEST/반응 수가 있는 실제 댓글 최대 세 건만 초안에 추천한다. 제목은 원문 제목에서 시작하며 사람이 수정·대조한다.
+- 기존 후보는 목록에서 한 건씩 원문 수집할 수 있고, 현재 선택을 다시 ZIP으로 찾아 열지 않아도 미리보기 또는 원문 ZIP 저장·이미지 제작으로 이어진다. 검수 확인은 자동으로 통과시키지 않는다.
+- `npm run check`: JS 169개 문법 및 테스트 55개 suite 통과. Electron 렌더러에서 본문·이미지·댓글 선택과 미검수 최종 출력 차단 확인. 이미 확보돼 있던 TheQoo 원본 이미지 8장으로 검수 전 예시 9장 ZIP을 생성해 첫 장을 육안 확인했다.
+- PC 설치: `%LOCALAPPDATA%\Programs\ThreadsCutEditor\app-0.2.4\Threads Cut Editor.exe`; 바탕화면의 `Threads Cut Editor 0.2.4` 바로가기, `Threads-Cut-Editor-0.2.4-Windows-x64.zip`, `Threads-real-source-review-preview.zip`. 예전 0.2.3은 보존했다. 배포 ZIP SHA-256: `63D3BA913BCEF335B22E3C92E665CF606580FF73D7E4E285591CD7717C2DC93B`.
+- GitHub PR #4의 `syntax`, `verify` 검사 통과. `main` 병합은 자동 승인 검토가 이번 요청에서 명시적 권한이 없다고 판단해 거절했다. 병합은 우회하지 않았고 사용자 승인 대기다.
+- 기존 후보 전체의 원문 검수/제작 완료, 권리·개인정보 검토, 실제 게시는 수행하지 않았다. 예시 ZIP은 검수 전 표시가 있으며 `publicationAllowed=false`. 최신 사실 상태는 Threads 저장소의 `00_START_HERE/NEXT_RUN_HANDOFF.md`를 확인한다.
