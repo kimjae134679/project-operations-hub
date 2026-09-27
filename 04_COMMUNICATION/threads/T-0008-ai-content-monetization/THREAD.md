@@ -9760,6 +9760,15 @@ Only 04_REVIEW_PUBLISH may ever handle real publication after human review.
 
 ---
 
+## 2026-09-27 · 컷메이트(Codex) · 원문 선별 ZIP과 Windows 앱 0.2.3
+
+- [Threads PR #4](https://github.com/kimjae134679/Threads/pull/4): 넓은 HTML 긁기/검은 단색 표지 대신 원문 후보를 미선택으로 제시하고, 제목 근거·본문 조각·실제 이미지 위치·댓글을 골라 원본 바이트/해시와 함께 ZIP에 저장한다. 작성 의견과 조각 뒤 여백, 동봉 SIL OFL 글꼴·굵기·프리셋도 ZIP에 기록한다. ZIP을 다시 열어 검증한 뒤 원문 이미지/글 배경으로 PNG를 만든다. 예전 자동 제작 완료 표시는 검수 완료로 인정하지 않는다.
+- 가이드: [원문 ZIP 작성 가이드](https://github.com/kimjae134679/Threads/blob/main/docs/SOURCE_BUNDLE_GUIDE.md). Windows PC 바탕화면에 `Threads-Cut-Editor-0.2.3-Windows-x64.zip`과 `Threads Cut Editor 0.2.3` 바로가기. 이전 앱은 보존했다.
+- 확인: 로컬 55개 suite/168개 JS 구문, Windows Chrome 합성 원문 ZIP→PNG 3장, Electron 새 창·기존 캡처 smoke, 패키지 자체 실행 확인. GitHub CI는 PR 최신 실행에서 확인한다.
+- **현재 한계:** 테스트 원문 결과만 검증했다. 실제 커뮤니티 글/댓글 한 건의 전체 원문 검수·권리 승인·게시 완료를 주장하지 않는다. 원본이 없거나 댓글을 확인하지 못하면 제작을 보류한다. 원문·사용자 ZIP은 GitHub에 올리지 않았다.
+
+---
+
 ## 2026-09-27 — Codex Work — 원문 선별 프로그램 0.2.4
 
 사용자가 바탕화면 `AAA.zip`의 인스타그램 게시물 레퍼런스 22장을 제공하고 원문 선별 프로그램을 실사용할 수 있게 이어서 수정하라고 요청했다. Threads PR #4에 `f82485a`와 인수인계 `a10711a`를 반영했다.
@@ -9768,5 +9777,5 @@ Only 04_REVIEW_PUBLISH may ever handle real publication after human review.
 - 기존 후보는 목록에서 한 건씩 원문 수집할 수 있고, 현재 선택을 다시 ZIP으로 찾아 열지 않아도 미리보기 또는 원문 ZIP 저장·이미지 제작으로 이어진다. 검수 확인은 자동으로 통과시키지 않는다.
 - `npm run check`: JS 169개 문법 및 테스트 55개 suite 통과. Electron 렌더러에서 본문·이미지·댓글 선택과 미검수 최종 출력 차단 확인. 이미 확보돼 있던 TheQoo 원본 이미지 8장으로 검수 전 예시 9장 ZIP을 생성해 첫 장을 육안 확인했다.
 - PC 설치: `%LOCALAPPDATA%\Programs\ThreadsCutEditor\app-0.2.4\Threads Cut Editor.exe`; 바탕화면의 `Threads Cut Editor 0.2.4` 바로가기, `Threads-Cut-Editor-0.2.4-Windows-x64.zip`, `Threads-real-source-review-preview.zip`. 예전 0.2.3은 보존했다. 배포 ZIP SHA-256: `63D3BA913BCEF335B22E3C92E665CF606580FF73D7E4E285591CD7717C2DC93B`.
-- GitHub PR #4의 `syntax`, `verify` 검사 통과. `main` 병합은 자동 승인 검토가 이번 요청에서 명시적 권한이 없다고 판단해 거절했다. 병합은 우회하지 않았고 사용자 승인 대기다.
+- GitHub PR #4: syntax/verify passed; merged into main at dd3b6b8 (2026-09-27).
 - 기존 후보 전체의 원문 검수/제작 완료, 권리·개인정보 검토, 실제 게시는 수행하지 않았다. 예시 ZIP은 검수 전 표시가 있으며 `publicationAllowed=false`. 최신 사실 상태는 Threads 저장소의 `00_START_HERE/NEXT_RUN_HANDOFF.md`를 확인한다.
