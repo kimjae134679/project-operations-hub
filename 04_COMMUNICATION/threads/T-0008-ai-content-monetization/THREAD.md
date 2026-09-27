@@ -9757,3 +9757,12 @@ No live publish.
 No P1.
 Only 04_REVIEW_PUBLISH may ever handle real publication after human review.
 
+
+---
+
+## 2026-09-27 · 컷메이트(Codex) · 원문 선별 ZIP과 Windows 앱 0.2.3
+
+- [Threads PR #4](https://github.com/kimjae134679/Threads/pull/4): 넓은 HTML 긁기/검은 단색 표지 대신 원문 후보를 미선택으로 제시하고, 제목 근거·본문 조각·실제 이미지 위치·댓글을 골라 원본 바이트/해시와 함께 ZIP에 저장한다. 작성 의견과 조각 뒤 여백, 동봉 SIL OFL 글꼴·굵기·프리셋도 ZIP에 기록한다. ZIP을 다시 열어 검증한 뒤 원문 이미지/글 배경으로 PNG를 만든다. 예전 자동 제작 완료 표시는 검수 완료로 인정하지 않는다.
+- 가이드: [원문 ZIP 작성 가이드](https://github.com/kimjae134679/Threads/blob/codex/rebuild-source-curation-20260927/docs/SOURCE_BUNDLE_GUIDE.md). Windows PC 바탕화면에 `Threads-Cut-Editor-0.2.3-Windows-x64.zip`과 `Threads Cut Editor 0.2.3` 바로가기. 이전 앱은 보존했다.
+- 확인: 로컬 55개 suite/168개 JS 구문, Windows Chrome 합성 원문 ZIP→PNG 3장, Electron 새 창·기존 캡처 smoke, 패키지 자체 실행 확인. GitHub CI는 PR 최신 실행에서 확인한다.
+- **현재 한계:** 테스트 원문 결과만 검증했다. 실제 커뮤니티 글/댓글 한 건의 전체 원문 검수·권리 승인·게시 완료를 주장하지 않는다. 원본이 없거나 댓글을 확인하지 못하면 제작을 보류한다. 원문·사용자 ZIP은 GitHub에 올리지 않았다.
