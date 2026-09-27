@@ -1,6 +1,6 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — 1.18.5 소스 main 통합 및 사용자 기기 동작 확인. 1.18.6 수정은 Draft PR, 빌드 전.
+상태: OPEN — `main` 1.18.6 소스 병합 및 Windows Android 빌드 완료. 1.18.5 기기 확인본은 `v1.18.5-known-good` 태그로 보존. 1.18.6 폰 실전과 iOS 서명은 미확인.
 현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/main/RECOVERY_STATUS.md).
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
@@ -185,3 +185,10 @@
 - KJW의 `D:\A_KJ\AI\PhoneLoL_02`에 남은 게임 코드 수정과 추가 사진의 전적창 16개 아이템 크기·미니언 수 배치를 합쳐 커밋 b4cf916으로 push했다. 5칸 배치는 유지하고 8/16칸에 맞춰 배치한다. URF 4000골드·기본 스킬 쿨타임 50%와 공지 원본도 맞췄다. 사용자 UnityConnectSettings.asset 변경, 임시 스크립트·로그·APK는 커밋하지 않았다.
 - Windows Unity 6000.3.14f1 Android 빌드는 BuildReport `Succeeded`, APK `PhoneLOL-02/Builds/PhoneLOL-1.18.6.apk` (113,510,925 bytes, 2026-09-27 15:42 KST)이다. 다만 `Errors: 2`는 `ProjectSettings/ProjectSettings.asset`의 임시 파일 이동 저장 실패이며 경고 750건도 있다. 빌드 성공은 휴대폰 작동 확인이 아니다.
 - 휴대폰에서 전적창, URF 전투 규칙, 두 기기 접속·재접속·핑, 승/패/무 및 iOS 설치를 확인해야 한다. 원본 랭킹·보상은 이슈 #3에 남았다. 서버 공지는 저장소 원본만 바뀌었고 실서버 반영을 주장하지 않는다.
+
+## 2026-09-27 — Codex Work — 1.18.6 메인 병합과 안정 버전 보존
+
+- [PhoneLoL_02 PR #7](https://github.com/kimjae134679/PhoneLoL_02/pull/7)을 `main`에 병합했다(merge `4f70a740b8c668389051da2b4e7d337a3569fbc1`). Android 폰에서 사용자가 작동을 확인한 1.18.5/code209는 [`v1.18.5-known-good`](https://github.com/kimjae134679/PhoneLoL_02/tree/v1.18.5-known-good) 태그로 보존했다. 현재 GitHub `main`은 1.18.6/code210이다.
+- 추가 수정: 아군 미니언 순보, 로비 랭크/전체 전적, 클릭한 아이템 설명창에만 URF 쿨감 문구 표시, 상점 전부 판매, 넥서스 사망 시 즉시 결과 판정, 5레벨 단위 성장치, 바론 이펙트 높이, 연습용 알리스타 피해 숫자 및 1만 초과 원샷 후 스킨·체력 5만·처치 5천 골드 단계. 기존 1.18.5 게임 규칙은 이전 태그에 남는다.
+- Unity 6000.3.14f1 Windows Android 빌드 `Succeeded`; APK `PhoneLOL-02/Builds/PhoneLOL-1.18.6.apk`, 113516837 bytes, SHA-256 `85048FCA11712C1C4E977FDDCC8574E717FB9DB7035BC68C02BC3581EE07990D`. Unity 로그의 ProjectSettings 저장 오류 2건과 경고 750건은 남아 있다. Android 기기 ADB 연결 없음; 1.18.6의 휴대폰 전투·UI·승패는 검증하지 못했다.
+- 운영 공지는 1.18.5의 7000골드/20%와 1.18.6의 4000골드/50%를 함께 표시하도록 갱신했다. [다른 Mac용 iPhone 안내](https://github.com/kimjae134679/PhoneLoL_02/blob/main/Docs/IOS_MAC_BUILD_GUIDE.md)를 메인에 통합했으나 연결된 Mac/Xcode/아이폰이 없어 iOS 서명·설치는 수행하지 않았다. 사용자 `UnityConnectSettings.asset` 변경과 임시 로그·APK는 Git에 올리지 않았다.
