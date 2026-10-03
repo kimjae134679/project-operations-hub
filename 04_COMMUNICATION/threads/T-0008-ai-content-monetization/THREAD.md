@@ -9800,3 +9800,5 @@ GitHub 반영·최종 정리 결과는 이 기록 아래에 이어 적는다. In
 Instagram 레퍼런스 수집·분석: 7개 실제 접근 계정에서 각각 6건, 총 42글·원본 이미지 200파일(서로 다른 SHA 193개)을 확보했다. 전체 장 확보 40글/부분 자료 2글이며 관찰 영상 프레임 1장은 별도이다. humor_saul은 일반 페이지 사용 불가이며 브라우저 나머지 1탭 URL은 미전달이다. 공개 Git에는 원본 이미지·캡션 대신 자체 분석 docs/INSTAGRAM_REFERENCE_GUIDE.md와 제안 규칙 reference-production-rules.json만 반영한다. 사진/민트/흰 바탕/설명형 선택·Instagram 일정 비율·의미 단위 장 구성·360px 검수는 추가 구현 명세이며 현재 프로그램 적용 완료로 기록하지 않는다.
 
 GitHub 반영: Threads main `b82ab5c2a0ce26a43a9aae9e32dd5a65828b936c`에 프로그램·테스트·최신 안내·자체 레퍼런스 기획 39파일을 커밋/push했고 로컬 HEAD=origin/main 및 clean을 확인했다. 원본 레퍼런스 이미지/캡션·runtime 자료는 이 커밋에 포함하지 않았다. GitHub CI의 새 실행 상태는 별도 확인 대상이다.
+
+추가 확인: Threads `b82ab5c2a0ce26a43a9aae9e32dd5a65828b936c`의 GitHub Actions check 실행 37139251467, job 111250077672는 completed/success이며 JavaScript 문법·회귀와 로컬 서버 smoke 단계 모두 success이다. URL https://github.com/kimjae134679/Threads/actions/runs/37139251467 . 입력 clone도 같은 SHA로 fast-forward했고 runtime 파일 10,750개와 index.json SHA-256 `3BC89BAFDE129FC5FFAF63779E169812F9184AD5E61632E2065C502E7FD1C3B3`가 전후 동일했다. 허브 원격의 동시 PhoneLoL 갱신은 보존하고 최신 main 위에 이번 4문서 변경만 반영했다.
