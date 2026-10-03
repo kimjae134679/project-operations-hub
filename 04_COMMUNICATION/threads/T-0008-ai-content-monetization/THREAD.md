@@ -9779,3 +9779,24 @@ Only 04_REVIEW_PUBLISH may ever handle real publication after human review.
 - PC 설치: `%LOCALAPPDATA%\Programs\ThreadsCutEditor\app-0.2.4\Threads Cut Editor.exe`; 바탕화면의 `Threads Cut Editor 0.2.4` 바로가기, `Threads-Cut-Editor-0.2.4-Windows-x64.zip`, `Threads-real-source-review-preview.zip`. 예전 0.2.3은 보존했다. 배포 ZIP SHA-256: `63D3BA913BCEF335B22E3C92E665CF606580FF73D7E4E285591CD7717C2DC93B`.
 - GitHub PR #4: syntax/verify passed; merged into main at dd3b6b8 (2026-09-27).
 - 기존 후보 전체의 원문 검수/제작 완료, 권리·개인정보 검토, 실제 게시는 수행하지 않았다. 예시 ZIP은 검수 전 표시가 있으며 `publicationAllowed=false`. 최신 사실 상태는 Threads 저장소의 `00_START_HERE/NEXT_RUN_HANDOFF.md`를 확인한다.
+
+
+---
+
+## 2026-10-04 KST — Codex: 폴더 자동 제작·자료 구조 최신화
+
+사용자 최신 지시로 프로그램 전체 수정, 기존 자료 보완, 자동 상태 기록, 최신 결과만 유지하는 정리를 수행했다. 실제 저장소의 현재 handoff가 과거 순차 기록보다 우선한다.
+
+Windows 0.3.1 / 제작 기준 2026-10-04.1. 기존 입력 1,084건 검사, 검수 전 결과 417건·2,886 PNG. 보류 667건(원문 154, 접근 422, 주소 56, 이미지 4, 선별 12, 원문 없음 14, 심한 소재 5), 실패 0. 같은 자료 재실행은 새 제작 0·건너뜀 417. 모든 결과의 ZIP/PNG 해시·규칙·크기·안전 여백·표지 겹침·URL 표시 감사 문제 0. 61개 테스트 suite와 실제 Electron 자동 제작 UI/원문 선별 smoke 통과. 배포 ASAR 주요 모듈과 렌더러가 검증 소스와 바이트 일치하고 실제 프로세스 실행을 확인했다. 전체 PNG 육안 검수·권리 확인·실제 게시 완료는 주장하지 않는다.
+
+기본 입력은 바탕화면 `Threads Cut Editor 자료/01_후보 기록`이며 실제 경로 `C:\Users\user\source\repos\Threads-program-inputs\data\runtime\program_inputs`로 연결된다. 결과는 `06_자동 제작 결과/현재 결과/제목__ID` 및 검색 가능한 `자료 목록.html`. 후보의 source/·작업 정보/·참고 기록/·자료 안내.txt·제작 계획.md를 분리했다. 제작 전에 제목과 장별 계획을 저장한다. 공개 주소 보완은 기존 더쿠·인벤·네이트판 대상이며 제한 소스는 보류한다.
+
+이전 평면 결과 416폴더, 검수/예시 2폴더와 구버전 설치파일을 최신 결과 검증 후 제거했다. 요약 3,252파일을 참고 기록으로 이동하고 예전 루트 메타 2,982파일·상태 안내 1,084파일을 제거했다. 중복 원본 이미지 8장은 SHA 비교 후 파생 입력 복사만 제거했다. 원본 후보 1,084건과 AAA 원본 22장을 보존했다. 설치는 기존 바탕화면 실행 동선을 유지한 예외이며 새 도구 설치는 없다.
+
+GitHub 반영·최종 정리 결과는 이 기록 아래에 이어 적는다. Instagram 수집·분석의 실제 관찰 범위는 Threads `docs/INSTAGRAM_REFERENCE_GUIDE.md`에 기록하며 타인 원본과 로그인 정보는 공개 Git에 넣지 않는다.
+
+최종 정리: 작업용 dist의 예전 ZIP·중간 빌드·profile·검사 helper 등 27항목을 제거해 최종 0.3.1 ZIP만 남겼다. 배포 ZIP SHA-256 `378fef93f282adbf5f6e00c273833f73459bf3b1a307da3eb25f1dad1865d611`; 바탕화면 전달 ZIP도 동일했다. 02 잔여 폴더를 제거하고 99 ZIP의 22 payload SHA가 AAA와 완전히 일치함을 확인해 중복 폴더만 제거했다. AAA 원본은 유지했다. 정리 후 실제 실행 PID 36212를 다시 확인했다. 메인/허브 `git diff --check` 통과.
+
+Instagram 레퍼런스 수집·분석: 7개 실제 접근 계정에서 각각 6건, 총 42글·원본 이미지 200파일(서로 다른 SHA 193개)을 확보했다. 전체 장 확보 40글/부분 자료 2글이며 관찰 영상 프레임 1장은 별도이다. humor_saul은 일반 페이지 사용 불가이며 브라우저 나머지 1탭 URL은 미전달이다. 공개 Git에는 원본 이미지·캡션 대신 자체 분석 docs/INSTAGRAM_REFERENCE_GUIDE.md와 제안 규칙 reference-production-rules.json만 반영한다. 사진/민트/흰 바탕/설명형 선택·Instagram 일정 비율·의미 단위 장 구성·360px 검수는 추가 구현 명세이며 현재 프로그램 적용 완료로 기록하지 않는다.
+
+GitHub 반영: Threads main `b82ab5c2a0ce26a43a9aae9e32dd5a65828b936c`에 프로그램·테스트·최신 안내·자체 레퍼런스 기획 39파일을 커밋/push했고 로컬 HEAD=origin/main 및 clean을 확인했다. 원본 레퍼런스 이미지/캡션·runtime 자료는 이 커밋에 포함하지 않았다. GitHub CI의 새 실행 상태는 별도 확인 대상이다.
