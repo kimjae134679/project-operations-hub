@@ -9802,3 +9802,20 @@ Instagram 레퍼런스 수집·분석: 7개 실제 접근 계정에서 각각 6�
 GitHub 반영: Threads main `b82ab5c2a0ce26a43a9aae9e32dd5a65828b936c`에 프로그램·테스트·최신 안내·자체 레퍼런스 기획 39파일을 커밋/push했고 로컬 HEAD=origin/main 및 clean을 확인했다. 원본 레퍼런스 이미지/캡션·runtime 자료는 이 커밋에 포함하지 않았다. GitHub CI의 새 실행 상태는 별도 확인 대상이다.
 
 추가 확인: Threads `b82ab5c2a0ce26a43a9aae9e32dd5a65828b936c`의 GitHub Actions check 실행 37139251467, job 111250077672는 completed/success이며 JavaScript 문법·회귀와 로컬 서버 smoke 단계 모두 success이다. URL https://github.com/kimjae134679/Threads/actions/runs/37139251467 . 입력 clone도 같은 SHA로 fast-forward했고 runtime 파일 10,750개와 index.json SHA-256 `3BC89BAFDE129FC5FFAF63779E169812F9184AD5E61632E2065C502E7FD1C3B3`가 전후 동일했다. 허브 원격의 동시 PhoneLoL 갱신은 보존하고 최신 main 위에 이번 4문서 변경만 반영했다.
+
+
+---
+
+## 2026-10-04 KST — 07-Codex-Handoff — 전체 작업 인수인계 통합
+
+사용자가 공유 링크와 레퍼런스 문서만으로는 GitHub·파일·진행 내용·다음 작업을 알 수 없다고 지적하여, 실제 Threads 저장소 `00_START_HERE/NEXT_RUN_HANDOFF.md`를 16개 구역의 전체 작업 원본으로 확장했다. GitHub/Windows/전달 파일의 위치, 완료와 미완료, 실제 검증과 미검증, 중단 사유, 다음 작업 순서, 재개 명령, 상태 필드와 보존 기준을 한 문서에 모았다. 공유 대화는 스냅샷이며 컴퓨터 접근 권한·브라우저 로그인·도구 연결은 전달하지 않는다는 점도 기록했다.
+
+- Threads 문서 변경: main `a892dc04ff1d8b896a27bd523b1fae1cd6b78ceb` push 완료, 로컬 HEAD=원격 main 및 clean 확인. 변경 파일은 `00_START_HERE/NEXT_RUN_HANDOFF.md`와 `docs/COMMUNITY_SOURCE_INPUT.md`의 오래된 기준일 한 줄이다. 프로그램 코드 변경·새 배포·재빌드는 없다.
+- 입력 clone도 같은 commit으로 fast-forward 후 clean이다. runtime index SHA가 전후 같고 runtime은 tracked 0이다.
+- 현재 자료 검증: 1,084개 입력, 현재 결과 417폴더·2,886 PNG. 모두 검수 `needs_review`, 실제 게시 `unknown`, 자료 확인일 `sourceCheckedAt=null`이다. 과거 ledger 420건과 현재 실제 결과 417건을 구분했다. 전체 PNG의 의미·가독성 육안 검수나 실제 게시를 완료라고 하지 않는다.
+- 다음 우선 작업은 수집 확인일·원문 게시일 전파이다. 새 사진/민트/흰 바탕/설명형 템플릿, 의미 단위 장 나눔, Instagram 일정 비율, 360px 가독성 검수는 제안과 현재 구현을 구분해 후속 순서와 합격 조건을 남겼다.
+- `전체작업_인수인계_2026-10-04.txt`를 바탕화면 `Threads Cut Editor 자료/00_먼저보기`와 전체 레퍼런스 ZIP 안에 같은 내용으로 준비하고 있다. ZIP은 기존 7계정·42게시물·200원본 이미지와 분석을 유지한다. 전달 파일의 최종 저장은 담당 root가 마지막에 별도로 확인하며 이 구역은 저장 성공을 대신 증명하지 않는다.
+- 레퍼런스 DOCX는 이번 문서 작업에서 변경하지 않았다. 타인 원본 이미지·캡션·사용자 runtime 자료·로그인 정보는 공개 Git에 넣지 않았다.
+- 오래된 임시 `status.json.tmp`는 공식 파일보다 오래되고 batch lock이 없음을 확인한 뒤 제거했고 공식 status 바이트는 보존했다.
+
+허브 `CURRENT_HANDOFF.md`와 사용자용 프로젝트 현황은 실제 저장소의 전체 작업 원본을 가리키도록 수정했다. 소통은 이 `THREAD.md`에만 이어 적었으며 별도 댓글 파일을 만들지 않았다. 허브의 원래 `work/phonelol-v1180-handoff`와 PhoneLoL 작업은 건드리지 않는다. 새 임시 worktree를 관리 루트 `C:\Program Files\_My\AI\Workspace`에 만들려 했으나 파일시스템 쓰기 권한이 없어 기존 사용자 repos 아래에만 만들었으며, 검증 후 제거한다. 새 도구 설치는 없다.
