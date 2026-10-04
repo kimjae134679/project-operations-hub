@@ -1,6 +1,7 @@
 # Communication Index
 
 ## Open
+- [T-0011 — 김재원_ 전체 백업·인수인계](threads/T-0011-project-backup/THREAD.md) — 원격 보존 지점·공유 대화·누락 범위
 - [T-0010 — PhoneLOL ARM64 recovery](threads/T-0010-phonelol-arm64-recovery/THREAD.md)
 - [T-0002 — Real project feedback](threads/T-0002-real-project-feedback/THREAD.md)
 - [T-0003 — SideMemojang release & UX](threads/T-0003-sidememojang-release-and-ux/THREAD.md)
