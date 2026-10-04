@@ -85,3 +85,10 @@ C:\\KJ\\Github\\Threads main은 로컬 fe97cb2c9297ed9750bdf42b33349caf3131f8d2�
 - 복원 가능 여부를 별도 빈 위치에서 확인하고 근거를 기록한다. 원래 작업 폴더를 덮어쓰지 않는다.
 
 이번 회차에서 새 프로그램·유료 서비스·예약·원격 실행기를 설치하지 않았으며 실제 PC의 프로그램/서버를 재시작하거나 서비스 연결을 종료하지 않았다.
+
+
+## 전달 백업 묶음 무결성
+
+파일: kimjaewon-backup-20261005.zip, 35,654,072 bytes. 사용자에게 전달한 비공개 파일이며 공개 Git에 전체 대화 원문을 복제하지 않았다. SHA-256: f82338b3db590fd91eb33a8f2bbe0fdff20efd506a3508c287082349d72f5ec8.
+
+내용: 9개 링크의 실제 추출 텍스트(CONVERSATIONS.md), 기존 인수인계/도구 목록의 추출 텍스트(REFERENCES.md), 보존 ref/범위/제약(README.md·MANIFEST.json), 원본 바이트의 reference-quality-examples.zip 및 인스타_레퍼런스_전체자료_2026-10-04.zip. 전체 ZIP 및 두 원본 ZIP 압축 CRC 검사가 통과했다. 모든 미공유 대화·실제 채팅 첨부·PC ignored 원본이 포함됐다는 뜻은 아니다.
