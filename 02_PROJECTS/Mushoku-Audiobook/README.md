@@ -1,26 +1,30 @@
 # Mushoku Tensei AI Audiobook
 
 - 저장소: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
-- 실제 루트: `D:\AI\VoiceAudiobook`
+- 실제 루트: D:/AI/VoiceAudiobook
 - 실행: RUN_Audiobook.bat / http://127.0.0.1:7862
-- 새 비교 폴더: comparison/20261005_감정장면_재비교
-- 듣기: RUN_EmotionSamples.bat / 바탕화면 무직전생 새 감정장면 듣기
-- 자료 연결: assets/local의 기존 13개 연결과 docs/ASSET_INDEX.md
-- Ollama 모델: D:\AI\models\ollama. 이 프로젝트는 사용자가 명시한 D드라이브 예외입니다.
+- 최신 MP3: comparison/01_CURRENT/20261005_FishS2
+- 선호기준: comparison/02_BASELINES/20261005_CosyVoice
+- 과거: comparison/90_ARCHIVE
+- 듣기: RUN_LatestMP3.bat / 바탕화면 '무직전생 최신 MP3 듣기'
+- 자료: assets/local 13개 연결, docs/ASSET_INDEX.md
+- Ollama 모델: D:/AI/models/ollama. 사용자 명시 D드라이브 예외 유지.
 
-## 현재 상태
+## 현재 실제 결과
 
-원문을 대조한 10개 소설 장면의 슬픔·격변·전투·애정 MP3, 실피·에리스 참조 비교, 한국어 VoiceDesign 원본 비교를 생성했습니다. 개별 26개 중 시험본 1개는 반복 전사 이상으로 보류했습니다. 재생 폴더에는 개별 25개와 약 6분56초 기본 모아듣기가 있습니다. 전체 파일 디코딩과 일부 전사를 확인했으며 자연스러운 연기는 청취 승인이 필요합니다.
+Fish S2 Pro Q8 커뮤니티 C++ 구현을 기존VS2022/CUDA13.1로 빌드하고 RTX4070SUPER12GB에서 새MP3 19개를 생성했습니다. 동일대사13개, 원문대조 전체장면4개(02/03/07/09), 기존Cosy루데우스 유지 조합2개(07/09). 전체장면 길이합187.9초. 모든새파일 전체디코딩, 원문/ID/순서, 중복 검증 완료.
 
-이전 감정본의 느림·실피 억양·하이브리드 이질감 피드백을 반영해 soft voice 강제 기본값을 제거하고 기본 감정 제어를 껐습니다. 기존 기본본은 보존합니다.
+기존 비교34MP3를 복사 없이 이동하고 원음 해시를 검증했습니다. 선호기준6개/과거28개이며 새결과와 섞이지 않습니다. 사용자거부02/03감정B는 보관. 선호07/09 기본 및 에리스참조2/3/4·기존21Cosy전체는 보존합니다.
 
-자동 화자 판정은 제한된 회귀 검증에서 25/47 및 별도 수치 오류로 미통과했습니다. 전권 자동 검수·미검증 대본 렌더는 보류입니다. 전권 MP3·최종 연기 품질이 완성됐다고 보고하지 않습니다. 25권 원문·전처리·자동 제안은 보존합니다.
+짧은 표본 실측: 음성102.864초 / 요청140.921초, 가중RTF1.370, 개별1.195~1.616. GPU 장치전체 최대표본10411MiB. 짧은13전체 및 전체장면4의 일부 전사를 확인했습니다. 자연스러운 연기·발음·음색의 사용자 청취 승인은 미완료입니다. Fish록시는 전사차이가 남아 기존Cosy선호를 유지하고 엔진을 전권기본으로 자동채택하지 않았습니다.
+
+자동화자 제한검증25/47 및 수치오류로 전권검수/미검증대본렌더는 보류입니다. 전권MP3·최종연기 완성으로 보고하지 않습니다.25권원문/전처리/자동제안은 보존합니다.
 
 ## 재개
 
-1. 실제 저장소의 00_START_HERE/CURRENT_HANDOFF.md.
-2. docs/LISTENING_SUITE_20261005.md와 docs/LISTENING_FEEDBACK_20261005.md.
-3. 로컬 output/listening_suite_20261005/final_summary.json 및 context_accuracy.json.
-4. T-0012 기록. 전체 대화와 자료를 반복해 가져오지 않습니다.
+1. 실제 저장소 00_START_HERE/CURRENT_HANDOFF.md 및 docs/FISH_S2_LOCAL.md.
+2. 청취: 새 조합07/09 → 전부Fish07/09 → 기존선호07/09.
+3. 로컬 output/fish_s2_20261005/final_summary.json, 이전 output/listening_suite_20261005/context_accuracy.json.
+4. T-0012. 전체대화/모델/자료를 반복검색하지 않고 요약·체크포인트를 재사용합니다.
 
-최신 코드: b75ef633c598428c081a5ff0063612b9cda432da. 업데이트: 2026-10-05 KST.
+최신코드:92f02f46b14176cd9a8ae3d1e61739ea92a09ae5. 업데이트:2026-10-05 KST.
