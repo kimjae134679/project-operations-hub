@@ -2,7 +2,7 @@
 
 업데이트: **2026-10-05 KST**
 
-최신 실제 원본은 `kimjae134679/txt_-`의 [CURRENT_HANDOFF.md](https://github.com/kimjae134679/txt_-/blob/main/00_START_HERE/CURRENT_HANDOFF.md)입니다.
+최신 실제 원본은 `kimjae134679/Mushoku-Tensei-AI-Audiobook`의 [CURRENT_HANDOFF.md](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/00_START_HERE/CURRENT_HANDOFF.md)입니다.
 
 허브에서는 다음만 유지합니다.
 
