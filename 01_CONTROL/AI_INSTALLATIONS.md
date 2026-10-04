@@ -25,6 +25,8 @@
 | AI Control Tower | 0.1.0 | 실제 설치 `%LocalAppData%\AIControlTower`; 소스 `project-operations-hub\ai-control-tower`; publish `ai-control-tower\artifacts\win-x64\AIControlTower.exe` | 2026-09-20 사용자 설치 실행·자동 시작 전환을 검증했고 최신 EXE 해시 일치를 확인했다. Program Files 우선 정책의 권한 부족 fallback 경로를 실제 사용 중이며, 로컬 Jev 실행은 계정 사용 방침에 따라 하드 차단 |
 | Unity iOS Build Support | 6000.3.14f1 | C:/Program Files_My/A_3D/Unity_Hub/Unity_Editor/6000.3.14f1/Editor/Data/PlaybackEngines/iOSSupport | 2026-09-25 공식 Unity CLI 설치 성공. 기존 Unity Editor 종속 모듈이므로 공식 설치 위치 유지. Windows에서 Xcode 프로젝트 내보내기용이며 Mac/Xcode는 별도 필요. 원격 에디터 실행은 PhoneLoL_02/Automation/OpenUnity.ps1 사용 |
 
+| 무직전생 AI 오디오북 | CosyVoice3 / Qwen3-TTS / Ollama 기존 설치 | D:\AI\VoiceAudiobook; 환경 D:\AI\envs; 문맥 모델 D:\AI\models\ollama | 사용자 명시 D드라이브 예외. 실행 RUN_Audiobook.bat. 기존 자료·환경 재사용, Ollama 12파일 SHA-256 및 실제 추론 검증. 상세 위치는 프로젝트 docs/RUNTIME_LOCATIONS.md |
+
 ## 인수인계 필수 항목
 모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.
 
