@@ -4,7 +4,7 @@
 - [T-0012 — Mushoku Tensei AI Audiobook](../../threads/T-0012-mushoku-ai-audiobook/)
 
 프로젝트 저장소:
-- https://github.com/kimjae134679/txt_-
+- https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
 
 현재 방향:
 - 한국어 TXT를 장면 단위로 분석
