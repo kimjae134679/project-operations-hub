@@ -1,18 +1,14 @@
 using AIControlTower.Models;
-
 namespace AIControlTower.Services;
-
 public sealed class JevStatusProvider : CommandStatusProvider
 {
     public JevStatusProvider(ProcessRunner runner) : base(runner) { }
     public override string Id => "jev";
-    public override async Task<ToolStatus> CheckAsync(CancellationToken cancellationToken)
+    public override Task<ToolStatus> CheckAsync(CancellationToken cancellationToken)
     {
-        var launcher = EnvironmentProbe.FindCommand("jev-codex");
-        if (launcher is null) return Status(Id, "Jev Router", StatusKind.NotInstalled, "jev-codex 실행 파일을 찾지 못했습니다.");
-        if (!EnvironmentProbe.HasAnyEnvironmentVariable("JEV_API_KEY", "TYPESAFE_API_KEY")) return Status(Id, "Jev Router", StatusKind.NotConfigured, "API 키 설정 여부를 확인하지 못했습니다.");
-        var result = await Runner.RunHiddenAsync("cmd.exe", "/d /c \"" + launcher + " --version\"", TimeSpan.FromSeconds(8), cancellationToken);
-        return Status(Id, "Jev Router", ToStatusKind(result.ExitCode), result.ExitCode == 0 ? "설치와 런처 확인. 키 존재는 인증·라우팅 성공을 뜻하지 않습니다. 작업별 선택 사용 가능합니다." : "런처 확인에 실패했습니다. PowerShell 실행 정책 또는 Codex 연결을 확인하세요.");
+        var package = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "node_modules", "jev-router", "package.json");
+        if (!File.Exists(package)) return Task.FromResult(Status(Id, "Jev Router", StatusKind.NotInstalled, "설치된 jev-router package를 찾지 못했습니다."));
+        if (!EnvironmentProbe.HasAnyEnvironmentVariable("JEV_API_KEY", "TYPESAFE_API_KEY")) return Task.FromResult(Status(Id, "Jev Router", StatusKind.NotConfigured, "설치는 확인했으나 키 설정 여부를 확인하지 못했습니다."));
+        return Task.FromResult(Status(Id, "Jev Router", StatusKind.Ready, "설치 파일·키 존재 확인. 인증·라우팅 왕복·업무 성공은 미검증이며 필요할 때 선택 사용합니다."));
     }
 }
-

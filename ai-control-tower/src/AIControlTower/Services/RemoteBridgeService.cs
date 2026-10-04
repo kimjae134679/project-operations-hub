@@ -16,10 +16,11 @@ public sealed class RemoteBridgeService
         $ErrorActionPreference='Stop'
         $all=@(Get-CimInstance Win32_Process)
         $nodes=@($all | Where-Object { $_.Name -eq 'node.exe' -and $_.CommandLine -match '(?i)desktop-commander' -and $_.CommandLine -match '(?i)(\bremote\b|dist[\\/]index\.js)' })
-        $ids=@{}; foreach($n in $nodes){$ids[[int]$n.ProcessId]=$true}
+        $remoteNodes=@($nodes | Where-Object {$_.CommandLine -match '(?i)\bremote\b'})
+        $ids=@{}; foreach($n in $remoteNodes){$ids[[int]$n.ProcessId]=$true}
         $parents=@{}; foreach($p in $all){$parents[[int]$p.ProcessId]=[int]$p.ParentProcessId}
         $roots=0
-        foreach($n in $nodes){
+        foreach($n in $remoteNodes){
             $parent=[int]$n.ParentProcessId; $child=$false; $seen=@{}
             while($parent -gt 0 -and $parents.ContainsKey($parent) -and !$seen.ContainsKey($parent)){
                 $seen[$parent]=$true
@@ -28,9 +29,18 @@ public sealed class RemoteBridgeService
             }
             if(!$child){$roots++}
         }
+        $processes=0
+        foreach($n in $nodes){
+            $parent=[int]$n.ProcessId; $seen=@{}
+            while($parent -gt 0 -and $parents.ContainsKey($parent) -and !$seen.ContainsKey($parent)){
+                $seen[$parent]=$true
+                if($ids.ContainsKey($parent)){$processes++;break}
+                $parent=$parents[$parent]
+            }
+        }
         $startup=[Environment]::GetFolderPath('Startup')
         $count=@(Get-ChildItem -LiteralPath $startup -File | Where-Object {$_.Name -in 'DesktopCommanderRemote.cmd','AIControlTower-DesktopCommanderSilent.vbs','AIControlTower-RemoteBridge.vbs'}).Count
-        @{RootCount=$roots;ProcessCount=$nodes.Count;StartupCount=$count;ProbeSucceeded=$true}|ConvertTo-Json -Compress
+        @{RootCount=$roots;ProcessCount=$processes;StartupCount=$count;ProbeSucceeded=$true}|ConvertTo-Json -Compress
         """;
     public async Task<RemoteBridgeSnapshot> CheckAsync(CancellationToken cancellationToken)
     {
@@ -60,13 +70,33 @@ public sealed class RemoteBridgeService
         if (File.Exists(launcher)) File.Copy(launcher, Path.Combine(backup, LauncherName + ".bak"));
         File.WriteAllText(script, SupervisorScript, Encoding.UTF8);
         var command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File " + '"' + script + '"';
-        File.WriteAllText(launcher, "Set shell = CreateObject(\"WScript.Shell\")\r\nshell.Run \"" + command.Replace("\"", "\"\"") + "\", 0, False\r\n", Encoding.ASCII);
+        File.WriteAllText(launcher, "Set shell = CreateObject(\"WScript.Shell\")\r\nshell.Run \"" + command.Replace("\"", "\"\"") + "\", 0, False\r\n", Encoding.Unicode);
         foreach (var name in legacy)
         {
             var path = Path.Combine(startupDirectory, name);
             if (File.Exists(path)) { File.Copy(path, Path.Combine(backup, name + ".bak")); File.Delete(path); }
         }
         return "시작 등록을 공유 중계기 하나로 통합했습니다. 기존 실행 프로세스는 유지했습니다. 백업: " + backup;
+    }
+    public string RestoreStartup(string startupDirectory, string dataDirectory)
+    {
+        var backups = Path.Combine(dataDirectory, "backups", "remote-startup");
+        var backup = Directory.Exists(backups) ? Directory.EnumerateFiles(backups, "DesktopCommanderRemote.cmd.bak", SearchOption.AllDirectories)
+            .OrderByDescending(Path.GetDirectoryName, StringComparer.Ordinal).FirstOrDefault() : null;
+        if (backup is null)
+        {
+            var oldBackups = Path.Combine(dataDirectory, "backups", "desktop-commander");
+            backup = Directory.Exists(oldBackups) ? Directory.EnumerateFiles(oldBackups, "DesktopCommanderRemote.cmd.*.bak").OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault() : null;
+        }
+        if (backup is null) throw new FileNotFoundException("복구할 기존 Remote 시작 등록 백업이 없습니다.");
+        var target = Path.Combine(startupDirectory, "DesktopCommanderRemote.cmd");
+        File.Copy(backup, target, true);
+        foreach (var name in new[] { LauncherName, "AIControlTower-DesktopCommanderSilent.vbs" })
+        {
+            var path = Path.Combine(startupDirectory, name);
+            if (File.Exists(path)) File.Delete(path);
+        }
+        return "기존 Remote 시작 등록 하나를 복구했습니다. 현재 연결은 유지했습니다.";
     }
     public static string EncodedArguments(string script) => "-NoProfile -ExecutionPolicy Bypass -EncodedCommand " + Convert.ToBase64String(Encoding.Unicode.GetBytes(script));
     public const string SupervisorScript = """

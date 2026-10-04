@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "project-operations-hub",
+  "name": "전체 프로젝트 관리",
+  "description": "프로젝트 운영 규칙, 도구 추천, Windows 관제 프로그램",
+  "functions": [
+    {
+      "id": "operations",
+      "name": "프로젝트 운영",
+      "programs": [
+        {
+          "id": "workspace",
+          "name": "통합소통방 저장소",
+          "kind": "Git workspace",
+          "path": ".",
+          "description": "정책과 기록의 원본 작업 폴더",
+          "commands": []
+        },
+        {
+          "id": "recommendations",
+          "name": "도구 활용 추천",
+          "kind": "문서",
+          "path": "000_사용자용/10_도구_활용_추천.md",
+          "description": "용도별 추천, 과용 비용, 최신 대안 재검토 기준",
+          "commands": []
+        }
+      ]
+    },
+    {
+      "id": "control-tower",
+      "name": "관제탑 프로그램과 검사",
+      "programs": [
+        {
+          "id": "source",
+          "name": "컨트롤타워 소스",
+          "kind": "WPF / .NET",
+          "path": "ai-control-tower",
+          "description": "UI와 프로젝트 발견·실행·공유 리모트 중계 코드",
+          "commands": []
+        },
+        {
+          "id": "validation",
+          "name": ".NET 검사기",
+          "kind": "CLI",
+          "path": "ai-control-tower",
+          "workingDirectory": "ai-control-tower",
+          "description": "실제로 설치된 .NET CLI로 버전 확인·테스트·빌드",
+          "commands": [
+            {
+              "name": "개발 환경 확인",
+              "fileName": "dotnet.exe",
+              "arguments": [
+                "--version"
+              ],
+              "timeoutSeconds": 30
+            },
+            {
+              "name": "관리 프로그램 검사",
+              "fileName": "dotnet.exe",
+              "arguments": [
+                "test",
+                "AIControlTower.sln",
+                "--nologo"
+              ],
+              "timeoutSeconds": 600
+            },
+            {
+              "name": "개발용 빌드",
+              "fileName": "dotnet.exe",
+              "arguments": [
+                "build",
+                "AIControlTower.sln",
+                "--nologo"
+              ],
+              "timeoutSeconds": 600
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

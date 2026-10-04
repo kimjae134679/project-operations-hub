@@ -41,5 +41,58 @@ public sealed class JobManagerTests
         Assert.Equal("item.completed · command_execution", JobManager.SanitizeOutput("{\"type\":\"item.completed\",\"item\":{\"type\":\"command_execution\",\"command\":\"SECRET PROMPT\"}}"));
         Assert.DoesNotContain("abc", JobManager.SanitizeOutput("Authorization: Bearer abc"));
         Assert.Contains("input_tokens", JobManager.SanitizeOutput("{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":12}}"));
+    }    [Fact]
+    public async Task StdinCancellationKillsTheOwnedProcess()
+    {
+        var manager = new JobManager(); var program = Program(Guid.NewGuid().ToString());
+        var pid = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+        manager.Log += line => { var match = System.Text.RegularExpressions.Regex.Match(line, @"OWNED:(\d+)"); if (match.Success) pid.TrySetResult(int.Parse(match.Groups[1].Value)); };
+        var task = manager.RunAsync(program, Command("Write-Output ('OWNED:'+$PID); Start-Sleep -Seconds 20", 30), standardInput: new string('x', 5_000_000));
+        var processId = await pid.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.True(manager.Stop(program.Id));
+        var result = await task.WaitAsync(TimeSpan.FromSeconds(10));
+        try { Assert.Equal("cancelled", result.State); Assert.False(IsAlive(processId)); }
+        finally { Cleanup(result); }
     }
+    [Fact]
+    public async Task ParentExitDoesNotLoseChildOwnershipOrTimeout()
+    {
+        var manager = new JobManager();
+        var result = await manager.RunAsync(Program(Guid.NewGuid().ToString()), Command("$p=Start-Process powershell.exe -ArgumentList '-NoProfile','-Command','Start-Sleep -Seconds 20' -NoNewWindow -PassThru; Write-Output ('CHILD:'+$p.Id); exit 0", 2));
+        try
+        {
+            Assert.Equal("timed_out", result.State);
+            var text = await File.ReadAllTextAsync(result.LogPath);
+            var match = System.Text.RegularExpressions.Regex.Match(text, @"CHILD:(\d+)");
+            Assert.True(match.Success); Assert.False(IsAlive(int.Parse(match.Groups[1].Value)));
+        }
+        finally { Cleanup(result); }
+    }
+    [Fact]
+    public async Task ExcessiveTimeoutDoesNotReserveProject()
+    {
+        var manager = new JobManager(); var program = Program(Guid.NewGuid().ToString());
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => manager.RunAsync(program, Command("exit 0", int.MaxValue)));
+        var result = await manager.RunAsync(program, Command("exit 0"));
+        try { Assert.Equal("succeeded", result.State); }
+        finally { Cleanup(result); }
+    }
+    [Fact]
+    public async Task ShutdownStopsOwnedJobWithoutDependingOnDispatcher()
+    {
+        var manager = new JobManager(); var program = Program(Guid.NewGuid().ToString());
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        manager.Log += line => { if (line.Contains("실행 시작")) started.TrySetResult(); };
+        var task = manager.RunAsync(program, Command("Start-Sleep -Seconds 20", 30));
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(10)); manager.StopAllOwned();
+        var result = await task.WaitAsync(TimeSpan.FromSeconds(10));
+        try { Assert.Equal("cancelled", result.State); Assert.Equal(0, manager.RunningCount); }
+        finally { Cleanup(result); }
+    }
+    private static bool IsAlive(int pid)
+    {
+        try { using var process = System.Diagnostics.Process.GetProcessById(pid); return !process.HasExited; }
+        catch (ArgumentException) { return false; }
+    }
+
 }

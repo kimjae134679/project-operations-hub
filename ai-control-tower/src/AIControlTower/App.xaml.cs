@@ -20,6 +20,20 @@ public partial class App : Application
             MainWindow.Show(); MainWindow.Activate();
         }), null, Timeout.Infinite, false);
         MainWindow.Show();
+        var capture = Array.IndexOf(e.Args, "--verify-ui");
+        if (capture >= 0 && capture + 1 < e.Args.Length)
+        {
+            var window = (MainWindow)MainWindow;
+            _ = Dispatcher.InvokeAsync(async () =>
+            {
+                try { await Services.UiVerification.RunAsync(window, Path.GetFullPath(e.Args[capture + 1]), e.Args.Contains("--consolidate-remote")); }
+                catch (Exception ex)
+                {
+                    var output = Path.GetFullPath(e.Args[capture + 1]); Directory.CreateDirectory(output);
+                    File.WriteAllText(Path.Combine(output, "ui-verification-error.txt"), Services.ProcessRunner.Sanitize(ex.ToString()));
+                }
+            });
+        }
     }
     protected override void OnExit(ExitEventArgs e)
     {

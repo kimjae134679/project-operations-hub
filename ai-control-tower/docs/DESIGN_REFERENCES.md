@@ -1,45 +1,61 @@
-# Control Tower design decisions
+# 컨트롤타워 화면 설계
 
-Reviewed on 2026-10-05 (Asia/Seoul). Native Windows WPF implementation. References are publicly readable; no paid template, font download, icon dependency or copied product asset is required.
+2026-10-05 기준. Windows WPF의 실제 구현을 대상으로 합니다. 외부 템플릿, 폰트, 제품 이미지나 웹 런타임을 추가하지 않았습니다.
 
-## Task and visual hierarchy
+## 사람이 이해하는 프로젝트 목록
 
-The primary action is choosing a project, finding its function/program, and opening or running that program. The interface therefore follows **project → function → program → action → actual execution record**. Tool health and installation controls are secondary tabs. Counts come from the project registry and owned processes, not example numbers.
+첫 화면은 **내 프로젝트**입니다. 폴더명이나 개발 도구의 상태 대신 프로젝트의 이름, 용도, 현재 작업·보관·준비 역할을 보여줍니다. 프로젝트를 선택하면 그 프로젝트의 기능별 프로그램과 자료가 나타납니다. 오른쪽에서는 선택한 항목이 무엇인지 읽고, `제작 화면 시작·열기`, `설치파일 위치 보기`, `안내 파일 보기`처럼 실제 할 일을 선택합니다.
 
-The former white/blue rounded dashboard is replaced by a graphite workbench with a subdued green accent, a flat project rail, compact function lists, one program inspector and a persistent log panel. Green emphasizes selection and the primary launch button. Grey retains navigation and metadata. Failure indicators use a restrained warm colour. No gradients, decorative fake charts or independent metric cards.
+검증 PC의 확인된 폴더는 6개 프로젝트, 24개 프로그램·자료 항목으로 묶었습니다. 게임의 이전 개발본·실험 사본·복구 자료와 오디오북의 코드 보관본은 관련 프로젝트 안에서 찾습니다. 파일을 옮기거나 지우는 정리가 아닙니다. 새 폴더의 용도를 확인하지 못하면 `새로 발견`으로 남깁니다.
 
-## References compared
+- 프로젝트 이름·소개·폴더 역할이 목록의 첫 정보입니다.
+- 선택 프로젝트의 제목을 한 번 크게 표시합니다. 반복 배너, 영문 구획 제목, 통계 카드와 장식 그래프를 두지 않습니다.
+- 자료 열기와 명령 실행을 구분합니다. APK는 휴대폰 설치파일이며, 발견한 EXE는 용도를 확인할 파일입니다. 발견만으로 실행 명령을 만들지 않습니다.
+- 폴더 위치, 작업 기록, 보관 자료와 개발·점검 도구는 기본 접힘입니다. 검색하면 일치하는 기능 그룹을 펼칩니다.
+- 원격 연결·AI 도구·설치와 복구는 **연결·관리** 탭에 둡니다. 한국어 이름과 한 문장 용도를 표시하며 자세한 확인 결과는 접습니다. n8n과 GPT 전달 상태는 이 사용자 화면의 목록에서 제외합니다.
 
-| Official reference | Useful principle | Applied decision | Deliberate limit |
-|---|---|---|---|
-| [Linear: A calmer interface for a product in motion](https://linear.app/now/behind-the-latest-design-refresh), March 12, 2026 | Navigation should recede; action placement should stay predictable; borders should clarify hierarchy quietly. | Dim project rail, distinct project header and program controls, small text labels, restrained separators and warm graphite. | No Linear assets or its issue-tracking terminology. |
-| [VS Code: User interface](https://code.visualstudio.com/docs/editing/getting-started/userinterface), current official documentation | Explorer, content workspace, secondary detail view and output panel have different jobs. | Project rail, central function/program explorer, program inspector and bottom execution record. | No editor controls that this application cannot perform. |
-| [Raycast: List](https://developers.raycast.com/api-reference/user-interface/list), current official developer documentation | Compact rows, grouped sections and the selected item's actions keep utilities easy to scan. | Program name/detail/status rows under function headings; actions belong to the selected program inspector. | No Raycast runtime/API dependency; this remains a Windows application. |
-| [shadcn/ui: Sidebar](https://ui.shadcn.com/docs/components/base/sidebar), current official component documentation | Sidebar grouping, clear active state and consistent compact navigation can scale. | Stable project list with an accent selection edge; folder discovery controls remain at the rail's bottom. | No React dependency or wholesale dashboard template. |
+## 확인한 공식 레퍼런스와 적용
 
-The existing hub document `03_KNOWLEDGE/CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md` was read from `work/phonelol-v1180-handoff`. Its three-reference comparison rule informed the process. Small component libraries such as Uiverse are useful for interaction details, while the above workspace references better match this application's hierarchy. No CSS component was pasted into WPF.
+| 공식 자료 | 참고한 원칙 | 실제 적용 |
+|---|---|---|
+| [Linear 프로젝트 문서](https://linear.app/docs/projects) | 프로젝트를 중심으로 관련 작업을 모아 찾게 합니다. | 사람용 프로젝트 이름을 먼저 고르고 해당 기능·자료·행동으로 이동합니다. |
+| [Notion 갤러리 문서](https://www.notion.com/help/galleries) | 카드에서 보여줄 속성을 목적에 맞춰 선택합니다. | 프로젝트 카드에 이름·용도·역할만 먼저 보여주고 경로는 상세로 접습니다. 불필요한 표지 이미지를 넣지 않습니다. |
+| [Things 3 공식 제품 소개](https://culturedcode.com/things/) | 읽기 쉬운 위계와 정돈된 목록이 작업 선택을 돕습니다. | 짧은 행동 이름, 차분한 바탕, 선택된 항목과 고정된 조작 영역을 사용합니다. |
+| [shadcn sidebar-07 예제](https://ui.shadcn.com/view/new-york-v4/sidebar-07) | 탐색 목록과 선택한 항목의 작업 공간을 분리합니다. | 왼쪽 프로젝트 목록, 가운데 기능별 항목, 오른쪽 설명과 실제 행동으로 구성합니다. React나 웹 컴포넌트를 복사하지 않았습니다. |
 
-## Tokens and interaction
+기존 허브의 `03_KNOWLEDGE/CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md`도 검토했습니다. 사용자 참고 사이트의 작은 버튼·메뉴 패턴을 그대로 장식으로 붙이기보다, 프로젝트와 폴더를 이해할 수 있는 위계를 우선했습니다.
 
-- Background `#111514`, rail `#0B100E`, surface `#181E1B`, raised control `#222A25`.
-- Primary text `#EDF2EE`, secondary text `#A5B2A9`, separators `#303A33`.
-- Accent `#AFE4B5` with dark button ink `#102918`; error `#ECAF9F`.
-- Segoe UI with Malgun Gothic fallback; no external typeface dependency. Monospaced paths/logs use Consolas with Korean fallback.
-- 232 px project rail, 280 px program inspector. Window minimum 1060 × 720. Scrollable program explorer, inspector and log preserve access at smaller sizes.
-- Native OS title bar preserves standard move/resize/snap behaviour. No custom caption logic.
-- Keyboard selection, visible focus, disabled launch state, hover feedback and truthful empty states.
-- Entrance/selection fade is 160 ms, from 0.84 to 1 opacity. It is disabled when Windows `SystemParameters.ClientAreaAnimation` is false or the user enables reduced motion. No continuous decoration or layout animation.
+## 색상·문자·상호작용
 
-## Functional bindings
+| 용도 | 현재 값 |
+|---|---|
+| 전체 바탕 | 따뜻한 회백색 `#F5F4F0` |
+| 내용·카드 | 흰색 `#FFFFFF` |
+| 본문 | 남색 `#21334B` |
+| 보조 설명 | `#647184` |
+| 구분선 | `#DCE1E7` |
+| 기본 행동·선택 강조 | 파랑 `#3268CB`, 흰색 버튼 글자 |
+| 선택 행 바탕 | `#EDF3FF` |
 
-- Project list → `Projects` / `SelectedProject`.
-- Discovery root → `RootPath`; folder selection and dropped directories call `DiscoverAsync`, then dropped project selection uses `SelectProjectByPath`.
-- Function groups → `SelectedProject.Functions`; program rows → `FunctionItem.Programs`.
-- Inspector → `SelectedProgram`, `OpenProgram`, `LaunchProgramAsync`, `StopProgram`.
-- Registry counts → `ProjectsCount`, `ProgramsCount`, `RunningCount`.
-- Tool table → actual `Statuses`; bottom record → `JobLogs`; footer → `Message`.
-- Jev controls retain their backend policy bindings. Installation and restore retain existing services.
+본문 기본 14px, 프로젝트 카드 제목 17px, 선택 프로젝트 제목 23~26px, 보조 정보 11~13px입니다. Segoe UI와 Malgun Gothic을 사용합니다. 카드 모서리는 8px, 버튼은 6px이며 그림자·그라데이션·연속 애니메이션은 없습니다. 긴 제목은 말줄임과 전체 이름 툴팁을 사용합니다. 검색 입력은 기본 WPF TextBox와 별도 안내 글자로 구성합니다.
 
-## Verification boundary
+최소 창은 1060×720입니다. 좁은 창에서는 프로젝트 목록 286px, 선택 항목 영역 254px을 사용합니다. 높이가 낮으면 여백과 상세 설명을 줄여 명령 선택과 주요 버튼이 고정 영역 안에 남게 합니다. 작업 기록을 펼친 높이는 기본 100px, 작은 창 65px입니다. 상세 설명만 스크롤하며 이름과 버튼을 함께 밀어내지 않습니다.
 
-XML structure is checked in the editing environment. Native Windows build, actual runtime binding diagnostics and screenshot inspection are required before calling the design verified. A generated image or HTML approximation does not count as evidence of this WPF application's layout. Test empty, discovered, selected, running and failed states; a narrow window; long Korean names/paths; keyboard navigation and reduced motion. The screenshots and exact build results belong in the release verification record.
+화면 전환은 160ms의 짧은 불투명도 변화입니다. Windows의 `SystemParameters.ClientAreaAnimation`이 꺼져 있거나 사용자가 화면 전환 효과 줄이기를 선택하면 적용하지 않습니다. 기본 Windows 제목 표시줄과 이동·크기 조절을 유지합니다.
+
+## 데이터와 실제 동작 연결
+
+- 프로젝트 검색 → `ProjectSearch` / `FilteredProjects` / `SelectedProject`.
+- 프로그램·자료 검색 → `ProgramSearch` / `FilteredFunctions`. 기존 `ProgramItem`의 동일성을 유지하며 검색 결과가 실행 대상을 바꾸지 않습니다.
+- 카탈로그 소개 → `ProjectItem.DisplayName/Description/RoleLabel/CategoryLabel`, `ProgramItem.DisplayName/Description/KindLabel/ActionLabel`.
+- 기본 행동 → `ActivateSelectedProgramAsync`. 등록 명령이 있으면 실행하고, 자료면 해당 파일·폴더를 엽니다. 이미 응답하는 로컬 제작 화면은 재사용합니다.
+- 명령 선택 → `SelectedCommand`. 명령이 있는 항목에만 선택기와 별도 열기·중지 버튼을 표시합니다.
+- 연결·관리 → `UserFacingStatuses`의 `DisplayName/Purpose/StateLabel`과 실제 확인 결과.
+- 작업 기록 → 실제 `JobLogs`; 안내 → `Message`. 예제 상태나 가짜 숫자를 사용하지 않습니다.
+- 폴더 선택·드롭 → `DiscoverAsync`; 기존 설치·복구·Jev 동작은 실제 서비스에 연결합니다.
+
+## 검증 범위
+
+XML 구문 검사와 Windows 테스트 36개를 수행했습니다. 네이티브 WPF 검증기는 실제 폴더 데이터, 검색 결과의 동일성, 등록된 `.NET --version` 명령 결과, 작은 창에서 보이는 명령·버튼 경계를 확인하고 화면과 JSON 근거를 남깁니다. 최종 캡처·빌드 결과는 [검증 기록](VERIFICATION-20261005.md)을 기준으로 확인합니다.
+
+게임의 실기기 작동, 오디오북 GPU 제작, 영상 다운로드, Jev의 인증·라우팅 왕복 성공은 이번 화면 검증 결과로 주장하지 않습니다. 생성 이미지나 HTML 모형은 이 WPF 화면의 검증 근거로 사용하지 않습니다.

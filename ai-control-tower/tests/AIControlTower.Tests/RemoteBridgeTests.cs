@@ -20,5 +20,21 @@ public sealed class RemoteBridgeTests
             service.ConsolidateStartup(startup, data); Assert.Single(Directory.GetFiles(startup));
         }
         finally { Directory.Delete(root, true); }
+    }    [Fact]
+    public void UnicodePathsAndRestoreKeepOneStartupEntry()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "중계 테스트 " + Guid.NewGuid().ToString("N"));
+        var startup = Path.Combine(root, "startup"); var data = Path.Combine(root, "한글 data");
+        Directory.CreateDirectory(startup); File.WriteAllText(Path.Combine(startup, "DesktopCommanderRemote.cmd"), "original");
+        try
+        {
+            var service = new RemoteBridgeService(new ProcessRunner()); service.ConsolidateStartup(startup, data);
+            Assert.Contains(data, File.ReadAllText(Path.Combine(startup, RemoteBridgeService.LauncherName)));
+            service.RestoreStartup(startup, data);
+            Assert.Equal("DesktopCommanderRemote.cmd", Path.GetFileName(Assert.Single(Directory.GetFiles(startup))));
+            Assert.Equal("original", File.ReadAllText(Path.Combine(startup, "DesktopCommanderRemote.cmd")));
+        }
+        finally { Directory.Delete(root, true); }
     }
+
 }

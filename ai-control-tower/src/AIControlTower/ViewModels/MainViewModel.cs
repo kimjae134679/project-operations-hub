@@ -12,6 +12,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private readonly SemaphoreSlim _discoveryLock = new(1, 1);
     private readonly ProjectDiscoveryService _discovery = new();
+    private readonly ProjectCatalogService _catalogService = new();
+    private readonly CatalogDefinition _catalog = ProjectCatalogService.Load();
     private readonly JobManager _jobs = new();
     private readonly ControlTowerSettings _settings;
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
@@ -31,6 +33,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private ProjectItem? _selectedProject;
     private ProgramItem? _selectedProgram;
     private ProgramCommand? _selectedCommand;
+    private string _projectSearch = "";
+    private string _programSearch = "";
 
     public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true)
     {
@@ -51,13 +55,35 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     }
     public ObservableCollection<ProjectItem> Projects { get; } = [];
     public ObservableCollection<ToolStatusViewModel> Statuses { get; } = [];
+    public IReadOnlyList<ToolStatusViewModel> UserFacingStatuses => Statuses.Where(s => s.IsUserFacing).ToArray();
     public ObservableCollection<string> JobLogs { get; } = [];
+    public string ProjectSearch
+    {
+        get => _projectSearch;
+        set { if (!SetProperty(ref _projectSearch, value)) return; OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults)); }
+    }
+    public string ProgramSearch
+    {
+        get => _programSearch;
+        set { if (!SetProperty(ref _programSearch, value)) return; OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults)); }
+    }
+    public IReadOnlyList<ProjectItem> FilteredProjects => Projects.Where(p => Matches(ProjectSearch, p.DisplayName, p.Description, p.Name, p.Path, p.RoleLabel)).ToArray();
+    public IReadOnlyList<FunctionItem> FilteredFunctions => SelectedProject?.Functions
+        .Select(f => new FunctionItem { Id = f.Id, Name = f.Name, IsAdvanced = f.IsAdvanced && string.IsNullOrWhiteSpace(ProgramSearch), Programs = f.Programs.Where(p => Matches(ProgramSearch, f.Name, p.DisplayName, p.Name, p.KindLabel, p.Description)).ToArray() })
+        .Where(f => f.Programs.Count > 0).ToArray() ?? [];
+    public bool NoProjectSearchResults => Projects.Count > 0 && FilteredProjects.Count == 0;
+    public bool NoProgramSearchResults => SelectedProject is not null && FilteredFunctions.Count == 0;
+    private static bool Matches(string query, params string[] values) => string.IsNullOrWhiteSpace(query) || values.Any(v => v.Contains(query.Trim(), StringComparison.OrdinalIgnoreCase));
     public int ProjectsCount => Projects.Count;
     public int ProgramsCount => Projects.Sum(p => p.Functions.Sum(f => f.Programs.Count));
     public int RunningCount => _jobs.RunningCount;
     public bool IsBusy => _jobs.BusyProjectCount > 0;
-    public bool CanStopSelectedProgram => SelectedProgram is not null && _jobs.IsProjectBusy(SelectedProgram.ProjectId);
-    public string RootPath { get => _settings.RootPath; set { if (_settings.RootPath == value) return; _settings.RootPath = value; OnPropertyChanged(); } }
+    public bool CanStopSelectedProgram => SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
+    public bool CanLaunchSelectedProgram => SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
+    public bool CanOpenSelectedProgram => SelectedProgram is not null && (File.Exists(SelectedProgram.Path) || Directory.Exists(SelectedProgram.Path));
+    public bool HasSelectedCommands => SelectedProgram?.CanLaunch == true;
+    public bool ShowSeparateOpenButton => HasSelectedCommands || SelectedProgram?.HasEditorLauncher == true;
+    public string RootPath { get => _settings.RootPath; set { if (_settings.RootPath == value) return; _settings.RootPath = value; _needsDiscovery = true; OnPropertyChanged(); } }
     public bool EnableJev
     {
         get => _settings.EnableJev;
@@ -74,14 +100,16 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         set
         {
             if (!SetProperty(ref _selectedProject, value)) return;
-            SelectedProgram = null;
+            SelectedProgram = value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
+            ProgramSearch = "";
+            OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults));
         }
     }
     public ProgramItem? SelectedProgram
     {
         get => _selectedProgram;
-        set { if (!SetProperty(ref _selectedProgram, value)) return; SelectedCommand = value?.Commands.FirstOrDefault(); OnPropertyChanged(nameof(CanStopSelectedProgram)); }
+        set { if (!SetProperty(ref _selectedProgram, value)) return; SelectedCommand = value?.Commands.FirstOrDefault(); OnPropertyChanged(nameof(CanStopSelectedProgram)); OnPropertyChanged(nameof(CanLaunchSelectedProgram)); OnPropertyChanged(nameof(CanOpenSelectedProgram)); OnPropertyChanged(nameof(HasSelectedCommands)); OnPropertyChanged(nameof(ShowSeparateOpenButton)); }
     }
     public ProgramCommand? SelectedCommand { get => _selectedCommand; set => SetProperty(ref _selectedCommand, value); }
     public string ProjectPath { get => _projectPath; set => SetProperty(ref _projectPath, value); }
@@ -101,7 +129,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             var root = Path.GetFullPath(RootPath);
             var selectedId = SelectedProject?.Id;
             var selectedProgramId = SelectedProgram?.Id;
-            var results = await Task.Run(() => _discovery.Scan(root, _lifetime.Token), _lifetime.Token);
+            var results = await Task.Run(() =>
+            {
+                var scanned = _discovery.Scan(root, _lifetime.Token);
+                return new DiscoveryResult(_catalogService.Apply(scanned.Projects, root, _catalog), scanned.Warnings);
+            }, _lifetime.Token);
+            if (!Path.GetFullPath(RootPath).Equals(root, StringComparison.OrdinalIgnoreCase)) { _needsDiscovery = true; Message = "탐색 루트가 변경되어 이전 결과를 폐기했습니다. 새 루트를 다시 탐색합니다."; return; }
             Projects.Clear();
             foreach (var project in results.Projects)
             {
@@ -110,7 +143,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 Projects.Add(project);
             }
             SelectedProject = Projects.FirstOrDefault(p => p.Id == selectedId) ?? Projects.FirstOrDefault();
-            SelectedProgram = SelectedProject?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id == selectedProgramId);
+            SelectedProgram = SelectedProject?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id == selectedProgramId)
+                ?? SelectedProject?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             _lastScan = DateTime.UtcNow;
             _needsDiscovery = false;
             if (_watcher?.Path != root)
@@ -130,6 +164,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
             SaveSettings();
             OnPropertyChanged(nameof(ProjectsCount)); OnPropertyChanged(nameof(ProgramsCount));
+            OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
             Message = $"프로젝트 {ProjectsCount}개 · 프로그램/산출물 {ProgramsCount}개를 확인했습니다.";
             foreach (var warning in results.Warnings) AddLog("탐색 참고 · " + warning);
             if (results.Warnings.Count > 0) Message += $" 참고 {results.Warnings.Count}건은 로그에서 확인하세요.";
@@ -148,11 +183,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             if (_disposed) return;
             foreach (var result in results)
             {
-                var existing = Statuses.FirstOrDefault(status => status.DisplayName == result.DisplayName);
+                var existing = Statuses.FirstOrDefault(status => status.RawName == result.DisplayName);
                 if (existing is null) Statuses.Add(new ToolStatusViewModel(result)); else existing.Update(result);
             }
             _lastStatus = DateTime.UtcNow;
-            Message = "도구 상태 확인 · " + DateTime.Now.ToString("HH:mm:ss") + " · 프로젝트 실행 상태는 개별 로그로 확인하세요.";
+            OnPropertyChanged(nameof(UserFacingStatuses));
+            Message = "연결 상태 확인 · " + DateTime.Now.ToString("HH:mm:ss");
             UpdateRunningProperties();
         }
         catch (OperationCanceledException) { }
@@ -161,7 +197,48 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     }
     public void SelectProjectByPath(string path) => SelectedProject = Projects.FirstOrDefault(p => Path.GetFullPath(p.Path).Equals(Path.GetFullPath(path), StringComparison.OrdinalIgnoreCase)) ?? SelectedProject;
     public void OpenProject() => OpenExisting(SelectedProject?.Path);
-    public void OpenProgram() => OpenExisting(SelectedProgram?.Path);
+    public void OpenProgram()
+    {
+        if (SelectedProgram is not null && Uri.TryCreate(SelectedProgram.ServiceUrl, UriKind.Absolute, out var url)
+            && url.IsLoopback && url.Scheme is "http" or "https")
+        {
+            try { Process.Start(new ProcessStartInfo(url.AbsoluteUri) { UseShellExecute = true })?.Dispose(); Message = "제작 화면을 열었습니다."; }
+            catch (Exception ex) { Message = "화면 열기 실패 · " + ProcessRunner.Sanitize(ex.Message); }
+            return;
+        }
+        OpenExisting(SelectedProgram?.Path);
+    }
+    public async Task ActivateSelectedProgramAsync()
+    {
+        if (SelectedProgram is { HasEditorLauncher: true } editor)
+        {
+            if (!File.Exists(editor.EditorOpenScript)) { Message = "편집기 열기 파일을 찾지 못했습니다."; return; }
+            try
+            {
+                // Editing sessions have their own lifetime; closing the tower must not kill unsaved work.
+                var start = new ProcessStartInfo("powershell.exe") { UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = editor.WorkingDirectory };
+                foreach (var argument in new[] { "-NoProfile", "-File", editor.EditorOpenScript }) start.ArgumentList.Add(argument);
+                Process.Start(start)?.Dispose();
+                Message = "Unity 열기를 요청했습니다. 편집기에서 확인하세요.";
+            }
+            catch (Exception ex) { Message = "편집기 열기 실패 · " + ProcessRunner.Sanitize(ex.Message); }
+            return;
+        }
+        if (SelectedProgram?.CanLaunch != true) { OpenProgram(); return; }
+        if (Uri.TryCreate(SelectedProgram.ServiceUrl, UriKind.Absolute, out var url) && url.IsLoopback && url.Scheme is "http" or "https")
+        {
+            try
+            {
+                using var client = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+                using var response = await client.GetAsync(url, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, _lifetime.Token);
+                if (response.IsSuccessStatusCode) { OpenProgram(); Message = "이미 실행 중인 제작 화면을 사용합니다."; return; }
+            }
+            catch (System.Net.Http.HttpRequestException) { }
+            catch (TaskCanceledException) { }
+            if (_lifetime.IsCancellationRequested) return;
+        }
+        await LaunchProgramAsync();
+    }
     private void OpenExisting(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || (!Directory.Exists(path) && !File.Exists(path))) { Message = "실제 경로를 찾지 못했습니다."; return; }
@@ -169,9 +246,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         {
             // Opening an artifact reveals it; it does not silently execute an installer/script.
             var info = new ProcessStartInfo("explorer.exe") { UseShellExecute = false };
-            if (File.Exists(path)) info.Arguments = "/select,\"" + path + "\""; else info.ArgumentList.Add(path);
+            if (File.Exists(path) && System.IO.Path.GetExtension(path).ToLowerInvariant() is ".md" or ".txt")
+            {
+                info = new ProcessStartInfo("notepad.exe") { UseShellExecute = false };
+                info.ArgumentList.Add(path);
+            }
+            else if (File.Exists(path)) info.Arguments = "/select,\"" + path + "\""; else info.ArgumentList.Add(path);
             Process.Start(info)?.Dispose();
-            Message = "탐색기에서 열었습니다 · " + Path.GetFileName(path);
+            Message = File.Exists(path) && System.IO.Path.GetExtension(path).ToLowerInvariant() is ".md" or ".txt" ? "안내 파일을 열었습니다." : "파일·폴더 위치를 열었습니다.";
         }
         catch (Exception ex) { Message = "열기 실패 · " + ProcessRunner.Sanitize(ex.Message); }
     }
@@ -184,14 +266,15 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     }
     private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null)
     {
+        if (_jobs.IsProjectBusy(program.ProjectId)) { Message = "이 프로젝트에는 실행 중인 작업이 있습니다."; return; }
         try
         {
             UpdateProgramState(program, "실행 중 · " + command.Name);
             var result = await _jobs.RunAsync(program, command, _lifetime.Token, input);
             UpdateProgramState(program, result.State + (result.ExitCode is null ? "" : " · exit " + result.ExitCode));
-            Message = program.Name + " · " + result.State + " · 상세 로그: " + result.LogPath;
+            Message = program.DisplayName + " · " + program.StatusLabel + " · 작업 기록에서 결과를 확인하세요.";
         }
-        catch (Exception ex) { Message = ProcessRunner.Sanitize(ex.Message); AddLog(Message); }
+        catch (Exception ex) { UpdateProgramState(program, "실행 실패"); Message = ProcessRunner.Sanitize(ex.Message); AddLog(Message); }
         finally { UpdateRunningProperties(); }
     }
     public void StopProgram()
@@ -234,7 +317,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         foreach (var item in Projects.SelectMany(p => p.Functions).SelectMany(f => f.Programs).Where(p => p.Id == program.Id)) item.Status = state;
     }
     private void UpdateRunningProperties()
-    { OnPropertyChanged(nameof(RunningCount)); OnPropertyChanged(nameof(IsBusy)); OnPropertyChanged(nameof(ActivitySummary)); OnPropertyChanged(nameof(CanStopSelectedProgram)); }
+    { OnPropertyChanged(nameof(RunningCount)); OnPropertyChanged(nameof(IsBusy)); OnPropertyChanged(nameof(ActivitySummary)); OnPropertyChanged(nameof(CanStopSelectedProgram)); OnPropertyChanged(nameof(CanLaunchSelectedProgram)); }
     private void OnJobLog(string line)
     {
         if (!_disposed) _dispatcher.InvokeAsync(() => { if (_disposed) return; AddLog(line); UpdateRunningProperties(); });

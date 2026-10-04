@@ -41,14 +41,8 @@ public sealed class InstallationService
     {
         try
         {
-            var target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "DesktopCommanderRemote.cmd");
-            var backupDirectory = Path.Combine(ControlTowerSettings.DataDirectory, "backups", "desktop-commander");
-            var backup = Directory.Exists(backupDirectory) ? Directory.GetFiles(backupDirectory, "DesktopCommanderRemote.cmd.*.bak").OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault() : null;
-            if (backup is null) return Task.FromResult(new InstallationResult(false, installPath, "복구할 Desktop Commander 시작 파일 백업을 찾지 못했습니다."));
-            new StartupMigrationService().Restore(backup, target);
-            var launcher = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), SilentLauncherName);
-            if (File.Exists(launcher)) File.Delete(launcher);
-            return Task.FromResult(new InstallationResult(true, installPath, "기존 Desktop Commander 시작 파일을 복구했습니다."));
+            var detail = new RemoteBridgeService(new ProcessRunner()).RestoreStartup(Environment.GetFolderPath(Environment.SpecialFolder.Startup), ControlTowerSettings.DataDirectory);
+            return Task.FromResult(new InstallationResult(true, installPath, detail));
         }
         catch (Exception ex) { return Task.FromResult(new InstallationResult(false, installPath, ProcessRunner.Sanitize(ex.Message))); }
     }

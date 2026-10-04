@@ -52,6 +52,8 @@ public sealed class ProjectDiscoveryService
         var config = JsonSerializer.Deserialize<ProjectManifest>(File.ReadAllText(manifest), JsonOptions) ?? throw new InvalidDataException("빈 manifest");
         if (config.SchemaVersion != 1) throw new InvalidDataException("지원하지 않는 schemaVersion: " + config.SchemaVersion);
         if (string.IsNullOrWhiteSpace(config.Id) || string.IsNullOrWhiteSpace(config.Name)) throw new InvalidDataException("프로젝트 id/name이 필요합니다.");
+        if (config.Functions is null || config.Functions.Any(f => f is null || f.Programs is null || f.Programs.Any(p => p is null || p.Commands is null || p.Commands.Any(c => c is null))))
+            throw new InvalidDataException("functions/programs/commands 배열과 요소는 null일 수 없습니다.");
         var programIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var functionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var functions = config.Functions.Select(function =>
@@ -65,7 +67,7 @@ public sealed class ProjectDiscoveryService
                     if (string.IsNullOrWhiteSpace(program.Id) || !programIds.Add(program.Id)) throw new InvalidDataException("프로그램 id는 프로젝트 안에서 유일해야 합니다.");
                     var work = ResolveInside(directory, program.WorkingDirectory);
                     var path = ResolveInside(directory, program.Path);
-                    if (program.Commands.Any(c => string.IsNullOrWhiteSpace(c.FileName) || c.TimeoutSeconds < 0 || c.Arguments is null))
+                    if (program.Commands.Any(c => string.IsNullOrWhiteSpace(c.FileName) || c.TimeoutSeconds is < 0 or > 86400 || c.Arguments is null || c.Arguments.Any(a => a is null)))
                         throw new InvalidDataException("명령 fileName/arguments/timeoutSeconds를 확인하세요.");
                     return new ProgramItem
                     {
@@ -98,6 +100,7 @@ public sealed class ProjectDiscoveryService
         if (File.Exists(System.IO.Path.Combine(directory, "pyproject.toml")) || File.Exists(System.IO.Path.Combine(directory, "requirements.txt"))) return "Python";
         if (Directory.EnumerateFiles(directory, "*.csproj").Any() || Directory.EnumerateFiles(directory, "*.sln").Any()) return ".NET";
         if (Directory.EnumerateFiles(directory, "*.uproject").Any()) return "Unreal";
+        if (Directory.EnumerateFiles(directory, "*.exe").Any()) return "Windows 프로그램";
         return null;
     }
 
@@ -106,8 +109,8 @@ public sealed class ProjectDiscoveryService
         var id = "folder:" + directory.ToLowerInvariant();
         var program = new ProgramItem
         {
-            Id = id + "/source", ProjectId = id, Name = "소스 작업 폴더", Kind = kind,
-            Detail = "자동 발견된 후보입니다. 기능과 실행 프로그램은 project.control.json으로 등록하세요.",
+            Id = id + "/source", ProjectId = id, Name = "프로젝트 폴더", Kind = kind, KindLabel = "작업 폴더", ActionLabel = "폴더 보기",
+            Detail = "새로 발견한 폴더입니다. 작업 목적과 실행 방법을 확인해야 합니다.", Description = "새로 발견한 폴더입니다. 작업 목적과 실행 방법을 아직 확인하지 않았습니다.",
             Path = directory, WorkingDirectory = directory, Status = "자동 발견 · 명령 미등록"
         };
         var functions = new List<FunctionItem> { new() { Id = "workspace", Name = "작업 공간", Programs = [program] } };
@@ -131,10 +134,10 @@ public sealed class ProjectDiscoveryService
                 {
                     var executable = System.IO.Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase);
                     items.Add(new() { Id = projectId + "/" + System.IO.Path.GetRelativePath(directory, file), ProjectId = projectId,
-                        Name = System.IO.Path.GetFileName(file), Kind = executable ? "Windows 실행파일 · 발견 후보" : "Android 설치 산출물",
+                        Name = System.IO.Path.GetFileName(file), Kind = executable ? "Windows 실행파일 · 발견 후보" : "Android 설치 산출물", KindLabel = executable ? "용도 확인이 필요한 파일" : "휴대폰 설치파일", ActionLabel = "파일 위치 보기", Description = executable ? "실행파일이 발견됐지만 어떤 프로그램인지 아직 확인하지 않았습니다." : "휴대폰에 설치하는 파일입니다. PC에서 실행하는 프로그램이 아닙니다.",
                         Detail = "파일 존재를 확인했습니다. 정상 동작·설치·최신 버전 여부는 별도 검증이 필요합니다.",
                         Path = file, WorkingDirectory = System.IO.Path.GetDirectoryName(file)!, Status = "발견됨 · 검증 전",
-                        Commands = executable ? [new() { FileName = file, Name = "프로그램 실행" }] : [] });
+                        Commands = [] });
                 }
                 if (depth >= 4) return;
                 foreach (var child in Directory.EnumerateDirectories(folder).OrderBy(f => f, StringComparer.OrdinalIgnoreCase))

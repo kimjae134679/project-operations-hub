@@ -40,5 +40,16 @@ public sealed class ProjectDiscoveryTests : IDisposable
     public void RejectsPathEscape(string relative) => Assert.Throws<InvalidDataException>(() => ProjectDiscoveryService.ResolveInside(_root, relative));
     [Fact]
     public void MissingRootIsReportedNotInvented() => Assert.Single(new ProjectDiscoveryService().Scan(Path.Combine(_root, "missing")).Warnings);
+    [Theory]
+    [InlineData("{\"id\":\"bad\",\"name\":\"Bad\",\"functions\":[null]}")]
+    [InlineData("{\"id\":\"bad\",\"name\":\"Bad\",\"functions\":[{\"id\":\"f\",\"programs\":[null]}]}")]
+    [InlineData("{\"id\":\"bad\",\"name\":\"Bad\",\"functions\":[{\"id\":\"f\",\"programs\":[{\"id\":\"p\",\"commands\":[null]}]}]}")]
+    public void NullArrayElementsDoNotHideHealthyProjects(string json)
+    {
+        Directory.CreateDirectory(Path.Combine(_root, "bad")); Directory.CreateDirectory(Path.Combine(_root, "healthy"));
+        File.WriteAllText(Path.Combine(_root, "bad", "project.control.json"), json);
+        var result = new ProjectDiscoveryService().Scan(_root);
+        Assert.Equal("healthy", Assert.Single(result.Projects).Name); Assert.Single(result.Warnings);
+    }
     public void Dispose() => Directory.Delete(_root, true);
 }

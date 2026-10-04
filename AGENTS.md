@@ -19,6 +19,8 @@
 
 `000_사용자용/`은 사용자에게 보여주는 요약이며 AI 정책 원본이 아닙니다.
 
+관제 UI·프로젝트 이름·폴더 설명·사용자용 인수인계를 수정할 때는 `01_CONTROL/PROJECT_PRESENTATION_RULES.md`를 읽습니다. 실제 연결 정보는 `project.catalog.json`과 대상 프로젝트의 현재 안내·파일에서 확인하고, 사람용 요약은 `000_사용자용/11_프로젝트와_폴더_안내.md`와 함께 갱신합니다.
+
 ## 효율적인 탐색
 
 - 매번 저장소 전체나 긴 스레드 전체를 읽지 않습니다.
@@ -73,6 +75,7 @@
 - 정책 → `01_CONTROL/USER_POLICIES.md` + `000_사용자용/05_내_작업규칙.md`
 - 도구 채택·설치 → `01_CONTROL/TOOLS.md` 또는 `AI_INSTALLATIONS.md` + 사용자용 도구 현황
 - 프로젝트 등록 → `PROJECT_REGISTRY.md` + 해당 `02_PROJECTS/` + 사용자용 프로젝트 현황
+- 관제 화면·프로젝트 설명 → `01_CONTROL/PROJECT_PRESENTATION_RULES.md` + `project.catalog.json` + 사용자용 폴더 안내
 - 후보 조사 → `03_KNOWLEDGE/CANDIDATE_CATALOG/` + 사용자용 후보 요약
 - 소통 구조 → `04_COMMUNICATION/` + 사용자용 소통창구
 

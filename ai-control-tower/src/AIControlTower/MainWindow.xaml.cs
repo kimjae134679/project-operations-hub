@@ -14,19 +14,49 @@ public partial class MainWindow : Window
     private readonly InstallationService _installationService = new();
     private JevControlWindow? _jevWindow;
     private ListBox? _activeProgramList;
+    private Task? _initializeTask;
 
     public MainWindow()
     {
         InitializeComponent();
         DataContext = _viewModel;
-        Loaded += async (_, _) =>
-        {
-            _viewModel.ReduceMotion = !SystemParameters.ClientAreaAnimation;
-            FadeIn(WorkspaceContent);
-            await _viewModel.DiscoverAsync();
-            await _viewModel.RefreshAsync();
-        };
+        Loaded += async (_, _) => await InitializeAsync();
+        SizeChanged += (_, _) => ApplyResponsiveLayout();
+        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) ApplyResponsiveLayout(); };
         Closed += (_, _) => _viewModel.Dispose();
+    }
+
+    public Task InitializeAsync() => _initializeTask ??= InitializeCoreAsync();
+
+    private async Task InitializeCoreAsync()
+    {
+        ApplyResponsiveLayout();
+        if (!SystemParameters.ClientAreaAnimation) _viewModel.ReduceMotion = true;
+        FadeIn(WorkspaceContent);
+        await _viewModel.DiscoverAsync();
+        await _viewModel.RefreshAsync();
+    }
+
+    private void ApplyResponsiveLayout()
+    {
+        if (ContentShell is null) return;
+        var compact = ActualHeight < 820;
+        var narrow = ActualWidth < 1220;
+        ContentShell.Margin = compact ? new Thickness(20, 14, 20, 10) : new Thickness(24);
+        PageHeader.Margin = new Thickness(0, 0, 0, compact ? 8 : 14);
+        WorkspaceContent.Margin = new Thickness(0, compact ? 10 : 16, 0, 0);
+        CatalogColumn.Width = new GridLength(narrow ? 286 : 328);
+        InspectorColumn.Width = new GridLength(narrow ? 254 : 280);
+        ProjectHeader.Padding = new Thickness(compact ? 16 : 20);
+        ProjectHeader.Margin = new Thickness(0, 0, 0, compact ? 12 : 16);
+        ProjectTitle.FontSize = narrow ? 23 : 26;
+        ProjectDescription.MaxHeight = compact ? 22 : 44;
+        ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
+        JobLogList.Height = compact ? 65 : 100;
+        LogPanel.Margin = new Thickness(0, compact ? 8 : 14, 0, 0);
+        var hideMetadata = compact && _viewModel.HasSelectedCommands;
+        InspectorMetadata.Visibility = hideMetadata ? Visibility.Collapsed : Visibility.Visible;
+        InspectorMetadataRow.Height = hideMetadata ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
     }
 
     private void FadeIn(UIElement element)
@@ -47,7 +77,6 @@ public partial class MainWindow : Window
     private void Projects_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.OriginalSource != sender || e.AddedItems.Count == 0 || WorkspaceContent is null) return;
-        if (_activeProgramList is not null) _activeProgramList.SelectedItem = null;
         _activeProgramList = null;
         FadeIn(WorkspaceContent);
     }
@@ -55,7 +84,6 @@ public partial class MainWindow : Window
     private void Programs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ListBox list || e.AddedItems.Count == 0 || e.AddedItems[0] is not ProgramItem program) return;
-        if (_activeProgramList is not null && _activeProgramList != list) _activeProgramList.SelectedItem = null;
         _activeProgramList = list;
         _viewModel.SelectedProgram = program;
         FadeIn(ProgramInspector);
@@ -74,7 +102,7 @@ public partial class MainWindow : Window
     private async void EnsureRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.EnsureRemoteRunningAsync();
     private void OpenProject_Click(object sender, RoutedEventArgs e) => _viewModel.OpenProject();
     private void OpenProgram_Click(object sender, RoutedEventArgs e) => _viewModel.OpenProgram();
-    private async void LaunchProgram_Click(object sender, RoutedEventArgs e) => await _viewModel.LaunchProgramAsync();
+    private async void LaunchProgram_Click(object sender, RoutedEventArgs e) => await _viewModel.ActivateSelectedProgramAsync();
     private void StopProgram_Click(object sender, RoutedEventArgs e) => _viewModel.StopProgram();
 
     private async void ChooseRoot_Click(object sender, RoutedEventArgs e)
@@ -136,6 +164,6 @@ public partial class MainWindow : Window
     private async void Restore_Click(object sender, RoutedEventArgs e)
     {
         var result = await _installationService.RestoreDesktopCommanderStartupAsync(ResolveInstallPath(), CancellationToken.None);
-        MessageBox.Show(this, result.Detail, "Desktop Commander 복구", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
+        MessageBox.Show(this, result.Detail, "공유 연결 복구", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }
 }

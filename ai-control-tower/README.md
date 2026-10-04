@@ -1,73 +1,85 @@
-﻿# AI Control Tower
+# AI Control Tower
 
-Windows에서 Desktop Commander Remote, Jev, Codex, GitHub CLI, n8n, AI Ops Runner와 전달 체인의 상태를 실제 확인 근거로 표시하는 .NET 9 WPF 관제탑입니다.
+Windows에서 여러 프로젝트의 **용도·폴더·프로그램·자료**를 한곳에서 찾고 실제 작업을 여는 로컬 관리 앱입니다. 첫 화면은 한국어 이름과 용도로 정리한 **내 프로젝트**, 공통 연결과 앱 관리는 **연결·관리**로 나눕니다.
 
-## 현재 배포 상태
+현재 검증 PC의 카탈로그는 **6개 프로젝트, 24개 프로그램·자료 항목**입니다. 이 숫자는 확인한 PC의 목록이며 다른 폴더를 선택하면 달라집니다.
 
-최신 소스에는 좌측 탐색 메뉴, 한 개의 전체 세로 스크롤 영역, 별도 Jev 작업 제어 창이 포함되어 있습니다. 2026-09-20 최종 단일 EXE publish와 `%LocalAppData%\AIControlTower\AIControlTower.exe` 설치본 교체를 완료했고, 두 파일의 SHA-256은 동일합니다: `89A4B961CA2F92EFBE53B1B872E18F843BB6478BDB418071BDA2A4B7DBCD4C3B`. 설치본 실행 프로세스 PID `29428`도 확인했습니다.
+| 프로젝트 | 하는 일 | 관련 폴더의 역할 |
+|---|---|---|
+| 멀티의 신 | 게임 개발, 휴대폰 설치파일과 사용 안내 확인 | 현재 개발 / 이전 개발 / 과거 테스트 / 복구 자료 |
+| 무직전생 오디오북 | 텍스트를 분석하고 등장인물별 음성 제작 | 실제 제작 / 이전 코드 보관 |
+| 영상·음원 저장 | 주소 목록과 저장 결과 관리 | 실제 실행 |
+| 전체 프로젝트 관리 | 공통 기준·도구 안내·인수인계 관리 | 관리 기준 / 설치 위치 |
+| 주식 자동매매 | 준비 폴더 확인 | 준비 중, 실행 기능 미등록 |
+| 청약 도구 | 준비 폴더 확인 | 준비 중, 실행 기능 미등록 |
 
-배포 대상 경로:
+## 사용 방법
 
-- 빌드 출력: `artifacts/win-x64/AIControlTower.exe`
-- 권한 제한 시 설치 대상: `%LocalAppData%\AIControlTower\AIControlTower.exe`
+1. 창 위쪽의 `프로젝트 폴더 선택`으로 상위 폴더를 지정합니다. 기본 탐색 경로는 `D:\A_KJ\AI`입니다. 폴더를 창으로 끌어와 연결할 수도 있습니다.
+2. `내 프로젝트`에서 이름·용도·역할을 보고 프로젝트를 선택합니다. 프로젝트 검색과 프로그램·자료 검색으로 필요한 항목을 찾습니다.
+3. 기능별 목록에서 자료 또는 프로그램을 고릅니다. 오른쪽에서 설명을 확인하고 `제작 화면 시작·열기`, `설치파일 위치 보기`, `안내 파일 보기` 등 해당 항목의 행동을 사용합니다.
+4. 등록 명령이 있는 프로그램에만 명령 선택과 별도 열기·중지 버튼이 나타납니다. 자료 항목은 폴더를 열거나 파일 위치를 보여주며, `.md/.txt` 안내 파일은 메모장으로 엽니다. APK나 용도 미확인 EXE를 자동 실행하지 않습니다.
+5. 폴더 위치와 작업 기록은 필요할 때 펼칩니다. 보관 자료와 개발·점검 도구는 기본 접힘이며 검색하면 일치하는 그룹이 펼쳐집니다.
+6. `연결·관리`에서 원격 연결, AI 작업 전달, 자동 시작, 설치·복구와 화면 전환 설정을 관리합니다. 자세한 확인 결과는 접어서 볼 수 있습니다.
 
-최종 publish 뒤에는 다음 명령으로 아티팩트와 설치본의 SHA-256이 같은지 확인합니다.
+## 프로젝트 소개 카탈로그
+
+허브 루트의 [project.catalog.json](../project.catalog.json)에 확인한 프로젝트 이름·용도·폴더 역할·기능·행동과 확인 근거를 기록합니다. `ProjectCatalogService`가 발견 결과에 이를 적용합니다. 관련된 이전·테스트·복구 폴더는 해당 프로젝트 안으로 묶어 보여주며 **실제 폴더를 옮기거나 삭제하지 않습니다**.
+
+카탈로그는 앱에 포함되는 리소스이므로 변경 후 다시 빌드해야 합니다. 현재 카탈로그의 기준 루트를 선택했을 때 확인된 외부 제작 폴더도 연결합니다. 다른 루트를 고르면 그 루트 안에 있는 카탈로그 항목만 반영합니다. 존재하지 않는 프로젝트·자료는 등록하지 않으며, 사용할 수 없는 실행 도구의 명령은 제외합니다.
+
+확인하지 않은 새 폴더는 `새로 발견`으로 표시합니다. `.git`, Node/Python/.NET/Unreal 파일 등을 탐색 단서로 사용하지만 용도나 실행 방법을 추정해 붙이지 않습니다. 발견한 EXE·APK·AAB는 위치를 볼 수 있는 자료 후보이며 정상 작동이나 사용 검증 완료를 뜻하지 않습니다. 최근 게임 APK는 파일명의 버전 순으로 선택하고 사용 확인된 완료본과 따로 표시합니다.
+
+## 기능·프로그램 등록
+
+실제 프로젝트 폴더에 `project.control.json`을 두면 자동 인식합니다. 스키마 1에서 `id`, `name`, `functions[].id/name`, `programs[].id/name/path/workingDirectory/commands[]`로 계층을 지정합니다. 예시: [project.control.json](examples/project.control.json). 이 허브 루트의 manifest는 실제 운영 문서·WPF 소스·.NET 검사 기능을 등록합니다.
+
+- 프로젝트 ID와 프로젝트 안의 기능/프로그램 ID는 유일해야 합니다.
+- `path`, `workingDirectory`는 프로젝트 내부 상대 경로입니다. 존재하지 않는 작업 폴더는 실행 실패로 표시하며 다른 폴더로 바꾸지 않습니다.
+- 명령은 `fileName` 실행파일과 `arguments` 문자열 배열입니다. 입력 문자열을 CMD 명령으로 이어 붙이지 않습니다.
+- `.cmd/.bat/.ps1`을 직접 실행파일로 등록하지 않습니다. 필요하면 `node.exe`와 npm CLI 스크립트, `powershell.exe`와 `-File` 등을 명시적으로 등록합니다. 모든 명령은 해당 사용자 권한으로 실행됩니다.
+- `timeoutSeconds`는 0~86400입니다. 0은 자동 시간 제한이 없는 프로그램입니다.
+- 외부 프로세스를 이름만 보고 임의 종료하지 않습니다. 관제탑이 직접 시작한 Windows job과 그 자식만 중지합니다.
+- 탐색은 프로젝트 깊이 3, 산출물 깊이 4/폴더 300/산출물 40개로 제한합니다. 더 깊은 구조나 별도 기능은 manifest로 명시합니다. 링크·archive·dependency 폴더는 우선 제외합니다.
+- 폴더 감시와 1분 재탐색으로 변경을 반영합니다. 도구 probe는 20초 간격입니다. 확인되지 않은 인증·외부 상태는 내부 `Unknown`, 화면에서는 `미확인`으로 표시합니다.
+
+Unity 편집기는 확인된 기존 열기 스크립트로 엽니다. 같은 게임 프로젝트의 중복 열기는 기존 스크립트가 막습니다. 편집기는 관제탑 작업 수명에 묶지 않으므로 앱 종료·중지가 미저장 편집을 강제 종료하지 않습니다. `개발 폴더 보기`는 별도로 제공합니다. 실제 편집기 열기는 이번 검증에서 수행하지 않았습니다.
+
+## 작업 상태와 로그
+
+같은 프로젝트는 작업 하나가 실행되며 서로 다른 프로젝트는 최대 3개까지 처리합니다. Windows job object로 자식까지 관리합니다. 실제 stdout/stderr, 부모 종료 코드, `queued/running/succeeded/failed/cancelled/timed_out/interrupted` 상태를 저장합니다. 부모가 종료해도 자식이 살아있으면 작업은 유지되며 중지·시간 제한이 적용됩니다. 성공은 등록된 명령의 종료 코드 기준이며 산출물 정확성·실기기 검증을 대신하지 않습니다.
+
+사용자 설정·이전 큐·작업 기록·리모트 백업은 `%LocalAppData%\AIControlTower`에 유지됩니다. 작업마다 `runs/<task-id>/result.json`과 `output.log`를 저장합니다. 갑작스러운 이전 앱 종료 기록은 다음 실행에 `interrupted`로 표시하며 작업을 자동 재실행하지 않습니다. UI 로그는 최근 500줄만 표시합니다. 비밀값 표현은 생략하고 Codex JSONL은 이벤트 종류와 usage를 남기며 원본 프롬프트·도구 명령 JSON을 기록하지 않습니다.
+
+텍스트 큐는 이전 데이터로 보존하며 자동 실행하지 않습니다. 프로젝트가 없는 옛 `.txt`를 새 실행기의 작업으로 추측하지 않습니다.
+
+## 공유 Remote Desktop Commander
+
+정리 전 PC 조사에서는 시작 등록 두 개와 여러 Node PID가 확인됐으며, 여러 PID는 하나의 부모·자식 트리에 속했습니다. 프로세스 개수와 연결 개수를 구분합니다. 프로세스 트리 확인은 서비스의 실제 Online·인증 상태를 대신하지 않습니다.
+
+`자동 시작 정리`는 기존 `DesktopCommanderRemote.cmd`와 `AIControlTower-DesktopCommanderSilent.vbs`를 백업한 뒤 `AIControlTower-RemoteBridge.vbs` 하나로 등록합니다. supervisor는 named mutex와 현재 리모트 프로세스 확인으로 같은 연결을 재사용하고 npm의 기존 cache를 사용해 숨김으로 시작합니다. 로그인 시 자동 설치·업그레이드하지 않습니다. 연결 프로세스의 부모·자식을 강제로 정리하거나 현재 Online 연결을 끄지 않습니다.
+
+복구는 새 백업 또는 이전 백업의 `DesktopCommanderRemote.cmd` 하나를 되돌리고 관제탑 런처를 제거합니다. 리모트 서비스는 관제탑 종료·제거와 무관하게 유지됩니다. 이전 수동 자동연결 배치를 다시 실행하면 그것이 시작 파일을 재생성할 수 있으므로 통합 상태를 다시 확인합니다. 새로운 로그인/재부팅에서의 실제 재연결은 별도 검증 대상입니다.
+
+## Jev
+
+사용은 허용되어 있고 **선택 사용**입니다. `연결·관리`의 `AI 작업 전달` 창에서 `Jev로 작업 전달 사용`을 켠 작업만 설치된 `jev-router` Node 런처를 통해 `codex exec --json --sandbox workspace-write -`로 시작합니다. 작업은 stdin으로 전달하며 비밀값은 프롬프트에 넣지 않습니다. 키 값은 표시하지 않습니다. 현재 또는 Windows 사용자 환경에 설정된 Jev 키를 자식에 전달합니다.
+
+Jev 설치·키 존재·Codex ChatGPT 로그인과 실제 인증/라우팅 왕복/업무 성공은 별개입니다. 이 개편의 검증에 유료 API 호출은 필요하지 않으며 Jev 왕복 테스트를 수행했다고 주장하지 않습니다. 실패·fallback·모델 사용량은 실제 작업에서 비교합니다. 추가 결제 없이 가능한 범위에서 선택합니다.
+
+## 디자인과 검증
+
+[디자인 비교 및 적용 기준](docs/DESIGN_REFERENCES.md)에 Linear 프로젝트 목록, Notion 갤러리, Things 3와 shadcn의 공식 자료를 비교했습니다. 따뜻한 회백색 바탕, 흰색 내용 영역, 남색 본문과 파란 기본 행동을 사용합니다. 영어 배너·통계 카드·일상 사용에 불필요한 도구 상태를 첫 화면에서 제거했습니다. 전환은 160ms이며 Windows 애니메이션 해제와 사용자 움직임 줄이기를 존중합니다.
+
+Windows 테스트 **36개**를 통과했습니다. 카탈로그의 관련 폴더 묶기·최신 APK 버전 선택·다른 루트 제외, 검색의 실제 항목 동일성, 발견·명령·작업 중지와 기록 등을 검사합니다. 네이티브 화면 검증은 실제 프로젝트 데이터와 `.NET --version` 명령으로 확인하며, 게임 실기기 실행·오디오북 GPU 제작·영상 다운로드·Jev 왕복 성공은 검증했다고 주장하지 않습니다. 최종 화면과 결과는 [검증 기록](docs/VERIFICATION-20261005.md)에 남깁니다.
+
+## 빌드·배포·복구
 
 ```powershell
-Get-FileHash artifacts\win-x64\AIControlTower.exe -Algorithm SHA256
-Get-FileHash "$env:LocalAppData\AIControlTower\AIControlTower.exe" -Algorithm SHA256
+dotnet test ai-control-tower/AIControlTower.sln --nologo
+dotnet publish ai-control-tower/src/AIControlTower/AIControlTower.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o <staging>
 ```
 
-```powershell
-.\AIControlTower.exe
-```
+Windows .NET 9 SDK가 필요합니다. 기본 앱 위치는 `D:\A_KJ\AI\Applications\AIControlTower`; D 경로에 쓸 수 없으면 LocalAppData를 사용합니다. 설치 EXE는 교체 전에 백업합니다. 제거는 관제탑 자동 시작과 실행파일만 대상으로 하며 사용자 데이터·작업 기록·리모트 연결을 유지합니다. 한 세션에서 두 번째 관제탑 실행은 기존 창을 활성화합니다.
 
-## 주요 기능
-
-- 5초 간격 상태 자동 갱신 및 수동 갱신
-- Desktop Commander, Jev, Codex, GitHub CLI, n8n, AI Ops Runner 상태 표시
-- 외부 GPT 세션처럼 로컬에서 증명할 수 없는 구간은 `Unknown`으로 표시
-- AA_01·AA_02 참고의 화이트·블루 대시보드, 상태 배지, 다크 실시간 작업 콘솔
-- 고정 좌측 메뉴와 하나의 전체 세로 스크롤로 대시보드·도구 상태·설치/복구 구역 이동
-- Jev 작업 제어는 대시보드에서 분리된 단일 별도 창으로 열림
-- 로컬 Jev 실행은 사용자 OpenAI 계정 사용 방침에 따라 기본적으로 차단
-- 비밀번호·API 키·토큰 값 비표시
-- 설치, 제거, Desktop Commander 시작 구성 복구
-
-## 설치와 복구
-
-앱의 **설치** 버튼은 실행 중인 EXE를 우선 `C:\Program Files\_My\AI\Applications\AIControlTower`에 복사하고, 권한 오류일 때 `%LocalAppData%\AIControlTower`를 사용합니다. 현재 사용자 시작 프로그램에 관제탑을 등록합니다.
-
-기존 `DesktopCommanderRemote.cmd`가 존재하면 설치 전 해당 파일을 앱 설치 폴더의 `backups\desktop-commander`에 백업합니다. 이후 기존 표시형 시작 파일은 비활성화하고 숨김 VBS 시작 런처로 교체합니다. **Desktop Commander 복구**는 이 백업이 있을 때만 기존 시작 파일을 되돌립니다.
-
-제거는 관제탑 자동 시작과 숨김 런처를 제거합니다. 설치된 EXE 자체에서 제거를 누른 경우에는 실행 중인 파일을 즉시 삭제할 수 없으므로 앱을 종료한 뒤 설치 폴더를 지웁니다.
-
-## 알려진 한계
-
-- GPT 외부 세션에서 Desktop Commander/Jev로 실제 메시지가 전달됐는지는 로컬 PC만으로 증명할 수 없어 `Unknown`으로 표시됩니다.
-- Jev는 로컬 OpenAI/ChatGPT 계정 사용을 막기 위해 명령·환경 확인과 작업 실행을 하지 않고 비활성 상태로 표시합니다.
-- 각 도구의 CLI 로그인 상태는 현재 PC의 비대화형 명령 결과에 의존합니다.
-
-## 개발 검증
-
-```powershell
-dotnet test tests\AIControlTower.Tests\AIControlTower.Tests.csproj -c Release
-dotnet build AIControlTower.sln -c Release
-dotnet publish src\AIControlTower\AIControlTower.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts\win-x64
-```
-
-탐색 화면 변경 기준으로 `dotnet test tests\AIControlTower.Tests\AIControlTower.Tests.csproj -c Release`는 11개 통과, `dotnet build AIControlTower.sln -c Release`는 경고·오류 0개를 기록했고 최종 publish도 성공했습니다. artifact와 설치본의 SHA-256 일치는 위 배포 상태에 기록했습니다. CUA에는 native app surface가 없어 자동 화면 캡처는 하지 못했으므로, 다음 화면 모양은 사용자가 직접 확인해야 합니다.
-
-- 좌측 메뉴가 보이고 모든 주 구역이 하나의 세로 스크롤에서 접근되는지
-- Jev 작업 제어가 별도 창으로 열리고 실행 버튼이 정책 설명과 함께 비활성인지
-- GPT 스케줄러·예약·브라우저·권한 자동 클릭 UI가 없는지
-
-## GPT 작업 큐
-
-`%LocalAppData%\AIControlTower\queue\inbox`에 작업당 하나의 `.txt` 파일을 만들 수 있습니다. 단, 현재 로컬 Jev 실행 정책이 비활성화되어 있으므로 관제탑은 파일을 `processing`으로 이동하거나 실행하지 않습니다. 정책을 별도로 변경할 때에만 원자 이동·완료 이력(`archive`)·결과(`result`) 흐름을 사용합니다.
-
-
-## 실제 설치 검증 기록
-
-2026-09-20에 %LocalAppData%\AIControlTower 설치, 현재 사용자 자동 시작, AIControlTower-DesktopCommanderSilent.vbs 생성 및 기존 Desktop Commander 시작 CMD 백업을 확인했습니다. 설치를 다시 실행하면 원본 CMD가 이미 없으므로 전환 대상이 없다는 안내가 나올 수 있습니다. 최신 탐색 화면 단일 EXE로 설치본을 교체하고 SHA-256 일치 및 PID `29428` 실행까지 확인했으며, 화면 모양은 사용자가 직접 확인해야 합니다.
-
+실제 빌드·화면·실행 검증과 최종 산출물 해시는 [검증 기록](docs/VERIFICATION-20261005.md)에 기록합니다.
