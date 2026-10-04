@@ -1,4 +1,4 @@
-﻿namespace AIControlTower.Services;
+namespace AIControlTower.Services;
 
 public static class EnvironmentProbe
 {
@@ -8,7 +8,7 @@ public static class EnvironmentProbe
         return candidates.FirstOrDefault(File.Exists);
     }
 
-    public static bool HasAnyEnvironmentVariable(params string[] names) => names.Any(name => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(name)));
+    public static bool HasAnyEnvironmentVariable(params string[] names) => names.Any(name => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(name)) || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.User)));
 
     private static IEnumerable<string> BuildCandidates(string command)
     {
@@ -19,3 +19,4 @@ public static class EnvironmentProbe
             yield return Path.Combine(folder.Trim('"'), command + extension);
     }
 }
+
