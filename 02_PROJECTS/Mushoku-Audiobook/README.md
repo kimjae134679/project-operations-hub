@@ -1,26 +1,26 @@
 # Mushoku Tensei AI Audiobook
 
-- 실제 저장소: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
-- 로컬 작업 폴더: `D:\AI\VoiceAudiobook`
-- 실행: `RUN_Audiobook.bat` / 바탕화면 무직전생 AI 오디오북
-- 자료 전체 연결: `assets/README.md`, 로컬 `assets/local`
-- 최종 출력 언어: 한국어
-
-## 재개 순서
-
-1. 실제 저장소의 `00_START_HERE/CURRENT_HANDOFF.md`.
-2. `docs/VALIDATION_20261005.md`와 필요한 코드.
-3. 복구 대본 `dubbing_ready_v2`, 기존 참조 `voice_resource_pack`.
-4. 필요한 경우 T-0012 소통 기록.
+- 저장소: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
+- 실제 루트: `D:\AI\VoiceAudiobook`
+- 실행: RUN_Audiobook.bat / http://127.0.0.1:7862
+- 새 비교 폴더: comparison/20261005_감정장면_재비교
+- 듣기: RUN_EmotionSamples.bat / 바탕화면 무직전생 새 감정장면 듣기
+- 자료 연결: assets/local의 기존 13개 연결과 docs/ASSET_INDEX.md
+- Ollama 모델: D:\AI\models\ollama. 이 프로젝트는 사용자가 명시한 D드라이브 예외입니다.
 
 ## 현재 상태
 
-기존 대사 따옴표 판정 손상을 복구했습니다. 이전의 전권 화자 정리 완료 표현은 정정하며, 남은 화자를 문맥 검수 중입니다. 기존 대본과 원문은 보존합니다.
+원문을 대조한 10개 소설 장면의 슬픔·격변·전투·애정 MP3, 실피·에리스 참조 비교, 한국어 VoiceDesign 원본 비교를 생성했습니다. 개별 26개 중 시험본 1개는 반복 전사 이상으로 보류했습니다. 재생 폴더에는 개별 25개와 약 6분56초 기본 모아듣기가 있습니다. 전체 파일 디코딩과 일부 전사를 확인했으며 자연스러운 연기는 청취 승인이 필요합니다.
 
-CosyVoice3 캐릭터별 실행기와 기본/감정 비교 장면을 실제 생성·검증했습니다. Qwen VoiceDesign+VC 비교본도 보존합니다. 감정·발음·목소리 닮음의 최종 청취 판단과 전권 MP3는 미완료입니다.
+이전 감정본의 느림·실피 억양·하이브리드 이질감 피드백을 반영해 soft voice 강제 기본값을 제거하고 기본 감정 제어를 껐습니다. 기존 기본본은 보존합니다.
 
-검수는 불확실 구간만 대상으로 로컬 처리하며, 캐시·체크포인트·GPU 작업 순서 제어를 사용합니다. 실제 코드와 진행 수치는 프로젝트 저장소 및 로컬 progress.json을 우선합니다.
+자동 화자 판정은 제한된 회귀 검증에서 25/47 및 별도 수치 오류로 미통과했습니다. 전권 자동 검수·미검증 대본 렌더는 보류입니다. 전권 MP3·최종 연기 품질이 완성됐다고 보고하지 않습니다. 25권 원문·전처리·자동 제안은 보존합니다.
 
-사용자 지시에 따라 기존 D:\AI를 기준으로 환경·자료를 재사용합니다. Ollama 모델도 D:\AI\models\ollama에 있습니다. 일반 C드라이브 설치 규칙의 프로젝트별 예외입니다.
+## 재개
 
-마지막 정리: 2026-10-05.
+1. 실제 저장소의 00_START_HERE/CURRENT_HANDOFF.md.
+2. docs/LISTENING_SUITE_20261005.md와 docs/LISTENING_FEEDBACK_20261005.md.
+3. 로컬 output/listening_suite_20261005/final_summary.json 및 context_accuracy.json.
+4. T-0012 기록. 전체 대화와 자료를 반복해 가져오지 않습니다.
+
+최신 코드: b75ef633c598428c081a5ff0063612b9cda432da. 업데이트: 2026-10-05 KST.
