@@ -208,6 +208,7 @@
 - `CONTENT_MEDIA.md` — MoneyPrinterTurbo/HyperFrames/VoxCPM
 - `FINANCE_AND_OSINT.md` — TradingAgents/Fincept/Flowsint
 - `SOURCE_BOOKMARKS.md` — 사용자가 준 원문 링크와 공식 원본
+- `UI_DESIGN_REFERENCES.md` — UI/UX 작업 전에 비교할 무료·오픈소스 디자인/컴포넌트/아이콘/SVG 레퍼런스와 필수 디자인 절차
 - `AMBIGUITIES.md` — 원본 특정 실패/이름 충돌
 - 개별 후보 문서 — `DPRINT.md`, `OSV_SCANNER.md`, `TOMBI.md`, `MARKDOWNLINT_CLI2.md`, `YAMLLINT.md`, `JEV_ROUTER.md` 등
 

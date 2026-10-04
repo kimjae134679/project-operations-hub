@@ -1,156 +1,386 @@
-# UI / Design / Agent-Rule References
+# UI / Design Reference Library
 
-확인일: **2026-09-15**
+확인일: **2026-10-05**
 
-이 문서는 설치 도구뿐 아니라 앞으로 UI/AGENTS/Skills를 정리할 때 다시 볼 참고자료를 모읍니다.
+이 문서는 AI에게 UI/UX/웹/데스크톱 앱 디자인을 맡길 때 **AI 서비스가 아니라, AI에게 보여주고 참고시키는 무료·오픈소스 레퍼런스**를 모읍니다.
 
----
+핵심 목적은 하나입니다.
 
-## 1. SceneAI
-
-- 사이트: https://sceneai.art/
-- 종류: **웹 UI/landing page용 AI prompt library**
-- 상태: `REFERENCE`
-
-### 확인된 정체
-사이트가 스스로 설명하는 핵심은 **“Beautiful AI Prompt Library, Made for Creators”**입니다.
-완성된 앱 프레임워크가 아니라 AI에게 웹 섹션/랜딩 페이지/배경을 만들게 할 때 재사용할 수 있는 prompt와 시각 레퍼런스를 모은 서비스입니다.
-
-현재 사이트에서 확인되는 범주:
-- landing page / hero section prompt
-- gradients
-- animated backgrounds
-- portfolio/agency/product page 계열 디자인 prompt
-- premium all-access 영역
-
-### 우리한테 의미
-AI가 UI를 만들 때 항상 비슷한 카드/그라데이션/대시보드를 뱉는 문제를 줄이기 위한 **시각 레퍼런스/프롬프트 아이디어 저장소**로 유용합니다.
-
-### 쓰는 방식
-UI 프로젝트를 시작할 때:
-1. 현재 앱의 목적/사용 흐름 먼저 결정
-2. SceneAI에서 분위기/section 레퍼런스 선택
-3. prompt를 그대로 복사하는 대신 우리 정보구조와 component에 맞게 축약
-4. 실제 PC/모바일 화면에서 사용성 검증
-
-### 주의
-- 유료/Premium 콘텐츠가 있음
-- prompt 결과물이 곧 좋은 UX라는 뜻은 아님
-- 라이선스/상업 이용조건은 실제 사용 전에 사이트 License Agreement 확인
+> **AI가 첫 생각대로 평범한 카드/그라데이션/대시보드 UI를 찍어내지 않게 하고, 실제 좋은 레퍼런스를 여러 개 비교한 뒤 더 완성도 높은 결과를 만들게 한다.**
 
 ---
 
-## 2. Adam Kucharski — “Ten reasons your vibe-coded dashboard looks terrible”
+## 0. 디자인 작업 기본 규칙 — 반드시 먼저 적용
 
-- 원문: https://kucharski.substack.com/p/ten-reasons-your-vibe-coded-dashboard
-- 게시: 2026-09-02
-- 종류: **AI 생성 dashboard 디자인 비평/참고 글**
-- 상태: `REFERENCE`
+UI/UX를 새로 만들거나 크게 손볼 때 바로 코딩부터 시작하지 않습니다.
 
-### 확인된 핵심
-글은 AI에게 CSV와 “visually attractive interactive dashboard”만 주었을 때 나오는 전형적인 결과가 왜 보기 나쁜지 분석합니다.
+### 필수 순서
 
-현재 원문에서 직접 확인된 핵심 문제 중 대표:
-- **No user journey** — 사용자가 왜 이 화면을 보고 무엇을 해야 하는지 흐름이 없음
-- **No visual hierarchy** — 모든 카드/그래프가 비슷한 강조도로 보여 중요도 구분이 없음
+1. 화면 목적과 가장 중요한 사용자 행동을 먼저 정의합니다.
+2. 아래 무료 레퍼런스에서 **최소 3개 이상** 가까운 사례를 찾습니다.
+3. 한 사이트만 복제하지 말고 각 레퍼런스에서 좋은 점을 분리합니다.
+   - 전체 레이아웃
+   - 버튼/입력창/카드
+   - 아이콘
+   - 색상
+   - 여백/타이포
+   - 상태 표시
+   - 애니메이션/피드백
+4. 현재 프로젝트 성격에 맞게 재조합합니다.
+5. 구현 후 실제 화면에서 정보 위계, 조작성, 밀도, 가독성을 다시 검증합니다.
 
-### Workbench UI 원칙과 연결
-우리 공통 UX 규칙의:
+### 금지
+
+- 아무 레퍼런스도 안 보고 AI 기본 스타일 그대로 구현
+- 모든 화면을 둥근 카드 + 그라데이션 + 큰 제목으로 통일
+- 기능만 들어갔다는 이유로 디자인 완료 처리
+- "예쁘게", "모던하게" 같은 추상적인 말만으로 디자인 결정
+- 한 레퍼런스를 거의 그대로 복제해 프로젝트 정체성을 없애기
+- 유료 템플릿/유료 에셋을 기본 전제로 설계
+
+### 목표
+
+**레퍼런스를 베끼는 것이 아니라 좋은 디자인 결정을 수집해서 조합한다.**
+
+---
+
+# 1. UI 컴포넌트 / 앱 화면
+
+## Uiverse
+
+- https://uiverse.io/
+- 비용: **무료**
+- 라이선스: 주로 MIT 기반 공개 컴포넌트
+- 용도: 버튼, 토글, 체크박스, 입력창, 카드, 로더, 애니메이션 UI
+
+### AI에게 주는 방식
 
 ```text
-현재 상태
-→ 지금 할 행동
-→ 결과
-→ 상세
+이 Uiverse 컴포넌트의 구조와 인터랙션을 참고하되
+현재 프로젝트 디자인 시스템에 맞게 색상, 크기, 여백, 상태를 다시 설계해.
+그대로 복붙하지 말고 더 일관되게 통합해.
 ```
-
-과 같은 방향입니다.
-
-즉 디자인을 “예쁜 카드 많이 놓기”로 보지 않고:
-- 가장 먼저 봐야 하는 정보
-- 다음 행동
-- 주요/보조 정보의 위계
-- 화면을 따라가는 사용자 여정
-을 먼저 정해야 합니다.
-
-### 적용처
-- Market Radar
-- ChungYack
-- ORV Inspector
-- Burgundy web UI
-- 각종 dashboard/settings 화면
 
 ---
 
-## 3. AGENTS.md / Skills 경량화 관련 SNS 참고
+## shadcn/ui
 
-사용자가 전달한 스크린샷/링크의 요지는 다음과 같습니다.
+- https://ui.shadcn.com/
+- 비용: **무료 / 오픈소스**
+- 용도: 대시보드, 사이드바, 로그인, 설정, 폼, 테이블, 차트, 전체 앱 구조
 
-### 문제 제기
-- AGENTS.md가 오래된 지침을 계속 누적
-- Skill trigger가 너무 넓음
-- 현재 작업과 상관없는 문서를 강제로 로드
-- 중복 확인/충돌 규칙으로 Agent가 저위험 작업까지 멈춤
-- 모델은 좋아졌는데 옛 모델용 안전장치가 그대로 남음
+Uiverse가 작은 부품이라면 shadcn/ui는 **화면과 앱 구조 참고용**입니다.
 
-### 유지해야 한다고 강조된 것
-- production environment 보호
-- 삭제/권한 변경 같은 위험 작업 경계
-- secret/민감정보 보호
-- 비가역 작업 승인
-- 필요한 테스트
+특히 참고할 것:
+- sidebar
+- dashboard
+- forms
+- dialogs
+- data table
+- command palette
+- settings layout
 
-### Workbench에 적용할 원칙
-**“무조건 문서를 줄여라”가 아니라 “현재 Agent가 스스로 처리할 수 있는 저위험 절차는 줄이고, 위험 경계와 검증은 유지한다.”**
+---
 
-따라서 정리 순서는:
+## HyperUI
+
+- https://www.hyperui.dev/
+- 비용: **무료 / MIT**
+- 용도: 앱 UI, 관리자 화면, 모달, 테이블, 탭, 진행상태, 폼
+
+실사용 프로그램 UI를 만들 때 화려함보다 **구조와 조작성** 참고용으로 좋습니다.
+
+---
+
+## daisyUI
+
+- https://daisyui.com/
+- 비용: **무료 / 오픈소스**
+- 용도: 컴포넌트, 테마, 상태 스타일, 빠른 디자인 시스템 비교
+
+특정 컴포넌트를 복사하기보다 **한 앱 전체의 스타일 일관성**을 잡을 때 참고합니다.
+
+---
+
+# 2. 아이콘
+
+## Lucide
+
+- https://lucide.dev/
+- 비용: **무료 / 오픈소스**
+- 라이선스: ISC
+- 용도: 프로그램 기본 아이콘
+
+기본 우선순위가 가장 높습니다.
+
+예:
+- Settings
+- FolderOpen
+- Trash2
+- Download
+- Upload
+- RefreshCw
+- Search
+- Play
+- Pause
+- CircleCheck
+- TriangleAlert
+
+가능하면 화면마다 제멋대로 다른 아이콘 세트를 섞지 않습니다.
+
+---
+
+## Tabler Icons
+
+- https://tabler.io/icons
+- 비용: **무료 / 오픈소스**
+- 라이선스: MIT
+- 용도: Lucide와 다른 느낌이 필요할 때
+
+---
+
+## Heroicons
+
+- https://heroicons.com/
+- 비용: **무료 / MIT**
+- 용도: 단순하고 정돈된 앱/웹 아이콘
+
+---
+
+## Bootstrap Icons
+
+- https://icons.getbootstrap.com/
+- 비용: **무료 / MIT**
+- 용도: 범용 아이콘, 상태/도구/파일 관련 아이콘
+
+---
+
+## Iconoir
+
+- https://iconoir.com/
+- 비용: **무료 / 오픈소스**
+- 용도: 조금 더 개성 있는 선형 아이콘 대안
+
+---
+
+## Simple Icons
+
+- https://simpleicons.org/
+- 비용: **무료 / 오픈소스**
+- 용도: GitHub, YouTube, Discord 등 브랜드 아이콘
+
+브랜드 로고는 임의로 비슷하게 그리지 말고 공식/공개 아이콘을 우선합니다.
+
+---
+
+# 3. SVG / 일러스트 / 그래픽
+
+## SVG Repo
+
+- https://www.svgrepo.com/
+- 비용: **무료 자료 중심**
+- 용도: SVG 아이콘, 그림, 벡터
+
+주의:
+- 사이트 자체는 무료 자료 저장소지만 **각 SVG 라이선스는 개별 확인**합니다.
+- 상업 사용 프로젝트라면 라이선스가 명확한 항목을 고릅니다.
+
+---
+
+## unDraw
+
+- https://undraw.co/illustrations
+- 비용: **무료**
+- 용도:
+  - 빈 화면
+  - 완료 화면
+  - 로그인
+  - 검색 결과 없음
+  - 업로드/다운로드
+  - 오류/안내 상태
+
+기능 화면에 장식 일러스트를 남발하지 말고 실제로 빈 상태나 설명이 필요한 곳에만 사용합니다.
+
+---
+
+## Openverse
+
+- https://openverse.org/
+- 비용: **무료 검색**
+- 용도: Creative Commons 이미지/오디오 레퍼런스 검색
+
+각 결과의 실제 라이선스를 확인합니다.
+
+---
+
+# 4. 배경 / 패턴 / 장식
+
+## BGJar
+
+- https://bgjar.com/
+- 비용: **무료**
+- 용도: SVG 배경, 패턴, wave, grid, blob, circuit 등
+
+AI가 쓸데없이 무거운 배경 이미지를 새로 생성하는 대신 가벼운 SVG 장식이 더 적합한 경우 사용합니다.
+
+---
+
+## Get Waves
+
+- https://getwaves.io/
+- 비용: **무료**
+- 용도: SVG wave 생성
+
+---
+
+## Blobmaker
+
+- https://www.blobmaker.app/
+- 비용: **무료**
+- 용도: 간단한 SVG blob 생성
+
+---
+
+## Neumorphism.io
+
+- https://neumorphism.io/
+- 비용: **무료**
+- 용도: shadow 값을 시각적으로 확인하는 CSS 생성기
+
+Neumorphism 스타일을 그대로 쓰라는 의미가 아니라 **shadow 강도와 방향을 빠르게 비교**할 때 사용합니다.
+
+---
+
+# 5. 색상 / 타이포그래피
+
+## Open Color
+
+- https://yeun.github.io/open-color/
+- 비용: **무료 / 오픈소스**
+- 용도: 검증된 색상 팔레트
+
+AI가 임의의 색을 너무 많이 만드는 대신 기준 팔레트로 사용하기 좋습니다.
+
+---
+
+## Google Fonts
+
+- https://fonts.google.com/
+- 비용: **무료 / 오픈소스 폰트**
+- 용도: UI 폰트, 글꼴 조합, 가변 폰트
+
+프로젝트 배포 방식과 실제 폰트 라이선스를 확인합니다.
+
+---
+
+## Fontshare
+
+- https://www.fontshare.com/
+- 비용: **무료 폰트**
+- 용도: Google Fonts 외의 개성 있는 무료 폰트 탐색
+
+---
+
+# 6. CSS / 애니메이션 레퍼런스
+
+## Animista
+
+- https://animista.net/
+- 비용: **무료**
+- 용도: CSS animation 동작 참고 및 값 조정
+
+애니메이션은 장식보다:
+- 상태 변화
+- 완료 피드백
+- 패널 전환
+- hover/focus
+를 이해시키는 데 우선 사용합니다.
+
+---
+
+## CSSFX
+
+- https://cssfx.netlify.app/
+- 비용: **무료 / 오픈소스**
+- 용도: 작은 CSS 효과와 인터랙션 참고
+
+---
+
+# 7. AI가 실제로 디자인할 때의 조합 예시
+
+## 데스크톱 관리 프로그램
 
 ```text
-현재 AGENTS / Skills 조사
-→ 실제 방해가 되는 broad trigger / forced loading / duplicate check 식별
-→ 최소 수정 제안
-→ 위험 경계가 사라지지 않는지 확인
-→ 적용
-→ 같은 작업을 다시 시켜 속도/정확도 비교
+전체 구조
+→ shadcn/ui + HyperUI에서 각각 2개 이상 레이아웃 비교
+
+세부 컨트롤
+→ Uiverse
+
+아이콘
+→ Lucide 우선, 부족하면 Tabler Icons
+
+색상
+→ Open Color
+
+빈 상태/안내
+→ unDraw 또는 SVG Repo
+
+미세한 전환
+→ Animista / CSSFX
 ```
 
-### 현재 Workbench와의 관계
-이미 적용한 `AGENTS = 영구 역사창고가 아니라 현재 실행본` 원칙과 일치합니다.
-추가로 앞으로 Skill을 만들 때 **trigger scope를 좁게 쓰고, 필요한 순간에만 로드**하는 기준을 유지합니다.
+## 다운로드/변환 도구
+
+```text
+1. HyperUI에서 실제 application layout 참고
+2. Uiverse에서 progress / button / toggle 참고
+3. Lucide에서 Download / FolderOpen / RefreshCw / CircleCheck 사용
+4. Open Color에서 상태색 통일
+5. 진행상황이 가장 먼저 보이도록 정보 위계 설계
+```
+
+## 대시보드
+
+```text
+1. shadcn/ui dashboard 사례 여러 개 비교
+2. 카드 수를 먼저 줄이고 정보 우선순위를 정의
+3. HyperUI table/form 패턴 참고
+4. Lucide 아이콘 통일
+5. 장식보다 현재 상태 → 행동 → 결과 순서를 우선
+```
 
 ---
 
-## 4. 디자인/Agent 참고자료를 후보 도구와 섞지 않는 이유
+# 8. 디자인 품질 체크리스트
 
-SceneAI나 디자인 비평 글은 설치할 프로그램이 아닙니다.
-따라서 `ACTIVE/PROJECT` 도구로 승격하지 않고 `REFERENCE`로 유지합니다.
+구현 완료 전에 아래를 확인합니다.
 
-반대로 이 참고에서 실제 reusable rule이 검증되면 그때 `PATTERNS.md`나 `USER_POLICIES.md`로 승격합니다.
+- [ ] 실제 레퍼런스를 최소 3개 이상 봤는가
+- [ ] 각각에서 무엇을 참고했는지 설명할 수 있는가
+- [ ] 화면에서 가장 중요한 정보가 1초 안에 보이는가
+- [ ] 대표 CTA가 하나로 명확한가
+- [ ] 모든 카드와 버튼이 똑같이 강조되어 있지 않은가
+- [ ] 여백과 정렬 규칙이 일정한가
+- [ ] 아이콘 세트가 통일되어 있는가
+- [ ] 필요 없는 테두리/그라데이션/그림자를 줄였는가
+- [ ] hover/focus/disabled/loading/error/success 상태가 있는가
+- [ ] 창 크기가 작아져도 핵심 기능이 유지되는가
+- [ ] 한글 텍스트가 길어져도 깨지지 않는가
+- [ ] 기능 구현만 끝내고 디자인 완료라고 부르지 않았는가
+- [ ] 유료 에셋 없이도 재현 가능한가
 
 ---
 
-## 5. Scrolltide
+# 9. 운영 원칙
 
-- 사이트: https://www.scrolltide.co/
-- 종류: **scroll-driven 웹 UI prompt / template reference library**
-- 상태: `REFERENCE`
+이 문서의 사이트들은 **AI 도구 후보가 아니라 REFERENCE**입니다.
 
-### 확인된 정체
-Scrolltide는 스스로를 **scroll-driven templates and prompts의 curated library**로 설명합니다.
-프롬프트를 AI에 붙여 넣어 motion이 있는 웹사이트를 빠르게 만드는 흐름이며, 현재 사이트에는 Hero Section, Landing Page, Portfolio, Ecommerce, 3D Scene, Background 범주가 있습니다.
+- 설치할 필요 없음
+- AI 기본 컨텍스트에 항상 넣지 않음
+- UI/UX 작업이 발생했을 때 필요한 항목만 확인
+- 최신 디자인이 필요한 작업은 이 목록에만 갇히지 말고 무료·오픈소스 레퍼런스를 추가 조사
+- 좋은 새 레퍼런스가 확인되면 이 문서에 추가
+- 유료 전용/무료체험 중심 자료는 기본 목록에 넣지 않음
 
-사이트에서 함께 언급하는 기술은 Next.js, GSAP, Three.js, Framer Motion, Tailwind, React, WebGL, Lenis, Shaders 등입니다.
-
-### 우리한테 의미
-SceneAI와 비슷하게 설치형 개발도구라기보다 **AI가 만든 웹이 뻔한 카드/정적 레이아웃으로 굳는 것을 막기 위한 motion/UI 레퍼런스**로 보는 게 맞습니다.
-특히 scroll interaction, hero motion, 3D/background 연출을 만들 때 참고 가치가 있습니다.
-
-### 쓰는 방식
-1. 정보구조와 실제 사용자 흐름을 먼저 정함
-2. Scrolltide에서 가까운 motion/section을 고름
-3. prompt/template의 효과를 통째로 복제하기보다 필요한 interaction만 가져옴
-4. 성능, 모바일, reduced-motion, 스크롤 조작성까지 실제 화면에서 검증
-
-### 알아둘 점
-무료와 Premium 템플릿이 섞여 있고 사이트는 one-time lifetime access 상품도 판매합니다.
-시각적으로 멋진 scroll effect가 UX를 자동으로 좋게 만드는 것은 아니므로 장식보다 사용성/성능을 우선합니다.
+최종 목표는 **AI가 매번 같은 디자인을 반복하는 것을 막고, 실제 좋은 사례를 조사해서 프로젝트마다 더 적합하고 완성도 높은 UI를 만드는 것**입니다.
