@@ -25,7 +25,7 @@
 | AI Control Tower | 0.2.0 | `D:\A_KJ\AI\Applications\AIControlTower\AIControlTower.exe`; 소스 `D:\A_KJ\AI\Projects\project-operations-hub\ai-control-tower` | 새 프로젝트 작업실·owned Windows job·공유 리모트 중계. 설정/작업 기록/백업은 `%LocalAppData%\AIControlTower` 유지. 옛 LocalAppData EXE는 복구용 보존. 실제 최종 검증/해시는 ai-control-tower/docs/VERIFICATION-20261005.md |
 | Unity iOS Build Support | 6000.3.14f1 | C:/Program Files_My/A_3D/Unity_Hub/Unity_Editor/6000.3.14f1/Editor/Data/PlaybackEngines/iOSSupport | 2026-09-25 공식 Unity CLI 설치 성공. 기존 Unity Editor 종속 모듈이므로 공식 설치 위치 유지. Windows에서 Xcode 프로젝트 내보내기용이며 Mac/Xcode는 별도 필요. 원격 에디터 실행은 PhoneLoL_02/Automation/OpenUnity.ps1 사용 |
 
-| 무직전생 AI 오디오북 | CosyVoice3 / Qwen3-TTS / Ollama 기존 설치 | D:\AI\VoiceAudiobook; 환경 D:\AI\envs; 문맥 모델 D:\AI\models\ollama | 사용자 명시 D드라이브 예외. 실행 RUN_Audiobook.bat. 기존 자료·환경 재사용, Ollama 12파일 SHA-256 및 실제 추론 검증. 상세 위치는 프로젝트 docs/RUNTIME_LOCATIONS.md |
+| 무직전생 AI 오디오북 | CosyVoice3 / Qwen3-TTS / Ollama + Fish S2 Pro Q8 시험 | D:/AI/VoiceAudiobook; 환경 D:/AI/envs; 문맥 모델 D:/AI/models/ollama; Fish engines/fish_s2 및 models/fish_s2 | 사용자 명시 D드라이브 예외. 기존VS2022/CUDA13.1 빌드와 실제19MP3 생성 검증. 최신청취 RUN_LatestMP3.bat, 현재/기준/과거 분리. RTF1.37/GPU최대표본10411MiB. 연기청취·전권생성은 미완료. 상세 프로젝트 docs/FISH_S2_LOCAL.md |
 
 ## 인수인계 필수 항목
 모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.
