@@ -10,6 +10,7 @@
 | 피규어만들기_01 | GitHub 필수 아님 | `02_PROJECTS/Figure-01/` |
 | 동물의숲 / Tiny Village | GitHub 필수 아님 | `02_PROJECTS/Tiny-Village/` |
 | AI 콘텐츠 수익화 / Threads | `kimjae134679/Threads` | `02_PROJECTS/Threads/` |
+| 무직전생 AI 오디오북 | `kimjae134679/txt_-` | `02_PROJECTS/Mushoku-Audiobook/` |
 
 사이드메모장, FinanceOne, ASCII Aquarium은 현재 주 프로젝트 레지스트리보다 **경험 소스**로 `03_KNOWLEDGE/LESSONS.md`에서 관리합니다.
 
