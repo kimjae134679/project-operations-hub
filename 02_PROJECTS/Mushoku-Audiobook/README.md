@@ -1,6 +1,6 @@
 # Mushoku Tensei AI Audiobook
 
-- 실제 저장소: https://github.com/kimjae134679/txt_-
+- 실제 저장소: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
 - 프로젝트 표기명: **Mushoku Tensei AI Audiobook Pipeline**
 - 로컬 원본: `D:\AI\VoiceAudiobook`
 - 최종 출력 언어: **한국어**
