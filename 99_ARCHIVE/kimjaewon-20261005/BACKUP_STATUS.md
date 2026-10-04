@@ -1,5 +1,28 @@
 # 김재원_ 통합 백업·기록·인수인계 현황
 
+## 2026-10-05 추가 확인 — 제공 대화 백업 완료
+
+사용자가 “다른 대화들을 다 백업하라는 소리였어. 멀신은 마무리됐고 나머지는 상황을 모르겠어”라고 범위를 확인했습니다. 기능 개발 재개가 아니라 대화 보존과 상황 정리로 처리했습니다.
+
+제공 링크 9개의 추출 텍스트를 비공개 [KimJae-Project-Backups](https://github.com/kimjae134679/KimJae-Project-Backups)에 전체본과 대화별 9개 파일로 기록했습니다. 원본 전달 ZIP을 그대로 [릴리스](https://github.com/kimjae134679/KimJae-Project-Backups/releases/tag/snapshot-20261005-remaining)에 올리고 원래 SHA-256 f82338b3db590fd91eb33a8f2bbe0fdff20efd506a3508c287082349d72f5ec8과 비교했습니다. 분할한 텍스트를 다시 합쳤을 때 전체본 바이트와 정확히 일치합니다.
+
+기존 회차가 업로드한 remaining ZIP 3개와 manifest도 확인했습니다. 49,866개 파일·21개 Git bundle, 제외 254개·오류 0건. GitHub ZIP digest가 로컬 manifest SHA-256과 일치합니다. 이전에 원격에서 찾지 못한 local hub 이력도 bundle에 포함되어 있으며 새 위치에서 b04d468c4af86e0ebc61e61f89bd8fc67c967f1a HEAD 복원과 git fsck를 확인했습니다. 복원 검사용 폴더는 정리했습니다.
+
+[현재 대화별 상황과 보존 범위](https://github.com/kimjae134679/KimJae-Project-Backups/blob/main/BACKUP_STATUS.md), [검증 기록](https://github.com/kimjae134679/KimJae-Project-Backups/blob/main/VERIFICATION.json), [출처·대화별 해시](https://github.com/kimjae134679/KimJae-Project-Backups/blob/main/CONVERSATION_MANIFEST.json).
+
+Threads는 현재 인수인계 기준 0.3.3·398건·3,209장, 686건 보류이며 실제 게시 및 전체 의미·권리 검수는 미완료입니다. Jev는 현재 정책상 비활성·미채택입니다. 영상 다운로드 대화의 마지막 상태와 현재 PC 폴더는 다르며 현재 프로그램·결과 존재만 확인했습니다. 멀신은 사용자 확인에 따라 마무리된 대상으로 기록했습니다.
+
+공유 원문이 없는 게시글 수익화_01 등과 일부 실제 채팅 첨부·미제공 대화는 미확보입니다. 제공한 9개 공유 링크에서 추출한 텍스트 보존은 완료했지만 전체 ChatGPT 계정 내보내기를 완료했다고 하지 않습니다. 새 프로그램·정책 변경·Jev 실행·기능 수정은 하지 않았습니다.
+
+보관 위치는 기존 C:\\Users\\user\\AppData\\Local\\KimJaeProjectBackups 예외 경로를 유지했습니다. 원래 작업 폴더와 다른 담당자 변경은 수정하지 않았습니다.
+
+---
+
+## 이전 회차의 보존 기록
+
+아래는 당시 관측값입니다. 현재 백업·복원 판정은 위 추가 확인과 비공개 저장소의 BACKUP_STATUS.md를 우선합니다. 멀신의 후속 브랜치 정리 결과는 현재 소스 저장소 Docs/GITHUB_CLEANUP_2026-10-05.md를 참고하며 아래 과거 ref 목록을 현재 존재 목록으로 단정하지 않습니다.
+
+
 기준: 2026-10-05 KST. 작성자: [B계정] Nova.
 
 ## 현재 판정
