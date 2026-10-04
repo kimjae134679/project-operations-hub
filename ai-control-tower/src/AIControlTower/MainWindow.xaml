@@ -1,307 +1,54 @@
-<Window x:Class="AIControlTower.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:models="clr-namespace:AIControlTower.Models"
-        Title="AI Control Tower" Height="820" Width="1280" MinHeight="680" MinWidth="980"
-        Background="#F5F8FE" Foreground="#122047" WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <SolidColorBrush x:Key="Blue" Color="#1769F5"/>
-        <SolidColorBrush x:Key="Line" Color="#DCE7F8"/>
-        <SolidColorBrush x:Key="Ink" Color="#122047"/>
-        <SolidColorBrush x:Key="Muted" Color="#63759A"/>
-        <Style x:Key="Panel" TargetType="Border">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="0,0,8,0"/>
-            <Setter Property="Padding" Value="15,8"/>
-            <Setter Property="Background" Value="{StaticResource Blue}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.48"/>
-                    <Setter Property="Cursor" Value="Arrow"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#1B3970"/>
-            <Setter Property="BorderBrush" Value="#C9D9F0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#E33E55"/>
-        </Style>
-        <Style x:Key="SidebarButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="Padding" Value="14,11"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#456087"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="9" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#EAF2FF"/>
-                    <Setter Property="Foreground" Value="{StaticResource Blue}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style x:Key="StatusBadge" TargetType="Border">
-            <Setter Property="Background" Value="#E6F0FF"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="9,4"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:StatusKind.Running}"><Setter Property="Background" Value="#DDF8E7"/></DataTrigger>
-                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:StatusKind.Ready}"><Setter Property="Background" Value="#E3F0FF"/></DataTrigger>
-                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:StatusKind.Error}"><Setter Property="Background" Value="#FFE6E8"/></DataTrigger>
-                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:StatusKind.NotConfigured}"><Setter Property="Background" Value="#FFF1D8"/></DataTrigger>
-                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:StatusKind.NotInstalled}"><Setter Property="Background" Value="#EEF1F6"/></DataTrigger>
-                <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:StatusKind.Unknown}"><Setter Property="Background" Value="#EEF1F6"/></DataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style TargetType="DataGridCell">
-            <Setter Property="BorderBrush" Value="#E7EEF8"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="Foreground" Value="#1C3566"/>
-        </Style>
-        <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#F2F6FC"/>
-            <Setter Property="Foreground" Value="#52688F"/>
-            <Setter Property="BorderBrush" Value="#E3ECF8"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="Padding" Value="10,9"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-        <Style TargetType="DataGridRow">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#1C3566"/>
-        </Style>
-    </Window.Resources>
-
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="224"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Border Grid.Column="0" Background="White" BorderBrush="#E2EAF6" BorderThickness="0,0,1,0">
-            <Grid Margin="22,24,22,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" Margin="2,0,0,28">
-                    <Border Width="38" Height="38" Background="{StaticResource Blue}" CornerRadius="10" Margin="0,0,10,0">
-                        <TextBlock Text="AI" Foreground="White" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="AI 관제" FontSize="11" FontWeight="Bold" Foreground="#7890B3"/>
-                        <TextBlock Text="타워" FontSize="17" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel Grid.Row="1">
-                    <TextBlock Text="메뉴" Foreground="#91A1BB" FontSize="11" FontWeight="Bold" Margin="12,0,0,9"/>
-                    <Button Style="{StaticResource SidebarButton}" Content="⌂   대시보드" Click="Home_Click"/>
-                    <Button Style="{StaticResource SidebarButton}" Content="●   도구 상태" Click="Status_Click"/>
-                    <Button Style="{StaticResource SidebarButton}" Content="▶   Jev 작업 제어" Click="Jev_Click"/>
-                    <Button Style="{StaticResource SidebarButton}" Content="↓   설치 및 복구" Click="InstallSection_Click"/>
-                </StackPanel>
-
-                <Border Grid.Row="3" Background="#F4F7FC" CornerRadius="10" Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="로컬 관제" Foreground="#52688F" FontWeight="SemiBold"/>
-                        <TextBlock Text="민감값을 화면과 로그에 표시하지 않습니다." Foreground="#8091AE" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
-
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0" Margin="30,23,30,18">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="AI Control Tower" FontSize="29" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-                    <TextBlock Text="로컬 AI 도구 상태와 운영 기능을 한곳에서 확인합니다." Foreground="{StaticResource Muted}" Margin="0,4,0,0"/>
-                </StackPanel>
-                <Border Grid.Column="1" Background="#E4F9EA" CornerRadius="16" Padding="14,8" VerticalAlignment="Top">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="10" Height="10" Fill="#16B34A" Margin="0,0,8,0"/>
-                        <TextBlock Text="5초마다 자동 갱신" Foreground="#137E39" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-
-            <ScrollViewer x:Name="DashboardScroll"
-                          Grid.Row="1"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          PanningMode="VerticalOnly">
-                <StackPanel Margin="30,0,30,28">
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Style="{StaticResource Panel}" Padding="18" Margin="0,0,12,0">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="50"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Width="46" Height="46" Background="#EAF2FF" CornerRadius="12">
-                                    <TextBlock Text="●" FontSize="20" Foreground="{StaticResource Blue}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="확인된 도구" FontWeight="SemiBold" Foreground="{StaticResource Muted}"/>
-                                    <TextBlock Text="{Binding Statuses.Count}" FontSize="26" FontWeight="Bold" Foreground="{StaticResource Ink}" Margin="0,2,0,0"/>
-                                    <TextBlock Text="현재 상태 항목" Foreground="{StaticResource Muted}" FontSize="12"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="1" Style="{StaticResource Panel}" Padding="18" Margin="0,0,12,0">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="50"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <Border Width="46" Height="46" Background="#EAF2FF" CornerRadius="12">
-                                    <TextBlock Text="↻" FontSize="28" Foreground="{StaticResource Blue}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="마지막 상태 확인" FontWeight="SemiBold" Foreground="{StaticResource Muted}"/>
-                                    <TextBlock Text="{Binding Message}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource Ink}" TextTrimming="CharacterEllipsis" Margin="0,5,0,0"/>
-                                    <TextBlock Text="실제 확인 결과만 표시" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,4,0,0"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2" Style="{StaticResource Panel}" Padding="18">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Jev 작업" FontWeight="SemiBold" Foreground="{StaticResource Muted}"/>
-                                    <TextBlock Text="별도 제어 창" FontSize="18" FontWeight="Bold" Foreground="{StaticResource Ink}" Margin="0,4,0,0"/>
-                                    <TextBlock Text="정책 보호 상태로 작업 관리" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,3,0,0"/>
-                                </StackPanel>
-                                <Button Grid.Column="1" Content="열기" Click="Jev_Click" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-                    </Grid>
-
-                    <Border x:Name="StatusSection" Style="{StaticResource Panel}" Padding="18" Margin="0,0,0,16">
-                        <DockPanel MinHeight="280">
-                            <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="도구 상태" FontSize="19" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-                                    <TextBlock Text="연결·로그인·실행 가능 여부를 분리하여 표시합니다." Foreground="{StaticResource Muted}" FontSize="12" Margin="0,3,0,0"/>
-                                </StackPanel>
-                                <Button Grid.Column="1" Content="↻  지금 갱신" Click="Refresh_Click" Margin="0,4,0,0"/>
-                            </Grid>
-                            <DataGrid ItemsSource="{Binding Statuses}"
-                                      MinHeight="280"
-                                      AutoGenerateColumns="False"
-                                      IsReadOnly="True"
-                                      CanUserAddRows="False"
-                                      HeadersVisibility="Column"
-                                      BorderThickness="0"
-                                      GridLinesVisibility="None"
-                                      Background="White"
-                                      RowHeaderWidth="0">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="도구" Binding="{Binding DisplayName}" Width="180"/>
-                                    <DataGridTemplateColumn Header="상태" Width="125">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Border Style="{StaticResource StatusBadge}">
-                                                    <TextBlock Text="{Binding State}" FontWeight="SemiBold" FontSize="12" Foreground="#1C4F92"/>
-                                                </Border>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="설명" Binding="{Binding Detail}" Width="*"/>
-                                    <DataGridTextColumn Header="확인" Binding="{Binding CheckedAt}" Width="90"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </DockPanel>
-                    </Border>
-
-                    <Border MinHeight="190" Background="#111C2D" CornerRadius="14" Padding="18" BorderBrush="#233752" BorderThickness="1" Margin="0,0,0,16">
-                        <Grid>
-                            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <StackPanel Orientation="Horizontal">
-                                    <Ellipse Width="9" Height="9" Fill="#18D26B" Margin="0,5,9,0"/>
-                                    <TextBlock Text="실시간 작업 콘솔" Foreground="White" FontSize="17" FontWeight="Bold"/>
-                                    <TextBlock Text="  ·  민감한 값은 표시하지 않습니다" Foreground="#91A7C7" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="실시간 상태" Foreground="#58A6FF" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
-                            </Grid>
-                            <StackPanel Grid.Row="1" Margin="0,18,0,0">
-                                <TextBlock Text="{Binding ActivitySummary}" Foreground="#E7F0FF" FontFamily="Consolas" FontSize="13" TextWrapping="Wrap"/>
-                                <TextBlock Text="{Binding Message}" Foreground="#66D9FF" FontFamily="Consolas" FontSize="13" TextWrapping="Wrap" Margin="0,9,0,0"/>
-                                <TextBlock Text="상태 표의 각 항목은 마지막 확인 시각과 함께 갱신됩니다." Foreground="#8DA3C2" FontFamily="Consolas" FontSize="12" Margin="0,9,0,0"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border x:Name="InstallSection" Style="{StaticResource Panel}" Padding="18" Margin="0,0,0,16">
-                        <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <StackPanel Margin="0,0,20,0">
-                                <TextBlock Text="설치 및 복구" FontSize="18" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-                                <TextBlock Text="기존 Desktop Commander 시작 파일은 백업 후에만 변경됩니다." TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,6,0,0"/>
-                            </StackPanel>
-                            <WrapPanel Grid.Column="1" VerticalAlignment="Center">
-                                <Button Content="설치" Click="Install_Click"/>
-                                <Button Content="제거" Style="{StaticResource DangerButton}" Click="Uninstall_Click"/>
-                                <Button Content="시작 구성 복구" Style="{StaticResource SecondaryButton}" Click="Restore_Click" Margin="0"/>
-                            </WrapPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border Background="#EDF4FF" CornerRadius="8" Padding="14,10">
-                        <TextBlock Foreground="#597099" Text="보안 안내  ·  비밀번호, API 키, 토큰 값은 화면과 로그에 표시하지 않습니다. 확인할 수 없는 상태는 Unknown으로 표시합니다." TextWrapping="Wrap"/>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
+<Window x:Class="AIControlTower.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Style="{StaticResource {x:Type Window}}" Title="내 프로젝트 · 컨트롤타워" Width="1420" Height="900" MinWidth="1060" MinHeight="720" WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="ProjectFolder_Drop">
+ <Window.Resources>
+  <Style x:Key="ProjectRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}"/></Style>
+  <Style x:Key="ProgramRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="Padding" Value="12"/><Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}"/></Style>
+ </Window.Resources>
+ <Grid x:Name="ContentShell" Margin="24">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid x:Name="PageHeader" Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Border Width="30" Height="30" CornerRadius="7" Background="{StaticResource TextBrush}" Margin="0,0,10,0"><Path Data="M 0 0 L 12 0 L 12 5 L 0 5 Z M 0 8 L 5 8 L 5 19 L 0 19 Z M 8 8 L 12 8 L 12 19 L 8 19 Z" Fill="White" Width="12" Height="19" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><TextBlock x:Name="PageTitle" Text="컨트롤타워" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/></StackPanel>
+   <StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="프로젝트 폴더 선택" Click="ChooseRoot_Click" ToolTip="프로젝트가 들어 있는 상위 폴더를 선택합니다. 폴더를 이 창으로 끌어와도 됩니다." Margin="0,0,8,0"/><Button Content="새로고침" Click="Discover_Click"/></StackPanel>
+  </Grid>
+  <TabControl x:Name="WorkspaceTabs" Grid.Row="1" SelectionChanged="WorkspaceTabs_SelectionChanged">
+   <TabItem Header="내 프로젝트">
+    <Grid x:Name="WorkspaceContent" Margin="0,16,0,0"><Grid.ColumnDefinitions><ColumnDefinition x:Name="CatalogColumn" Width="328"/><ColumnDefinition Width="24"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+     <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+      <Grid Margin="0,0,0,14"><TextBox x:Name="ProjectSearchBox" Style="{StaticResource SearchBox}" Tag="프로젝트 찾기" Text="{Binding ProjectSearch, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="프로젝트 찾기"/><TextBlock Text="프로젝트 찾기" Foreground="{StaticResource MutedBrush}" FontSize="14" Margin="12,0" VerticalAlignment="Center" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ProjectSearch}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
+      <Grid Grid.Row="1"><ListBox ScrollViewer.CanContentScroll="False" x:Name="ProjectList" ItemsSource="{Binding FilteredProjects}" SelectedItem="{Binding SelectedProject, Mode=TwoWay}" SelectionChanged="Projects_SelectionChanged" ItemContainerStyle="{StaticResource ProjectRow}" Padding="0,0,6,0" AutomationProperties.Name="내 프로젝트"><ListBox.ItemTemplate><DataTemplate>
+       <StackPanel><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding DisplayName}" FontSize="17" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding DisplayName}" Margin="0,0,8,0"/><Border Grid.Column="1" Background="{StaticResource RaisedBrush}" CornerRadius="4" Padding="7,3"><TextBlock Text="{Binding RoleLabel}" FontSize="11" Foreground="{StaticResource MutedBrush}"/></Border></Grid><TextBlock Text="{Binding Description}" FontSize="13" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" MaxHeight="40" TextTrimming="CharacterEllipsis" Margin="0,8,0,0"/><TextBlock Text="{Binding CategoryLabel}" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,10,0,0"/></StackPanel>
+      </DataTemplate></ListBox.ItemTemplate></ListBox><TextBlock Text="검색 결과가 없습니다." Foreground="{StaticResource MutedBrush}" Margin="14,18" Visibility="{Binding NoProjectSearchResults, Converter={StaticResource BoolVisibility}}"/></Grid>
+     </Grid>
+     <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <Border x:Name="ProjectHeader" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,16">
+       <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel><TextBlock Text="{Binding SelectedProject.CategoryLabel}" Style="{StaticResource Eyebrow}" Margin="0,0,0,5"/><TextBlock x:Name="ProjectTitle" Text="{Binding SelectedProject.DisplayName, TargetNullValue=프로젝트를 선택하세요}" FontSize="26" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding SelectedProject.DisplayName}" Margin="0,0,14,0"/></StackPanel>
+        <Button Grid.Column="1" Content="폴더 보기" Click="OpenProject_Click" VerticalAlignment="Center" AutomationProperties.Name="프로젝트 폴더 보기"/>
+        <TextBlock x:Name="ProjectDescription" Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding SelectedProject.Description}" Foreground="{StaticResource MutedBrush}" FontSize="14" TextWrapping="Wrap" MaxHeight="44" TextTrimming="CharacterEllipsis" Margin="0,10,0,0"/>
+        <Expander x:Name="ProjectPathLine" Grid.Row="2" Grid.ColumnSpan="2" IsExpanded="False" Header="폴더 위치" Margin="0,4,0,0"><TextBlock Text="{Binding SelectedProject.Path}" FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/></Expander>
+       </Grid>
+      </Border>
+      <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition x:Name="InspectorColumn" Width="280"/></Grid.ColumnDefinitions>
+       <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><Grid Margin="0,0,0,8"><TextBox x:Name="ProgramSearchBox" Style="{StaticResource SearchBox}" Tag="프로그램 · 자료 찾기" Text="{Binding ProgramSearch, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="프로그램 찾기"/><TextBlock Text="프로그램·자료 찾기" Foreground="{StaticResource MutedBrush}" FontSize="14" Margin="12,0" VerticalAlignment="Center" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ProgramSearch}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
+        <Grid Grid.Row="1"><ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ItemsControl ItemsSource="{Binding FilteredFunctions}"><ItemsControl.ItemTemplate><DataTemplate><Expander Margin="0,0,0,6"><Expander.Style><Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}"><Setter Property="IsExpanded" Value="True"/><Style.Triggers><DataTrigger Binding="{Binding IsAdvanced}" Value="True"><Setter Property="IsExpanded" Value="False"/></DataTrigger></Style.Triggers></Style></Expander.Style><Expander.Header><TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"/></Expander.Header><ListBox ItemsSource="{Binding Programs}" SelectedItem="{Binding DataContext.SelectedProgram, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay}" SelectionChanged="Programs_SelectionChanged" ItemContainerStyle="{StaticResource ProgramRow}" ScrollViewer.VerticalScrollBarVisibility="Disabled"><ListBox.ItemTemplate><DataTemplate><StackPanel><TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" ToolTip="{Binding DisplayName}"/><TextBlock Text="{Binding Description}" FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" MaxHeight="36" TextTrimming="CharacterEllipsis" Margin="0,5,0,0"/><Grid Margin="0,8,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding KindLabel}" FontSize="11" Foreground="{StaticResource MutedBrush}"/><TextBlock Grid.Column="1" Text="{Binding StatusLabel}" FontSize="11" Foreground="{StaticResource MutedBrush}"/></Grid></StackPanel></DataTemplate></ListBox.ItemTemplate></ListBox></Expander></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></ScrollViewer><TextBlock Text="검색 결과가 없습니다." Foreground="{StaticResource MutedBrush}" Margin="12,18" Visibility="{Binding NoProgramSearchResults, Converter={StaticResource BoolVisibility}}"/></Grid>
+       </Grid>
+       <Border x:Name="ProgramInspector" Grid.Column="2" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="18">
+        <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition x:Name="InspectorMetadataRow" Height="*" MinHeight="0"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+         <StackPanel><TextBlock Text="{Binding SelectedProgram.KindLabel, TargetNullValue=프로그램 · 자료}" Style="{StaticResource Eyebrow}"/><TextBlock Text="{Binding SelectedProgram.DisplayName, TargetNullValue=목록에서 선택하세요}" FontSize="20" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding SelectedProgram.DisplayName}" Margin="0,7,0,0"/><TextBlock Text="{Binding SelectedProgram.StatusLabel}" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,8,0,0"/></StackPanel>
+         <ScrollViewer x:Name="InspectorMetadata" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,16,0,14"><StackPanel><TextBlock Text="이건 무엇인가요?" Style="{StaticResource Eyebrow}" Margin="0,0,0,7"/><TextBlock Text="{Binding SelectedProgram.Description}" TextWrapping="Wrap" FontSize="14" LineHeight="22"/><Expander Header="파일 위치" IsExpanded="False" Margin="0,12,0,0"><TextBlock Text="{Binding SelectedProgram.Path}" Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap"/></Expander></StackPanel></ScrollViewer>
+         <StackPanel Grid.Row="2" Margin="0,16,0,0"><TextBlock Text="무엇을 할 수 있나요?" Style="{StaticResource Eyebrow}" Margin="0,0,0,8"/><ComboBox x:Name="CommandSelector" ItemsSource="{Binding SelectedProgram.Commands}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedCommand, Mode=TwoWay}" IsEnabled="{Binding CanLaunchSelectedProgram}" Visibility="{Binding HasSelectedCommands, Converter={StaticResource BoolVisibility}}" AutomationProperties.Name="실행할 작업" Margin="0,0,0,8"/><Button x:Name="LaunchProgramButton" Content="{Binding SelectedProgram.ActionLabel, TargetNullValue=작업 실행}" Click="LaunchProgram_Click" IsEnabled="{Binding CanLaunchSelectedProgram}" Style="{StaticResource PrimaryButton}" HorizontalContentAlignment="Center" AutomationProperties.Name="선택한 작업 실행"/><Grid Margin="0,8,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Button x:Name="OpenProgramButton" Content="{Binding SelectedProgram.OpenActionLabel}" Click="OpenProgram_Click" IsEnabled="{Binding CanOpenSelectedProgram}" Visibility="{Binding ShowSeparateOpenButton, Converter={StaticResource BoolVisibility}}" AutomationProperties.Name="선택한 파일 또는 폴더 보기"/><Button x:Name="StopProgramButton" Grid.Column="2" Content="중지" Click="StopProgram_Click" Visibility="{Binding HasSelectedCommands, Converter={StaticResource BoolVisibility}}" IsEnabled="{Binding CanStopSelectedProgram}" AutomationProperties.Name="실행 중인 작업 중지"/></Grid></StackPanel>
         </Grid>
+       </Border>
+      </Grid>
+      <Border x:Name="LogPanel" Grid.Row="2" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,14,0,0"><Expander x:Name="LogExpander" Header="작업 기록" IsExpanded="False"><ListBox x:Name="JobLogList" ItemsSource="{Binding JobLogs}" Height="100" FontSize="12" Padding="0" ScrollViewer.VerticalScrollBarVisibility="Auto"><ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="Padding" Value="0,3"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter/></ControlTemplate></Setter.Value></Setter></Style></ListBox.ItemContainerStyle></ListBox></Expander></Border>
+     </Grid>
     </Grid>
+   </TabItem>
+   <TabItem Header="연결·관리"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="0,20,0,0">
+    <TextBlock Text="프로젝트 폴더" FontSize="20" FontWeight="SemiBold"/><TextBlock Text="이 폴더 안의 프로젝트를 찾아 내 프로젝트에 표시합니다." Foreground="{StaticResource MutedBrush}" Margin="0,7,0,12"/><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox Text="{Binding RootPath, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="프로젝트 상위 폴더" MinWidth="500"/><Button Grid.Column="1" Content="폴더 선택" Click="ChooseRoot_Click" Margin="10,0,0,0"/></Grid>
+    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,26,0,0" Padding="0,22,0,0"><StackPanel><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="작업에 필요한 연결" FontSize="20" FontWeight="SemiBold"/><Button Grid.Column="1" Content="연결 확인" Click="Refresh_Click"/></Grid><ItemsControl ItemsSource="{Binding UserFacingStatuses}" Margin="0,14,0,0"><ItemsControl.ItemTemplate><DataTemplate><Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,0,0,8"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="15"/><TextBlock Text="{Binding Purpose}" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,5,20,0"/><Expander Header="자세한 확인 결과" IsExpanded="False" Margin="0,5,20,0"><TextBlock Text="{Binding Detail}" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}" FontSize="12"/></Expander></StackPanel><Border Grid.Column="1" Background="{StaticResource RaisedBrush}" Padding="9,5" CornerRadius="4" VerticalAlignment="Top"><TextBlock Text="{Binding StateLabel}" FontSize="12"/></Border></Grid></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><WrapPanel Margin="0,8,0,0"><Button Content="공유 연결 시작" Click="EnsureRemote_Click" Margin="0,0,8,0"/><Button Content="자동 시작 정리" Click="ConsolidateRemote_Click" Margin="0,0,8,0"/><Button Content="AI 작업 전달" Click="Jev_Click"/></WrapPanel></StackPanel></Border>
+    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,26,0,0" Padding="0,22,0,0"><StackPanel><TextBlock Text="앱 관리" FontSize="20" FontWeight="SemiBold"/><WrapPanel Margin="0,14,0,0"><Button Content="설치 · 자동 시작" Click="Install_Click" Margin="0,0,8,0"/><Button Content="공유 연결 복구" Click="Restore_Click" Margin="0,0,8,0"/><Button Content="앱 제거" Click="Uninstall_Click"/></WrapPanel><CheckBox Content="화면 전환 효과 줄이기" IsChecked="{Binding ReduceMotion, Mode=TwoWay}" Margin="0,18,0,0"/></StackPanel></Border>
+   </StackPanel></ScrollViewer></TabItem>
+  </TabControl>
+  <TextBlock Grid.Row="2" Text="{Binding Message}" Foreground="{StaticResource MutedBrush}" FontSize="12" TextTrimming="CharacterEllipsis" ToolTip="{Binding Message}" Margin="0,12,0,0" MaxHeight="20"/>
+ </Grid>
 </Window>

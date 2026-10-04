@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "anchorRoot": "D:\\A_KJ\\AI",
+  "projects": [
+    {
+      "id": "phonelol-current",
+      "name": "멀티의 신",
+      "path": "D:\\A_KJ\\AI\\PhoneLoL_02",
+      "description": "휴대폰에서 플레이하는 게임입니다. 게임을 만들고 설치파일을 확인하는 주 작업 공간입니다.",
+      "category": "게임",
+      "role": "active",
+      "roleLabel": "현재 개발",
+      "evidencePath": "README.md · Docs/FEATURES_0.23.5.md",
+      "checkedAt": "2026-10-05",
+      "functions": [
+        {
+          "id": "use",
+          "name": "설치파일·사용 안내",
+          "programs": [
+            {
+              "id": "latest-apk",
+              "name": "최근 작업용 설치파일",
+              "path": "PhoneLOL-02/Builds/PhoneLOL-0.23.5.apk",
+              "description": "휴대폰에 설치하는 Android용 파일입니다. PC에서 실행하는 게임이 아닙니다. 최신 파일이 있다는 것만으로 사용 검증이 완료된 것은 아닙니다.",
+              "kindLabel": "휴대폰 설치파일",
+              "openActionLabel": "설치파일 위치 보기",
+              "latestApkFolder": "PhoneLOL-02/Builds"
+            },
+            {
+              "id": "stable-apk",
+              "name": "사용 확인된 완료본 · 0.23.4",
+              "path": "PhoneLOL-02/Builds/PhoneLOL-0.23.4.apk",
+              "description": "사용자가 정상 작동을 확인한 완료본입니다. 최근 작업본과 비교하거나 되돌릴 때 보관합니다.",
+              "kindLabel": "확인된 설치파일",
+              "openActionLabel": "완료본 위치 보기"
+            },
+            {
+              "id": "feature-guide",
+              "name": "새 기능·직접 테스트 안내",
+              "path": "Docs/FEATURES_0.23.5.md",
+              "description": "게임에서 직접 확인할 기능과 사용 방법을 정리한 문서입니다.",
+              "kindLabel": "사용 안내",
+              "openActionLabel": "안내 파일 보기"
+            }
+          ]
+        },
+        {
+          "id": "source",
+          "name": "게임을 만드는 폴더",
+          "programs": [
+            {
+              "id": "unity-project",
+              "name": "Unity에서 게임 수정",
+              "path": "PhoneLOL-02",
+              "description": "게임 화면과 동작을 수정하는 편집 프로젝트입니다. 이미 열린 같은 프로젝트는 중복 실행하지 않습니다.",
+              "kindLabel": "게임 편집기",
+              "openActionLabel": "개발 폴더 보기",
+              "actionLabel": "Unity로 열기",
+              "editorOpenScript": "Automation/OpenUnity.ps1",
+              "editorExecutable": "C:\\Program Files_My\\A_3D\\Unity_Hub\\Unity_Editor\\6000.3.14f1\\Editor\\Unity.exe"
+            },
+            {
+              "id": "handoff",
+              "name": "현재 작업·인수인계",
+              "path": "HANDOFF.md",
+              "description": "다음 작업자가 읽을 현재 상태와 지켜야 할 작업 기준입니다.",
+              "kindLabel": "작업 기록",
+              "openActionLabel": "인수인계 파일 보기"
+            }
+          ]
+        }
+      ],
+      "relatedFolders": [
+        {
+          "id": "old-game",
+          "name": "게임 이전 개발본",
+          "path": "D:\\A_KJ\\AI\\PhoneLOL",
+          "description": "1.15.9 계열의 이전 개발 이력입니다. 현재 개발본과 섞어 작업하지 않습니다.",
+          "roleLabel": "이전 개발"
+        },
+        {
+          "id": "test-copy",
+          "name": "게임 실험용 사본",
+          "path": "D:\\A_KJ\\AI\\PhoneLoL_02-CloudTest",
+          "description": "옛 0.21.5 기준의 테스트용 복사본입니다. 현재 배포용 소스로 표시하지 않습니다.",
+          "roleLabel": "과거 테스트"
+        },
+        {
+          "id": "recovery",
+          "name": "게임 복구 자료",
+          "path": "D:\\A_KJ\\AI\\PhoneLOL-Recovery-v11511",
+          "description": "추출한 원본 리소스와 셰이더를 보관한 자료입니다. 게임 실행 프로그램이 아닙니다.",
+          "roleLabel": "복구 자료"
+        }
+      ]
+    },
+    {
+      "id": "audiobook",
+      "name": "무직전생 오디오북",
+      "path": "D:\\AI\\VoiceAudiobook",
+      "description": "소설 텍스트를 분석하고 등장인물별 음성으로 제작하는 프로젝트입니다.",
+      "category": "음성 제작",
+      "roleLabel": "실제 제작 폴더",
+      "evidencePath": "README.md · 00_START_HERE/CURRENT_HANDOFF.md",
+      "checkedAt": "2026-10-05",
+      "functions": [
+        {
+          "id": "create",
+          "name": "오디오북 제작",
+          "programs": [
+            {
+              "id": "studio",
+              "name": "오디오북 제작 화면",
+              "path": "audiobook_directed.py",
+              "description": "장면·화자·감정을 확인하고 음성을 만드는 화면입니다. 이미 열려 있으면 기존 화면을 사용합니다. 제작 작업은 PC의 그래픽카드를 사용할 수 있습니다.",
+              "kindLabel": "제작 도구",
+              "openActionLabel": "제작 화면 열기",
+              "actionLabel": "제작 화면 시작·열기",
+              "serviceUrl": "http://127.0.0.1:7862",
+              "commands": [
+                {
+                  "name": "제작 화면 시작",
+                  "fileName": "D:\\AI\\envs\\cosyvoice\\python.exe",
+                  "arguments": [
+                    "-u",
+                    "audiobook_directed.py"
+                  ],
+                  "timeoutSeconds": 0
+                }
+              ]
+            },
+            {
+              "id": "outputs",
+              "name": "만든 음성",
+              "path": "output/directed",
+              "description": "제작된 음성 파일을 모아 둔 폴더입니다. 파일을 선택해 들어볼 수 있습니다.",
+              "kindLabel": "제작 결과",
+              "openActionLabel": "음성 결과 폴더 보기"
+            },
+            {
+              "id": "compare",
+              "name": "목소리 비교 듣기",
+              "path": "comparison",
+              "description": "기본 음성과 감정을 강화한 음성 등 비교용 결과가 들어 있습니다.",
+              "kindLabel": "비교 자료",
+              "openActionLabel": "비교 결과 폴더 보기"
+            }
+          ]
+        },
+        {
+          "id": "notes",
+          "name": "작업 안내",
+          "programs": [
+            {
+              "id": "guide",
+              "name": "현재 제작 상태",
+              "path": "00_START_HERE/CURRENT_HANDOFF.md",
+              "description": "제작 진행 상황과 다음 작업자가 확인할 내용을 정리한 기록입니다.",
+              "kindLabel": "작업 안내",
+              "openActionLabel": "제작 기록 보기"
+            }
+          ]
+        }
+      ],
+      "relatedFolders": [
+        {
+          "id": "old-copy",
+          "name": "오디오북 코드 보관본",
+          "path": "D:\\A_KJ\\AI\\txt_무직전생",
+          "description": "이전 코드와 자료 사본입니다. 실제 제작은 D드라이브의 VoiceAudiobook 폴더에서 진행합니다.",
+          "roleLabel": "이전 자료"
+        }
+      ]
+    },
+    {
+      "id": "video-downloader",
+      "name": "영상·음원 저장",
+      "path": "D:\\AI\\video-downloader",
+      "description": "주소 목록에 있는 영상과 음원을 PC에 저장합니다. 오디오북용 자료를 모을 때도 사용합니다.",
+      "category": "자료 수집",
+      "roleLabel": "실제 실행 폴더",
+      "evidencePath": "run.bat · downloader.py · downloads",
+      "checkedAt": "2026-10-05",
+      "functions": [
+        {
+          "id": "download",
+          "name": "주소·다운로드",
+          "programs": [
+            {
+              "id": "links",
+              "name": "저장할 주소 목록",
+              "path": "links.txt",
+              "description": "여기에 기록한 주소가 다운로드 대상입니다. 실행 전에 목록을 확인하세요.",
+              "kindLabel": "입력 목록",
+              "openActionLabel": "주소 목록 보기"
+            },
+            {
+              "id": "download",
+              "name": "목록 다운로드",
+              "path": "downloader.py",
+              "description": "입력 목록의 영상을 저장합니다. 기존 다운로드가 진행 중이면 같은 작업을 중복 시작하지 마세요.",
+              "kindLabel": "저장 도구",
+              "openActionLabel": "실행 파일 위치 보기",
+              "actionLabel": "다운로드 시작",
+              "commands": [
+                {
+                  "name": "목록 다운로드",
+                  "fileName": "C:\\WINDOWS\\py.exe",
+                  "arguments": [
+                    "downloader.py"
+                  ],
+                  "timeoutSeconds": 0
+                }
+              ]
+            },
+            {
+              "id": "files",
+              "name": "저장된 영상·음원",
+              "path": "downloads",
+              "description": "다운로드가 끝난 영상과 음원이 저장되는 폴더입니다.",
+              "kindLabel": "저장 결과",
+              "openActionLabel": "저장 결과 폴더 보기"
+            },
+            {
+              "id": "summary",
+              "name": "최근 실행 요약",
+              "path": "result_summary.txt",
+              "description": "저장 성공과 실패 내역을 확인하는 결과 파일입니다.",
+              "kindLabel": "결과 기록",
+              "openActionLabel": "결과 파일 보기"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "project-operations-hub",
+      "name": "전체 프로젝트 관리",
+      "path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub",
+      "description": "여러 프로젝트를 연결하고 공통 작업 기준과 인수인계를 관리하는 공간입니다.",
+      "category": "전체 관리",
+      "roleLabel": "관리 기준",
+      "evidencePath": "AGENTS.md · ai-control-tower/README.md",
+      "checkedAt": "2026-10-05",
+      "preserveManifest": true,
+      "functions": [
+        {
+          "id": "guides",
+          "name": "사용 안내",
+          "programs": [
+            {
+              "id": "tower-guide",
+              "name": "이 관리 화면의 사용법",
+              "path": "000_사용자용/08_AI_관제탑.md",
+              "description": "프로젝트 선택, 폴더 연결과 작업 실행 방법을 안내합니다.",
+              "kindLabel": "사용 안내",
+              "openActionLabel": "사용 안내 보기"
+            },
+            {
+              "id": "tools-guide",
+              "name": "도구를 잘 쓰는 방법",
+              "path": "000_사용자용/10_도구_활용_추천.md",
+              "description": "작업마다 적합한 도구와 분업 방법을 고르고 과용을 피하는 기준입니다.",
+              "kindLabel": "도구 안내",
+              "openActionLabel": "도구 안내 보기"
+            }
+          ]
+        }
+      ],
+      "relatedFolders": [
+        {
+          "id": "installed-tower",
+          "name": "설치된 관리 프로그램",
+          "path": "D:\\A_KJ\\AI\\Applications\\AIControlTower",
+          "description": "지금 보고 있는 관리 프로그램의 실행파일이 설치된 폴더입니다.",
+          "roleLabel": "설치 위치"
+        }
+      ]
+    },
+    {
+      "id": "stock-planned",
+      "name": "주식 자동매매",
+      "path": "D:\\A_KJ\\AI\\자동매매주식관련",
+      "description": "자동매매 프로젝트를 준비하던 폴더입니다. 실행 기능은 아직 등록되지 않았습니다.",
+      "category": "준비 중",
+      "role": "planned",
+      "roleLabel": "준비 중",
+      "evidencePath": "폴더 직접 확인",
+      "checkedAt": "2026-10-05",
+      "functions": [
+        {
+          "id": "workspace",
+          "name": "준비 폴더",
+          "programs": [
+            {
+              "id": "folder",
+              "name": "주식 프로젝트 폴더",
+              "path": ".",
+              "description": "현재 확인한 폴더는 비어 있습니다. 실행할 프로그램으로 표시하지 않습니다.",
+              "kindLabel": "준비 폴더",
+              "openActionLabel": "준비 폴더 보기"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "housing-planned",
+      "name": "청약 도구",
+      "path": "D:\\A_KJ\\AI\\청약관련",
+      "description": "청약 프로젝트를 준비하던 폴더입니다. 실행 기능은 아직 등록되지 않았습니다.",
+      "category": "준비 중",
+      "role": "planned",
+      "roleLabel": "준비 중",
+      "evidencePath": "폴더 직접 확인",
+      "checkedAt": "2026-10-05",
+      "functions": [
+        {
+          "id": "workspace",
+          "name": "준비 폴더",
+          "programs": [
+            {
+              "id": "folder",
+              "name": "청약 프로젝트 폴더",
+              "path": ".",
+              "description": "현재 확인한 폴더는 비어 있습니다. 실행할 프로그램으로 표시하지 않습니다.",
+              "kindLabel": "준비 폴더",
+              "openActionLabel": "준비 폴더 보기"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

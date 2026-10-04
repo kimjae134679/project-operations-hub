@@ -14,7 +14,7 @@ public sealed class LocalExecutionPolicyTests
     [Fact]
     public void MainViewModel_ExposesDisabledJevPolicy()
     {
-        using var viewModel = new MainViewModel();
+        using var viewModel = new MainViewModel(new ControlTowerSettings(), enablePolling: false);
         Assert.False(viewModel.IsLocalJevExecutionAllowed);
         Assert.Equal(LocalExecutionPolicy.LocalJevDisabledMessage, viewModel.LocalJevPolicyMessage);
     }
@@ -26,7 +26,7 @@ public sealed class LocalExecutionPolicyTests
         try
         {
             Environment.SetEnvironmentVariable("PATH", string.Empty);
-            using var viewModel = new MainViewModel { TaskInput = "Do not launch Jev during this policy test." };
+            using var viewModel = new MainViewModel(new ControlTowerSettings(), enablePolling: false) { TaskInput = "Do not launch Jev during this policy test." };
 
             viewModel.RunJevTask();
 
@@ -38,3 +38,4 @@ public sealed class LocalExecutionPolicyTests
         }
     }
 }
+
