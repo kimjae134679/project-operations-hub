@@ -28,8 +28,8 @@
 
 ## 실제 원본
 
-- 프로젝트 저장소: https://github.com/kimjae134679/txt_-
-- 최신 인수인계: https://github.com/kimjae134679/txt_-/blob/main/00_START_HERE/CURRENT_HANDOFF.md
+- 프로젝트 저장소: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
+- 최신 인수인계: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/00_START_HERE/CURRENT_HANDOFF.md
 - 허브 포인터: `02_PROJECTS/Mushoku-Audiobook/`
 
 ## 다음
