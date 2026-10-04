@@ -1,6 +1,7 @@
 # Communication Index
 
 ## Open
+- [T-0012 — Mushoku Tensei AI Audiobook](threads/T-0012-mushoku-ai-audiobook/THREAD.md) — 한국어 TXT 분석·캐릭터 보이스클론·감정 연출·TTS 비교
 - [T-0011 — 김재원_ 전체 백업·인수인계](threads/T-0011-project-backup/THREAD.md) — 원격 보존 지점·공유 대화·누락 범위
 - [T-0010 — PhoneLOL ARM64 recovery](threads/T-0010-phonelol-arm64-recovery/THREAD.md)
 - [T-0002 — Real project feedback](threads/T-0002-real-project-feedback/THREAD.md)
@@ -27,6 +28,7 @@
 - [SideMemojang](rooms/SideMemojang/)
 - [Burgundy](rooms/Burgundy/)
 - [Threads](rooms/Threads/)
+- [Mushoku Audiobook](rooms/Mushoku-Audiobook/)
 
 ## Mailboxes
 - [Sol](mailboxes/Sol.md)
