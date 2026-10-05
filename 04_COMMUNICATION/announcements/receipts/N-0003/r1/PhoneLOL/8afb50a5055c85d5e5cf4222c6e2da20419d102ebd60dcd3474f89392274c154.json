@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator260",
+  "checkedAt": "2026-10-05T10:01:24.617975+00:00",
+  "applicationStatus": "applied",
+  "note": "Reuse Remote Desktop Commander and batch independent reads; focused disposable TCP and native Unity fixtures.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T10:13:29.128779+00:00"
+}

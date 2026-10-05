@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator260",
+  "checkedAt": "2026-10-05T10:01:24.693574+00:00",
+  "applicationStatus": "pending",
+  "note": "Verified separate source and runtime roots. Live deployment remains pending, explicitly authorized in this conversation.",
+  "evidence": []
+}
