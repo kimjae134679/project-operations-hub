@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 1,
+  "contentSha256": "539af1b0faa8026c40c116b0c8b630bc42f57fec29c600e5c0baeb6079e3788d",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_inventory",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:12.443449+00:00",
+  "applicationStatus": "applied",
+  "note": "공지 4개의 현재 본문과 버전·해시를 읽고 본인 프로젝트·역할·세션으로만 기록했다. 다른 담당자의 읽음과 프로젝트 전체 완료를 대신 확인하지 않는다. 이 기록의 GitHub 공유는 통합 커밋 이후이며 다음 재개 때 변경 공지를 다시 확인한다.",
+  "evidence": [
+    "04_COMMUNICATION/announcements/PROTOCOL.md",
+    "04_COMMUNICATION/announcements/manifest.json"
+  ],
+  "appliedAt": "2026-10-05T08:15:27.488143+00:00"
+}

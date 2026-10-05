@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Control-Tower",
+  "actorId": "/root/efficiency_research",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:02.452438+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "이번 담당은 공지 CLI·스키마·확인 절차와 본인 Control-Tower 확인 기록이다. PC 설치·공유 원격 프로세스 변경·프로그램 종료·Unity 제어는 담당하지 않아 해당 제어 항목은 적용 대상이 아니다. 다른 프로젝트 자료·현재 원격 연결을 변경하지 않았고 PC 실행·Jev 왕복 성공으로 보고하지 않는다.",
+  "evidence": [
+    "scripts/notice_board.py"
+  ]
+}

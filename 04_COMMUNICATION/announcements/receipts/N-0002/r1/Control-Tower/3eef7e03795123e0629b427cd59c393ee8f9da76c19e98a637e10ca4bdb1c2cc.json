@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Control-Tower",
+  "actorId": "/root/efficiency_research",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:02.451678+00:00",
+  "applicationStatus": "applied",
+  "note": "공지 CLI의 사람용 출력에 한국어 용도·행동·미확인/적용대기/적용 구분을 사용했다. STATUS 표는 필수·선택 프로젝트, 작성자 이름, KST/UTC 시각을 표시하고 전체 AI 확인으로 오인하지 않게 설명했다. 이번 역할은 공지 화면·절차이며 WPF 디자인이나 PC 폴더 이동은 수행하지 않았다.",
+  "evidence": [
+    "scripts/notice_board.py"
+  ],
+  "appliedAt": "2026-10-05T08:15:15.603813+00:00"
+}

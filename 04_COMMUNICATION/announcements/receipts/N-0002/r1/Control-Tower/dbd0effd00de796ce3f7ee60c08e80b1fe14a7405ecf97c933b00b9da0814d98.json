@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Control-Tower",
+  "actorId": "/root/control_tower_audit",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:16.632976+00:00",
+  "applicationStatus": "applied",
+  "note": "Control-Tower UI·문서 검토에 한국어 프로젝트 이름·용도·역할, 자료 열기와 등록 명령 실행의 구분, APK/미확인 EXE 자동 실행 없음, 기본 접힌 위치·기록과 검색을 반영했다. Linear/Notion/Things/shadcn 공식 자료를 비교한 근거와 작은 창 고정 조작 원칙을 문서화했다. 본인 검토는 소스·문서 범위이며 최종 네이티브 캡처·PC 배포와 실제 게임/GPU 작업 성공은 대신 확인하지 않는다.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/MainWindow.xaml",
+    "ai-control-tower/docs/DESIGN_REFERENCES.md",
+    "ai-control-tower/README.md"
+  ],
+  "appliedAt": "2026-10-05T08:14:54.855627+00:00"
+}
