@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-10-06T00:58:26+09:00",
+  "platform": "Windows WPF .NET 9",
+  "unitTests": {
+    "passed": 96,
+    "failed": 0,
+    "skipped": 0
+  },
+  "layouts": [
+    [
+      1460,
+      920
+    ],
+    [
+      1060,
+      720
+    ]
+  ],
+  "themeScreenChecks": 33,
+  "minRenderedContrast": 4.811831218487221,
+  "wheelChecks": 4,
+  "catalogRefresh": {
+    "selection": true,
+    "search": true,
+    "fold": true,
+    "scroll": true,
+    "beforeOffset": 7,
+    "afterOffset": 7
+  },
+  "scaleTest": {
+    "isolatedProjects": 200,
+    "originalObjectSelection": true
+  },
+  "serverRoster": {
+    "monitorResponded": false,
+    "pollIntervalSeconds": 1,
+    "busyIdleAndRotationObserved": true,
+    "successfulTimestampsReverified": false,
+    "serverRestarted": false
+  },
+  "qaGitMutation": false,
+  "finalDeployment": "See project local communication handoff for final executable hash and installation verification"
+}

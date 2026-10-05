@@ -13,11 +13,11 @@ public static class NoticeDocument
     public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached("Text",typeof(string),typeof(NoticeDocument),new PropertyMetadata("",Changed));
     public static void SetText(DependencyObject target,string value)=>target.SetValue(TextProperty,value);
     public static string GetText(DependencyObject target)=>(string)target.GetValue(TextProperty);
-    private static Brush Brush(string key)=>(Brush)Application.Current.FindResource(key);
     private static void Changed(DependencyObject target,DependencyPropertyChangedEventArgs e)
     {
         if(target is not RichTextBox reader)return;
-        var document=new FlowDocument { FontFamily=new FontFamily("Segoe UI, Malgun Gothic"),FontSize=14,Foreground=Brush("TextBrush"),PagePadding=new Thickness(0),ColumnWidth=double.PositiveInfinity,LineHeight=23 };
+        var document=new FlowDocument { FontFamily=new FontFamily("Segoe UI, Malgun Gothic"),FontSize=14,PagePadding=new Thickness(0),ColumnWidth=double.PositiveInfinity,LineHeight=23 };
+        document.SetResourceReference(FlowDocument.ForegroundProperty,"TextBrush");
         var lines=(e.NewValue as string??"").Replace("\r","").Split('\n');
         for(var i=0;i<lines.Length;i++)
         {
@@ -47,7 +47,10 @@ public static class NoticeDocument
                     {
                         var paragraph=new Paragraph { Margin=new Thickness(0),FontSize=13,FontWeight=row==0?FontWeights.SemiBold:FontWeights.Normal };
                         AddInline(paragraph,col<rows[row].Length?rows[row][col]:"");
-                        tr.Cells.Add(new TableCell(paragraph) { Padding=new Thickness(10,8,10,8),BorderBrush=Brush("LineBrush"),BorderThickness=new Thickness(0,0,0,1),Background=row==0?Brush("RaisedBrush"):Brush("SurfaceBrush") });
+                        var cell=new TableCell(paragraph) { Padding=new Thickness(10,8,10,8),BorderThickness=new Thickness(0,0,0,1) };
+                        cell.SetResourceReference(TableCell.BorderBrushProperty,"LineBrush");
+                        cell.SetResourceReference(TableCell.BackgroundProperty,row==0?"RaisedBrush":"SurfaceBrush");
+                        tr.Cells.Add(cell);
                     }
                 }
                 document.Blocks.Add(table);continue;
@@ -67,10 +70,16 @@ public static class NoticeDocument
         {
             paragraph.Inlines.Add(new Run(text[offset..match.Index]));
             if(match.Groups[1].Success)paragraph.Inlines.Add(new Run(match.Groups[1].Value) { FontWeight=FontWeights.SemiBold });
-            else if(match.Groups[2].Success)paragraph.Inlines.Add(new Run(match.Groups[2].Value) { Foreground=Brush("AccentBrush") });
+            else if(match.Groups[2].Success)
+            {
+                var run=new Run(match.Groups[2].Value);
+                run.SetResourceReference(Run.ForegroundProperty,"AccentBrush");
+                paragraph.Inlines.Add(run);
+            }
             else if(Uri.TryCreate(match.Groups[4].Value,UriKind.Absolute,out var uri) && uri.Scheme=="https")
             {
-                var link=new Hyperlink(new Run(match.Groups[3].Value)) { NavigateUri=uri,Foreground=Brush("AccentBrush") };
+                var link=new Hyperlink(new Run(match.Groups[3].Value)) { NavigateUri=uri };
+                link.SetResourceReference(Hyperlink.ForegroundProperty,"AccentBrush");
                 link.RequestNavigate+=(_,args)=> { Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri) { UseShellExecute=true })?.Dispose();args.Handled=true; };
                 paragraph.Inlines.Add(link);
             }

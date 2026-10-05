@@ -72,13 +72,20 @@ public sealed partial class MainViewModel
     public void OpenCollectedFile() => OpenExisting(SelectedInbox?.Path);
     public async Task SyncCommunicationAsync(bool force=false)
     {
-        if(_disposed || !force && DateTime.UtcNow-_lastCommunication<TimeSpan.FromSeconds(15) || !await _communicationLock.WaitAsync(0)) return;
+        if(_disposed || !force && DateTime.UtcNow-_lastCommunication<TimeSpan.FromSeconds(15)) return;
+        try
+        {
+            if (force) await _communicationLock.WaitAsync(_lifetime.Token);
+            else if (!await _communicationLock.WaitAsync(0)) return;
+        }
+        catch (OperationCanceledException) { return; }
         try
         {
             IsCommunicating=true; _lastCommunication=DateTime.UtcNow;
             var network=force || DateTime.UtcNow-_lastCommunicationNetwork>TimeSpan.FromMinutes(1);
             CommunicationGitResult? prepare=null;
-            if(network) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); _communicationPrepared=prepare.Success; CentralSyncMessage=_settings.IsTemporary && !prepare.Success ? "화면 검증용 로컬 자료 · GitHub 업로드 없음" : prepare.Message; }
+            if(network && !_settings.IsTemporary) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); _communicationPrepared=prepare.Success; CentralSyncMessage=prepare.Message; }
+            else if (_settings.IsTemporary) CentralSyncMessage="화면 검증용 로컬 자료 · GitHub 변경 없음";
             if (!_settings.IsTemporary && !_communicationPrepared) { CommunicationMessage="전용 소통 저장소 연결 대기 · 기존 폴더의 자료는 보존합니다."; return; }
             var manifest=Path.Combine(CommunicationHubPath,"04_COMMUNICATION","announcements","manifest.json");
             if(!File.Exists(manifest)) { CommunicationMessage="공지를 아직 내려받지 못했습니다. 연결되면 다시 시도합니다."; return; }
@@ -89,13 +96,26 @@ public sealed partial class MainViewModel
                 CentralSyncMessage=published.Message;
                 if(published.Success) snapshot=await _communication.SyncAsync(CommunicationHubPath,GetCommunicationTargets(),_lifetime.Token);
             }
-            _communicationSnapshot=snapshot;
-            ReadCommunicationNames(manifest);
-            UpdateCommunicationView(snapshot);
+            if(!snapshot.Errors.Any(e=>e.Code=="manifest_invalid")) ReadCommunicationNames(manifest);
+            ApplyCommunicationSnapshot(snapshot);
         }
         catch(OperationCanceledException) { }
         catch(Exception ex) { CommunicationMessage="소통 동기화 대기 · " + ProcessRunner.Sanitize(ex.Message); }
         finally { IsCommunicating=false; _communicationLock.Release(); }
+    }
+    internal void ApplyCommunicationSnapshot(CommunicationSnapshot snapshot)
+    {
+        if(snapshot.Errors.Any(e=>e.Code=="manifest_invalid"))
+        {
+            _communicationViewFingerprint="";
+            CommunicationErrors.Clear();
+            foreach(var error in snapshot.Errors) CommunicationErrors.Add(error.Message);
+            CommunicationMessage="공지 읽기 재시도 대기 · 마지막 정상 내용을 유지합니다.";
+            CentralSyncMessage=CommunicationMessage;
+            return;
+        }
+        _communicationSnapshot=snapshot;
+        UpdateCommunicationView(snapshot);
     }
     private void ReadCommunicationNames(string path)
     {
