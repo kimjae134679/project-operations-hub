@@ -16,6 +16,7 @@ public static class UiVerification
         Directory.CreateDirectory(outputDirectory);
         await window.InitializeAsync();
         var vm = (MainViewModel)window.DataContext;
+        var contrastChecks = new List<object>();
         vm.SelectedProject = vm.Projects.FirstOrDefault(p => p.Id == "project-operations-hub") ?? vm.Projects.FirstOrDefault();
         window.UpdateLayout();
         var program = vm.SelectedProject?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id.EndsWith("/validation"));
@@ -30,6 +31,8 @@ public static class UiVerification
             if (vm.SelectedCommand is not null) await vm.LaunchProgramAsync();
         }
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        contrastChecks.Add(CheckTextColor(window, "ProjectTitle", "wide"));
+        contrastChecks.Add(CheckTextColor(window, "InspectorTitle", "wide"));
         Capture(window, Path.Combine(outputDirectory, "management.png"));
         var logExpander = window.FindName("LogExpander") as Expander;
         if (logExpander is not null)
@@ -79,10 +82,12 @@ public static class UiVerification
         tabs.SelectedIndex = 4;
         await vm.RefreshServerAsync(true);
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        contrastChecks.Add(CheckTextColor(window, "ServerHeading", "wide"));
         Capture(window, Path.Combine(outputDirectory, "server.png"));
         window.Width = 1060; window.Height = 720;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         CheckVisibleControl(window, "ServerModePanel");
+        contrastChecks.Add(CheckTextColor(window, "ServerHeading", "compact"));
         Capture(window, Path.Combine(outputDirectory, "server-compact.png"));
         window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 0;
@@ -91,6 +96,8 @@ public static class UiVerification
         if (logExpander is not null) logExpander.IsExpanded = true;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         var compactControls = CheckInspectorControls(window);
+        contrastChecks.Add(CheckTextColor(window, "ProjectTitle", "compact"));
+        contrastChecks.Add(CheckTextColor(window, "InspectorTitle", "compact"));
         Capture(window, Path.Combine(outputDirectory, "management-compact.png"));
         if (logExpander is not null) logExpander.IsExpanded = false;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
@@ -120,6 +127,7 @@ public static class UiVerification
             window.Width = oldWidth; window.Height = oldHeight;
             await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         }
+        var wheelChecks = await MouseWheelVerification.VerifyListsAsync(window);
         var summary = new
         {
             CheckedAt = DateTimeOffset.Now, vm.ProjectsCount, vm.ProgramsCount, vm.RunningCount,
@@ -128,6 +136,9 @@ public static class UiVerification
             Controls = Walk(window).OfType<Button>().Where(b => b.Content is string).Select(b => new { Name = b.Content, b.IsEnabled, b.ActualWidth, b.ActualHeight }).ToArray(),
             CompactControls = compactControls,
             SearchVerified = searchVerified,
+            MouseWheelChecks = wheelChecks,
+            ContrastChecks = contrastChecks,
+            KeyColors = new { Text = ThemeColor(window, "TextBrush"), Canvas = ThemeColor(window, "CanvasBrush"), Surface = ThemeColor(window, "SurfaceBrush") },
             ValidationState = program?.Status,
             Catalog = vm.Projects.Select(p => new { p.DisplayName, p.Description, p.RoleLabel, p.Path, p.EvidenceDate, Programs = p.Functions.SelectMany(f => f.Programs).Select(item => new { item.DisplayName, item.KindLabel, item.ActionLabel, item.Path, item.CanLaunch, item.HasEditorLauncher }).ToArray() }).ToArray(),
             Statuses = vm.Statuses.Select(s => new { s.DisplayName, s.State, s.Detail }).ToArray(),
@@ -141,6 +152,23 @@ public static class UiVerification
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static string ThemeColor(MainWindow window, string key) =>
+        (window.FindResource(key) as SolidColorBrush)?.Color.ToString()
+        ?? throw new InvalidOperationException("Expected solid theme color: " + key);
+
+    private static object CheckTextColor(MainWindow window, string name, string layout)
+    {
+        var text = window.FindName(name) as TextBlock
+            ?? throw new InvalidOperationException("Missing body text verification target: " + name);
+        var expected = window.FindResource("TextBrush") as SolidColorBrush
+            ?? throw new InvalidOperationException("TextBrush must be a solid color.");
+        var actual = text.Foreground as SolidColorBrush;
+        var visible = text.IsVisible && text.ActualWidth > 0 && text.ActualHeight > 0;
+        var matches = actual is not null && actual.Color == expected.Color && actual.Opacity == expected.Opacity;
+        if (!visible || !matches)
+            throw new InvalidOperationException($"Body text color regression in {layout}/{name}: visible={visible}, actual={text.Foreground}, expected={expected}.");
+        return new { Name = name, Layout = layout, IsVisible = visible, Foreground = actual!.Color.ToString(), ExpectedTextColor = expected.Color.ToString(), MatchesTextBrush = matches };
     }
     private static void CheckVisibleControl(MainWindow window, string name)
     {
