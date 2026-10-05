@@ -6,10 +6,10 @@
   "projectId": "Mushoku-Audiobook",
   "actorId": "/root",
   "sessionId": "20261005-mushoku-native-battle",
-  "checkedAt": "2026-10-05T09:10:00+00:00",
+  "checkedAt": "2026-10-05T09:25:54+00:00",
   "appliedAt": "2026-10-05T09:25:54+00:00",
   "applicationStatus": "applied",
-  "note": "공유 Remote Desktop 연결을 유지하고 직접 시작한 제작/검사 프로세스만 관리했다. 기존 사용자 지정 안정 프로젝트 D:/AI/VoiceAudiobook 유지; 새 관리루트 D:/A_KJ/AI는 프로젝트 이동 지시로 적용하지 않는다.",
+  "note": "공유 Remote Desktop 연결을 유지하고 직접 시작한 제작/검사 프로세스만 관리했다. 기존 사용자 지정 안정 프로젝트 D:/AI/VoiceAudiobook 유지; 새 관리루트 D:/A_KJ/AI는 프로젝트 이동 지시로 적용하지 않는다. 본문 확인 후 최신 목록을 다시 확인했으며 동일 버전·해시였다.",
   "evidence": [
     "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/AGENTS.md",
     "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/NATIVE_BATTLE_REVISION.md"
