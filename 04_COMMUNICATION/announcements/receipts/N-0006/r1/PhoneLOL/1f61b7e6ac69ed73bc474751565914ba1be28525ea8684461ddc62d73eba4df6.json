@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Gold265",
+  "checkedAt": "2026-10-05T10:01:24.693574+00:00",
+  "applicationStatus": "applied",
+  "note": "Gold265: 기존 관전 배포 후 시작 골드 추가 배포·본인 완료 기록. 클라이언트 변경이며 서버/계정/원래 공지 보존.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T18:08:42.065816+00:00"
+}
