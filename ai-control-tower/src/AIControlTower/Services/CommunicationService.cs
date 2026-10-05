@@ -145,6 +145,8 @@ public sealed class CommunicationService
                     "```text\npython 기록도우미.py check --actor Sol --read\npython 기록도우미.py ack --actor Sol --session 본인작업세션 --notice N-0001 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
                     "본문을 실제 읽은 뒤 현재 revision·hash를 사용하세요. 적용 완료에는 구체적인 설명·근거를 남깁니다. 받은공지의 manifest.json이 현재 전달 목록의 원본입니다. 로컬 배포·수집과 GitHub 공유 완료는 별개입니다. 다른 독립 채팅을 자동으로 깨우지 않습니다.\n";
                 await AtomicWrite(mailbox, "README.md", Encoding.UTF8.GetBytes(instructions), true, ct).ConfigureAwait(false);
+                try { await UpdateEntryHint(projectRoot, target.ProjectId, ct).ConfigureAwait(false); }
+                catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "entry_hint_held"); }
                 foreach (var path in EnumerateSafe(localReceipts, errors, target.ProjectId))
                 {
                     if (!Path.GetExtension(path).Equals(".json", StringComparison.OrdinalIgnoreCase)) continue;
@@ -394,6 +396,7 @@ public sealed class CommunicationService
             "secret_held" => "비밀키·인증정보 의심 패턴 때문에 보류했습니다. 본문을 표시하거나 중앙에 복사하지 않았습니다.",
             "receipt_conflict" => "같은 작성자·세션의 중앙 확인 기록과 달라 보류했습니다. 본인이 기록을 비교해 병합해야 합니다.",
             "project_unavailable" => "프로젝트 등록 ID·실제 폴더·안전한 경로를 확인해야 합니다.",
+            "entry_hint_held" => "프로젝트 진입 안내가 변경 중이거나 관리 구역이 불완전해 보류했습니다. 기존 AGENTS.md를 보존했습니다.",
             "path_blocked" => "소통 폴더의 링크 또는 범위를 벗어난 경로를 건너뛰었습니다.",
             "file_limit" => "파일 수 제한에 도달했습니다. 나머지는 정리 후 다시 수집합니다.",
             _ => "파일이 변경 중이거나 형식·크기·경로 검증에 실패했습니다. 원본을 유지하고 다음 갱신에서 재시도합니다."
@@ -419,6 +422,40 @@ public sealed class CommunicationService
         if (Path.IsPathRooted(relativeAgain) || relativeAgain == ".." || relativeAgain.StartsWith(".." + Path.DirectorySeparatorChar)) throw new InvalidDataException("Path escaped root.");
         RejectLinks(full);
         return full;
+    }
+    private static async Task UpdateEntryHint(string projectRoot, string projectId, CancellationToken ct)
+    {
+        const string begin = "<!-- control-tower:communication-entry:begin -->";
+        const string end = "<!-- control-tower:communication-entry:end -->";
+        var block = begin + "\n## 통합 공지·인수인계\n\n" +
+            "이 소통함의 프로젝트 ID: `" + projectId + "`. 작업 시작·재개·인수인계 때 `_통합소통/받은공지/manifest.json`과 본인 확인 기록을 비교하고 새·변경 공지만 실제로 읽습니다. 최신 사용자 지시와 이 프로젝트의 기존 작업 규칙이 우선입니다.\n\n" +
+            "읽은 AI는 `_통합소통/기록도우미.py`로 본인 작성자·세션의 읽음·적용 기록을 남깁니다. 공지 전달은 읽음이 아니며 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 이유를 남깁니다. 공유할 요약·인수인계는 `_통합소통/보낼자료`에 두면 관리 앱이 수집합니다. 상세 절차는 `_통합소통/README.md`를 읽습니다. 연결·동기화가 실패했으면 최신이라고 단정하지 않습니다.\n" + end;
+        var path = Inside(projectRoot, "AGENTS.md");
+        var existed = File.Exists(path);
+        byte[] original = [];
+        if (existed)
+        {
+            if (new FileInfo(path).Length > MaximumFileBytes) throw new InvalidDataException("Entry document too large.");
+            original = await File.ReadAllBytesAsync(path,ct).ConfigureAwait(false);
+        }
+        var text = StrictUtf8.GetString(original); // Preserve the existing BOM, newlines, and every unrelated instruction.
+        var start = text.IndexOf(begin,StringComparison.Ordinal);
+        string updated;
+        if (start >= 0)
+        {
+            var finish = text.IndexOf(end,start,StringComparison.Ordinal);
+            if (finish < start || text.IndexOf(begin,start+begin.Length,StringComparison.Ordinal)>=0 || text.IndexOf(end,finish+end.Length,StringComparison.Ordinal)>=0) throw new InvalidDataException("Ambiguous managed entry.");
+            updated = text[..start] + block + text[(finish+end.Length)..];
+        }
+        else
+        {
+            if(text.Contains(end,StringComparison.Ordinal)) throw new InvalidDataException("Incomplete managed entry.");
+            updated = text + (text.Length==0?"":"\n\n") + block + "\n";
+        }
+        if (updated==text) return;
+        var bytes = StrictUtf8.GetBytes(updated);
+        if (bytes.Length > MaximumFileBytes) throw new InvalidDataException("Entry document too large.");
+        await AtomicWrite(projectRoot,"AGENTS.md",bytes,existed,ct,existed?original:null).ConfigureAwait(false);
     }
     private static void RejectLinks(string path)
     {
@@ -480,7 +517,7 @@ public sealed class CommunicationService
         }
         return NormalizeText(buffer.ToArray());
     }
-    private static async Task AtomicWrite(string root, string relative, byte[] bytes, bool replace, CancellationToken ct)
+    private static async Task AtomicWrite(string root, string relative, byte[] bytes, bool replace, CancellationToken ct, byte[]? expectedOriginal=null)
     {
         var destination = Inside(root, relative); var directory = Path.GetDirectoryName(destination)!;
         if (replace && File.Exists(destination) && new FileInfo(destination).Length <= MaximumFileBytes)
@@ -495,6 +532,7 @@ public sealed class CommunicationService
             await using (var file = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None, 8192, FileOptions.Asynchronous))
             { await file.WriteAsync(bytes, ct).ConfigureAwait(false); await file.FlushAsync(ct).ConfigureAwait(false); file.Flush(true); }
             ct.ThrowIfCancellationRequested(); RejectLinks(destination); RejectLinks(directory);
+            if(expectedOriginal is not null && (!File.Exists(destination) || !(await File.ReadAllBytesAsync(destination,ct).ConfigureAwait(false)).AsSpan().SequenceEqual(expectedOriginal))) throw new IOException("Entry document changed during delivery.");
             File.Move(temp, destination, replace);
         }
         finally { if (File.Exists(temp)) File.Delete(temp); }

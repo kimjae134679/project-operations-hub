@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         SourceInitialized += (_, _) => { var dark = 1; DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int)); };
         Loaded += async (_, _) => await InitializeAsync();
         SizeChanged += (_, _) => ApplyResponsiveLayout();
-        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) ApplyResponsiveLayout(); };
+        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
         Closed += (_, _) => _viewModel.Dispose();
     }
     [DllImport("dwmapi.dll")]
@@ -96,6 +96,19 @@ public partial class MainWindow : Window
         _viewModel.SelectedProgram = program;
         FadeIn(ProgramInspector);
         e.Handled = true;
+    }
+    private void SynchronizeProgramSelections()
+    {
+        void Visit(DependencyObject element)
+        {
+            if (element is ListBox list && list.Items.OfType<ProgramItem>().Any())
+            {
+                var expected = list.Items.Contains(_viewModel.SelectedProgram) ? _viewModel.SelectedProgram : null;
+                if (list.SelectedItem != expected) list.SetCurrentValue(ListBox.SelectedItemProperty, expected);
+            }
+            for (var i=0; i<System.Windows.Media.VisualTreeHelper.GetChildrenCount(element); i++) Visit(System.Windows.Media.VisualTreeHelper.GetChild(element,i));
+        }
+        Visit(this);
     }
 
     private void WorkspaceTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)

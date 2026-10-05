@@ -109,6 +109,9 @@ public static class UiVerification
             await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
             var gameList = Walk(window).OfType<ListBox>().FirstOrDefault(l => l.Items.Contains(vm.SelectedProgram));
             if (gameList is not null) gameList.SelectedItem = vm.SelectedProgram;
+            await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+            var selections=Walk(window).OfType<ListBox>().Where(l=>l.SelectedItem is AIControlTower.Models.ProgramItem).ToArray();
+            if (selections.Length!=1 || selections[0].SelectedItem != vm.SelectedProgram) throw new InvalidOperationException("Multiple program groups retain stale selection.");
             Capture(window, Path.Combine(outputDirectory, "workbench.png"));
             window.Width = 1060; window.Height = 720;
             await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);

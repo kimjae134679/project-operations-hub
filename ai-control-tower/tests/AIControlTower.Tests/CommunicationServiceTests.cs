@@ -69,6 +69,28 @@ public sealed class CommunicationServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task EntryHintPreservesExistingRulesAndDoesNotChurnOrAcknowledge()
+    {
+        var path=Path.Combine(Project,"AGENTS.md");var original="\uFEFF# 기존 지침\r\n이 지침은 그대로 보존합니다.\r\n";
+        File.WriteAllText(path,original,new UTF8Encoding(false));
+        var service=Service();await service.Sync(Hub,[Target]);
+        var updated=File.ReadAllText(path,new UTF8Encoding(false));
+        Assert.Contains("이 지침은 그대로 보존합니다.\r\n",updated);
+        Assert.Contains("_통합소통/받은공지/manifest.json",updated);
+        File.SetLastWriteTimeUtc(path,new DateTime(2020,1,1));
+        var second=await service.Sync(Hub,[Target]);
+        Assert.Equal(updated,File.ReadAllText(path,new UTF8Encoding(false)));Assert.Equal(2020,File.GetLastWriteTimeUtc(path).Year);Assert.Empty(second.Receipts);
+    }
+    [Fact]
+    public async Task IncompleteEntryHintIsPreservedAndReportedWithoutBlockingNoticeDelivery()
+    {
+        var path=Path.Combine(Project,"AGENTS.md");const string original="# 작업규칙\n<!-- control-tower:communication-entry:begin -->\n진행 중";
+        File.WriteAllText(path,original);
+        var result=await Service().Sync(Hub,[Target]);
+        Assert.Equal(original,File.ReadAllText(path));Assert.Contains(result.Errors,e=>e.Code=="entry_hint_held");
+        Assert.True(File.Exists(Path.Combine(Local("받은공지"),"N-0001.md")));Assert.Empty(result.Receipts);
+    }
+    [Fact]
     public async Task HelperIsOnlyCopiedAndOnlyRewrittenWhenItChanges()
     {
         var scripts = Path.Combine(Hub, "scripts"); Directory.CreateDirectory(scripts);

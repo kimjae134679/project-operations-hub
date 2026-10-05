@@ -78,7 +78,7 @@ public sealed partial class MainViewModel
             IsCommunicating=true; _lastCommunication=DateTime.UtcNow;
             var network=force || DateTime.UtcNow-_lastCommunicationNetwork>TimeSpan.FromMinutes(1);
             CommunicationGitResult? prepare=null;
-            if(network) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); _communicationPrepared=prepare.Success; CentralSyncMessage=prepare.Message; }
+            if(network) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); _communicationPrepared=prepare.Success; CentralSyncMessage=_settings.IsTemporary && !prepare.Success ? "화면 검증용 로컬 자료 · GitHub 업로드 없음" : prepare.Message; }
             if (!_settings.IsTemporary && !_communicationPrepared) { CommunicationMessage="전용 소통 저장소 연결 대기 · 기존 폴더의 자료는 보존합니다."; return; }
             var manifest=Path.Combine(CommunicationHubPath,"04_COMMUNICATION","announcements","manifest.json");
             if(!File.Exists(manifest)) { CommunicationMessage="공지를 아직 내려받지 못했습니다. 연결되면 다시 시도합니다."; return; }

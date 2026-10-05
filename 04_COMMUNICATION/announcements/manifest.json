@@ -186,7 +186,7 @@
     },
     {
       "id": "N-0005",
-      "revision": 1,
+      "revision": 2,
       "title": "프로젝트 소통 폴더와 자료 정리",
       "path": "notices/N-0005.md",
       "targets": [
@@ -194,7 +194,7 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "ebc10e96a20952f968f0a73720278b859fe096d899a54b2394b7779be39e75aa"
+      "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c"
     },
     {
       "id": "N-0006",
