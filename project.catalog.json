@@ -176,6 +176,27 @@
           "path": "D:\\A_KJ\\AI\\txt_무직전생",
           "description": "이전 코드와 자료 사본입니다. 실제 제작은 D드라이브의 VoiceAudiobook 폴더에서 진행합니다.",
           "roleLabel": "이전 자료"
+        },
+        {
+          "id": "voice-models",
+          "name": "새 음성 모델 보관",
+          "path": "D:\\A_KJ\\AI\\Models",
+          "description": "새 음성 엔진을 비교하기 위한 모델 자료입니다. 실제 합성·채택 완료는 별도로 확인합니다.",
+          "roleLabel": "모델 자료"
+        },
+        {
+          "id": "voice-bench",
+          "name": "음성 엔진 검토 환경",
+          "path": "D:\\A_KJ\\AI\\Workspace\\VoiceBench",
+          "description": "기존 제작 환경과 분리한 새 음성 엔진 검토 작업입니다.",
+          "roleLabel": "별도 검토"
+        },
+        {
+          "id": "omnivoice-source",
+          "name": "OmniVoice 공식 소스",
+          "path": "D:\\A_KJ\\AI\\Workspace\\VoiceBench\\omnivoice-source",
+          "description": "새 음성 엔진을 검토하는 공식 소스입니다. 현재 제작 결과나 완료된 새 앱을 뜻하지 않습니다.",
+          "roleLabel": "검토용 소스"
         }
       ]
     },

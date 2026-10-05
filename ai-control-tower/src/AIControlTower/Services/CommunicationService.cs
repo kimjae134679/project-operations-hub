@@ -12,6 +12,7 @@ namespace AIControlTower.Services;
 public sealed class CommunicationService
 {
     public event Action<string>? Diagnostic;
+    private readonly Dictionary<string,string> _centralHelperFallbacks = new(StringComparer.OrdinalIgnoreCase);
     public const int MaximumFileBytes = 1024 * 1024;
     public const int MaximumFilesPerFolder = 300;
     private readonly SemaphoreSlim _syncLock = new(1, 1);
@@ -137,17 +138,29 @@ public sealed class CommunicationService
                 await AtomicWrite(received, "manifest.json", JsonSerializer.SerializeToUtf8Bytes(localManifest, JsonOptions), true, ct).ConfigureAwait(false);
                 phase = "기록 도우미 갱신";
                 var helperSource = Inside(root, "scripts/project_notice.py");
+                var helperCommand = "python 기록도우미.py";
                 if (File.Exists(helperSource))
                 {
                     var helper = await ReadText(helperSource, ct).ConfigureAwait(false);
-                    await AtomicWrite(mailbox, "기록도우미.py", Encoding.UTF8.GetBytes(helper), true, ct).ConfigureAwait(false);
+                    var localHelper = Inside(mailbox,"기록도우미.py");
+                    var helperStamp = ContentHash(helper)+"/"+File.GetLastWriteTimeUtc(localHelper).Ticks;
+                    var centralCommand = "python \""+helperSource+"\" --root \""+mailbox+"\"";
+                    if (_centralHelperFallbacks.GetValueOrDefault(localHelper)==helperStamp) helperCommand=centralCommand;
+                    else try { await AtomicWrite(mailbox, "기록도우미.py", Encoding.UTF8.GetBytes(helper), true, ct).ConfigureAwait(false); _centralHelperFallbacks.Remove(localHelper); }
+                    catch (Exception ex) when (IsFileError(ex))
+                    {
+                        // Preserve a protected local helper. The validated central helper accepts an explicit mailbox.
+                        helperCommand = centralCommand;
+                        _centralHelperFallbacks[localHelper]=helperStamp;
+                        Diagnostic?.Invoke(target.ProjectId+" · 로컬 도우미 보존 · 중앙 도우미 연결");
+                    }
                 }
                 var instructions = "# 프로젝트 소통 폴더\n\n이 소통함의 프로젝트 ID: " + target.ProjectId + "\n\n" +
                     "- 받은공지: 자동 전달된 현재 공지와 목록입니다. 전달은 읽음 확인이 아닙니다. 목록에서 제외된 이전 본문은 이력입니다.\n" +
                     "- 보낼자료: UTF-8 .md/.txt/.json을 넣으면 중앙에서 수집합니다. 원본은 삭제하지 않습니다. 파일당 1MiB 이하, 변경 중·비밀키 의심 파일은 보류합니다.\n" +
                     "- 확인기록: 실제로 읽은 AI가 자기 프로젝트·작성자·세션 기록만 작성합니다. 읽음 대기와 적용 완료를 구분합니다.\n\n" +
-                    "기록도우미.py가 배포되면 이 폴더에서 다음 명령으로 확인합니다. 프로그램은 도우미를 자동 실행하거나 확인 기록을 대신 작성하지 않습니다.\n\n" +
-                    "```text\npython 기록도우미.py check --actor Sol --read\npython 기록도우미.py ack --actor Sol --session 본인작업세션 --notice N-0001 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
+                    "이 폴더에서 아래 현재 도우미 명령으로 확인합니다. 로컬 도우미가 보호돼 있으면 중앙 도우미를 연결하고 기존 파일은 보존합니다. 프로그램은 도우미를 자동 실행하거나 확인 기록을 대신 작성하지 않습니다.\n\n" +
+                    "```text\n"+helperCommand+" check --actor Sol --read\n"+helperCommand+" ack --actor Sol --session 본인작업세션 --notice N-0001 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
                     "본문을 실제 읽은 뒤 현재 revision·hash를 사용하세요. 적용 완료에는 구체적인 설명·근거를 남깁니다. 받은공지의 manifest.json이 현재 전달 목록의 원본입니다. 로컬 배포·수집과 GitHub 공유 완료는 별개입니다. 다른 독립 채팅을 자동으로 깨우지 않습니다.\n";
                 phase = "소통 안내 갱신";
                 await AtomicWrite(mailbox, "README.md", Encoding.UTF8.GetBytes(instructions), true, ct).ConfigureAwait(false);
@@ -435,7 +448,7 @@ public sealed class CommunicationService
         const string end = "<!-- control-tower:communication-entry:end -->";
         var block = begin + "\n## 통합 공지·인수인계\n\n" +
             "이 소통함의 프로젝트 ID: `" + projectId + "`. 작업 시작·재개·인수인계 때 `_통합소통/받은공지/manifest.json`과 본인 확인 기록을 비교하고 새·변경 공지만 실제로 읽습니다. 최신 사용자 지시와 이 프로젝트의 기존 작업 규칙이 우선입니다.\n\n" +
-            "읽은 AI는 `_통합소통/기록도우미.py`로 본인 작성자·세션의 읽음·적용 기록을 남깁니다. 공지 전달은 읽음이 아니며 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 이유를 남깁니다. 공유할 요약·인수인계는 `_통합소통/보낼자료`에 두면 관리 앱이 수집합니다. 상세 절차는 `_통합소통/README.md`를 읽습니다. 연결·동기화가 실패했으면 최신이라고 단정하지 않습니다.\n" + end;
+            "읽은 AI는 `_통합소통/README.md`의 현재 도우미 명령으로 본인 작성자·세션의 읽음·적용 기록을 남깁니다. 공지 전달은 읽음이 아니며 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 이유를 남깁니다. 공유할 요약·인수인계는 `_통합소통/보낼자료`에 두면 관리 앱이 수집합니다. 연결·동기화가 실패했으면 최신이라고 단정하지 않습니다.\n" + end;
         var path = Inside(projectRoot, "AGENTS.md");
         var existed = File.Exists(path);
         byte[] original = [];
