@@ -156,13 +156,13 @@ public static class UiVerification
     {
         window.UpdateLayout();
         var content = (FrameworkElement)window.Content;
-        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(content.ActualWidth), (int)Math.Ceiling(content.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(content.ActualWidth + content.Margin.Left + content.Margin.Right), (int)Math.Ceiling(content.ActualHeight + content.Margin.Top + content.Margin.Bottom), 96, 96, PixelFormats.Pbgra32);
         var background = new DrawingVisual();
         // VisualBrush renders the content in its own coordinates, without its Window margin offset.
         using (var drawing = background.RenderOpen())
         {
-            var bounds = new Rect(0, 0, content.ActualWidth, content.ActualHeight);
-            drawing.DrawRectangle(window.Background, null, bounds);
+            var bounds = new Rect(content.Margin.Left, content.Margin.Top, content.ActualWidth, content.ActualHeight);
+            drawing.DrawRectangle(window.Background, null, new Rect(0,0,bitmap.Width,bitmap.Height));
             drawing.DrawRectangle(new VisualBrush(content) { Stretch = Stretch.Fill }, null, bounds);
         }
         bitmap.Render(background);

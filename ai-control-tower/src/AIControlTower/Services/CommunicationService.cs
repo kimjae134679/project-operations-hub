@@ -142,7 +142,7 @@ public sealed class CommunicationService
                     "- 보낼자료: UTF-8 .md/.txt/.json을 넣으면 중앙에서 수집합니다. 원본은 삭제하지 않습니다. 파일당 1MiB 이하, 변경 중·비밀키 의심 파일은 보류합니다.\n" +
                     "- 확인기록: 실제로 읽은 AI가 자기 프로젝트·작성자·세션 기록만 작성합니다. 읽음 대기와 적용 완료를 구분합니다.\n\n" +
                     "기록도우미.py가 배포되면 이 폴더에서 다음 명령으로 확인합니다. 프로그램은 도우미를 자동 실행하거나 확인 기록을 대신 작성하지 않습니다.\n\n" +
-                    "```text\npython 기록도우미.py check --actor Sol --read\npython 기록도우미.py ack --actor Sol --session 본인작업세션 --notice N-0001 --revision 현재버전 --sha256 현재해시 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
+                    "```text\npython 기록도우미.py check --actor Sol --read\npython 기록도우미.py ack --actor Sol --session 본인작업세션 --notice N-0001 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
                     "본문을 실제 읽은 뒤 현재 revision·hash를 사용하세요. 적용 완료에는 구체적인 설명·근거를 남깁니다. 받은공지의 manifest.json이 현재 전달 목록의 원본입니다. 로컬 배포·수집과 GitHub 공유 완료는 별개입니다. 다른 독립 채팅을 자동으로 깨우지 않습니다.\n";
                 await AtomicWrite(mailbox, "README.md", Encoding.UTF8.GetBytes(instructions), true, ct).ConfigureAwait(false);
                 foreach (var path in EnumerateSafe(localReceipts, errors, target.ProjectId))
@@ -383,7 +383,8 @@ public sealed class CommunicationService
     private static void ValidateDigest(string? value) { if (value is null || !Digest.IsMatch(value)) throw new InvalidDataException("Invalid digest."); }
     private static void ValidateIdentity(string? value)
     { if (string.IsNullOrWhiteSpace(value) || value.Length > 256 || value.Any(c => c < 32)) throw new InvalidDataException("Invalid actor/session."); }
-    private static bool HasSecret(string text) => SecretPattern.IsMatch(text);
+    public static bool ContainsSensitiveText(string text) => SecretPattern.IsMatch(text);
+    private static bool HasSecret(string text) => ContainsSensitiveText(text);
     private static StringComparer PathComparer => OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     private static bool IsFileError(Exception ex) => ex is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or KeyNotFoundException or RegexMatchTimeoutException;
     private static void Hold(List<CommunicationIssue> errors, string? id, string code)

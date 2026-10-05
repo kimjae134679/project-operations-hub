@@ -35,6 +35,28 @@ public sealed class CommunicationGitServiceTests
         }
         finally { if(Directory.Exists(root)) { foreach(var file in Directory.EnumerateFiles(root,"*",SearchOption.AllDirectories)) File.SetAttributes(file,FileAttributes.Normal); Directory.Delete(root,true); } }
     }
+    [Fact]
+    public async Task OutgoingHistoryAndRedirectedPushAreRejectedAndUploadOffStillPulls()
+    {
+        var root=Path.Combine(Path.GetTempPath(),"tower-git-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
+        try
+        {
+            var seed=Path.Combine(root,"seed");Directory.CreateDirectory(seed);
+            await Git(seed,"init","-b","main");await Git(seed,"config","user.name","Test");await Git(seed,"config","user.email","test@example.invalid");
+            File.WriteAllText(Path.Combine(seed,"README.md"),"seed");await Git(seed,"add","README.md");await Git(seed,"commit","-m","seed");
+            var origin=Path.Combine(root,"origin.git");await Git(root,"clone","--bare",seed,origin);
+            var mirror=Path.Combine(root,"mirror");var service=new CommunicationGitService(origin);Assert.True((await service.PrepareAsync(mirror)).Success);
+            await Git(mirror,"config","remote.origin.pushurl",Path.Combine(root,"wrong.git"));
+            Assert.False((await service.SynchronizeAsync(mirror,[],true)).Success);
+            await Git(mirror,"config","--unset","remote.origin.pushurl");
+            var status="04_COMMUNICATION/announcements/STATUS.md";var file=Path.Combine(mirror,status);Directory.CreateDirectory(Path.GetDirectoryName(file)!);File.WriteAllText(file,"local record");
+            await Git(seed,"remote","add","origin",origin);File.WriteAllText(Path.Combine(seed,"NEW.md"),"latest notice");await Git(seed,"add","NEW.md");await Git(seed,"commit","-m","latest");await Git(seed,"push","origin","main");
+            var noUpload=await service.SynchronizeAsync(mirror,[status],false);Assert.True(noUpload.Success,noUpload.Message);Assert.False(noUpload.Published);Assert.True(File.Exists(Path.Combine(mirror,"NEW.md")));
+            File.WriteAllText(Path.Combine(mirror,"outside.txt"),"do not publish");await Git(mirror,"add","outside.txt");await Git(mirror,"commit","-m","outside added");File.Delete(Path.Combine(mirror,"outside.txt"));await Git(mirror,"add","outside.txt");await Git(mirror,"commit","-m","outside reverted");
+            Assert.False((await service.SynchronizeAsync(mirror,[status],true)).Success);
+        }
+        finally { if(Directory.Exists(root)) { foreach(var file in Directory.EnumerateFiles(root,"*",SearchOption.AllDirectories))File.SetAttributes(file,FileAttributes.Normal);Directory.Delete(root,true); } }
+    }
     private static async Task<string> Git(string directory,params string[] arguments)
     {
         using var p=new Process{StartInfo=new ProcessStartInfo("git"){WorkingDirectory=directory,UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true}};

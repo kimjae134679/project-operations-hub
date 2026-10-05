@@ -11,6 +11,8 @@ public sealed class ControlTowerSettings
     public bool AutoPublishCommunication { get; set; } = true;
     public string CommunicationHubPath { get; set; } = @"D:\A_KJ\AI\ControlTowerData\communication-hub";
     public Dictionary<string, string> CommunicationFolders { get; set; } = new();
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsTemporary { get; set; }
     public static string DataDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AIControlTower");
     public static string SettingsPath => Path.Combine(DataDirectory, "settings.json");
     public static ControlTowerSettings Load()
@@ -20,6 +22,7 @@ public sealed class ControlTowerSettings
     }
     public void Save()
     {
+        if (IsTemporary) return;
         Directory.CreateDirectory(DataDirectory);
         var temporary = SettingsPath + ".tmp";
         File.WriteAllText(temporary, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));

@@ -14,6 +14,7 @@ public partial class App : Application
         if (!_owns) { _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);
         var settings = Services.ControlTowerSettings.Load();
+        if (e.Args.Contains("--verify-ui")) settings.IsTemporary = true;
         var communicationRoot = Array.IndexOf(e.Args, "--communication-hub");
         if (communicationRoot >= 0 && communicationRoot + 1 < e.Args.Length)
         {

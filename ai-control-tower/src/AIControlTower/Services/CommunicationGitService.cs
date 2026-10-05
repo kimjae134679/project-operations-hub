@@ -26,7 +26,7 @@ public sealed class CommunicationGitService
         {
             if (!Owned(path)) return new(false, false, "폴더에서 공지를 읽습니다. 자동 GitHub 동기화는 전용 소통 폴더에서만 가능합니다.");
             var origin = await Git(path, ct, "remote", "get-url", "origin");
-            if (origin.Code != 0 || origin.Output.Trim() != _origin) return new(false, false, "소통 저장소의 연결 주소가 변경되어 자동 업로드를 보류했습니다.");
+                if (origin.Code != 0 || origin.Output.Trim() != _origin) return new(false, false, "소통 저장소의 연결 주소가 변경되어 자동 업로드를 보류했습니다.");
             return new(true, false, "전용 소통 저장소 연결됨");
         }
         if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any()) return new(false, false, "선택한 소통 폴더에 기존 자료가 있어 초기화를 보류했습니다.");
@@ -41,8 +41,7 @@ public sealed class CommunicationGitService
     public async Task<CommunicationGitResult> SynchronizeAsync(string path, IEnumerable<string> validatedPaths, bool publish, CancellationToken ct = default)
     {
         if (!Owned(path)) return new(false, false, "전용 소통 저장소가 아니므로 자동 업로드를 보류했습니다.");
-        var origin = await Git(path, ct, "remote", "get-url", "origin");
-        if (origin.Code != 0 || origin.Output.Trim() != _origin) return new(false, false, "소통 저장소의 연결 주소가 변경되어 자동 업로드를 보류했습니다.");
+        if (!await HasExpectedOrigin(path, ct)) return new(false, false, "소통 저장소의 연결 주소가 변경되어 자동 업로드를 보류했습니다.");
         var paths = validatedPaths.Distinct(StringComparer.Ordinal).ToHashSet(StringComparer.Ordinal);
         if (paths.Any(p => !IsPublishablePath(p))) return new(false, false, "검증 대상 밖 경로가 있어 자동 업로드를 보류했습니다.");
         var status = await Git(path, ct, "status", "--porcelain=v1", "-z", "--untracked-files=all");
@@ -57,7 +56,6 @@ public sealed class CommunicationGitService
         }
         if (dirty.Count > 0)
         {
-            if (!publish) return new(false, false, "로컬 수집 완료 · 자동 GitHub 업로드 꺼짐");
             foreach (var relative in dirty)
             {
                 var full = Path.GetFullPath(Path.Combine(path, relative));
@@ -86,10 +84,34 @@ public sealed class CommunicationGitService
         if (count == 0) return new(true, false, "최신 공지와 기록이 연결되어 있습니다.");
         if (!publish) return new(true, false, "공지 내려받음 · 업로드할 기록은 로컬 대기 중");
         // Every outgoing commit must touch only communication-generated paths, including retried commits.
-        var outgoing = await Git(path, ct, "diff", "--name-only", "-z", "origin/main...HEAD");
-        if (outgoing.Code != 0 || outgoing.Output.Split('\0', StringSplitOptions.RemoveEmptyEntries).Any(p => !IsPublishablePath(p))) return new(false, false, "중앙 업로드 범위 밖 커밋을 발견해 보류했습니다.");
-        var pushed = await Git(path, ct, "push", "origin", "HEAD:main");
+        var outgoing = await Git(path, ct, "rev-list", "origin/main..HEAD");
+        if (outgoing.Code != 0) return new(false, false, "중앙 업로드 커밋 확인 실패");
+        foreach (var commit in outgoing.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var changes = await Git(path, ct, "diff-tree", "--root", "-m", "--no-commit-id", "--name-only", "-r", "-z", commit.Trim());
+            if (changes.Code != 0 || changes.Output.Split('\0', StringSplitOptions.RemoveEmptyEntries).Any(p => !IsPublishablePath(p))) return new(false, false, "중앙 업로드 범위 밖 커밋을 발견해 보류했습니다.");
+            foreach (var relative in changes.Output.Split('\0', StringSplitOptions.RemoveEmptyEntries).Distinct())
+            {
+                var size = await Git(path, ct, "cat-file", "-s", commit.Trim() + ":" + relative);
+                if (size.Code != 0) continue; // A deletion contains no new blob.
+                if (!int.TryParse(size.Output.Trim(), out var bytes) || bytes > CommunicationService.MaximumFileBytes) return new(false, false, "크기 제한을 넘는 소통 기록을 보류했습니다.");
+                var blob = await Git(path, ct, "show", commit.Trim() + ":" + relative);
+                if (blob.Code != 0 || CommunicationService.ContainsSensitiveText(blob.Output)) return new(false, false, "비밀값 의심 기록의 GitHub 업로드를 보류했습니다.");
+            }
+        }
+        var pushed = await Git(path, ct, "push", _origin, "HEAD:main");
         return pushed.Code == 0 ? new(true, true, "GitHub에 수집 기록을 반영했습니다.") : new(false, false, "수집 기록은 보존됨 · GitHub 업로드 재시도 대기");
+    }
+    private async Task<bool> HasExpectedOrigin(string path, CancellationToken ct)
+    {
+        foreach(var push in new[]{false,true})
+        {
+            var arguments=push ? new[]{"remote","get-url","--push","--all","origin"} : new[]{"remote","get-url","--all","origin"};
+            var result=await Git(path,ct,arguments);
+            var urls=result.Output.Split(new[]{'\r','\n'},StringSplitOptions.RemoveEmptyEntries);
+            if(result.Code!=0 || urls.Length!=1 || urls[0]!=_origin) return false;
+        }
+        return true;
     }
     private static async Task<(int Code, string Output)> Git(string? root, CancellationToken ct, params string[] arguments)
     {
