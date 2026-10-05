@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261006-cast-audition",
+  "checkedAt": "2026-10-05T10:53:44.459328+00:00",
+  "applicationStatus": "applied",
+  "note": "7배역14원문/새Qwen·Vox28개+기존13개=41구간,MP37개. 선호음성 참조와 실제원문역할검증. 단일창뒤로앞으로/청취상태복원PC모바일33검사·비교재생9검사 통과. 과거비교분리 및 전체162/163SHA보존. 바탕화면·모델·원문 보존.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\cast_audition_20261006\\final_delivery_verification.json"
+  ],
+  "appliedAt": "2026-10-05T16:13:45.813788+00:00"
+}
