@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-native-layer",
+  "checkedAt": "2026-10-06T01:09:11.957633+09:00",
+  "applicationStatus": "applied",
+  "note": "읽기 전용 UI 감사와 격리 테스트를 분업하고 실제 Windows CLI·네이티브 화면으로 검증. 새 유료 도구나 Jev 호출 불필요.",
+  "evidence": [
+    "ai-control-tower/docs/LAYER-DESIGN-20261006.md",
+    "https://github.com/kimjae134679/project-operations-hub/pull/19"
+  ],
+  "appliedAt": "2026-10-06T01:09:11.957633+09:00"
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-native-layer",
+  "checkedAt": "2026-10-06T01:09:11.957633+09:00",
+  "applicationStatus": "applied",
+  "note": "본인 결과와 확인 기록만 프로젝트 _통합소통에 남기고 관리 앱이 자동 수집·공유한다. 원본 경로 유지.",
+  "evidence": [
+    "ai-control-tower/docs/LAYER-DESIGN-20261006.md",
+    "https://github.com/kimjae134679/project-operations-hub/pull/19"
+  ],
+  "appliedAt": "2026-10-06T01:09:11.957633+09:00"
+}

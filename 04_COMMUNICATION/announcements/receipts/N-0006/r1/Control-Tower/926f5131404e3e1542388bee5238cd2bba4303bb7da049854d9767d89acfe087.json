@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-native-layer",
+  "checkedAt": "2026-10-06T01:09:11.957633+09:00",
+  "applicationStatus": "applied",
+  "note": "서버 모니터는 이번 조회 응답 없음. 조회 실패와 0명을 구분하고 서버를 재시작하지 않음. 디자인 작업과 게임 운영을 구분.",
+  "evidence": [
+    "ai-control-tower/docs/LAYER-DESIGN-20261006.md",
+    "https://github.com/kimjae134679/project-operations-hub/pull/19"
+  ],
+  "appliedAt": "2026-10-06T01:09:11.957633+09:00"
+}
