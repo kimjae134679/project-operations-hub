@@ -1,11 +1,11 @@
 import contextlib
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import tempfile
 import unittest
 from unittest.mock import patch
-from project_notice import main, owner, sha
+from project_notice import main, owner, sha, comparable_path
 
 class ProjectNoticeTests(unittest.TestCase):
     def setUp(self):
@@ -45,6 +45,13 @@ class ProjectNoticeTests(unittest.TestCase):
     def test_traversal_manifest_is_rejected(self):
         self.notice['path']='../../outside.md';self.save()
         self.assertEqual(1,self.run_cli('check','--actor','나의 AI','--read'))
+    def test_long_windows_path_aliases_preserve_containment_only(self):
+        ordinary=PureWindowsPath(r'D:\project\_통합소통')
+        extended=PureWindowsPath(r'\\?\D:\project\_통합소통\확인기록\long.json')
+        self.assertTrue(comparable_path(extended).is_relative_to(comparable_path(ordinary)))
+        self.assertFalse(comparable_path(PureWindowsPath(r'\\?\D:\project\_통합소통-other\file.json')).is_relative_to(comparable_path(ordinary)))
+        self.assertFalse(comparable_path(PureWindowsPath(r'\\?\GLOBALROOT\Device\HarddiskVolume1\file.json')).is_relative_to(comparable_path(ordinary)))
+
     def test_another_actor_cannot_use_my_read(self):
         self.run_cli('check','--actor','나의 AI','--read')
         self.assertEqual(1,self.run_cli('ack','--actor','다른 AI','--session','작업','--notice','N-0001','--status','applied','--note','대신 읽음이라고 주장'))

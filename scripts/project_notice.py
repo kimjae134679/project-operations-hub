@@ -4,7 +4,7 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import sys
 import tempfile
@@ -22,6 +22,25 @@ def owner(actor, session=None):
     value = [actor, session] if session is not None else actor
     return sha(json.dumps(value, ensure_ascii=False))
 
+def comparable_path(path):
+    r"""Compare resolved Windows drive/UNC paths independently of a long-path prefix.
+
+    Windows resolve() may retain \\?\ on a not-yet-existing long destination while
+    returning the ordinary spelling for its existing root. Keep the original
+    resolved path for I/O; normalize only these equivalent anchors for comparison.
+    Other device namespaces are deliberately not accepted as aliases.
+    """
+    if isinstance(path, PureWindowsPath):
+        value = str(path)
+        if value[:8].lower() == "\\\\?\\unc\\":
+            value = "\\\\" + value[8:]
+        elif (value.startswith("\\\\?\\") and len(value) >= 7
+              and value[4].isascii() and value[4].isalpha() and value[5:7] == ":\\"):
+            value = value[4:]
+        return PureWindowsPath(value)
+    return path
+
+
 def safe(root, relative):
     raw = root / relative
     for item in [raw, *raw.parents]:
@@ -30,7 +49,7 @@ def safe(root, relative):
         if item == root:
             break
     resolved = raw.resolve()
-    if not resolved.is_relative_to(root.resolve()):
+    if not comparable_path(resolved).is_relative_to(comparable_path(root.resolve())):
         raise ValueError("소통 폴더 밖 경로입니다.")
     return resolved
 
