@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-05T18:21:46.359712+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "이 작업은 오디오북이며 게임 서버 프로젝트 변경 지시는 범위 밖.",
+  "evidence": []
+}

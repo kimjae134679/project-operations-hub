@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-05T18:21:46.284513+00:00",
+  "applicationStatus": "applied",
+  "note": "독립 원문 검수와 UI 병렬, GPU 직렬, 캐시 재사용과 측정값 기록. 토큰 절감률 수치 주장 없음.",
+  "evidence": [
+    "src/production_voice_worker.py"
+  ],
+  "appliedAt": "2026-10-05T18:49:16.505599+00:00"
+}

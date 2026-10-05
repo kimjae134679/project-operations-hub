@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-05T18:21:46.267572+00:00",
+  "applicationStatus": "applied",
+  "note": "설명과 줄바꿈, 한 창 이동, 캐릭터 색과 클릭. PC와 모바일 실제 fixture 검증, 신규 본문 검증은 게시 후 별도.",
+  "evidence": [
+    "ui/audiobook_reader.html"
+  ],
+  "appliedAt": "2026-10-05T18:49:16.342629+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-05T18:21:46.216868+00:00",
+  "applicationStatus": "applied",
+  "note": "실제 공지 읽기 및 프로젝트 적용 기록. 중앙 동기화 완료는 주장하지 않음.",
+  "evidence": [
+    "src/production_queue.py"
+  ],
+  "appliedAt": "2026-10-05T18:49:13.188216+00:00"
+}

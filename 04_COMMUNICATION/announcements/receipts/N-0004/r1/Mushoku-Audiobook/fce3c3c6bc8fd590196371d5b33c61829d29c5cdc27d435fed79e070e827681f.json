@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-05T18:21:46.301056+00:00",
+  "applicationStatus": "applied",
+  "note": "기존 D AI VoiceAudiobook 루트 유지. Desktop 및 다른 서버 작업 없음.",
+  "evidence": [
+    "src/project_paths.py"
+  ],
+  "appliedAt": "2026-10-05T18:49:16.668176+00:00"
+}

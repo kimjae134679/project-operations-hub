@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-05T18:21:46.317850+00:00",
+  "applicationStatus": "applied",
+  "note": "본인 회차 작업 수신기록 생성. 로컬 보낼자료 기록 후 중앙 수집을 기다림.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T18:49:16.849770+00:00"
+}
