@@ -8,14 +8,21 @@
 - 허브 등록은 실제 프로젝트 수정 권한을 뜻하지 않습니다.
 - 실제 프로젝트 코드·버전·실행 상태는 해당 저장소의 현재 tip과 README/AGENTS가 원본입니다.
 
+## 공지 필독
+
+작업 시작·재개·인수인계 때 최신 main의 `04_COMMUNICATION/announcements/manifest.json`과 본인 확인 기록을 비교합니다. 새 공지·변경 공지는 실제 본문을 읽고 공지 ID·버전·해시·프로젝트·AI·세션·확인 시각·적용 내용을 기록합니다. 기록이 없는 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 인수인계하고, 내용 변경 시 재확인합니다.
+
+진입점: `04_COMMUNICATION/announcements/README.md`, 절차: `PROTOCOL.md`, 현황: `STATUS.md`. 로컬 체크만으로 공유 완료라고 하지 않고 본인 기록을 GitHub에 반영합니다. 이미 읽은 동일 내용은 반복 로딩하지 않습니다. 최신 사용자 지시와 실제 프로젝트 권한이 우선입니다.
+
 ## 읽는 순서
 
 1. 현재 채팅의 사용자 최신 지시
-2. `00_SYSTEM/CONTROLLER.md`와 `00_SYSTEM/GOVERNANCE.md`
-3. `01_CONTROL/USER_POLICIES.md`
-4. 관련 `02_PROJECTS/<name>/README.md`
-5. 실제 프로젝트 저장소의 현재 README/AGENTS와 필요한 파일
-6. 이전 결정이 필요할 때만 관련 `03_KNOWLEDGE/` 또는 `04_COMMUNICATION/`
+2. 현재 공지 목록·본인 기록과 새 공지 본문
+3. `00_SYSTEM/CONTROLLER.md`와 `00_SYSTEM/GOVERNANCE.md`
+4. `01_CONTROL/USER_POLICIES.md`
+5. 관련 `02_PROJECTS/<name>/README.md`
+6. 실제 프로젝트 저장소의 현재 README/AGENTS와 필요한 파일
+7. 이전 결정이 필요할 때만 관련 `03_KNOWLEDGE/` 또는 `04_COMMUNICATION/`
 
 `000_사용자용/`은 사용자에게 보여주는 요약이며 AI 정책 원본이 아닙니다.
 

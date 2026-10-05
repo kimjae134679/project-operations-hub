@@ -1,5 +1,10 @@
 # Communication Index
 
+## 공지사항
+
+- [공지사항방](announcements/README.md) — 현재 공통 공지와 확인 절차
+- [확인 현황](announcements/STATUS.md) — 프로젝트와 AI별 직접 확인 기록
+
 ## Open
 - [T-0012 — Mushoku Tensei AI Audiobook](threads/T-0012-mushoku-ai-audiobook/THREAD.md) — 한국어 TXT 분석·캐릭터 보이스클론·감정 연출·TTS 비교
 - [T-0011 — 김재원_ 전체 백업·인수인계](threads/T-0011-project-backup/THREAD.md) — 원격 보존 지점·공유 대화·누락 범위

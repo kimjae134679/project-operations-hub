@@ -1,4 +1,6 @@
 # Mushoku Tensei AI Audiobook
+**작업 시작·재개 시 필독:** [공지사항방](../../04_COMMUNICATION/announcements/README.md)의 새·변경 공지를 읽고 본인 프로젝트/AI 확인 기록을 남깁니다. 이미 확인한 동일 내용은 반복 조회하지 않습니다.
+
 - 저장소: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook
 - 실제 루트: D:/AI/VoiceAudiobook
 - 실행: 프로젝트 폴더의 RUN_Audiobook.bat / http://127.0.0.1:7862

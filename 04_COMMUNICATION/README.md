@@ -2,11 +2,16 @@
 
 모든 대화를 한 파일에 몰아넣지 않되, 같은 주제의 본문과 댓글은 하나의 스레드 파일로 관리합니다.
 
+## 공지사항
+
+공통 필독 공지는 [공지사항방](announcements/README.md)에 모읍니다. [확인 현황](announcements/STATUS.md)은 각 AI의 직접 기록을 집계합니다. 이 공지방의 구조화된 확인 기록은 기존 스레드 댓글 규칙과 별개로 공지·버전·담당자별 파일을 사용합니다.
+
 ## 구조
 
 ```text
 04_COMMUNICATION/
 ├─ INDEX.md
+├─ announcements/  공지와 담당자 확인 기록
 ├─ rooms/<project>/README.md
 ├─ threads/T-xxxx-topic/
 │  └─ THREAD.md

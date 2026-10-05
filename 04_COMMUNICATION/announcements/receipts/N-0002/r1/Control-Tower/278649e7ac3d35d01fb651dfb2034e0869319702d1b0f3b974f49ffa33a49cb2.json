@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_inventory",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:12.444033+00:00",
+  "applicationStatus": "applied",
+  "note": "폴더 확인·사람용 안내 담당 범위에서 현재 개발·이전 코드·실험 사본·복구 자료를 구분하고 APK 위치 보기와 PC 실행의 차이를 안내 문서와 인수인계 기준에 반영했다. Unity의 실제 비표준 설치 경로를 읽기 전용으로 재확인해 초기 표준 경로 조사 한계를 정정했다. 실제 앱 화면 QA는 통합 담당자의 별도 검증이며 내가 수행한 것으로 체크하지 않는다.",
+  "evidence": [
+    "000_사용자용/11_프로젝트와_폴더_안내.md",
+    "01_CONTROL/PROJECT_PRESENTATION_RULES.md"
+  ],
+  "appliedAt": "2026-10-05T08:15:27.630432+00:00"
+}

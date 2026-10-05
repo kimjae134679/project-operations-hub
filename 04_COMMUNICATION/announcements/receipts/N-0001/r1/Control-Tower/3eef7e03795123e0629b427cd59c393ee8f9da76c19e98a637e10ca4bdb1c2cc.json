@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 1,
+  "contentSha256": "539af1b0faa8026c40c116b0c8b630bc42f57fec29c600e5c0baeb6079e3788d",
+  "projectId": "Control-Tower",
+  "actorId": "/root/efficiency_research",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:02.451044+00:00",
+  "applicationStatus": "applied",
+  "note": "실제 공지 4개와 README/PROTOCOL을 읽었다. 공지 CLI에 본문조회와 적용상태 분리, ID·revision·hash 재확인, 본인·세션별 원자적 기록을 구현했고 이 기록도 Control-Tower의 본인 범위만 남긴다. 현재는 로컬 통합 준비본이며 공개 반영은 관리 담당자가 수행한다.",
+  "evidence": [
+    "scripts/notice_board.py",
+    "scripts/test_notice_board.py",
+    "04_COMMUNICATION/announcements/PROTOCOL.md"
+  ],
+  "appliedAt": "2026-10-05T08:15:15.595376+00:00"
+}

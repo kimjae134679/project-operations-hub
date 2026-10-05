@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 1,
+  "contentSha256": "539af1b0faa8026c40c116b0c8b630bc42f57fec29c600e5c0baeb6079e3788d",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261005-notice-management",
+  "checkedAt": "2026-10-05T08:14:49.482798+00:00",
+  "applicationStatus": "applied",
+  "note": "공통 진입·재개·인수인계 규칙과 본인별 확인 절차를 구현했다. 공지 게시와 실제 열람·적용을 분리하며 다른 프로젝트와 AI의 확인을 대신 기록하지 않는다. 이 배치의 GitHub 반영은 통합 커밋으로 완료한다.",
+  "evidence": [
+    "AGENTS.md",
+    "04_COMMUNICATION/announcements/PROTOCOL.md",
+    "scripts/notice_board.py"
+  ],
+  "appliedAt": "2026-10-05T08:19:59.119005+00:00"
+}
