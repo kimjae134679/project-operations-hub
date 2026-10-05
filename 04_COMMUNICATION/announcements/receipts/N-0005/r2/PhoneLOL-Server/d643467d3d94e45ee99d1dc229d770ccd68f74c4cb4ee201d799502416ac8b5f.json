@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "Codex",
+  "sessionId": "Spectator267",
+  "checkedAt": "2026-10-05T20:04:08.634706+00:00",
+  "applicationStatus": "applied",
+  "note": "관전 재입장/스킬 조작 차단 검증·배포; 원래 서버 코드/DB/공지 레이아웃 보존. UI 디자인 변경 없음. 중앙 수집 미검증.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T20:26:34.049239+00:00"
+}
