@@ -7,7 +7,8 @@
   "actorId": "PhoneLOL-Sol",
   "sessionId": "Spectator260",
   "checkedAt": "2026-10-05T10:01:24.601261+00:00",
-  "applicationStatus": "pending",
-  "note": "Native waiting-room and game UI layout validation remains pending. No source folders moved.",
-  "evidence": []
+  "applicationStatus": "applied",
+  "note": "관전/참가와 눈 아이콘, 클릭·viewport·원본 씬 PNG 확인. 직접 테스트 안내 작성.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T11:28:05.265353+00:00"
 }

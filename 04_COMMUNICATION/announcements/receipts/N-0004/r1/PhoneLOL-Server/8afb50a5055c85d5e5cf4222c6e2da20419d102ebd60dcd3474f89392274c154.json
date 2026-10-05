@@ -7,7 +7,8 @@
   "actorId": "PhoneLOL-Sol",
   "sessionId": "Spectator260",
   "checkedAt": "2026-10-05T11:05:08.320677+00:00",
-  "applicationStatus": "pending",
-  "note": "공유 원격 연결 종료하지 않음. 서버 v33 프로세스와 포트 일치 확인 뒤 해당 프로세스만 교체 예정.",
-  "evidence": []
+  "applicationStatus": "applied",
+  "note": "공유 원격 연결 유지. 작업 소유 batch Unity만 직렬 실행. v33 PID/port 식별하여 두 번 공지 후 교체, 원래 독립 프로그램은 종료하지 않음.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T11:28:06.260336+00:00"
 }

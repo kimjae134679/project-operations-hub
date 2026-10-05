@@ -7,7 +7,8 @@
   "actorId": "PhoneLOL-Sol",
   "sessionId": "Spectator260",
   "checkedAt": "2026-10-05T11:05:08.329183+00:00",
-  "applicationStatus": "pending",
-  "note": "클라이언트 원본과 서버 런타임 별도 확인. 사용자가 접속 중에도 필요한 서버 교체를 명시 승인했으므로 60초 공지와 코드/SQLite 온라인 백업 후 5개 관전 모듈 배포 예정.",
-  "evidence": []
+  "applicationStatus": "applied",
+  "note": "서버 v33/29000와 runtime6개 파일 해시 확인. 온라인 SQLite 일관백업, 14개 테이블 counts/integrity와 기존 공지 배치 보존. 사용자 서버 교체 명시 승인에 따라 공지60초 후 배포 완료.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T11:28:06.441451+00:00"
 }

@@ -8,7 +8,7 @@
   "sessionId": "Spectator260",
   "checkedAt": "2026-10-05T10:01:24.659768+00:00",
   "applicationStatus": "applied",
-  "note": "Reuse existing remote connection. Gracefully close only PhoneLOL Unity after verifying its title.",
+  "note": "공유 원격 연결 유지. 작업 소유 batch Unity만 직렬 실행. v33 PID/port 식별하여 두 번 공지 후 교체, 원래 독립 프로그램은 종료하지 않음.",
   "evidence": [],
-  "appliedAt": "2026-10-05T10:13:29.244348+00:00"
+  "appliedAt": "2026-10-05T11:28:05.504502+00:00"
 }

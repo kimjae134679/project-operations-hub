@@ -7,7 +7,8 @@
   "actorId": "PhoneLOL-Sol",
   "sessionId": "Spectator260",
   "checkedAt": "2026-10-05T10:01:24.676671+00:00",
-  "applicationStatus": "pending",
-  "note": "Feature handoff and brief user instructions will be written after validation.",
-  "evidence": []
+  "applicationStatus": "applied",
+  "note": "보낼자료/Spectator260-완료.md 및 git Docs 안내 작성. 사용자 AGENTS/소통 기록 stage/삭제하지 않음. 중앙 수집은 미확인.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T11:28:05.760210+00:00"
 }
