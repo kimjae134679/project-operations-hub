@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""프로젝트 폴더의 본인 공지 확인. 네트워크·Git·AI 호출은 하지 않습니다."""
+"""프로젝트 공지와 받은 명령·실제 답변 기록. 네트워크·Git·AI 호출은 하지 않습니다."""
 import argparse
 import hashlib
 import json
@@ -136,8 +136,157 @@ def ack(root, args):
     print(atomic(root, relative, record))
     print("본인 기록을 남겼습니다. 컨트롤타워가 실행 중이면 수집·중앙 동기화를 진행합니다.")
 
+
+TASK_STATES = {"pending", "in_progress", "completed", "blocked", "superseded"}
+TASK_RESULTS = {"pass", "fail", "not_run", "partial"}
+TASK_LABELS = {"pending": "대기", "in_progress": "진행 중", "completed": "완료", "blocked": "막힘", "superseded": "새 지시로 대체"}
+MAX_RECORD_BYTES = 1024 * 1024
+
+def task_text(value, name, required=True):
+    if not isinstance(value, str) or (required and not value.strip()):
+        raise ValueError(name + ": 비어 있지 않은 문자열이 필요합니다.")
+
+def task_strings(value, name):
+    if not isinstance(value, list) or any(not isinstance(item, str) or not item.strip() for item in value):
+        raise ValueError(name + ": 문자열 배열이 필요합니다.")
+
+def task_time(value, name):
+    task_text(value, name)
+    try:
+        result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise ValueError(name + ": ISO 8601 시각이 필요합니다.")
+    if result.tzinfo is None:
+        raise ValueError(name + ": 시간대가 필요합니다.")
+    return result
+
+def validate_task(value):
+    required = {"schemaVersion", "recordType", "recordId", "revision", "title", "projectId", "actorId", "sessionId", "receivedAt", "updatedAt", "request", "response", "status", "workDone", "verification", "nextActions", "blockers", "supersedes"}
+    if not isinstance(value, dict) or set(value) != required:
+        raise ValueError("기록 필드가 부족하거나 알려지지 않은 필드가 있습니다.")
+    if type(value["schemaVersion"]) is not int or value["schemaVersion"] != 1 or value["recordType"] != "task_exchange":
+        raise ValueError("task_exchange 스키마 버전 1이 필요합니다.")
+    for key in ("recordId", "projectId"):
+        if not isinstance(value[key], str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,119}", value[key]):
+            raise ValueError(key + ": 영문·숫자·밑줄·하이픈 1~120자로 적으세요.")
+    if type(value["revision"]) is not int or value["revision"] < 1:
+        raise ValueError("revision: 1 이상의 정수가 필요합니다.")
+    for key in ("actorId", "sessionId", "title"):
+        task_text(value[key], key)
+        if len(value[key]) > 200:
+            raise ValueError(key + ": 200자를 넘을 수 없습니다.")
+    received = task_time(value["receivedAt"], "receivedAt")
+    updated = task_time(value["updatedAt"], "updatedAt")
+    if updated < received:
+        raise ValueError("updatedAt이 receivedAt보다 빠릅니다.")
+    for key in ("request", "response"):
+        section = value[key]
+        if not isinstance(section, dict) or set(section) != {"summary", "details", "source"}:
+            raise ValueError(key + ": summary/details/source가 필요합니다.")
+        for field in ("summary", "source"):
+            task_text(section[field], key + "." + field)
+        task_text(section["details"], key + ".details", False)
+    if value["status"] not in TASK_STATES:
+        raise ValueError("알려지지 않은 작업 상태입니다.")
+    for key in ("workDone", "nextActions", "blockers", "supersedes"):
+        task_strings(value[key], key)
+    for item in value["supersedes"]:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,119}", item):
+            raise ValueError("supersedes: 안전한 recordId만 적으세요.")
+    if not isinstance(value["verification"], list):
+        raise ValueError("verification: 배열이 필요합니다.")
+    for item in value["verification"]:
+        if not isinstance(item, dict) or set(item) != {"name", "result", "evidence"}:
+            raise ValueError("검증에는 name/result/evidence가 필요합니다.")
+        task_text(item["name"], "verification.name")
+        if item["result"] not in TASK_RESULTS:
+            raise ValueError("verification.result: pass/fail/not_run/partial 중 하나가 필요합니다.")
+        task_strings(item["evidence"], "verification.evidence")
+        if item["result"] in {"pass", "fail", "partial"} and not item["evidence"]:
+            raise ValueError("수행한 검증에는 근거가 필요합니다.")
+    if value["status"] == "blocked" and not value["blockers"]:
+        raise ValueError("막힌 작업에는 blockers 이유가 필요합니다.")
+    if value["status"] in {"pending", "in_progress", "blocked"} and not value["nextActions"]:
+        raise ValueError("진행·대기·막힘에는 다음 작업이 필요합니다.")
+    if value["status"] == "completed" and (value["blockers"] or value["nextActions"]):
+        raise ValueError("완료에는 남은 필수 작업·막힘을 남길 수 없습니다. 진행 중 또는 막힘으로 기록하세요.")
+    encoded = (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    if len(encoded) > MAX_RECORD_BYTES:
+        raise ValueError("기록이 수집 한도 1MiB를 넘습니다.")
+    return value
+
+def load_task(path):
+    if path.stat().st_size > MAX_RECORD_BYTES:
+        raise ValueError("기록 입력이 1MiB를 넘습니다.")
+    return validate_task(read_json(path))
+
+def task_key(value):
+    return (value["projectId"], value["actorId"], value["recordId"])
+
+def write_task(root, value):
+    validate_task(value)
+    project, _ = board(root)
+    if value["projectId"] != project:
+        raise ValueError("기록 projectId가 이 소통함의 실제 프로젝트 ID와 다릅니다.")
+    folder = safe(root, "보낼자료")
+    previous = []
+    if folder.exists():
+        for path in folder.glob("task-*-r*.json"):
+            old = load_task(path)
+            if task_key(old) == task_key(value):
+                previous.append(old)
+    if previous:
+        latest = max(previous, key=lambda item: item["revision"])
+        if value["revision"] != latest["revision"] + 1:
+            raise ValueError("기존 최신 revision 다음 번호로 기록하세요. 원본은 덮어쓰지 않습니다.")
+        if value["receivedAt"] != latest["receivedAt"] or value["request"] != latest["request"]:
+            raise ValueError("받은 명령·수신 시각은 유지하세요. 새 명령은 새 recordId로 적습니다.")
+        if task_time(value["updatedAt"], "updatedAt") < task_time(latest["updatedAt"], "updatedAt"):
+            raise ValueError("기존 최신 기록보다 updatedAt이 빠릅니다.")
+    filename = "task-" + sha(json.dumps(task_key(value), ensure_ascii=False)) + "-r" + str(value["revision"]) + ".json"
+    relative = "보낼자료/" + filename
+    destination = safe(root, relative)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    safe(root, relative)
+    # Publish a complete file atomically while refusing revision collisions.
+    handle, temporary = tempfile.mkstemp(prefix=".writing-task-", suffix=".tmp", dir=destination.parent)
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8", newline="\n") as stream:
+            json.dump(value, stream, ensure_ascii=False, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        safe(root, relative)
+        os.link(temporary, destination)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return destination
+
+def render_task(value):
+    print(value["title"] + " · " + TASK_LABELS[value["status"]])
+    print("프로젝트: " + value["projectId"] + " / 작성: " + value["actorId"])
+    print("받은 지시: " + value["request"]["summary"])
+    print("AI 답변: " + value["response"]["summary"])
+    for title, key in (("한 일", "workDone"), ("남은 일", "nextActions"), ("막힌 이유", "blockers")):
+        if value[key]:
+            print(title + ":")
+            for item in value[key]:
+                print("- " + item)
+    if value["verification"]:
+        print("검증:")
+        for item in value["verification"]:
+            label = {"pass": "통과", "fail": "실패", "not_run": "미실행", "partial": "일부 확인"}[item["result"]]
+            print("- " + item["name"] + " · " + label)
+            for evidence in item["evidence"]:
+                print("  근거: " + evidence)
+    print("기록: " + value["recordId"] + " / 버전 " + str(value["revision"]) + " / " + value["updatedAt"])
+    print("지시 출처: " + value["request"]["source"])
+    print("답변 출처: " + value["response"]["source"])
+
+
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="프로젝트 공지 본인 확인")
+    parser = argparse.ArgumentParser(description="프로젝트 공지·명령·답변 기록")
     parser.add_argument("--root", default=str(Path(__file__).resolve().parent), help="_통합소통 폴더")
     commands = parser.add_subparsers(dest="command", required=True)
     read = commands.add_parser("check")
@@ -148,8 +297,21 @@ def main(argv=None):
         write.add_argument("--" + name, required=True)
     write.add_argument("--status", choices=sorted(STATES), required=True)
     write.add_argument("--evidence", action="append", default=[])
+    for command in ("record", "validate", "render"):
+        task = commands.add_parser(command)
+        task.add_argument("--input", required=True, help="task_exchange JSON 경로")
     args = parser.parse_args(argv)
     try:
+        if args.command in {"record", "validate", "render"}:
+            value = load_task(Path(args.input))
+            if args.command == "record":
+                print(write_task(Path(args.root).resolve(), value))
+                print("본인 명령·답변 기록을 작성했습니다. 수집·중앙 공유 여부는 앱에서 별도로 확인하세요.")
+            elif args.command == "render":
+                render_task(value)
+            else:
+                print("기록 형식 검증 통과: " + value["recordId"] + " / 버전 " + str(value["revision"]))
+            return 0
         if not args.actor.strip() or len(args.actor) > 200:
             raise ValueError("본인 AI 식별자가 필요합니다.")
         root = Path(args.root).resolve()

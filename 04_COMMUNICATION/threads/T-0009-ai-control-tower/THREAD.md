@@ -1,4 +1,4 @@
-﻿# T-0009 — AI Control Tower
+# T-0009 — AI Control Tower
 
 ## 2026-09-20 KST — 구현 및 인수인계
 
@@ -98,3 +98,9 @@
 기존 관제탑 설치본은 PID 24404에서 실행 중이고 배포 SHA-256 63EF0DB015C78A14FAF7FC231F8307A8412E4E9049934CD9841170E9119DB5F3와 일치했다. 저장소의 src/AIControlTower 및 tests/AIControlTower.Tests 각각 bin·obj 캐시 4개만 정리했다. 설치 앱·원격 연결·프로젝트 데이터는 유지했다. 이번에는 UI 코드 변경·새 앱 배포가 없으므로 앞선 36개 테스트와 실제 Windows 화면 검증의 범위를 새 검증으로 확대하지 않는다.
 
 공지: ../../announcements/README.md · 확인 현황: ../../announcements/STATUS.md · 기록 방법: ../../announcements/PROTOCOL.md
+
+## 2026-10-06 KST — 명령·답변 기록과 소통 읽기 개선
+
+관리 담당 Codex가 최신 사용자 지시에 따라 0.6.0 배포 완료를 확인하고 0.6.1 소통 기록·읽기를 구현했습니다. 요청 종료에서 회전을 강제 Stop하여0도로 튀는 원인을 고쳤습니다. 소통 JSON 원본에서 사용자용 요청·답변·실제 작업·검증·남은 일을 보여주며 검색·상태·프로젝트·이전 기록 필터를 제공합니다.
+
+N-0007·정책·템플릿과 기록도우미를 연결했습니다. 다른 AI의 읽음을 대신 기록하지 않습니다. Windows109개와 Python29개 테스트, 실제 EXE33개 테마/창 조합·휠4개·선택/스크롤보존·회전완료를 확인했습니다. 상세는 [검증 문서](../../../ai-control-tower/docs/COMMUNICATION-READER-20261006.md)를 봅니다. 설치 교체·중앙 공유는 이번 종료 기록으로 확인합니다.

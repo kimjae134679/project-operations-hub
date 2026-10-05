@@ -85,3 +85,7 @@ dotnet publish ai-control-tower/src/AIControlTower/AIControlTower.csproj -c Rele
 Windows .NET 9 SDK가 필요합니다. 기본 앱 위치는 `D:\A_KJ\AI\Applications\AIControlTower`; D 경로에 쓸 수 없으면 LocalAppData를 사용합니다. 설치 EXE는 교체 전에 백업합니다. 제거는 관제탑 자동 시작과 실행파일만 대상으로 하며 사용자 데이터·작업 기록·리모트 연결을 유지합니다. 한 세션에서 두 번째 관제탑 실행은 기존 창을 활성화합니다.
 
 실제 빌드·화면·실행 검증과 최종 산출물 해시는 [검증 기록](docs/VERIFICATION-20261005.md)에 기록합니다.
+
+## 0.6.1 소통 기록과 읽기 개선
+
+프로젝트 소통에서 요청·AI 답변·실제 작업·검증·남은 일을 읽습니다. 검색, 선택 프로젝트만 보기, 작업 상태와 이전 기록 필터를 사용할 수 있습니다. AI가 읽는 원본을 펼치면 같은 JSON을 확인·복사합니다. 작은 창도 목록과 본문이 나란히 표시됩니다. 새로고침은 한바퀴를 자연스럽게 마치며 움직임 줄이기 설정을 존중합니다. [변경·실제 검증](docs/COMMUNICATION-READER-20261006.md), [기록 형식](../05_TEMPLATES/TASK_EXCHANGE.md).

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "EXAMPLE-replace-before-use",
+  "revision": 1,
+  "title": "예시: 요청받은 화면 개선",
+  "projectId": "Control-Tower",
+  "actorId": "본인-AI-ID",
+  "sessionId": "본인-세션-ID",
+  "receivedAt": "2026-10-06T05:37:58+09:00",
+  "updatedAt": "2026-10-06T05:40:00+09:00",
+  "request": {
+    "summary": "실제 받은 지시의 핵심을 적으세요.",
+    "details": "주요 요구·제약을 빠뜨리지 않고 요약합니다. 이 예시는 실제 수신 기록이 아닙니다.",
+    "source": "unknown"
+  },
+  "response": {
+    "summary": "최종 답변 대기",
+    "details": "실제로 전달한 진행 답변이 있으면 그 내용을 적으세요. 예정한 답변을 실제 답변처럼 기록하지 않습니다.",
+    "source": "unknown"
+  },
+  "status": "pending",
+  "workDone": [],
+  "verification": [
+    {
+      "name": "실제 사용자 흐름",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [
+    "실제 대상과 현재 상태 확인"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

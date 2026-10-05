@@ -10,6 +10,9 @@ namespace AIControlTower.Services;
 /// <summary>Small native reader for the controlled announcement Markdown; no HTML/web runtime.</summary>
 public static class NoticeDocument
 {
+    public static readonly DependencyProperty HideMetadataProperty = DependencyProperty.RegisterAttached("HideMetadata",typeof(bool),typeof(NoticeDocument),new PropertyMetadata(true));
+    public static void SetHideMetadata(DependencyObject target,bool value)=>target.SetValue(HideMetadataProperty,value);
+    public static bool GetHideMetadata(DependencyObject target)=>(bool)target.GetValue(HideMetadataProperty);
     public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached("Text",typeof(string),typeof(NoticeDocument),new PropertyMetadata("",Changed));
     public static void SetText(DependencyObject target,string value)=>target.SetValue(TextProperty,value);
     public static string GetText(DependencyObject target)=>(string)target.GetValue(TextProperty);
@@ -18,13 +21,22 @@ public static class NoticeDocument
         if(target is not RichTextBox reader)return;
         var document=new FlowDocument { FontFamily=new FontFamily("Segoe UI, Malgun Gothic"),FontSize=14,PagePadding=new Thickness(0),ColumnWidth=double.PositiveInfinity,LineHeight=23 };
         document.SetResourceReference(FlowDocument.ForegroundProperty,"TextBrush");
-        var lines=(e.NewValue as string??"").Replace("\r","").Split('\n');
+        var lines=Regex.Replace(e.NewValue as string??"", @"(?s)<!--.*?-->", "").Replace("\r","").Split('\n');
         for(var i=0;i<lines.Length;i++)
         {
             var line=lines[i].Trim();
             if(line.Length==0)continue;
-            if(i==0 && line.StartsWith("# "))continue;
-            if(i<5 && line.StartsWith("버전 "))continue;
+            if(GetHideMetadata(reader) && i==0 && line.StartsWith("# "))continue;
+            if(GetHideMetadata(reader) && i<5 && line.StartsWith("버전 "))continue;
+            if(line.StartsWith("```"))
+            {
+                var code = new System.Text.StringBuilder();
+                i++;
+                while(i<lines.Length && !lines[i].TrimStart().StartsWith("```")) { code.AppendLine(lines[i]); i++; }
+                var block = new Paragraph(new Run(code.ToString())) { FontFamily=new FontFamily("Consolas, Malgun Gothic"),FontSize=12,Padding=new Thickness(10),Margin=new Thickness(0,8,0,14) };
+                block.SetResourceReference(Paragraph.BackgroundProperty,"RaisedBrush");
+                document.Blocks.Add(block); continue;
+            }
             if(line.StartsWith('|'))
             {
                 var rows=new System.Collections.Generic.List<string[]>();
@@ -55,7 +67,7 @@ public static class NoticeDocument
                 }
                 document.Blocks.Add(table);continue;
             }
-            var heading=line.StartsWith("##");
+            var heading=line.StartsWith("#");
             var paragraphBlock=new Paragraph { Margin=new Thickness(0,heading?15:0,0,heading?10:14),FontSize=heading?16:14,FontWeight=heading?FontWeights.SemiBold:FontWeights.Normal };
             if(heading)line=line.TrimStart('#').Trim();
             if(line.StartsWith("- "))line="— "+line[2..];
