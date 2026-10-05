@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261005-mushoku-native-battle",
+  "checkedAt": "2026-10-05T09:10:00+00:00",
+  "appliedAt": "2026-10-05T09:25:54+00:00",
+  "applicationStatus": "applied",
+  "note": "기존 D 환경·모델·캐시와 GPU 순차 잠금을 재사용했다. CPU 표본 ASR과 실제 음성 CTC, 직접 CLI/CDP 검사로 검증했다. 측정하지 않은 토큰 절감률을 주장하지 않는다.",
+  "evidence": [
+    "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/AGENTS.md",
+    "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/NATIVE_BATTLE_REVISION.md"
+  ]
+}
