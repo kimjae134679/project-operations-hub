@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator261",
+  "checkedAt": "2026-10-05T11:05:08.329183+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자의 서버 교체 승인 범위에서 60초 공지 후 적용. 계정 DB/기존 공지 배치와 이전 설치파일 보존. 실제 runtime/source 해시 별도 증거 작성.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T12:29:37.235167+00:00"
+}

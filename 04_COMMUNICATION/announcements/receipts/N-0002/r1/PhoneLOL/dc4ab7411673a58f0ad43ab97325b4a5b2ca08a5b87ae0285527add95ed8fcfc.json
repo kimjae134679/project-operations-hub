@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator261",
+  "checkedAt": "2026-10-05T10:01:24.601261+00:00",
+  "applicationStatus": "applied",
+  "note": "관전자 5명씩 페이지/끝 화살표 비활성화. 원본 UI 55개 검사와 프레임 갱신 화면 확인.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T12:29:36.239494+00:00"
+}

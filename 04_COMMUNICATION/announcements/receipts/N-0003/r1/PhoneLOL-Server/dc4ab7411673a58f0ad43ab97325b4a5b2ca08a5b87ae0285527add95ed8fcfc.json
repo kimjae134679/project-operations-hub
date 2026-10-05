@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator261",
+  "checkedAt": "2026-10-05T11:05:08.316442+00:00",
+  "applicationStatus": "applied",
+  "note": "기존 RDC 연결과 검사·배포 도구 재사용. 역할/페이지 변경 단독 수행. Astra/서브에이전트 사용하지 않음.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T12:29:36.953799+00:00"
+}

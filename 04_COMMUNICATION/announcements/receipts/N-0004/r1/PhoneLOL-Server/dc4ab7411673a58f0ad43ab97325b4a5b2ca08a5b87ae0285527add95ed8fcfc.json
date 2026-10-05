@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator261",
+  "checkedAt": "2026-10-05T11:05:08.320677+00:00",
+  "applicationStatus": "applied",
+  "note": "공유 연결 유지. 열린 사용자 Unity 없음 확인 후 소유 batch만 직렬 실행. 지정 v33 PID와 port 확인 후 공지하여 교체.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T12:29:37.047763+00:00"
+}
