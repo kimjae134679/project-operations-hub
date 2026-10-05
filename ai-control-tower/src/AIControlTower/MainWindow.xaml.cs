@@ -42,7 +42,7 @@ public partial class MainWindow : Window
         FadeIn(WorkspaceContent);
         await _viewModel.DiscoverAsync();
         await _viewModel.RefreshAsync();
-        await _viewModel.RefreshServerAsync(true);
+        await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true);
         if (_viewModel.AutoCommunication) await _viewModel.SyncCommunicationAsync(true);
     }
 
@@ -120,7 +120,7 @@ public partial class MainWindow : Window
 
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
-    private async void RefreshServer_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshServerAsync(true);
+    private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true); }
     private void OpenServerFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerFolder();
     private void OpenServerMailbox_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerMailbox();
     private void OpenServerSource_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(false);
@@ -130,7 +130,7 @@ public partial class MainWindow : Window
         var dialog = new OpenFolderDialog { Title = "실제로 실행하는 멀티의 신 서버 폴더 선택" };
         if (dialog.ShowDialog(this) != true) return;
         _viewModel.ServerRootPath = dialog.FolderName;
-        await _viewModel.RefreshServerAsync(true);
+        await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true);
         await _viewModel.SyncCommunicationAsync(true);
     }
     private void OpenCommunicationFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCommunicationFolder();

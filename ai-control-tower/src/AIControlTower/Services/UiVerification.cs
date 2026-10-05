@@ -81,8 +81,10 @@ public static class UiVerification
         window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 4;
         await vm.RefreshServerAsync(true);
+        await vm.RefreshRosterAsync();
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         contrastChecks.Add(CheckTextColor(window, "ServerHeading", "wide"));
+        var rosterLiveChecks = await VerifyRosterActivity(window, vm, outputDirectory);
         Capture(window, Path.Combine(outputDirectory, "server.png"));
         window.Width = 1060; window.Height = 720;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
@@ -149,9 +151,33 @@ public static class UiVerification
             CommunicationIssues = vm.CommunicationErrors.ToArray(),
             CommunicationDiagnostics = vm.JobLogs.Where(line=>line.Contains("소통 진단 · ")).ToArray(),
             Server = vm.ServerSnapshot,
+            Roster = new { vm.RosterHealthy, PlayerCount = vm.ServerPlayers.Count, vm.RosterStatus, vm.RosterCheckedAt },
+            RosterLiveChecks = rosterLiveChecks,
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static async Task<object> VerifyRosterActivity(MainWindow window, MainViewModel vm, string output)
+    {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var busy = false; var idle = false; var captured = false; double maxAngle = 0;
+        var timestamps = new HashSet<string>();
+        while (watch.Elapsed < TimeSpan.FromSeconds(2.7))
+        {
+            await Task.Delay(40);
+            await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+            if (vm.IsUpdatingRoster)
+            {
+                busy = true;
+                if (window.FindName("RosterSpinner") is TextBlock { RenderTransform: RotateTransform rotation }) maxAngle = Math.Max(maxAngle, rotation.Angle);
+                if (!captured) { Capture(window, Path.Combine(output, "server-updating.png")); captured = true; }
+            }
+            else idle = true;
+            if (vm.RosterHealthy) timestamps.Add(vm.RosterCheckedAt);
+        }
+        if (!busy || !idle || maxAngle <= 0)
+            throw new InvalidOperationException("Roster refresh indicator does not reflect live request activity.");
+        return new { BusyObserved = busy, IdleObserved = idle, MaxRotationAngle = maxAngle, ScreenTransitionsReduced = vm.ReduceMotion, SuccessfulTimestampChanges = timestamps.Count, PollIntervalSeconds = 1 };
     }
     private static string ThemeColor(MainWindow window, string key) =>
         (window.FindResource(key) as SolidColorBrush)?.Color.ToString()

@@ -56,6 +56,51 @@ public sealed partial class MainViewModel
         catch(OperationCanceledException) { }
         finally { IsCheckingServer=false; _serverLock.Release(); }
     }
+    private readonly MultiplayerRosterService _rosterMonitor = new();
+    private readonly SemaphoreSlim _rosterLock = new(1, 1);
+    private bool _isUpdatingRoster;
+    private bool _rosterHealthy;
+    private string _rosterHealth = "접속자 목록 확인 전";
+    private DateTimeOffset? _rosterCheckedAt;
+    public ObservableCollection<MultiplayerPlayer> ServerPlayers { get; } = [];
+    public bool IsUpdatingRoster { get => _isUpdatingRoster; private set { SetProperty(ref _isUpdatingRoster, value); OnPropertyChanged(nameof(RosterStatus)); } }
+    public bool RosterHealthy => _rosterHealthy;
+    public bool RosterEmpty => _rosterHealthy && ServerPlayers.Count == 0;
+    public string RosterStatus => IsUpdatingRoster ? "접속자 갱신 중…" : _rosterHealth;
+    public string RosterCheckedAt => _rosterCheckedAt is { } time ? "마지막 확인 " + time.LocalDateTime.ToString("HH:mm:ss") : "";
+    public async Task RefreshRosterAsync()
+    {
+        if (_disposed || !await _rosterLock.WaitAsync(0)) return;
+        try
+        {
+            IsUpdatingRoster = true;
+            var watch = Stopwatch.StartNew();
+            var result = await _rosterMonitor.FetchAsync(_lifetime.Token);
+            _rosterHealthy = result.IsHealthy;
+            _rosterHealth = result.IsHealthy ? "1초마다 자동 갱신" : result.Health + (ServerPlayers.Count > 0 ? " · 이전 목록" : "");
+            if (result.IsHealthy)
+            {
+                _rosterCheckedAt = result.FetchedAt;
+                if (!ServerPlayers.SequenceEqual(result.Players))
+                {
+                    // Keep unchanged items in place: no empty-list flash on each poll.
+                    for (var i = 0; i < result.Players.Count; i++)
+                    {
+                        var player = result.Players[i];
+                        if (i < ServerPlayers.Count && ServerPlayers[i] == player) continue;
+                        if (i < ServerPlayers.Count && ServerPlayers[i].Nickname == player.Nickname) ServerPlayers[i] = player;
+                        else { var existing = ServerPlayers.ToList().FindIndex(i, x => x.Nickname == player.Nickname); if (existing >= 0) ServerPlayers.Move(existing, i); else ServerPlayers.Insert(i, player); ServerPlayers[i] = player; }
+                    }
+                    while (ServerPlayers.Count > result.Players.Count) ServerPlayers.RemoveAt(ServerPlayers.Count - 1);
+                }
+            }
+            foreach (var property in new[] { nameof(RosterHealthy), nameof(RosterEmpty), nameof(RosterStatus), nameof(RosterCheckedAt) }) OnPropertyChanged(property);
+            var remaining = TimeSpan.FromMilliseconds(180) - watch.Elapsed;
+            if (remaining > TimeSpan.Zero) await Task.Delay(remaining, _lifetime.Token);
+        }
+        catch (OperationCanceledException) { }
+        finally { IsUpdatingRoster = false; _rosterLock.Release(); }
+    }
     public void OpenServerFolder() => OpenExisting(ServerRootPath);
     public void OpenServerMailbox() => OpenExisting(Path.Combine(ServerRootPath,"_통합소통"));
     public void OpenServerRepository(bool release)
