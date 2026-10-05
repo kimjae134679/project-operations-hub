@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator264",
+  "checkedAt": "2026-10-05T10:01:24.659768+00:00",
+  "applicationStatus": "applied",
+  "note": "Unity 닫힌 상태에서 직렬 검사/빌드. 지정 v33 PID와 리스너 확인 후 교체.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T17:52:06.288027+00:00"
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator264",
+  "checkedAt": "2026-10-05T11:05:08.324639+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 소통 파일 stage/삭제 없음. Spectator264 완료자료 작성; 중앙 수집 확인 없음.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T17:52:07.116632+00:00"
+}

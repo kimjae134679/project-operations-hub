@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator264",
+  "checkedAt": "2026-10-05T10:01:24.556064+00:00",
+  "applicationStatus": "applied",
+  "note": "현재 manifest 및 기존 본인 applied 기록 확인. Spectator264 결과 기록.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T17:52:05.790014+00:00"
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator264",
+  "checkedAt": "2026-10-05T10:01:24.693574+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 서버 교체 승인 범위. 65초공지/SQLite백업/계정보존/소스9해시 증거.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T17:52:06.580427+00:00"
+}

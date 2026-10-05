@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator264",
+  "checkedAt": "2026-10-05T10:01:24.601261+00:00",
+  "applicationStatus": "applied",
+  "note": "직접 관전/양팀 핑/원본 탈주·접속 음성/최신 월드 복원 검증.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T17:52:05.979891+00:00"
+}
