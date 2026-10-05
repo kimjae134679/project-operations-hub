@@ -6,10 +6,10 @@
   "projectId": "Mushoku-Audiobook",
   "actorId": "/root",
   "sessionId": "20261005-mushoku-native-battle",
-  "checkedAt": "2026-10-05T09:10:00+00:00",
+  "checkedAt": "2026-10-05T09:25:54+00:00",
   "appliedAt": "2026-10-05T09:25:54+00:00",
   "applicationStatus": "applied",
-  "note": "본인 프로젝트의 공지 목록/본문을 확인하고 버전·해시·세션 기록을 공유했다. 다른 AI의 적용을 추정하지 않는다.",
+  "note": "본인 프로젝트의 공지 목록/본문을 확인하고 버전·해시·세션 기록을 공유했다. 다른 AI의 적용을 추정하지 않는다. 본문 확인 후 최신 목록을 다시 확인했으며 동일 버전·해시였다.",
   "evidence": [
     "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/AGENTS.md",
     "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/NATIVE_BATTLE_REVISION.md"
