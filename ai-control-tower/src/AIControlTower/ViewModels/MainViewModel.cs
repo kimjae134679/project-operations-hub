@@ -335,7 +335,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _rosterMonitor.Dispose(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog;
+        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog;
         // Semaphores remain available for in-flight finally blocks during shutdown.
     }
 }
