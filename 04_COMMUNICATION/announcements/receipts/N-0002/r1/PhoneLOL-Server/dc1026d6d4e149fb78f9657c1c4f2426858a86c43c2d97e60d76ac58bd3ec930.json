@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "Codex",
+  "sessionId": "server-recovery-20261006-0500",
+  "checkedAt": "2026-10-05T20:04:08.622888+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "Server recovery only; no UI or folder layout change.",
+  "evidence": []
+}

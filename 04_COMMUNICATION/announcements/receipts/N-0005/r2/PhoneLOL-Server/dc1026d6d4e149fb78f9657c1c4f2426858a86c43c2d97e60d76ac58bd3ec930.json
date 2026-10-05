@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "Codex",
+  "sessionId": "server-recovery-20261006-0500",
+  "checkedAt": "2026-10-05T20:04:08.634706+00:00",
+  "applicationStatus": "applied",
+  "note": "Read current notice. Reused existing remote connection and existing V33 runtime/control after seven deployed-source hashes matched. Restored missing listener; queried runtime HTTP without account/key disclosure. Central synchronization unverified.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T20:05:17.664407+00:00"
+}
