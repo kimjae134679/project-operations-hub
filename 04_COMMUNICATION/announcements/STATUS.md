@@ -1,8 +1,8 @@
 # 공지 확인 현황
 
-<!-- communication-state-sha256: e74d543b5e3ff14883b7ea978e39f79d29e2a8eb1031bd0225867b7bac9d81fb -->
+<!-- communication-state-sha256: 43c88041a486452b4978f90fa03b16fc9deda8e8cedfc72de5969c5c29ab03d6 -->
 
-생성 시각: 2026-10-05 19:58:58 KST / 2026-10-05 10:58:58 UTC
+생성 시각: 2026-10-05 20:01:04 KST / 2026-10-05 11:01:04 UTC
 
 프로젝트 기록은 누군가 해당 범위에서 확인했다는 뜻입니다. 전체 AI의 확인·적용 완료가 아닙니다. 자동 배포는 읽음 확인이 아닙니다.
 
@@ -26,7 +26,7 @@
 | 피규어 만들기 | 등록 프로젝트 · 필수 | 0 / 6 | 미확인 |
 | 동물의숲 | 등록 프로젝트 · 필수 | 0 / 6 | 미확인 |
 | 콘텐츠 제작 | 등록 프로젝트 · 필수 | 0 / 6 | 미확인 |
-| 무직전생 오디오북 | 등록 프로젝트 · 필수 | 6 / 6 | root, /root/firered_bench, /root/app_cleanup, /root/higgs_bench, 관리 담당 Codex |
+| 무직전생 오디오북 | 등록 프로젝트 · 필수 | 6 / 6 | root, /root/firered_bench, /root/app_cleanup, /root/voicestudio_setup, /root/higgs_bench, 관리 담당 Codex |
 | 버건디 보드게임 | 기존 프로젝트 방 · 필수 | 0 / 6 | 미확인 |
 | 사이드메모장 | 경험 소스·기존 방 · 필수 | 0 / 6 | 미확인 |
 | 통합소통방·컨트롤타워 | 관리 작업 · 필수 | 6 / 6 | 관리 담당 Codex, 프로젝트·폴더 확인 AI, 도구·확인 절차 검토 AI, 화면·코드 검토 AI |

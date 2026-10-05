@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/voicestudio_setup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:47.788781+00:00",
+  "applicationStatus": "applied",
+  "note": "새앱D관리루트와기존오디오북D루트예외를기록. 공유원격연결유지,다운로드중단은본VoiceStudio정상종료만사용. 다른앱/게임/서버제어없음.",
+  "evidence": [
+    "docs/VOICESTUDIO_LOCAL.md"
+  ],
+  "appliedAt": "2026-10-05T11:00:54.311587+00:00"
+}

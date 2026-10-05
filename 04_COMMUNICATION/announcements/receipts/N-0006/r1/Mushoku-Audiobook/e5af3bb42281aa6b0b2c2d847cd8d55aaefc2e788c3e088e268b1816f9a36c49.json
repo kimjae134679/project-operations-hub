@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/voicestudio_setup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:47.822404+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "본작업은무직전생VoiceStudio설치/검토이며PhoneLOL게임/서버를운영하지않음. 다른프로젝트코드/서비스/DB를변경하거나관측완료를대신보고하지않음.",
+  "evidence": [
+    "docs/VOICESTUDIO_LOCAL.md"
+  ]
+}

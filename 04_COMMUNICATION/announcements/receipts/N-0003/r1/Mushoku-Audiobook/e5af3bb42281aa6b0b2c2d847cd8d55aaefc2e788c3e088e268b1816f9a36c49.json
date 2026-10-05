@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/voicestudio_setup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:47.772121+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자명시병렬요청에따라VoiceStudio담당만수정하고GPU벤치는다른담당에게분리. 공식skill/API/CLI/GUI검증을활용했고합성미검증과실측범위를구분.",
+  "evidence": [
+    "output/battle_action_20261005/voicestudio_setup.json"
+  ],
+  "appliedAt": "2026-10-05T11:00:54.272015+00:00"
+}

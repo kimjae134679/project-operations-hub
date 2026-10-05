@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/voicestudio_setup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:47.734147+00:00",
+  "applicationStatus": "applied",
+  "note": "현재6공지와 revision/hash를본인check--read로실제읽고본인actor/session기록만작성. 로컬작성과중앙수집/동기화완료를구분하며동기화확인은대기.",
+  "evidence": [
+    "_통합소통/README.md"
+  ],
+  "appliedAt": "2026-10-05T11:00:54.117578+00:00"
+}

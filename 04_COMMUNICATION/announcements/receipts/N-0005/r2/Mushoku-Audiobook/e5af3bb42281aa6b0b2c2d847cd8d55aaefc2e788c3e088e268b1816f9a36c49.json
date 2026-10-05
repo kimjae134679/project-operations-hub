@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/voicestudio_setup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:47.805692+00:00",
+  "applicationStatus": "applied",
+  "note": "로컬소통폴더에본인요약과본인확인기록만작성. 원문/음원/가중치/비밀키를제외하고중앙수집은대기로명시.",
+  "evidence": [
+    "_통합소통/보낼자료/20261005_voicestudio_setup.md"
+  ],
+  "appliedAt": "2026-10-05T11:00:54.354960+00:00"
+}
