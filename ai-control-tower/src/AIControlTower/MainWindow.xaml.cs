@@ -10,14 +10,15 @@ namespace AIControlTower;
 
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel _viewModel = new();
+    private readonly MainViewModel _viewModel;
     private readonly InstallationService _installationService = new();
     private JevControlWindow? _jevWindow;
     private ListBox? _activeProgramList;
     private Task? _initializeTask;
 
-    public MainWindow()
+    public MainWindow(ControlTowerSettings? settings = null)
     {
+        _viewModel = new(settings);
         InitializeComponent();
         DataContext = _viewModel;
         Loaded += async (_, _) => await InitializeAsync();
@@ -35,6 +36,7 @@ public partial class MainWindow : Window
         FadeIn(WorkspaceContent);
         await _viewModel.DiscoverAsync();
         await _viewModel.RefreshAsync();
+        if (_viewModel.AutoCommunication) await _viewModel.SyncCommunicationAsync(true);
     }
 
     private void ApplyResponsiveLayout()
@@ -97,6 +99,19 @@ public partial class MainWindow : Window
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
+    private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
+    private void OpenCommunicationFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCommunicationFolder();
+    private void OpenCollectedFile_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCollectedFile();
+    private async void LinkCommunicationProject_Click(object sender, RoutedEventArgs e)
+    {
+        var project = _viewModel.SelectedCommunicationProject;
+        if (project is null) return;
+        var dialog = new OpenFolderDialog { Title = project.Name + "의 주 작업 폴더 선택", Multiselect = false };
+        if (Directory.Exists(project.Root)) dialog.InitialDirectory = project.Root;
+        if (dialog.ShowDialog(this) != true) return;
+        _viewModel.LinkCommunicationProject(project.Id, dialog.FolderName);
+        await _viewModel.SyncCommunicationAsync(true);
+    }
     private async void Discover_Click(object sender, RoutedEventArgs e) => await _viewModel.DiscoverAsync();
     private async void ConsolidateRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.ConsolidateRemoteStartupAsync();
     private async void EnsureRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.EnsureRemoteRunningAsync();

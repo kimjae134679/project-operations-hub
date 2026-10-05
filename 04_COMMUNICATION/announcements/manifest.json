@@ -132,7 +132,7 @@
   "notices": [
     {
       "id": "N-0001",
-      "revision": 1,
+      "revision": 2,
       "title": "공지 확인과 기록",
       "path": "notices/N-0001.md",
       "targets": [
@@ -140,7 +140,7 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "539af1b0faa8026c40c116b0c8b630bc42f57fec29c600e5c0baeb6079e3788d"
+      "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea"
     },
     {
       "id": "N-0002",
@@ -177,6 +177,18 @@
       "required": true,
       "active": true,
       "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de"
+    },
+    {
+      "id": "N-0005",
+      "revision": 1,
+      "title": "프로젝트 소통 폴더와 자료 정리",
+      "path": "notices/N-0005.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "ebc10e96a20952f968f0a73720278b859fe096d899a54b2394b7779be39e75aa"
     }
   ]
 }

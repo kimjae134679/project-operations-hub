@@ -6,7 +6,7 @@ using AIControlTower.Services;
 
 namespace AIControlTower.ViewModels;
 
-public sealed class MainViewModel : ObservableObject, IDisposable
+public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private readonly IReadOnlyList<IStatusProvider> _providers;
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
@@ -39,6 +39,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true)
     {
         _settings = settings ?? ControlTowerSettings.Load();
+        InitializeCommunication();
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
         var runner = new ProcessRunner();
         _providers = [new DesktopCommanderStatusProvider(runner), new JevStatusProvider(runner), new CodexStatusProvider(runner),
@@ -48,6 +49,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _timer.Tick += async (_, _) =>
         {
             UpdateRunningProperties();
+            if (AutoCommunication) await SyncCommunicationAsync();
             if (_needsDiscovery || DateTime.UtcNow - _lastScan > TimeSpan.FromMinutes(1)) await DiscoverAsync();
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
