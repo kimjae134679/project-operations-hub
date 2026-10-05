@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-control-tower-reader",
+  "revision": 2,
+  "title": "소통방 읽기와 명령·답변 기록 개선",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-communication-reader",
+  "receivedAt": "2026-10-06T05:37:58+09:00",
+  "updatedAt": "2026-10-05T21:04:37.812389+00:00",
+  "request": {
+    "summary": "최신 통합소통을 확인하고 하던 작업을 마무리하며 받은 명령·실제 답변을 계속 기록하고 소통방과 새로고침을 읽기 쉽게 개선.",
+    "details": "최신 링크에서 최근 작업과 받은 명령 확인; 다음부터 모든 담당 AI가 받은 명령과 실제 답변 요약을 지속 기록하도록 규칙 전달; 중단된 작업 확인·마무리; 새로고침 아이콘이 끊기지 않고 부드럽게 한 바퀴 돌도록 개선; 사람에게 쉬운 설명과 AI가 제대로 읽는 구조화 원본을 함께 제공.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "0.6.1 설치본을 교체하고 실행 확인. 변경과 공통 공지를 PR #20으로 병합했으며 이번 기록의 중앙 자동 수집과 임시파일 정리를 확인 중이라고 실제로 답변했습니다.",
+    "details": "최종 답변 전 실제 전달한 진행 답변을 기록합니다. 이전 작업은 0.6.0 디자인 배포까지 완료되어 있었으며 그 위에 이번 소통 읽기·기록·회전 개선을 적용했습니다.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "이전 명령·0.6.0 실제 배포 확인",
+    "JSON 원본→요청/답변/실제작업/검증/남은일 사람용 읽기",
+    "한글 escape 검색·프로젝트/상태/최신·이전 필터·선택 보존·상충 경고/회복",
+    "800ms 회전 한바퀴 완료·움직임 줄이기 존중",
+    "작은 창의 본문0높이 수정·밝음/어두움 테마 확인",
+    "N-0007·공통정책·AI 진입/인수인계·템플릿·기록도우미 등록",
+    "PR20 병합·기존0.6.0백업·0.6.1교체·실행 확인"
+  ],
+  "verification": [
+    {
+      "name": "Windows .NET Release 109개 테스트",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/docs/screens-reader/dotnet-test.log"
+      ]
+    },
+    {
+      "name": "Python 공지/기록도우미29개 테스트",
+      "result": "pass",
+      "evidence": [
+        "scripts/test_notice_board.py",
+        "scripts/test_project_notice.py",
+        "scripts/test_task_exchange.py"
+      ]
+    },
+    {
+      "name": "실제 최종 EXE 테마/창33개·휠4개·선택/스크롤보존·회전완료",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/docs/screens-reader/ui-verification.json"
+      ]
+    },
+    {
+      "name": "설치본0.6.1 SHA256 일치·PID7672 실행",
+      "result": "pass",
+      "evidence": [
+        "D:\\A_KJ\\AI\\Applications\\AIControlTower\\AIControlTower.exe",
+        "SHA256:5DB2C570B9AF408A3A428AAD603DE36BA620B8B5CD3D0E6CBA6AF2D2F46906D0"
+      ]
+    },
+    {
+      "name": "GitHub PR20 병합",
+      "result": "pass",
+      "evidence": [
+        "https://github.com/kimjae134679/project-operations-hub/pull/20"
+      ]
+    },
+    {
+      "name": "게임 실기기/Unity열기/음성·영상제작/Jev왕복",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [
+    "이번 명령·답변 및 본인 공지확인이 중앙 자동수집됐는지 확인",
+    "이번 작업에서 만든 임시빌드·검사스크립트·캐시 정리"
+  ],
+  "blockers": [],
+  "supersedes": []
+}
