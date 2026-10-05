@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:53:44.426483+00:00",
+  "applicationStatus": "applied",
+  "note": "최신 r2 공지를 직접 읽고 실제 소통 폴더에 본인 기록을 작성한다. 수집과 중앙 공유 완료는 아직 검증하지 않았다.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\app_and_cleanup_checks_20261005.json"
+  ],
+  "appliedAt": "2026-10-05T10:53:44.560317+00:00"
+}

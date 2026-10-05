@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:53:44.476508+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 병렬 지시에 따라 독립4담당으로 설치/합성/UI정리를 분리했다. GPU만 공용잠금으로 직렬화하고 실제VRAM/RTF를 기록한다. 별도 유료계정/결제는 없다.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\app_and_cleanup_checks_20261005.json"
+  ],
+  "appliedAt": "2026-10-05T10:53:44.643540+00:00"
+}

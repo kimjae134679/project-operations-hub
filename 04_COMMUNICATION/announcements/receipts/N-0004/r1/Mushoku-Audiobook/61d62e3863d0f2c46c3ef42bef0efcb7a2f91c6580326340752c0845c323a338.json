@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:53:44.492815+00:00",
+  "applicationStatus": "applied",
+  "note": "새 도구/모델/환경은 D A_KJ AI에 설치하고 기존 프로젝트 D AI VoiceAudiobook은 호환 예외로 유지한다. 공유원격 연결과 바탕화면은 수정하지 않는다.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\app_and_cleanup_checks_20261005.json"
+  ],
+  "appliedAt": "2026-10-05T10:53:44.683552+00:00"
+}

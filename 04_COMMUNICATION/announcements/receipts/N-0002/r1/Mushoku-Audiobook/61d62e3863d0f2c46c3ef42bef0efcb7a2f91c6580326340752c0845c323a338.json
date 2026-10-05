@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:53:44.459328+00:00",
+  "applicationStatus": "applied",
+  "note": "사용 시작은 무직전생.exe로 정리했고 실제 본문 PC/모바일 각17검사와 비교듣기 클릭재생을 검증했다. 원문/음성/모델은 보존한다.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\app_and_cleanup_checks_20261005.json"
+  ],
+  "appliedAt": "2026-10-05T10:53:44.600573+00:00"
+}

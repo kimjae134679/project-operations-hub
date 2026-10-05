@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:53:44.526639+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "게임/서버 작업을 하지 않는 오디오북 담당이다. 다른 프로젝트/서버를 조작하지 않았으며 본인 기록만 작성한다. 공지대상14개와 실제연결수를 혼동하지 않는다.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\app_and_cleanup_checks_20261005.json"
+  ]
+}
