@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/firered_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:20.151479+00:00",
+  "applicationStatus": "applied",
+  "note": "소통은 실제 프로젝트 _통합소통에서 본인 기록과 짧은 진행 요약을 남깁니다. 원문·모델·오디오와 소통 요약을 분리하며 중앙 수집 완료를 임의 보고하지 않습니다.",
+  "evidence": [
+    "D:/AI/VoiceAudiobook/_통합소통/보낼자료"
+  ],
+  "appliedAt": "2026-10-05T10:58:17.813445+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/firered_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:20.134751+00:00",
+  "applicationStatus": "applied",
+  "note": "새 환경·소스·가중치는 D:/A_KJ/AI 아래, 기존 프로젝트는 D:/AI/VoiceAudiobook 유지. 공유 원격 연결·바탕화면은 건드리지 않고 자신이 만든 다운로드 프로세스만 명령행 확인 후 재개합니다.",
+  "evidence": [
+    "D:/AI/VoiceAudiobook/docs/FIRERED_LOCAL.md"
+  ],
+  "appliedAt": "2026-10-05T10:58:17.757359+00:00"
+}

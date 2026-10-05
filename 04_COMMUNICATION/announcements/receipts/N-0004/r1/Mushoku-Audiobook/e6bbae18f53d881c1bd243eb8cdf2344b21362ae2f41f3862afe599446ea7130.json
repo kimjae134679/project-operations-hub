@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/higgs_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:56:59.066490+00:00",
+  "applicationStatus": "applied",
+  "note": "기존루트 D:/AI/VoiceAudiobook 보존 예외 문서화. 새환경과 모델 D:/A_KJ/AI에 저장. 공유원격연결 유지, 본인 downloader 프로세스만 재시작.",
+  "evidence": [
+    "docs/HIGGS_TTS3_BENCHMARK.md"
+  ],
+  "appliedAt": "2026-10-05T10:58:18.504709+00:00"
+}

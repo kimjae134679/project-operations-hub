@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:58:46.825785+00:00",
+  "applicationStatus": "applied",
+  "note": "기존 프로젝트 D:/AI/VoiceAudiobook와 환경을 보존하고 새 엔진은 D:/A_KJ/AI에 분리했습니다. 공유 원격 서비스와 타 앱을 종료하지 않았고 장애 중 RPC 누적을 줄여 대기했습니다. 설치/import와 실제 합성 완료를 구분합니다.",
+  "evidence": [
+    "docs/OMNI_VOX_BENCHMARK.md"
+  ],
+  "appliedAt": "2026-10-05T10:58:47.457683+00:00"
+}

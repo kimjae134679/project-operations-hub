@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/higgs_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:56:59.002675+00:00",
+  "applicationStatus": "applied",
+  "note": "최신6공지 check --read로 본인이 실제 읽고 자신의 로컬 확인 기록만 작성. 중앙수집/동기화 완료는 미확인.",
+  "evidence": [
+    "docs/HIGGS_TTS3_BENCHMARK.md"
+  ],
+  "appliedAt": "2026-10-05T10:58:18.046882+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:58:46.842480+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 README/시작 안내/인수인계에서 현재 실행·입력·결과·이전실험 경로를 갱신했습니다. 기존 환경·원문·모델·오디오는 이동하지 않았습니다. 본인 공지 확인만 로컬 작성하며 관리 앱의 자동수집 결과를 대신 완료로 표시하지 않습니다.",
+  "evidence": [
+    "README.md"
+  ],
+  "appliedAt": "2026-10-05T10:58:47.586416+00:00"
+}

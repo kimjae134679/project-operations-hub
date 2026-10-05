@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:58:46.809188+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자가 명시한 병렬 분업에서 UI/정리와 Omni/Vox 환경·합성을 담당합니다. 공식 API 확인, CUDA Torch 재사용, GPUguard 순차 추론과 참조 캐시를 사용하고 토큰 절감률을 임의 주장하지 않습니다. Omni8개 실제생성·실측 완료, Vox는 설치검증 후 모델 자산 대기입니다.",
+  "evidence": [
+    "output/battle_action_20261005/omni_verification.json"
+  ],
+  "appliedAt": "2026-10-05T10:58:47.331667+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/firered_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:20.168209+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "본 음성 엔진 비교 작업은 멀티의 신 개발·배포·서버 운영 범위가 아닙니다. 서버·DB·게임 프로세스·원격 연결을 변경하지 않았습니다.",
+  "evidence": [
+    "D:/AI/VoiceAudiobook/docs/FIRERED_LOCAL.md"
+  ]
+}

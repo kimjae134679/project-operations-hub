@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:58:46.859670+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "본인 작업 범위는 무직전생 오디오북 UI·음성 비교입니다. 멀티의 신 클라이언트/서버·DB·서비스·배포는 읽거나 수정·제어하지 않았습니다. 다른 담당자의 확인도 대신 작성하지 않습니다.",
+  "evidence": [
+    "AGENTS.md"
+  ]
+}

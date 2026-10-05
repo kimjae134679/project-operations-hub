@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/higgs_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:56:59.049670+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 명시 병렬지시에 따라 Higgs 담당으로 분리. 공식모델/Windows포트 검토, 별도환경, cache/range 재사용, 실제runtime/codec검사. GPU는 공유잠금 순차. 측정없는 품질승인/절감률 주장 없음.",
+  "evidence": [
+    "docs/HIGGS_TTS3_BENCHMARK.md"
+  ],
+  "appliedAt": "2026-10-05T10:58:18.312330+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:58:46.792284+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 실제 화면을 참고해 같은 화자 묶음·넓은 글·황토색·문장 클릭을 반영했습니다. 앱 렌더와 PC/모바일 각17검사, 안내/인수인계와 26파일 해시 이동검증을 완료했고 연기 승인은 false로 유지했습니다.",
+  "evidence": [
+    "output/app_and_cleanup_checks_20261005.json"
+  ],
+  "appliedAt": "2026-10-05T10:58:47.182074+00:00"
+}

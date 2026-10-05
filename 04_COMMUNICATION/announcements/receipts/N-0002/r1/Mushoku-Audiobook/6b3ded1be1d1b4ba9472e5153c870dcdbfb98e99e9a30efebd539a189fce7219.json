@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/firered_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:20.100950+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "본 분업은 음성 엔진 설치·합성과 공식 조건 검토입니다. 프로그램·본문 UI와 사용자 폴더 안내 수정은 별도 담당 범위라 그 검증을 대신 승인하지 않습니다.",
+  "evidence": [
+    "D:/AI/VoiceAudiobook/docs/FIRERED_LOCAL.md"
+  ]
+}

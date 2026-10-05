@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/firered_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:20.082028+00:00",
+  "applicationStatus": "applied",
+  "note": "본인이 N-0001r2~N-0006 현재 본문을 check --read로 실제 읽었고 이 작성자·세션 기록만 로컬에 남깁니다. 중앙 수집·동기화 성공은 별도 확인 대상입니다.",
+  "evidence": [
+    "D:/AI/VoiceAudiobook/_통합소통/확인기록"
+  ],
+  "appliedAt": "2026-10-05T10:58:17.620074+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/firered_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:57:20.117796+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자의 병렬 작업 지시에 따라 FireRed 설치·다운로드를 독립 담당하고 GPU만 gpu_guard로 직렬화합니다. 공식 API와 실제 CUDA 사전검증을 구분하며 미측정 연기 향상을 주장하지 않습니다.",
+  "evidence": [
+    "D:/AI/VoiceAudiobook/benchmark_firered.py"
+  ],
+  "appliedAt": "2026-10-05T10:58:17.705069+00:00"
+}

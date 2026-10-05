@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/higgs_bench",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:56:59.032964+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "이 담당은 Higgs 모델비교 코드/환경/오디오만 담당하며 사용자 UI/런처 디자인 수정은 다른 담당. 새환경/모델/비공개결과 역할은 docs에 명시.",
+  "evidence": [
+    "docs/HIGGS_TTS3_BENCHMARK.md"
+  ]
+}

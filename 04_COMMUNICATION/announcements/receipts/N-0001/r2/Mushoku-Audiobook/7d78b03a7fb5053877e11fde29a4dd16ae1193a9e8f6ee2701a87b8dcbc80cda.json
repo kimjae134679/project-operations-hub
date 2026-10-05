@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261005-voice-parallel",
+  "checkedAt": "2026-10-05T10:58:46.773130+00:00",
+  "applicationStatus": "applied",
+  "note": "현재 로컬 manifest의 6개 본문을 본인이 실제 읽고 해시 검증한 뒤 본인 actor/session만 기록했습니다. 중앙 자동수집·공유는 별도이며 수동 업로드하지 않습니다.",
+  "evidence": [
+    "_통합소통/확인기록"
+  ],
+  "appliedAt": "2026-10-05T10:58:47.053428+00:00"
+}
