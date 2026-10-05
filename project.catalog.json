@@ -131,11 +131,11 @@
             },
             {
               "id": "outputs",
-              "name": "만든 음성",
-              "path": "output/directed",
-              "description": "제작된 음성 파일을 모아 둔 폴더입니다. 파일을 선택해 들어볼 수 있습니다.",
+              "name": "최신 전체화 음성·본문",
+              "path": "audiobooks/01_CURRENT",
+              "description": "162·163화 수정본 MP3와 이름·색·클릭 이동이 있는 본문을 보는 폴더입니다. 프로젝트의 최신 듣기 실행기로 본문을 엽니다.",
               "kindLabel": "제작 결과",
-              "openActionLabel": "음성 결과 폴더 보기"
+              "openActionLabel": "최신 음성·본문 폴더 보기"
             },
             {
               "id": "compare",
