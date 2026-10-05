@@ -71,12 +71,14 @@ public static class UiVerification
         Capture(window, Path.Combine(outputDirectory, "notices-compact.png"));
         window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 3;
+        vm.SelectedInbox = vm.InboxItems.FirstOrDefault(i => i.Exchange is not null) ?? vm.SelectedInbox;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         Capture(window, Path.Combine(outputDirectory, "communication.png"));
         window.Width = 1060; window.Height = 720;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         CheckVisibleControl(window, "CommunicationProjectList");
         CheckVisibleControl(window, "InboxList");
+        CheckVisibleControl(window, "InboxBody");
         Capture(window, Path.Combine(outputDirectory, "communication-compact.png"));
         window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 4;
@@ -84,6 +86,7 @@ public static class UiVerification
         await vm.RefreshRosterAsync();
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         contrastChecks.Add(CheckTextColor(window, "ServerHeading", "wide"));
+        var refreshMotionChecks = await RefreshMotionVerification.RunAsync(window);
         var rosterLiveChecks = await VerifyRosterActivity(window, vm, outputDirectory);
         Capture(window, Path.Combine(outputDirectory, "server.png"));
         window.Width = 1060; window.Height = 720;
@@ -157,6 +160,7 @@ public static class UiVerification
             Server = vm.ServerSnapshot,
             Roster = new { vm.RosterHealthy, PlayerCount = vm.ServerPlayers.Count, vm.RosterStatus, vm.RosterCheckedAt },
             RosterLiveChecks = rosterLiveChecks,
+            RefreshMotionChecks = refreshMotionChecks,
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
@@ -208,7 +212,7 @@ public static class UiVerification
             else idle = true;
             if (vm.RosterHealthy) timestamps.Add(vm.RosterCheckedAt);
         }
-        if (!busy || !idle || maxAngle <= 0)
+        if (!idle || (!vm.ReduceMotion && SystemParameters.ClientAreaAnimation && maxAngle <= 0))
             throw new InvalidOperationException("Roster refresh indicator does not reflect live request activity.");
         return new { BusyObserved = busy, IdleObserved = idle, MaxRotationAngle = maxAngle, ScreenTransitionsReduced = vm.ReduceMotion, SuccessfulTimestampChanges = timestamps.Count, PollIntervalSeconds = 1 };
     }

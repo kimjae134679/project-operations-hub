@@ -159,6 +159,7 @@ public sealed class CommunicationService
                     "- 받은공지: 자동 전달된 현재 공지와 목록입니다. 전달은 읽음 확인이 아닙니다. 목록에서 제외된 이전 본문은 이력입니다.\n" +
                     "- 보낼자료: UTF-8 .md/.txt/.json을 넣으면 중앙에서 수집합니다. 원본은 삭제하지 않습니다. 파일당 1MiB 이하, 변경 중·비밀키 의심 파일은 보류합니다.\n" +
                     "- 확인기록: 실제로 읽은 AI가 자기 프로젝트·작성자·세션 기록만 작성합니다. 읽음 대기와 적용 완료를 구분합니다.\n\n" +
+                    "받은 명령·실제 답변·한 일·검증·남은 일은 task_exchange JSON으로 보낼자료에 계속 기록합니다. 첫 수신과 진행 변경·종료 때 revision을 올리고 이전 기록을 보존합니다. 구조: 허브 05_TEMPLATES/TASK_EXCHANGE.md. 기록도우미 record --input 파일.json, validate --input 파일.json, render --input 파일.json을 사용합니다. 사람이 읽는 요약과 AI 원본은 같은 기록에서 확인합니다. 자동 수집은 채팅 감시나 자동 명령 작성이 아닙니다.\n\n" +
                     "이 폴더에서 아래 현재 도우미 명령으로 확인합니다. 로컬 도우미가 보호돼 있으면 중앙 도우미를 연결하고 기존 파일은 보존합니다. 프로그램은 도우미를 자동 실행하거나 확인 기록을 대신 작성하지 않습니다.\n\n" +
                     "```text\n"+helperCommand+" check --actor Sol --read\n"+helperCommand+" ack --actor Sol --session 본인작업세션 --notice N-0001 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
                     "본문을 실제 읽은 뒤 현재 revision·hash를 사용하세요. 적용 완료에는 구체적인 설명·근거를 남깁니다. 받은공지의 manifest.json이 현재 전달 목록의 원본입니다. 로컬 배포·수집과 GitHub 공유 완료는 별개입니다. 다른 독립 채팅을 자동으로 깨우지 않습니다.\n";
@@ -283,9 +284,13 @@ public sealed class CommunicationService
                 var body = await ReadText(Inside(root, item.CentralPath), ct).ConfigureAwait(false);
                 if (ContentHash(body) != item.ContentSha256 || HasSecret(body)) throw new InvalidDataException("Content held.");
                 if (item.CentralPath.EndsWith(".json", StringComparison.Ordinal)) { using var json = JsonDocument.Parse(body); }
-                var firstLine = body.Split('\n').FirstOrDefault(line => !string.IsNullOrWhiteSpace(line))?.Trim() ?? "내용 없음";
-                var preview = firstLine.Length > 160 ? firstLine[..160] : firstLine;
-                items.Add(item with { Title = preview.TrimStart('#', ' '), Preview = preview, Body = body }); publish.Add(item.CentralPath); publish.Add(prefix + "item.json");
+                var displayBody = System.Text.RegularExpressions.Regex.Replace(body, @"(?s)<!--.*?-->", "");
+                var firstLine = displayBody.Split('\n').FirstOrDefault(line => !string.IsNullOrWhiteSpace(line))?.Trim() ?? "내용 없음";
+                var title = firstLine.TrimStart('#', ' ');
+                var previewLine = displayBody.Split('\n').SkipWhile(line => string.IsNullOrWhiteSpace(line) || line.Trim() == firstLine).FirstOrDefault(line => !string.IsNullOrWhiteSpace(line))?.Trim() ?? firstLine;
+                if (item.CentralPath.EndsWith(".json", StringComparison.Ordinal)) { title = item.SourceName; previewLine = "원본 JSON 자료 · 선택하면 내용과 기록 형식을 확인합니다."; }
+                var preview = previewLine.Length > 160 ? previewLine[..160] : previewLine;
+                items.Add(item with { Title = title, Preview = preview, Body = body }); publish.Add(item.CentralPath); publish.Add(prefix + "item.json");
             }
             catch (Exception ex) when (IsFileError(ex)) { Hold(errors, null, "central_inbox_invalid"); }
         }
@@ -448,7 +453,7 @@ public sealed class CommunicationService
         const string end = "<!-- control-tower:communication-entry:end -->";
         var block = begin + "\n## 통합 공지·인수인계\n\n" +
             "이 소통함의 프로젝트 ID: `" + projectId + "`. 작업 시작·재개·인수인계 때 `_통합소통/받은공지/manifest.json`과 본인 확인 기록을 비교하고 새·변경 공지만 실제로 읽습니다. 최신 사용자 지시와 이 프로젝트의 기존 작업 규칙이 우선입니다.\n\n" +
-            "읽은 AI는 `_통합소통/README.md`의 현재 도우미 명령으로 본인 작성자·세션의 읽음·적용 기록을 남깁니다. 공지 전달은 읽음이 아니며 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 이유를 남깁니다. 공유할 요약·인수인계는 `_통합소통/보낼자료`에 두면 관리 앱이 수집합니다. 연결·동기화가 실패했으면 최신이라고 단정하지 않습니다.\n" + end;
+            "읽은 AI는 `_통합소통/README.md`의 현재 도우미 명령으로 본인 작성자·세션의 읽음·적용 기록을 남깁니다. 공지 전달은 읽음이 아니며 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 이유를 남깁니다. 공유할 요약·인수인계는 `_통합소통/보낼자료`에 두면 관리 앱이 수집합니다. 받은 명령·실제 답변·진행·검증·남은 일은 task_exchange JSON으로 첫 수신·변경·종료 때 계속 기록하고 revision을 올려 이전 기록을 보존합니다. 형식은 허브 `05_TEMPLATES/TASK_EXCHANGE.md`, 작성은 현재 기록도우미 `record --input 파일.json`을 사용합니다. 자동 수집은 채팅 감시나 명령 자동 작성을 뜻하지 않습니다. 연결·동기화가 실패했으면 최신이라고 단정하지 않습니다.\n" + end;
         var path = Inside(projectRoot, "AGENTS.md");
         var existed = File.Exists(path);
         byte[] original = [];

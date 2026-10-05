@@ -14,7 +14,15 @@ public sealed record NoticeRow(CommunicationNotice Notice, string ReadSummary)
     public string VersionLabel => $"버전 {Notice.Revision}";
     public string Body => Regex.Replace(Regex.Replace(Notice.Body, @"(?m)^#{1,6}\s*", ""), @"\[([^\]]+)\]\([^)]+\)", "$1").Replace("**", "").Replace("`", "");
 }
-public sealed record InboxRow(string Project, string Title, string Preview, string Body, string Path, string Time);
+public sealed record InboxRow(string Project, string Title, string Preview, string Body, string Path, string Time)
+{
+    public string ProjectId { get; init; } = "";
+    public TaskExchangeView? Exchange { get; init; }
+    public string? Warning { get; init; }
+    public string StateLabel => Warning ?? Exchange?.StateLabel ?? "전달 자료";
+    public string RevisionLabel => Exchange is { } record ? $"기록 {record.Revision} · {record.ActorId}" : "";
+    public string ReadableBody => Exchange?.Markdown ?? (Body.TrimStart().StartsWith('{') || Body.TrimStart().StartsWith('[') ? "```json\n" + Body + "\n```" : Body);
+}
 
 public sealed partial class MainViewModel
 {
@@ -33,6 +41,45 @@ public sealed partial class MainViewModel
     private Dictionary<string,string> _communicationNames = new();
     private Dictionary<string,string> _communicationActorNames = new();
     private string _communicationViewFingerprint = "";
+    private readonly List<InboxRow> _allInboxRows = [];
+    private string _communicationSearch = "";
+    private string _communicationStateFilter = "전체 상태";
+    private bool _selectedProjectOnly, _showHistory, _rebuildingCommunication;
+    public string[] CommunicationStateFilters { get; } = ["전체 상태", "남은 일", "진행 중", "완료", "막힘", "대기", "변경된 요청", "전달 자료", "기록 형식 확인 필요", "상충 기록"];
+    public string CommunicationSearch { get => _communicationSearch; set { if (SetProperty(ref _communicationSearch, value)) FilterInbox(); } }
+    public string CommunicationStateFilter { get => _communicationStateFilter; set { if (SetProperty(ref _communicationStateFilter, value)) FilterInbox(); } }
+    public bool SelectedProjectOnly { get => _selectedProjectOnly; set { if (SetProperty(ref _selectedProjectOnly, value)) FilterInbox(); } }
+    public bool ShowCommunicationHistory { get => _showHistory; set { if (SetProperty(ref _showHistory, value)) FilterInbox(); } }
+    public string InboxCountLabel => $"{InboxItems.Count}개 표시 · 전체 {_allInboxRows.Count}개";
+    public string InboxEmptyLabel => _allInboxRows.Count == 0 ? "아직 전달된 자료가 없습니다" : "조건에 맞는 기록이 없습니다";
+    private void FilterInbox()
+    {
+        var selected = SelectedInbox;
+        IEnumerable<InboxRow> rows = _allInboxRows;
+        if (!ShowCommunicationHistory)
+        {
+            var latest = _allInboxRows.Where(r => r.Exchange is not null).GroupBy(r => (r.ProjectId, r.Exchange!.ActorId, r.Exchange.RecordId))
+                .ToDictionary(g => g.Key, g => g.Max(r => r.Exchange!.Revision));
+            rows = rows.Where(r => r.Exchange is null || r.Exchange.Revision == latest[(r.ProjectId, r.Exchange.ActorId, r.Exchange.RecordId)]);
+        }
+        if (SelectedProjectOnly) rows = rows.Where(r => r.ProjectId == SelectedCommunicationProject?.Id);
+        if (CommunicationStateFilter == "남은 일") rows = rows.Where(r => r.Exchange?.Status is "pending" or "in_progress" or "blocked" || r.Warning is not null);
+        else if (CommunicationStateFilter != "전체 상태") rows = rows.Where(r => r.StateLabel == CommunicationStateFilter);
+        var query = CommunicationSearch.Trim();
+        if (query.Length > 0) rows = rows.Where(r => (r.Project + "\n" + r.Title + "\n" + r.ReadableBody + "\n" + r.Body).Contains(query, StringComparison.OrdinalIgnoreCase));
+        var visible = rows.ToArray();
+        // Avoid collection resets on unchanged background refreshes and keep selected document identity.
+        for (var i = 0; i < visible.Length; i++)
+        {
+            if (i < InboxItems.Count && ReferenceEquals(InboxItems[i], visible[i])) continue;
+            var existing = InboxItems.IndexOf(visible[i]);
+            if (existing >= 0) InboxItems.Move(existing, i);
+            else InboxItems.Insert(i, visible[i]);
+        }
+        while (InboxItems.Count > visible.Length) InboxItems.RemoveAt(InboxItems.Count - 1);
+        SelectedInbox = visible.FirstOrDefault(r => r.Path == selected?.Path) ?? visible.FirstOrDefault();
+        OnPropertyChanged(nameof(NoInboxItems)); OnPropertyChanged(nameof(InboxCountLabel)); OnPropertyChanged(nameof(InboxEmptyLabel));
+    }
     public ObservableCollection<NoticeRow> Notices { get; } = [];
     public ObservableCollection<CommunicationProjectRow> CommunicationProjects { get; } = [];
     public ObservableCollection<InboxRow> InboxItems { get; } = [];
@@ -50,7 +97,7 @@ public sealed partial class MainViewModel
     public bool NoInboxItems => InboxItems.Count==0;
     public NoticeRow? SelectedNotice { get => _selectedNotice; set { if(SetProperty(ref _selectedNotice,value)) UpdateNoticeReceipts(); } }
     public InboxRow? SelectedInbox { get => _selectedInbox; set => SetProperty(ref _selectedInbox,value); }
-    public CommunicationProjectRow? SelectedCommunicationProject { get => _selectedCommunicationProject; set => SetProperty(ref _selectedCommunicationProject,value); }
+    public CommunicationProjectRow? SelectedCommunicationProject { get => _selectedCommunicationProject; set { if (SetProperty(ref _selectedCommunicationProject,value) && SelectedProjectOnly && !_rebuildingCommunication) FilterInbox(); } }
     private string NameFor(string id) => _communicationNames.GetValueOrDefault(id,id);
     public IReadOnlyList<CommunicationTarget> GetCommunicationTargets()
     {
@@ -130,14 +177,16 @@ public sealed partial class MainViewModel
             snapshot.Notices,
             Receipts = snapshot.Receipts.Where(r=>r.IsCurrent).Select(r=>r.Receipt),
             Projects = snapshot.ProjectStates.Select(p=>new {p.ProjectId,p.RootPath,p.State,p.DeliveredCount}),
-            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath}),
+            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath,i.SourceName,i.CollectedAt,i.Title,i.Preview}),
             snapshot.Errors, Names = _communicationNames, Actors = _communicationActorNames
         });
         OnPropertyChanged(nameof(CommunicationCheckedAt));
         if (fingerprint == _communicationViewFingerprint) return;
         _communicationViewFingerprint = fingerprint;
         var selectedId=SelectedNotice?.Notice.Id;
-        var selectedInboxPath=SelectedInbox?.Path;
+        var selectedInboxPath = SelectedInbox?.Path;
+        var existingInboxRows = _allInboxRows.ToDictionary(r => r.Path);
+        _rebuildingCommunication = true;
         var projectId=SelectedCommunicationProject?.Id;
         Notices.Clear();
         foreach(var notice in snapshot.Notices)
@@ -157,12 +206,29 @@ public sealed partial class MainViewModel
             CommunicationProjects.Add(new(project.Key,project.Value,state?.RootPath??"",state is null?"폴더 연결 필요":state.State,count==0?"미확인":$"{count}/{applicable.Length}개 공지 · {receipts.Select(r=>r.Receipt.ActorId).Distinct().Count()}명",applied==0?"—":$"적용 기록 {applied}건"));
         }
         SelectedCommunicationProject=CommunicationProjects.FirstOrDefault(p=>p.Id==projectId)??CommunicationProjects.FirstOrDefault();
-        InboxItems.Clear();
+        _allInboxRows.Clear();
         foreach(var item in snapshot.InboxItems.OrderByDescending(i=>i.CollectedAt))
-            InboxItems.Add(new(NameFor(item.ProjectId),item.Title,item.Preview,item.Body ?? "",Path.Combine(CommunicationHubPath,item.CentralPath),item.CollectedAt.LocalDateTime.ToString("MM/dd HH:mm")));
-        SelectedInbox=InboxItems.FirstOrDefault(i=>i.Path==selectedInboxPath)??InboxItems.FirstOrDefault();
+        {
+            var body = item.Body ?? "";
+            var exchange = TaskExchangeDocument.Parse(body, item.ProjectId, out var warning);
+            var row = new InboxRow(NameFor(item.ProjectId), exchange?.Title ?? item.Title,
+                exchange?.RequestSummary ?? item.Preview, body, Path.Combine(CommunicationHubPath,item.CentralPath),
+                (exchange?.UpdatedAt ?? item.CollectedAt).ToOffset(TimeSpan.FromHours(9)).ToString("MM/dd HH:mm") + " KST")
+                { ProjectId = item.ProjectId, Exchange = exchange, Warning = warning };
+            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning)
+                row = previous;
+            _allInboxRows.Add(row);
+        }
+        var conflicts = _allInboxRows.Where(r => r.Exchange is not null)
+            .GroupBy(r => (r.ProjectId, r.Exchange!.ActorId, r.Exchange.RecordId, r.Exchange.Revision))
+            .Where(g => g.Select(r => r.Body).Distinct().Count() > 1).SelectMany(g => g).Select(r => r.Path).ToHashSet();
+        for (var i = 0; i < _allInboxRows.Count; i++)
+            if (conflicts.Contains(_allInboxRows[i].Path)) _allInboxRows[i] = _allInboxRows[i] with { Warning = "상충 기록" };
+        _rebuildingCommunication = false;
+        SelectedInbox = _allInboxRows.FirstOrDefault(r => r.Path == selectedInboxPath);
+        FilterInbox();
         CommunicationErrors.Clear(); foreach(var error in snapshot.Errors) CommunicationErrors.Add((error.ProjectId is null?"":NameFor(error.ProjectId)+" · ")+error.Message);
-        CommunicationMessage=$"공지 {Notices.Count}개 · 폴더 연결 {snapshot.ProjectStates.Count}개 · 수집 자료 {InboxItems.Count}개";
+        CommunicationMessage=$"공지 {Notices.Count}개 · 폴더 연결 {snapshot.ProjectStates.Count}개 · 수집 자료 {_allInboxRows.Count}개";
         OnPropertyChanged(nameof(CommunicationCheckedAt)); OnPropertyChanged(nameof(NoNotices)); OnPropertyChanged(nameof(NoInboxItems));
         UpdateNoticeReceipts();
     }

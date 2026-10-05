@@ -74,7 +74,6 @@ public sealed partial class MainViewModel
         try
         {
             IsUpdatingRoster = true;
-            var watch = Stopwatch.StartNew();
             var result = await _rosterMonitor.FetchAsync(_lifetime.Token);
             _rosterHealthy = result.IsHealthy;
             _rosterHealth = result.IsHealthy ? "1초마다 자동 갱신" : result.Health + (ServerPlayers.Count > 0 ? " · 이전 목록" : "");
@@ -95,8 +94,6 @@ public sealed partial class MainViewModel
                 }
             }
             foreach (var property in new[] { nameof(RosterHealthy), nameof(RosterEmpty), nameof(RosterStatus), nameof(RosterCheckedAt) }) OnPropertyChanged(property);
-            var remaining = TimeSpan.FromMilliseconds(180) - watch.Elapsed;
-            if (remaining > TimeSpan.Zero) await Task.Delay(remaining, _lifetime.Token);
         }
         catch (OperationCanceledException) { }
         finally { IsUpdatingRoster = false; _rosterLock.Release(); }
