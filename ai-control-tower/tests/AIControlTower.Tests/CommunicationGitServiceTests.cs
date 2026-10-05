@@ -19,8 +19,12 @@ public sealed class CommunicationGitServiceTests
             var seed=Path.Combine(root,"seed");Directory.CreateDirectory(seed);
             await Git(seed,"init","-b","main"); await Git(seed,"config","user.name","Test");await Git(seed,"config","user.email","test@example.invalid");
             File.WriteAllText(Path.Combine(seed,"README.md"),"seed");await Git(seed,"add","README.md");await Git(seed,"commit","-m","seed");
-            var origin=Path.Combine(root,"origin.git");await Git(root,"clone","--bare",seed,origin);
+            var origin=Path.Combine(root,"origin.git");
             var mirror=Path.Combine(root,"mirror");var service=new CommunicationGitService(origin);
+            Assert.False((await service.PrepareAsync(mirror)).Success);
+            Assert.False(Directory.Exists(mirror));
+            Assert.Empty(Directory.GetDirectories(root,"mirror.clone-*"));
+            await Git(root,"clone","--bare",seed,origin);
             Assert.True((await service.PrepareAsync(mirror)).Success);
             var receipt="04_COMMUNICATION/announcements/receipts/N-1/r1/P/read.json";
             var path=Path.Combine(mirror,receipt);Directory.CreateDirectory(Path.GetDirectoryName(path)!);File.WriteAllText(path,"{}");

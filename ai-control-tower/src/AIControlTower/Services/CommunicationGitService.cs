@@ -31,12 +31,32 @@ public sealed class CommunicationGitService
         }
         if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any()) return new(false, false, "선택한 소통 폴더에 기존 자료가 있어 초기화를 보류했습니다.");
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        var cloned = await Git(null, ct, "clone", "--single-branch", "--branch", "main", "--", _origin, path);
-        if (cloned.Code != 0) return new(false, false, "GitHub 연결 대기 · 네트워크와 Git 로그인을 확인하세요.");
-        File.WriteAllText(Marker(path), _origin);
-        await Git(path, ct, "config", "user.name", "Control Tower");
-        await Git(path, ct, "config", "user.email", "control-tower@users.noreply.github.com");
-        return new(true, false, "소통 저장소 연결됨");
+        var staging = path + ".clone-" + Guid.NewGuid().ToString("N");
+        try
+        {
+            var cloned = await Git(null, ct, "clone", "--depth", "1", "--single-branch", "--branch", "main", "--", _origin, staging);
+            if (cloned.Code != 0) return new(false, false, "GitHub 연결 대기 · 네트워크와 Git 로그인을 확인하세요.");
+            File.WriteAllText(Marker(staging), _origin);
+            if ((await Git(staging, ct, "config", "user.name", "Control Tower")).Code != 0
+                || (await Git(staging, ct, "config", "user.email", "control-tower@users.noreply.github.com")).Code != 0)
+                return new(false, false, "소통 저장소 초기화 대기 · 다음 연결에서 다시 시도합니다.");
+            if (Directory.Exists(path)) Directory.Delete(path, false); // Only an empty destination may be removed.
+            Directory.Move(staging, path);
+            return new(true, false, "소통 저장소 연결됨");
+        }
+        finally
+        {
+            // This unique staging clone belongs to this attempt; never clean a user's destination.
+            try
+            {
+                if (Directory.Exists(staging))
+                {
+                    foreach (var file in Directory.EnumerateFiles(staging, "*", SearchOption.AllDirectories)) File.SetAttributes(file, FileAttributes.Normal);
+                    Directory.Delete(staging, true);
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        }
     }
     public async Task<CommunicationGitResult> SynchronizeAsync(string path, IEnumerable<string> validatedPaths, bool publish, CancellationToken ct = default)
     {
@@ -126,7 +146,7 @@ public sealed class CommunicationGitService
         process.StartInfo.Environment["GIT_TERMINAL_PROMPT"] = "0";
         process.StartInfo.Environment["GCM_INTERACTIVE"] = "Never";
         process.StartInfo.Environment["GIT_EDITOR"] = "true";
-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct); timeout.CancelAfter(TimeSpan.FromSeconds(25));
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct); timeout.CancelAfter(TimeSpan.FromSeconds(arguments.FirstOrDefault() == "clone" ? 120 : 25));
         try
         {
             process.Start(); var output = process.StandardOutput.ReadToEndAsync(ct); var error = process.StandardError.ReadToEndAsync(ct);
