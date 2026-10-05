@@ -18,6 +18,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly ControlTowerSettings _settings;
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
     private readonly DispatcherTimer _timer;
+    private readonly DispatcherTimer _serverLiveTimer;
     private readonly Dispatcher _dispatcher;
     private readonly CancellationTokenSource _lifetime = new();
     private readonly Dictionary<string, string> _programStates = new(StringComparer.OrdinalIgnoreCase);
@@ -54,7 +55,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (_needsDiscovery || DateTime.UtcNow - _lastScan > TimeSpan.FromMinutes(1)) await DiscoverAsync();
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
-        if (enablePolling) { JobManager.RecoverInterruptedRuns(); _timer.Start(); }
+        _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
+        if (enablePolling) { JobManager.RecoverInterruptedRuns(); _timer.Start(); _serverLiveTimer.Start(); }
     }
     public ObservableCollection<ProjectItem> Projects { get; } = [];
     public ObservableCollection<ToolStatusViewModel> Statuses { get; } = [];
@@ -332,7 +335,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _disposed = true; _timer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog;
+        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _rosterMonitor.Dispose(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog;
         // Semaphores remain available for in-flight finally blocks during shutdown.
     }
 }
