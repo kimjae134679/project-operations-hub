@@ -105,6 +105,20 @@ public sealed class CommunicationServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task ProtectedLocalHelperUsesCurrentCentralHelperWithoutStoppingCollection()
+    {
+        var scripts=Path.Combine(Hub,"scripts");Directory.CreateDirectory(scripts);
+        File.WriteAllText(Path.Combine(scripts,"project_notice.py"),"# current helper\n");
+        Directory.CreateDirectory(Local(""));var path=Local("기록도우미.py");File.WriteAllText(path,"# protected original\n");File.SetAttributes(path,FileAttributes.ReadOnly);
+        try
+        {
+            var result=await Service().Sync(Hub,[Target]);Assert.Empty(result.Errors);Assert.Empty(result.Receipts);
+            Assert.Equal("# protected original\n",File.ReadAllText(path));
+            var instructions=File.ReadAllText(Local("README.md"));Assert.Contains(Path.Combine(scripts,"project_notice.py"),instructions);Assert.Contains("--root",instructions);
+        }
+        finally { File.SetAttributes(path,FileAttributes.Normal); }
+    }
+    [Fact]
     public async Task ConcurrentTicksSerializeAndDuplicateRootsAreRejected()
     {
         var service = Service();

@@ -38,7 +38,7 @@ public sealed partial class MainViewModel
     public ObservableCollection<InboxRow> InboxItems { get; } = [];
     public ObservableCollection<CommunicationReceiptRow> SelectedNoticeReceipts { get; } = [];
     public ObservableCollection<string> CommunicationErrors { get; } = [];
-    private void InitializeCommunication() { }
+    private void InitializeCommunication() { _communication.Diagnostic += line => OnJobLog("소통 진단 · " + line); }
     public bool AutoCommunication { get => _settings.AutoCommunication; set { _settings.AutoCommunication=value; SaveSettings(); OnPropertyChanged(); } }
     public bool AutoPublishCommunication { get => _settings.AutoPublishCommunication; set { _settings.AutoPublishCommunication=value; SaveSettings(); OnPropertyChanged(); } }
     public string CommunicationHubPath { get => _settings.CommunicationHubPath; set { _settings.CommunicationHubPath=value; _lastCommunicationNetwork=DateTime.MinValue; SaveSettings(); OnPropertyChanged(); } }
