@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_inventory",
+  "sessionId": "20261005-notice-review",
+  "checkedAt": "2026-10-05T08:14:12.444414+00:00",
+  "applicationStatus": "applied",
+  "note": "독립된 실제 폴더 조사와 공지 대상 확인만 맡고 지정 문서 범위로 수정 소유권을 제한했다. 필요한 README·실행기·목록만 선별 조회하고 원문·키를 읽지 않았다. 기존 원격 파일 도구와 GitHub 읽기 API, 기록용 CLI를 작업에 맞게 사용했으며 추가 하위 에이전트·플러그인 설치·Jev 호출은 필요 없어 실행하지 않았다. 측정하지 않은 총 토큰 절감이나 품질 향상을 주장하지 않는다.",
+  "evidence": [
+    "AGENTS.md",
+    "01_CONTROL/USER_POLICIES.md",
+    "04_COMMUNICATION/announcements/PROTOCOL.md"
+  ],
+  "appliedAt": "2026-10-05T08:15:27.706591+00:00"
+}

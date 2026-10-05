@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 1,
+  "contentSha256": "ebc10e96a20952f968f0a73720278b859fe096d899a54b2394b7779be39e75aa",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_inventory",
+  "sessionId": "20261005-folder-docs",
+  "checkedAt": "2026-10-05T08:48:40.895327+00:00",
+  "applicationStatus": "applied",
+  "note": "문서 담당 범위에서 소통 폴더 세 역할과 지원 자료·본인 확인 JSON 형식을 정리하고 프로젝트 README에 주작업·입력·결과·보관 역할을 설명하되 원본 이동·삭제를 강제하지 않도록 반영했다. 현재 PC 6개 진입점과 허브 13개 공지 대상을 분리하고 실제 연결 근거가 있는 4개 ID 대응만 확정해 안내했다. 다른 프로젝트 README·데이터·카탈로그는 직접 수정하지 않았고 다른 담당자의 확인 기록도 작성하지 않았다.",
+  "evidence": [
+    "04_COMMUNICATION/announcements/PROTOCOL.md",
+    "000_사용자용/12_공지사항.md",
+    "05_TEMPLATES/PROJECT_AGENTS.template.md"
+  ],
+  "appliedAt": "2026-10-05T08:49:14.926083+00:00"
+}
