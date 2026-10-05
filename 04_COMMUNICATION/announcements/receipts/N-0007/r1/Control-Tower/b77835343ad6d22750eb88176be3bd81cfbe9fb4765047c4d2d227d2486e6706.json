@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0007",
+  "revision": 1,
+  "contentSha256": "3f0edd4e30dbb06fb14d4d1e29c5edd3cb2c8146ec589787bb7afe904250a9f8",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-communication-reader",
+  "checkedAt": "2026-10-05T20:56:33.617367+00:00",
+  "applicationStatus": "applied",
+  "note": "본인 관리 작업에서 실제 공지를 읽고 소통 기록·가독성·검증·원본 보존에 적용. 다른 담당자 확인은 대신 기록하지 않음.",
+  "evidence": [
+    "ai-control-tower/docs/COMMUNICATION-READER-20261006.md"
+  ],
+  "appliedAt": "2026-10-05T21:03:20.149251+00:00"
+}
