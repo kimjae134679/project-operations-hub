@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator266",
+  "checkedAt": "2026-10-05T11:05:08.312179+00:00",
+  "applicationStatus": "applied",
+  "note": "Spectator266: 관전 정렬·즉시 입장·실시간·온라인 단독 서버 연동 수정 배포. 서버/계정/공지 보존; 본인 완료 기록.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T18:59:12.727068+00:00"
+}
