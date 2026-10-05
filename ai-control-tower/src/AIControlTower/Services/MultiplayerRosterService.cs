@@ -51,7 +51,7 @@ public sealed class MultiplayerRosterService : IDisposable
             using var json = JsonDocument.Parse(bytes.ToArray());
             return new(true, "접속자 목록 확인됨", DateTimeOffset.UtcNow, Parse(json.RootElement));
         }
-        catch (Exception ex) when (!ct.IsCancellationRequested && ex is HttpRequestException or IOException or JsonException or InvalidOperationException or KeyNotFoundException or FormatException or OverflowException or OperationCanceledException)
+        catch (Exception ex) when (!ct.IsCancellationRequested && ex is HttpRequestException or IOException or InvalidDataException or JsonException or InvalidOperationException or KeyNotFoundException or FormatException or OverflowException or OperationCanceledException)
         { return new(false, "접속자 목록 연결 대기 · 다시 확인 중", DateTimeOffset.UtcNow, []); }
     }
     internal static IReadOnlyList<MultiplayerPlayer> Parse(JsonElement json)
