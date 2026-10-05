@@ -98,3 +98,8 @@
 - 실제 안내 D:/AI/VoiceAudiobook/00_START_HERE/TXT_내용과_순서.txt. 재사용 색인 docs/STORY_CATALOG.json.
 - 저장소 커밋 e1e6bfc. 목록: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/STORY_CATALOG.md
 - 이번 완료는 내용/순서·방향 정리. 전권 MP3 및 전권 혼합 렌더는 미완료, 자동화자 semantic hold 유지. 전체 생성 worker를 새로 시작하지 않았습니다.
+
+
+## 2026-10-05 — 162·163화 전체 더빙 실행
+사용자는 용신·루데우스·에리스의 전투를 발췌 장면이 아닌 해당 화 전체로 요청했습니다. 본편16의 162/163을 직접 문맥 대조하고 원문22,836자·928개 비어 있지 않은 줄의 순서/포함을 검사했습니다. 288 Cosy발화+31 Fish발화, 무언어/구분선22쉼. 선호기준유지의 루데우스/록시Cosy 및 에리스/실피Fish를 적용하고, 올스테드/길레느/갈파리온/나레이터 고정참조를 준비했습니다.
+실제 생성 worker와 CPU 일부 전사 검사를 시작했습니다. 아직 MP3 완성으로 보고하지 않습니다. 코드 main 162ad94, 실행 체크포인트 e4a76e8. 상태 output/battle_chapters_162_163. 최종 폴더 D:/AI/VoiceAudiobook/audiobooks/01_CURRENT/20261005_162-163_선호기준유지. 기존 비교/원본 보존, 바탕화면 금지, 전권 자동판정hold 유지. 최종 결과와 길이·검증은 완료 후 갱신합니다.
