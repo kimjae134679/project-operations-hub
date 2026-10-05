@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261005-control-tower-automation",
+  "checkedAt": "2026-10-05T10:36:20.181533+00:00",
+  "applicationStatus": "applied",
+  "note": "본인의 현재 공지6개만 실제 읽고 기록한다. 프로그램 자동 배포·수집·GitHub 공유가 서버 요약과 실제 게임 AI 기록으로 확인됐으며 다른 AI 확인을 대신하지 않는다.",
+  "evidence": [
+    "https://github.com/kimjae134679/project-operations-hub/pull/13",
+    "https://github.com/kimjae134679/project-operations-hub/pull/15",
+    "https://github.com/kimjae134679/project-operations-hub/commit/e06aaf5942b25ed58f078133b4dd2a4ad0aafabd"
+  ],
+  "appliedAt": "2026-10-05T10:37:32.179296+00:00"
+}

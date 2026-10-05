@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261005-control-tower-automation",
+  "checkedAt": "2026-10-05T10:36:20.449756+00:00",
+  "applicationStatus": "applied",
+  "note": "개발 Source/배포 저장소와 서버 런타임을 구분했다. 실제 온라인·정책 API와 서버 화면·서버 요약·중앙 자동 수집을 연결하고 v30/v33 불일치 제어는 실행하지 않았다.",
+  "evidence": [
+    "https://github.com/kimjae134679/project-operations-hub/pull/13",
+    "https://github.com/kimjae134679/project-operations-hub/pull/15",
+    "https://github.com/kimjae134679/project-operations-hub/commit/e06aaf5942b25ed58f078133b4dd2a4ad0aafabd"
+  ],
+  "appliedAt": "2026-10-05T10:37:32.807877+00:00"
+}

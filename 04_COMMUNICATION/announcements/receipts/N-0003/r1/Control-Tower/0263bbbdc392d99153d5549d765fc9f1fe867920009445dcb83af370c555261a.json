@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261005-control-tower-automation",
+  "checkedAt": "2026-10-05T10:36:20.274504+00:00",
+  "applicationStatus": "applied",
+  "note": "분업 담당 범위를 나누고 직접 CLI·GitHub 연결·공식 자료·검사기를 목적별로 사용했다. 전체 토큰 절감률은 측정하지 않았다.",
+  "evidence": [
+    "https://github.com/kimjae134679/project-operations-hub/pull/13",
+    "https://github.com/kimjae134679/project-operations-hub/pull/15",
+    "https://github.com/kimjae134679/project-operations-hub/commit/e06aaf5942b25ed58f078133b4dd2a4ad0aafabd"
+  ],
+  "appliedAt": "2026-10-05T10:37:32.481328+00:00"
+}

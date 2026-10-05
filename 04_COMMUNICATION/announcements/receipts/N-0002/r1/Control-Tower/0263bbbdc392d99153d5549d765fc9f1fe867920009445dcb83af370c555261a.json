@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261005-control-tower-automation",
+  "checkedAt": "2026-10-05T10:36:20.232897+00:00",
+  "applicationStatus": "applied",
+  "note": "한국어 용도와 행동 중심 화면으로 교체하고 1460×920/1060×720 실제 WPF 검색·선택·배치와 폴더 설명을 검증했다.",
+  "evidence": [
+    "https://github.com/kimjae134679/project-operations-hub/pull/13",
+    "https://github.com/kimjae134679/project-operations-hub/pull/15",
+    "https://github.com/kimjae134679/project-operations-hub/commit/e06aaf5942b25ed58f078133b4dd2a4ad0aafabd"
+  ],
+  "appliedAt": "2026-10-05T10:37:32.322914+00:00"
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261005-control-tower-automation",
+  "checkedAt": "2026-10-05T10:36:20.399737+00:00",
+  "applicationStatus": "applied",
+  "note": "실제5개 루트의 소통 폴더와 관리 AGENTS 구역을 연결했다. 공지6개·필수대상14개를 구분하며 보호된 도우미는 원본 유지 후 중앙 도우미를 쓴다. 서버 요약·실제 게임 AI 기록 자동 중앙 반영을 확인했다.",
+  "evidence": [
+    "https://github.com/kimjae134679/project-operations-hub/pull/13",
+    "https://github.com/kimjae134679/project-operations-hub/pull/15",
+    "https://github.com/kimjae134679/project-operations-hub/commit/e06aaf5942b25ed58f078133b4dd2a4ad0aafabd"
+  ],
+  "appliedAt": "2026-10-05T10:37:32.683105+00:00"
+}
