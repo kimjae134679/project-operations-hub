@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator263",
+  "checkedAt": "2026-10-05T11:05:08.329183+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 서버 교체 승인에 따라65초 공지/SQLite백업/계정 보존. 런타임 소스 해시 별도 증거 기록.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T16:04:17.905578+00:00"
+}

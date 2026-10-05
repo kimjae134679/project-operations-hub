@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator263",
+  "checkedAt": "2026-10-05T10:01:24.676671+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 AGENTS/소통 파일 stage/삭제 없음. 보낼자료/Spectator263-완료.md 작성. 중앙 수집 확인 없음.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T16:04:17.072558+00:00"
+}

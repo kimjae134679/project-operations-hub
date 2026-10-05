@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "PhoneLOL",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator263",
+  "checkedAt": "2026-10-05T10:01:24.601261+00:00",
+  "applicationStatus": "applied",
+  "note": "관전 양팀 팀채팅/단일접두사/자동따라가기/탈주 회색프로필/양측 팁과 원본소리 검증.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T16:04:16.413428+00:00"
+}
