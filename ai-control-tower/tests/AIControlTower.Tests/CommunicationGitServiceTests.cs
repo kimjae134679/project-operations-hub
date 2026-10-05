@@ -32,6 +32,7 @@ public sealed class CommunicationGitServiceTests
             Assert.True(result.Success,result.Message);Assert.True(result.Published);
             Assert.Equal("",(await Git(mirror,"status","--porcelain")).Trim());
             Assert.Contains(receipt,(await Git(mirror,"ls-tree","-r","--name-only","origin/main")));
+            Assert.Contains(receipt,(await Git(origin,"ls-tree","-r","--name-only","main")));
         }
         finally { if(Directory.Exists(root)) { foreach(var file in Directory.EnumerateFiles(root,"*",SearchOption.AllDirectories)) File.SetAttributes(file,FileAttributes.Normal); Directory.Delete(root,true); } }
     }

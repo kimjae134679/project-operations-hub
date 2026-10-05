@@ -40,6 +40,14 @@ public sealed class ProjectDiscoveryTests : IDisposable
     public void RejectsPathEscape(string relative) => Assert.Throws<InvalidDataException>(() => ProjectDiscoveryService.ResolveInside(_root, relative));
     [Fact]
     public void MissingRootIsReportedNotInvented() => Assert.Single(new ProjectDiscoveryService().Scan(Path.Combine(_root, "missing")).Warnings);
+    [Fact]
+    public void InternalCommunicationAndBuildCopiesAreNotProjects()
+    {
+        Directory.CreateDirectory(Path.Combine(_root,"ControlTowerData","build",".git"));
+        Directory.CreateDirectory(Path.Combine(_root,"_통합소통","받은공지"));
+        Directory.CreateDirectory(Path.Combine(_root,"사용자 프로젝트"));
+        Assert.Equal("사용자 프로젝트",Assert.Single(new ProjectDiscoveryService().Scan(_root).Projects).Name);
+    }
     [Theory]
     [InlineData("{\"id\":\"bad\",\"name\":\"Bad\",\"functions\":[null]}")]
     [InlineData("{\"id\":\"bad\",\"name\":\"Bad\",\"functions\":[{\"id\":\"f\",\"programs\":[null]}]}")]

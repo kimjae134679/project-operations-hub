@@ -49,6 +49,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _timer.Tick += async (_, _) =>
         {
             UpdateRunningProperties();
+            await RefreshServerAsync();
             if (AutoCommunication) await SyncCommunicationAsync();
             if (_needsDiscovery || DateTime.UtcNow - _lastScan > TimeSpan.FromMinutes(1)) await DiscoverAsync();
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
@@ -156,6 +157,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 void Mark(object? _, FileSystemEventArgs args)
                 {
                     if (args.FullPath.Contains(Path.DirectorySeparatorChar + ".git" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                        || args.FullPath.Contains(Path.DirectorySeparatorChar + "ControlTowerData" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                        || args.FullPath.Contains(Path.DirectorySeparatorChar + "_통합소통" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
                         || args.FullPath.Contains(Path.DirectorySeparatorChar + "node_modules" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return;
                     if (args.Name?.EndsWith(ProjectDiscoveryService.ManifestName, StringComparison.OrdinalIgnoreCase) == true
                         || args.ChangeType is WatcherChangeTypes.Created or WatcherChangeTypes.Deleted or WatcherChangeTypes.Renamed) _needsDiscovery = true;
@@ -329,7 +332,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _disposed = true; _timer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _jobs.Log -= OnJobLog;
+        _disposed = true; _timer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog;
         // Semaphores remain available for in-flight finally blocks during shutdown.
     }
 }

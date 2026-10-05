@@ -76,6 +76,15 @@ public static class UiVerification
         CheckVisibleControl(window, "InboxList");
         Capture(window, Path.Combine(outputDirectory, "communication-compact.png"));
         window.Width = 1460; window.Height = 920;
+        tabs.SelectedIndex = 4;
+        await vm.RefreshServerAsync(true);
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        Capture(window, Path.Combine(outputDirectory, "server.png"));
+        window.Width = 1060; window.Height = 720;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        CheckVisibleControl(window, "ServerModePanel");
+        Capture(window, Path.Combine(outputDirectory, "server-compact.png"));
+        window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 0;
         var oldWidth = window.Width; var oldHeight = window.Height;
         window.Width = 1060; window.Height = 720;
@@ -124,6 +133,7 @@ public static class UiVerification
             CommunicationProjects = vm.CommunicationProjects.ToArray(),
             CollectedItems = vm.InboxItems.Count,
             CommunicationIssues = vm.CommunicationErrors.ToArray(),
+            Server = vm.ServerSnapshot,
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));

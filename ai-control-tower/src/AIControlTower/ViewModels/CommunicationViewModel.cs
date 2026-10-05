@@ -27,6 +27,7 @@ public sealed partial class MainViewModel
     private InboxRow? _selectedInbox;
     private CommunicationProjectRow? _selectedCommunicationProject;
     private bool _isCommunicating;
+    private bool _communicationPrepared;
     private string _communicationMessage = "공지와 프로젝트 전달 기록을 연결합니다.";
     private string _centralSyncMessage = "GitHub 연결 대기";
     private Dictionary<string,string> _communicationNames = new();
@@ -57,6 +58,7 @@ public sealed partial class MainViewModel
         var ids = new Dictionary<string,string> { ["phonelol-current"]="PhoneLOL", ["audiobook"]="Mushoku-Audiobook", ["video-downloader"]="Video-Downloader", ["project-operations-hub"]="Control-Tower" };
         foreach(var entry in _catalog.Projects)
             if(ids.TryGetValue(entry.Id,out var id) && Directory.Exists(entry.Path)) targets[id]=new(id,entry.Path,entry.Name);
+        if (Directory.Exists(ServerRootPath)) targets["PhoneLOL-Server"] = new("PhoneLOL-Server",ServerRootPath,"멀티의 신 서버");
         foreach(var pair in _settings.CommunicationFolders)
             targets[pair.Key]=new(pair.Key,pair.Value,NameFor(pair.Key));
         return targets.Values.ToArray();
@@ -76,7 +78,8 @@ public sealed partial class MainViewModel
             IsCommunicating=true; _lastCommunication=DateTime.UtcNow;
             var network=force || DateTime.UtcNow-_lastCommunicationNetwork>TimeSpan.FromMinutes(1);
             CommunicationGitResult? prepare=null;
-            if(network) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); CentralSyncMessage=prepare.Message; }
+            if(network) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); _communicationPrepared=prepare.Success; CentralSyncMessage=prepare.Message; }
+            if (!_settings.IsTemporary && !_communicationPrepared) { CommunicationMessage="전용 소통 저장소 연결 대기 · 기존 폴더의 자료는 보존합니다."; return; }
             var manifest=Path.Combine(CommunicationHubPath,"04_COMMUNICATION","announcements","manifest.json");
             if(!File.Exists(manifest)) { CommunicationMessage="공지를 아직 내려받지 못했습니다. 연결되면 다시 시도합니다."; return; }
             var snapshot=await _communication.SyncAsync(CommunicationHubPath,GetCommunicationTargets(),_lifetime.Token);

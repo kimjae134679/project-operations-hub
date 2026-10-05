@@ -26,6 +26,12 @@
       "required": true
     },
     {
+      "id": "PhoneLOL-Server",
+      "name": "멀티의 신 서버",
+      "category": "게임 서버",
+      "required": true
+    },
+    {
       "id": "Market-Radar",
       "name": "주식 앱",
       "category": "등록 프로젝트",
@@ -189,6 +195,18 @@
       "required": true,
       "active": true,
       "contentSha256": "ebc10e96a20952f968f0a73720278b859fe096d899a54b2394b7779be39e75aa"
+    },
+    {
+      "id": "N-0006",
+      "revision": 1,
+      "title": "멀티의 신 서버 연결과 운영 구분",
+      "path": "notices/N-0006.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d"
     }
   ]
 }

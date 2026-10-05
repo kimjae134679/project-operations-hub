@@ -10,7 +10,7 @@ public sealed class ProjectDiscoveryService
     public const string ManifestName = "project.control.json";
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip };
     private static readonly HashSet<string> Ignored = new(StringComparer.OrdinalIgnoreCase)
-    { ".git", "node_modules", ".venv", "venv", "__pycache__", "bin", "obj", "backups", "cache", "Installers", "99_ARCHIVE", "Intermediate", "Saved", ".next" };
+    { ".git", "node_modules", ".venv", "venv", "__pycache__", "bin", "obj", "backups", "cache", "Installers", "99_ARCHIVE", "Intermediate", "Saved", ".next", "ControlTowerData", "_통합소통" };
 
     public DiscoveryResult Scan(string root, CancellationToken cancellationToken = default)
     {

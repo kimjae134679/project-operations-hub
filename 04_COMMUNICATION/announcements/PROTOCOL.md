@@ -61,16 +61,19 @@ python 기록도우미.py ack --actor Sol --session 20261005-work --notice N-000
 
 ## 중앙과 로컬의 차이
 
-허브 기본 공지 대상은 등록 9개, 기존 Burgundy·SideMemojang 방, 통합 관리, 영상 저장의 **13개**입니다. FinanceOne·ASCII Aquarium은 경험 자료로 별도 집계하며 실제 비활성이라고 추정하지 않습니다. 그 작업을 재개하는 AI도 공지를 읽습니다.
+허브 기본 공지 대상은 등록 9개, 기존 Burgundy·SideMemojang 방, 통합 관리, 영상 저장, 멀티의 신 서버의 **14개**입니다. FinanceOne·ASCII Aquarium은 경험 자료로 별도 집계하며 실제 비활성이라고 추정하지 않습니다. 그 작업을 재개하는 AI도 공지를 읽습니다.
 
-현재 PC의 **6개 메뉴 진입점**은 이 13개 대상 전체와 같지 않습니다. 실제 연결 근거가 확인된 ID 대응은 다음과 같습니다.
+기존 PC의 **6개 메뉴 진입점**은 이 14개 대상 전체와 같지 않습니다. 서버 운영 기능이 추가돼도 기본 공지 대상 전체의 연결을 뜻하지 않습니다. 실제 연결 근거가 확인된 ID 대응은 다음과 같습니다.
 
 | PC 메뉴 ID | 중앙 공지 ID |
 |---|---|
 | `phonelol-current` | `PhoneLOL` |
+| 게임의 실제 서버 운영 루트 | `PhoneLOL-Server` |
 | `audiobook` | `Mushoku-Audiobook` |
 | `video-downloader` | `Video-Downloader` |
 | `project-operations-hub` | `Control-Tower` |
+
+서버 운영 루트는 `C:\Users\user\Documents\MultiGod\PhoneLOL_LocalRuntime`으로 게임 개발 루트와 다릅니다. 서로 별도의 소통 폴더를 연결하고 확인 기록을 대신 승계하지 않습니다. [N-0006](notices/N-0006.md)과 [서버 근거](../../ai-control-tower/docs/MULTIPLAYER_SERVER.md)를 확인합니다.
 
 `stock-planned`, `housing-planned`는 확인 당시 빈 준비 폴더입니다. 소통 대상 별칭을 지정하더라도 기존 Investment-Lab·ChungYack 개발 저장소가 연결됐거나 동작한다고 확대하지 않습니다. 나머지 대상의 실제 폴더는 확인·추가 연결이 필요합니다. 폴더명만으로 ID를 추정하거나 없는 경로를 대신 만들지 않습니다.
 

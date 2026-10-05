@@ -24,7 +24,7 @@ public sealed class CommunicationGitService
     {
         if (Directory.Exists(Path.Combine(path, ".git")))
         {
-            if (!Owned(path)) return new(false, false, "폴더에서 공지를 읽습니다. 자동 GitHub 동기화는 전용 소통 폴더에서만 가능합니다.");
+            if (!Owned(path)) return new(false, false, "기존 작업 폴더의 자료를 보존합니다. 자동 소통은 전용 폴더에서만 가능합니다.");
             var origin = await Git(path, ct, "remote", "get-url", "origin");
                 if (origin.Code != 0 || origin.Output.Trim() != _origin) return new(false, false, "소통 저장소의 연결 주소가 변경되어 자동 업로드를 보류했습니다.");
             return new(true, false, "전용 소통 저장소 연결됨");
@@ -100,7 +100,10 @@ public sealed class CommunicationGitService
             }
         }
         var pushed = await Git(path, ct, "push", _origin, "HEAD:main");
-        return pushed.Code == 0 ? new(true, true, "GitHub에 수집 기록을 반영했습니다.") : new(false, false, "수집 기록은 보존됨 · GitHub 업로드 재시도 대기");
+        if (pushed.Code != 0) return new(false, false, "수집 기록은 보존됨 · GitHub 업로드 재시도 대기");
+        // Pushing to the verified URL does not advance the named remote's tracking ref.
+        var confirmed = await Git(path, ct, "fetch", "origin", "main");
+        return new(true, true, confirmed.Code == 0 ? "GitHub에 수집 기록을 반영했습니다." : "GitHub 반영 완료 · 최신 공지 재확인은 다음 연결에서 이어갑니다.");
     }
     private async Task<bool> HasExpectedOrigin(string path, CancellationToken ct)
     {
