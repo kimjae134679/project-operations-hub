@@ -4,7 +4,7 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 import sys
 import tempfile
@@ -40,12 +40,32 @@ def digest(value):
     return value
 
 
+def comparable_path(path):
+    r"""Compare resolved Windows drive/UNC paths independently of a long-path prefix.
+
+    Windows resolve() may retain \\?\ on a not-yet-existing long destination while
+    returning the ordinary spelling for its existing root. Keep the original
+    resolved path for I/O; normalize only these equivalent anchors for comparison.
+    Other device namespaces are deliberately not accepted as aliases.
+    """
+    if isinstance(path, PureWindowsPath):
+        value = str(path)
+        if value[:8].lower() == "\\\\?\\unc\\":
+            value = "\\\\" + value[8:]
+        elif (value.startswith("\\\\?\\") and len(value) >= 7
+              and value[4].isascii() and value[4].isalpha() and value[5:7] == ":\\"):
+            value = value[4:]
+        return PureWindowsPath(value)
+    return path
+
+
 def inside(root, relative):
     parts = PurePosixPath(relative)
-    if not relative or "\\" in relative or parts.is_absolute() or any(p in {"..", "."} for p in relative.split("/")):
+    if (not relative or "\\" in relative or ":" in relative or parts.is_absolute()
+            or any(p in {"..", "."} for p in relative.split("/"))):
         raise ValueError("공지 경로는 내부 상대 경로여야 합니다.")
     target = (root / relative).resolve()
-    if not target.is_relative_to(root.resolve()):
+    if not comparable_path(target).is_relative_to(comparable_path(root.resolve())):
         raise ValueError("공지 경로가 공지방 밖을 가리킵니다.")
     return target
 
@@ -170,7 +190,7 @@ class Board:
             record = self.receipt_valid(json.loads(path.read_text(encoding="utf-8-sig")))
             notice = {"id": record["noticeId"], "revision": record["revision"]}
             expected = self.receipt_path(notice, record["projectId"], record["actorId"], record["sessionId"])
-            if path.resolve() != expected:
+            if comparable_path(path.resolve()) != comparable_path(expected):
                 raise ValueError("receipt 경로와 기록의 소유자가 다릅니다: " + str(path))
             if record["projectId"] not in self.projects or record["noticeId"] not in self.notices:
                 raise ValueError("receipt의 프로젝트/공지 ID가 등록되지 않았습니다.")

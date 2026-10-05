@@ -1,10 +1,11 @@
 import concurrent.futures
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from notice_board import Board, content_hash
+from notice_board import Board, comparable_path, content_hash, inside
 
 
 class NoticeBoardTests(unittest.TestCase):
@@ -103,11 +104,48 @@ class NoticeBoardTests(unittest.TestCase):
         board.check("A", "Sol", True)
         board.check("A", "별도 AI / 연구", True)
         tasks = [("Sol", "one"), ("Sol", "two"), ("별도 AI / 연구", "one")]
-        with concurrent.futures.ThreadPoolExecutor() as pool:
+        tasks.extend(("Sol", "parallel-" + str(i)) for i in range(5))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
             paths = list(pool.map(lambda pair: self.ack(board, *pair), tasks))
-        self.assertEqual(3, len(set(paths)))
-        self.assertEqual(3, len(board.receipts()))
+        self.assertEqual(8, len(set(paths)))
+        self.assertEqual(8, len(board.receipts()))
         self.assertFalse(list(self.base.rglob("*.tmp")))
+
+    def test_long_windows_resolved_destination_is_inside_ordinary_root(self):
+        # Deterministic version of Python 3.13's observed Windows mkdir/resolve race:
+        # missing destination returns \\?\D:\..., existing root returns D:\....
+        for resolved_root, resolved_target in (
+            (PureWindowsPath(r"D:\test\announcements"), PureWindowsPath(r"\\?\D:\test\announcements\receipts\record.json")),
+            (PureWindowsPath(r"\\server\share\announcements"), PureWindowsPath(r"\\?\UNC\server\share\announcements\receipts\record.json")),
+            (PureWindowsPath(r"\\?\D:\test\announcements"), PureWindowsPath(r"D:\test\announcements\receipts\record.json")),
+        ):
+            with self.subTest(root=resolved_root, target=resolved_target):
+                with patch.object(Path, "resolve", side_effect=[resolved_target, resolved_root]):
+                    self.assertEqual(resolved_target, inside(self.base, "receipts/record.json"))
+                self.assertEqual(comparable_path(resolved_target), comparable_path(PureWindowsPath(str(resolved_root)) / "receipts/record.json"))
+
+    def test_windows_anchor_normalization_does_not_allow_escape_or_device_paths(self):
+        resolved_root = PureWindowsPath(r"D:\test\announcements")
+        for target in (r"\\?\D:\test\announcements-other\record.json", r"\\?\E:\test\announcements\record.json",
+                       r"\\?\GLOBALROOT\Device\HarddiskVolume1\record.json"):
+            with self.subTest(target=target):
+                with patch.object(Path, "resolve", side_effect=[PureWindowsPath(target), resolved_root]):
+                    with self.assertRaisesRegex(ValueError, "공지방 밖"):
+                        inside(self.base, "receipts/record.json")
+        for relative in ("C:/outside.json", "notices/file.md:stream", "../outside.json"):
+            with self.subTest(relative=relative), self.assertRaisesRegex(ValueError, "상대 경로"):
+                inside(self.base, relative)
+
+    def test_symlink_outside_root_remains_rejected(self):
+        outside = self.root / "outside"
+        outside.mkdir()
+        link = self.base / "linked"
+        try:
+            link.symlink_to(outside, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("이 환경에는 디렉터리 symlink 생성 권한이 없습니다.")
+        with self.assertRaisesRegex(ValueError, "공지방 밖"):
+            inside(self.base, "linked/record.json")
 
     def test_line_endings_and_bom_do_not_change_hash(self):
         self.assertEqual(content_hash(b"a\nb\n"), content_hash(b"\xef\xbb\xbfa\r\nb\r\n"))

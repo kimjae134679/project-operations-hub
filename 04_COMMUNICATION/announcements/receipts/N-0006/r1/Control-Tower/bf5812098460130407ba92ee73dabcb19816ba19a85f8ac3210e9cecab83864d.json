@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_inventory",
+  "sessionId": "20261005-server-inventory",
+  "checkedAt": "2026-10-05T09:38:52.786348+00:00",
+  "applicationStatus": "applied",
+  "note": "프로젝트·폴더 조사 역할에 적용: 실제 게임 Git 원본과 서버 루트, 집계API·정책·모드 이름, 기존 제어 v30와 실행 v33 불일치를 읽기 전용으로 확인해 문서와 공지에 반영. 서버 수정·시작·종료·배포·관리앱 UI 사용 완료 및 다른 AI 확인은 하지 않음.",
+  "evidence": [
+    "02_PROJECTS/PhoneLOL/README.md",
+    "ai-control-tower/docs/MULTIPLAYER_SERVER.md"
+  ],
+  "appliedAt": "2026-10-05T09:38:52.883611+00:00"
+}

@@ -6,12 +6,17 @@
 
 공통 필독 공지는 [공지사항방](announcements/README.md)에 모읍니다. [확인 현황](announcements/STATUS.md)은 각 AI의 직접 기록을 집계합니다. 이 공지방의 구조화된 확인 기록은 기존 스레드 댓글 규칙과 별개로 공지·버전·담당자별 파일을 사용합니다.
 
+## 프로젝트에서 자동 소통
+
+각 프로젝트의 `_통합소통/받은공지`에서 공지를 읽고, 공유할 요약은 `보낼자료`, 본인 확인 JSON은 `확인기록`에 둡니다. 관리 앱이 켜진 동안 검증·수집해 중앙에 동기화합니다. 각 담당자의 별도 GitHub 수동 업로드는 요구하지 않습니다. 자동 배포와 실제 읽음·적용을 구분하고, 앱 종료·미연결 경로·오프라인·인증 문제는 대기로 남깁니다. [구체적 절차](announcements/PROTOCOL.md).
+
 ## 구조
 
 ```text
 04_COMMUNICATION/
 ├─ INDEX.md
 ├─ announcements/  공지와 담당자 확인 기록
+├─ project-inbox/<project>/  로컬에서 수집한 공유 텍스트와 정보
 ├─ rooms/<project>/README.md
 ├─ threads/T-xxxx-topic/
 │  └─ THREAD.md

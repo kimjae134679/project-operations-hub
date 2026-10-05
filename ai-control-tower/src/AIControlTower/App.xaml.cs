@@ -13,7 +13,15 @@ public partial class App : Application
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
         if (!_owns) { _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);
-        MainWindow = new MainWindow();
+        var settings = Services.ControlTowerSettings.Load();
+        if (e.Args.Contains("--verify-ui")) settings.IsTemporary = true;
+        var communicationRoot = Array.IndexOf(e.Args, "--communication-hub");
+        if (communicationRoot >= 0 && communicationRoot + 1 < e.Args.Length)
+        {
+            settings.CommunicationHubPath = Path.GetFullPath(e.Args[communicationRoot + 1]);
+            if (e.Args.Contains("--verify-ui")) settings.AutoPublishCommunication = false;
+        }
+        MainWindow = new MainWindow(settings);
         _listener = ThreadPool.RegisterWaitForSingleObject(_activate, (_, _) => Dispatcher.InvokeAsync(() =>
         {
             if (MainWindow.WindowState == WindowState.Minimized) MainWindow.WindowState = WindowState.Normal;

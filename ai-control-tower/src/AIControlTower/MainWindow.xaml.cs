@@ -5,26 +5,32 @@ using AIControlTower.Models;
 using AIControlTower.Services;
 using AIControlTower.ViewModels;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace AIControlTower;
 
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel _viewModel = new();
+    private readonly MainViewModel _viewModel;
     private readonly InstallationService _installationService = new();
     private JevControlWindow? _jevWindow;
     private ListBox? _activeProgramList;
     private Task? _initializeTask;
 
-    public MainWindow()
+    public MainWindow(ControlTowerSettings? settings = null)
     {
+        _viewModel = new(settings);
         InitializeComponent();
         DataContext = _viewModel;
+        SourceInitialized += (_, _) => { var dark = 1; DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int)); };
         Loaded += async (_, _) => await InitializeAsync();
         SizeChanged += (_, _) => ApplyResponsiveLayout();
-        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) ApplyResponsiveLayout(); };
+        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
         Closed += (_, _) => _viewModel.Dispose();
     }
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
 
     public Task InitializeAsync() => _initializeTask ??= InitializeCoreAsync();
 
@@ -35,6 +41,8 @@ public partial class MainWindow : Window
         FadeIn(WorkspaceContent);
         await _viewModel.DiscoverAsync();
         await _viewModel.RefreshAsync();
+        await _viewModel.RefreshServerAsync(true);
+        if (_viewModel.AutoCommunication) await _viewModel.SyncCommunicationAsync(true);
     }
 
     private void ApplyResponsiveLayout()
@@ -89,6 +97,19 @@ public partial class MainWindow : Window
         FadeIn(ProgramInspector);
         e.Handled = true;
     }
+    private void SynchronizeProgramSelections()
+    {
+        void Visit(DependencyObject element)
+        {
+            if (element is ListBox list && list.Items.OfType<ProgramItem>().Any())
+            {
+                var expected = list.Items.Contains(_viewModel.SelectedProgram) ? _viewModel.SelectedProgram : null;
+                if (list.SelectedItem != expected) list.SetCurrentValue(ListBox.SelectedItemProperty, expected);
+            }
+            for (var i=0; i<System.Windows.Media.VisualTreeHelper.GetChildrenCount(element); i++) Visit(System.Windows.Media.VisualTreeHelper.GetChild(element,i));
+        }
+        Visit(this);
+    }
 
     private void WorkspaceTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -97,6 +118,32 @@ public partial class MainWindow : Window
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
+    private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
+    private async void RefreshServer_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshServerAsync(true);
+    private void OpenServerFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerFolder();
+    private void OpenServerMailbox_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerMailbox();
+    private void OpenServerSource_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(false);
+    private void OpenServerRelease_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(true);
+    private async void LinkServerFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog { Title = "실제로 실행하는 멀티의 신 서버 폴더 선택" };
+        if (dialog.ShowDialog(this) != true) return;
+        _viewModel.ServerRootPath = dialog.FolderName;
+        await _viewModel.RefreshServerAsync(true);
+        await _viewModel.SyncCommunicationAsync(true);
+    }
+    private void OpenCommunicationFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCommunicationFolder();
+    private void OpenCollectedFile_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCollectedFile();
+    private async void LinkCommunicationProject_Click(object sender, RoutedEventArgs e)
+    {
+        var project = _viewModel.SelectedCommunicationProject;
+        if (project is null) return;
+        var dialog = new OpenFolderDialog { Title = project.Name + "의 주 작업 폴더 선택", Multiselect = false };
+        if (Directory.Exists(project.Root)) dialog.InitialDirectory = project.Root;
+        if (dialog.ShowDialog(this) != true) return;
+        _viewModel.LinkCommunicationProject(project.Id, dialog.FolderName);
+        await _viewModel.SyncCommunicationAsync(true);
+    }
     private async void Discover_Click(object sender, RoutedEventArgs e) => await _viewModel.DiscoverAsync();
     private async void ConsolidateRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.ConsolidateRemoteStartupAsync();
     private async void EnsureRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.EnsureRemoteRunningAsync();
