@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root/app_cleanup",
+  "sessionId": "20261006-reader-production",
+  "checkedAt": "2026-10-05T10:58:46.792284+00:00",
+  "applicationStatus": "pending",
+  "note": "본문/128회차 제작목록 디자인: 실제 제품 공식 자료 확인 및 1366/390 검증 적용 중",
+  "evidence": []
+}
