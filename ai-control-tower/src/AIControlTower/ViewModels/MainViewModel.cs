@@ -57,12 +57,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         };
         _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
-        if (enablePolling) { JobManager.RecoverInterruptedRuns(); _timer.Start(); _serverLiveTimer.Start(); }
+        if (enablePolling)
+        {
+            JobManager.RecoverInterruptedRuns();
+            if (!_settings.IsTemporary) _timer.Start();
+            _serverLiveTimer.Start();
+        }
     }
     public ObservableCollection<ProjectItem> Projects { get; } = [];
     public ObservableCollection<ToolStatusViewModel> Statuses { get; } = [];
     public IReadOnlyList<ToolStatusViewModel> UserFacingStatuses => Statuses.Where(s => s.IsUserFacing).ToArray();
     public ObservableCollection<string> JobLogs { get; } = [];
+    public event EventHandler? CatalogRefreshing;
+    public event EventHandler? CatalogRefreshed;
     public string ProjectSearch
     {
         get => _projectSearch;
@@ -100,6 +107,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         get => _settings.ReduceMotion;
         set { if (_settings.ReduceMotion == value) return; _settings.ReduceMotion = value; SaveSettings(); OnPropertyChanged(); }
     }
+    public bool DarkMode
+    {
+        get => _settings.DarkMode;
+        set { if (_settings.DarkMode == value) return; _settings.DarkMode = value; ThemeService.Apply(value); SaveSettings(); OnPropertyChanged(); OnPropertyChanged(nameof(ThemeSwitchLabel)); }
+    }
+    public string ThemeSwitchLabel => DarkMode ? "밝은 화면" : "어두운 화면";
     public ProjectItem? SelectedProject
     {
         get => _selectedProject;
@@ -135,12 +148,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             var root = Path.GetFullPath(RootPath);
             var selectedId = SelectedProject?.Id;
             var selectedProgramId = SelectedProgram?.Id;
+            var programSearch = ProgramSearch;
+            var selectedCommand = SelectedCommand;
             var results = await Task.Run(() =>
             {
                 var scanned = _discovery.Scan(root, _lifetime.Token);
                 return new DiscoveryResult(_catalogService.Apply(scanned.Projects, root, _catalog), scanned.Warnings);
             }, _lifetime.Token);
             if (!Path.GetFullPath(RootPath).Equals(root, StringComparison.OrdinalIgnoreCase)) { _needsDiscovery = true; Message = "탐색 루트가 변경되어 이전 결과를 폐기했습니다. 새 루트를 다시 탐색합니다."; return; }
+            CatalogRefreshing?.Invoke(this, EventArgs.Empty);
             Projects.Clear();
             foreach (var project in results.Projects)
             {
@@ -151,6 +167,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             SelectedProject = Projects.FirstOrDefault(p => p.Id == selectedId) ?? Projects.FirstOrDefault();
             SelectedProgram = SelectedProject?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id == selectedProgramId)
                 ?? SelectedProject?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
+            if (SelectedProject?.Id == selectedId) ProgramSearch = programSearch;
+            if (selectedCommand is not null && SelectedProgram is not null && SelectedProgram.Id == selectedProgramId)
+                SelectedCommand = SelectedProgram.Commands.FirstOrDefault(c => c.Name == selectedCommand.Name
+                    && c.FileName == selectedCommand.FileName && c.Arguments.SequenceEqual(selectedCommand.Arguments)) ?? SelectedCommand;
             _lastScan = DateTime.UtcNow;
             _needsDiscovery = false;
             if (_watcher?.Path != root)
@@ -173,6 +193,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             SaveSettings();
             OnPropertyChanged(nameof(ProjectsCount)); OnPropertyChanged(nameof(ProgramsCount));
             OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
+            CatalogRefreshed?.Invoke(this, EventArgs.Empty);
             Message = $"프로젝트 {ProjectsCount}개 · 프로그램/산출물 {ProgramsCount}개를 확인했습니다.";
             foreach (var warning in results.Warnings) AddLog("탐색 참고 · " + warning);
             if (results.Warnings.Count > 0) Message += $" 참고 {results.Warnings.Count}건은 로그에서 확인하세요.";

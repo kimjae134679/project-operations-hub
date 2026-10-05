@@ -130,6 +130,8 @@ public static class UiVerification
             await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         }
         var wheelChecks = await MouseWheelVerification.VerifyListsAsync(window);
+        var themeChecks = await ThemeVerification.RunAsync(window, outputDirectory);
+        var catalogRefresh = await VerifyCatalogRefresh(window, vm);
         var summary = new
         {
             CheckedAt = DateTimeOffset.Now, vm.ProjectsCount, vm.ProgramsCount, vm.RunningCount,
@@ -140,6 +142,8 @@ public static class UiVerification
             SearchVerified = searchVerified,
             MouseWheelChecks = wheelChecks,
             ContrastChecks = contrastChecks,
+            ThemeChecks = themeChecks,
+            CatalogRefresh = catalogRefresh,
             KeyColors = new { Text = ThemeColor(window, "TextBrush"), Canvas = ThemeColor(window, "CanvasBrush"), Surface = ThemeColor(window, "SurfaceBrush") },
             ValidationState = program?.Status,
             Catalog = vm.Projects.Select(p => new { p.DisplayName, p.Description, p.RoleLabel, p.Path, p.EvidenceDate, Programs = p.Functions.SelectMany(f => f.Programs).Select(item => new { item.DisplayName, item.KindLabel, item.ActionLabel, item.Path, item.CanLaunch, item.HasEditorLauncher }).ToArray() }).ToArray(),
@@ -156,6 +160,35 @@ public static class UiVerification
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static async Task<object> VerifyCatalogRefresh(MainWindow window, MainViewModel vm)
+    {
+        var oldProject=vm.SelectedProject; var oldProgram=vm.SelectedProgram; var oldSearch=vm.ProgramSearch;
+        var projectId=vm.SelectedProject?.Id; var programId=vm.SelectedProgram?.Id;
+        vm.ProgramSearch=vm.SelectedProgram?.DisplayName ?? "";
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        var group=Walk(window).OfType<Expander>().FirstOrDefault(e=>e.DataContext is AIControlTower.Models.FunctionItem);
+        if(group is null) throw new InvalidOperationException("No actual function group for discovery preservation.");
+        var groupId=((AIControlTower.Models.FunctionItem)group.DataContext).Id;
+        group.IsExpanded=false;
+        var list=(ListBox)window.FindName("ProjectList");
+        var scroll=Walk(list).OfType<ScrollViewer>().First();
+        scroll.ScrollToBottom();
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        var before=scroll.VerticalOffset; var search=vm.ProgramSearch;
+        await vm.DiscoverAsync();
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ContextIdle);
+        var refreshed=Walk(window).OfType<Expander>().FirstOrDefault(e=>e.DataContext is AIControlTower.Models.FunctionItem f && f.Id==groupId);
+        var after=Walk(list).OfType<ScrollViewer>().First().VerticalOffset;
+        var preserved=vm.SelectedProject?.Id==projectId && vm.SelectedProgram?.Id==programId && vm.ProgramSearch==search
+            && refreshed is { IsExpanded:false } && Math.Abs(after-before)<0.01;
+        if(!preserved) throw new InvalidOperationException($"Discovery changed active search/selection/fold/scroll: {before} -> {after}");
+        refreshed!.IsExpanded=true;
+        vm.ProgramSearch=oldSearch;
+        vm.SelectedProject=vm.Projects.FirstOrDefault(p=>p.Id==oldProject?.Id);
+        vm.SelectedProgram=vm.SelectedProject?.Functions.SelectMany(f=>f.Programs).FirstOrDefault(p=>p.Id==oldProgram?.Id);
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        return new { SelectionPreserved=true, SearchPreserved=true, FoldPreserved=true, ScrollPreserved=true,Before=before,After=after };
     }
     private static async Task<object> VerifyRosterActivity(MainWindow window, MainViewModel vm, string output)
     {
@@ -220,7 +253,7 @@ public static class UiVerification
         }
         return results.ToArray();
     }
-    private static void Capture(Window window, string path)
+    internal static void Capture(Window window, string path)
     {
         window.UpdateLayout();
         var content = (FrameworkElement)window.Content;

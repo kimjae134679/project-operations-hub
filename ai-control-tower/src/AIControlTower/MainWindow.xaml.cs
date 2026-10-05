@@ -17,21 +17,53 @@ public partial class MainWindow : Window
     private JevControlWindow? _jevWindow;
     private ListBox? _activeProgramList;
     private Task? _initializeTask;
+    private double _catalogOffset;
+    private readonly Dictionary<string, bool> _expandedFunctions = new();
 
     public MainWindow(ControlTowerSettings? settings = null)
     {
         _viewModel = new(settings);
+        ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
-        SourceInitialized += (_, _) => { var dark = 1; DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int)); };
+        SourceInitialized += (_, _) => ApplyTitlebarTheme();
         Loaded += async (_, _) => await InitializeAsync();
         SizeChanged += (_, _) => ApplyResponsiveLayout();
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
+        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.DarkMode)) ApplyTitlebarTheme(); };
+        _viewModel.CatalogRefreshing += (_, _) => CaptureCatalogView();
+        _viewModel.CatalogRefreshed += (_, _) => Dispatcher.BeginInvoke(RestoreCatalogView, System.Windows.Threading.DispatcherPriority.Loaded);
         Closed += (_, _) => _viewModel.Dispose();
     }
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
+    private void ApplyTitlebarTheme()
+    {
+        var dark = _viewModel.DarkMode ? 1 : 0;
+        DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int));
+    }
+    private void Theme_Click(object sender, RoutedEventArgs e) => _viewModel.DarkMode = !_viewModel.DarkMode;
+
+    private static IEnumerable<DependencyObject> Descendants(DependencyObject element)
+    {
+        yield return element;
+        for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(element); i++)
+            foreach (var child in Descendants(System.Windows.Media.VisualTreeHelper.GetChild(element,i))) yield return child;
+    }
+    private void CaptureCatalogView()
+    {
+        _catalogOffset = Descendants(ProjectList).OfType<ScrollViewer>().FirstOrDefault()?.VerticalOffset ?? 0;
+        _expandedFunctions.Clear();
+        foreach (var group in Descendants(WorkspaceContent).OfType<Expander>().Where(e => e.DataContext is FunctionItem))
+            _expandedFunctions[((FunctionItem)group.DataContext).Id] = group.IsExpanded;
+    }
+    private void RestoreCatalogView()
+    {
+        foreach (var group in Descendants(WorkspaceContent).OfType<Expander>().Where(e => e.DataContext is FunctionItem))
+            if (_expandedFunctions.TryGetValue(((FunctionItem)group.DataContext).Id, out var open)) group.SetCurrentValue(Expander.IsExpandedProperty,open);
+        Descendants(ProjectList).OfType<ScrollViewer>().FirstOrDefault()?.ScrollToVerticalOffset(_catalogOffset);
+    }
 
     public Task InitializeAsync() => _initializeTask ??= InitializeCoreAsync();
 
@@ -54,16 +86,24 @@ public partial class MainWindow : Window
         ContentShell.Margin = new Thickness(narrow ? 12 : 16);
         PageHeader.Margin = new Thickness(0, 0, 0, compact ? 8 : 14);
         WorkspaceContent.Margin = new Thickness(0, compact ? 16 : 20, 0, 0);
-        CatalogColumn.Width = new GridLength(narrow ? 216 : 238);
-        InspectorColumn.Width = new GridLength(narrow ? 220 : 258);
-        ProjectHeader.Padding = new Thickness(narrow ? 18 : 24);
+        CatalogColumn.Width = new GridLength(narrow ? 230 : 264);
+        InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
+        ProjectHeader.Padding = compact ? new Thickness(18,10,18,6) : new Thickness(narrow ? 18 : 24);
+        ProjectCategory.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
+        ProjectHeaderBody.Margin = new Thickness(0,0,7,compact ? 2 : 18);
         ProjectHeader.Margin = new Thickness(0, 0, 0, compact ? 12 : 16);
         ProjectTitle.FontSize = narrow ? 27 : 32;
         ProjectDescription.MaxHeight = compact ? 22 : 44;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
         JobLogList.Height = compact ? 65 : 100;
+        ReceiptList.MaxHeight = compact ? 80 : 130;
         LogPanel.Margin = new Thickness(0, compact ? 8 : 14, 0, 0);
         var hideMetadata = compact && _viewModel.HasSelectedCommands;
+        ProgramInspector.Padding = new Thickness(compact ? 14 : 20);
+        InspectorType.Visibility = hideMetadata ? Visibility.Collapsed : Visibility.Visible;
+        InspectorStatus.Visibility = hideMetadata ? Visibility.Collapsed : Visibility.Visible;
+        InspectorActionLabel.Visibility = hideMetadata ? Visibility.Collapsed : Visibility.Visible;
+        InspectorActions.Margin = new Thickness(0,compact ? 6 : 16,0,0);
         InspectorMetadata.Visibility = hideMetadata ? Visibility.Collapsed : Visibility.Visible;
         InspectorMetadataRow.Height = hideMetadata ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
     }
@@ -74,11 +114,19 @@ public partial class MainWindow : Window
         {
             element.BeginAnimation(OpacityProperty, null);
             element.Opacity = 1;
+            element.RenderTransform = System.Windows.Media.Transform.Identity;
             return;
         }
         element.BeginAnimation(OpacityProperty, new DoubleAnimation(0.84, 1, TimeSpan.FromMilliseconds(160))
         {
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut },
+            FillBehavior = FillBehavior.Stop
+        });
+        var offset = new System.Windows.Media.TranslateTransform();
+        element.RenderTransform = offset;
+        offset.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, new DoubleAnimation(6, 0, TimeSpan.FromMilliseconds(180))
+        {
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
             FillBehavior = FillBehavior.Stop
         });
     }
@@ -87,7 +135,8 @@ public partial class MainWindow : Window
     {
         if (e.OriginalSource != sender || e.AddedItems.Count == 0 || WorkspaceContent is null) return;
         _activeProgramList = null;
-        FadeIn(WorkspaceContent);
+        FadeIn(ProjectHeader);
+        FadeIn(ProgramInspector);
     }
 
     private void Programs_SelectionChanged(object sender, SelectionChangedEventArgs e)
