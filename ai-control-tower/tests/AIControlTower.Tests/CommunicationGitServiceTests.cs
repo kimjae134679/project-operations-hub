@@ -33,7 +33,7 @@ public sealed class CommunicationGitServiceTests
             Assert.Equal("",(await Git(mirror,"status","--porcelain")).Trim());
             Assert.Contains(receipt,(await Git(mirror,"ls-tree","-r","--name-only","origin/main")));
         }
-        finally { try { Directory.Delete(root,true); } catch(IOException) { } }
+        finally { if(Directory.Exists(root)) { foreach(var file in Directory.EnumerateFiles(root,"*",SearchOption.AllDirectories)) File.SetAttributes(file,FileAttributes.Normal); Directory.Delete(root,true); } }
     }
     private static async Task<string> Git(string directory,params string[] arguments)
     {

@@ -31,6 +31,7 @@ public sealed partial class MainViewModel
     private string _centralSyncMessage = "GitHub 연결 대기";
     private Dictionary<string,string> _communicationNames = new();
     private Dictionary<string,string> _communicationActorNames = new();
+    private string _communicationViewFingerprint = "";
     public ObservableCollection<NoticeRow> Notices { get; } = [];
     public ObservableCollection<CommunicationProjectRow> CommunicationProjects { get; } = [];
     public ObservableCollection<InboxRow> InboxItems { get; } = [];
@@ -101,6 +102,17 @@ public sealed partial class MainViewModel
     }
     private void UpdateCommunicationView(CommunicationSnapshot snapshot)
     {
+        var fingerprint = JsonSerializer.Serialize(new
+        {
+            snapshot.Notices,
+            Receipts = snapshot.Receipts.Where(r=>r.IsCurrent).Select(r=>r.Receipt),
+            Projects = snapshot.ProjectStates.Select(p=>new {p.ProjectId,p.RootPath,p.State,p.DeliveredCount}),
+            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath}),
+            snapshot.Errors, Names = _communicationNames, Actors = _communicationActorNames
+        });
+        OnPropertyChanged(nameof(CommunicationCheckedAt));
+        if (fingerprint == _communicationViewFingerprint) return;
+        _communicationViewFingerprint = fingerprint;
         var selectedId=SelectedNotice?.Notice.Id;
         var selectedInboxPath=SelectedInbox?.Path;
         var projectId=SelectedCommunicationProject?.Id;
@@ -124,7 +136,7 @@ public sealed partial class MainViewModel
         SelectedCommunicationProject=CommunicationProjects.FirstOrDefault(p=>p.Id==projectId)??CommunicationProjects.FirstOrDefault();
         InboxItems.Clear();
         foreach(var item in snapshot.InboxItems.OrderByDescending(i=>i.CollectedAt))
-            InboxItems.Add(new(NameFor(item.ProjectId),item.Title,item.Preview,item.Body,item.CentralPath,item.CollectedAt.LocalDateTime.ToString("MM/dd HH:mm")));
+            InboxItems.Add(new(NameFor(item.ProjectId),item.Title,item.Preview,item.Body ?? "",Path.Combine(CommunicationHubPath,item.CentralPath),item.CollectedAt.LocalDateTime.ToString("MM/dd HH:mm")));
         SelectedInbox=InboxItems.FirstOrDefault(i=>i.Path==selectedInboxPath)??InboxItems.FirstOrDefault();
         CommunicationErrors.Clear(); foreach(var error in snapshot.Errors) CommunicationErrors.Add((error.ProjectId is null?"":NameFor(error.ProjectId)+" · ")+error.Message);
         CommunicationMessage=$"공지 {Notices.Count}개 · 폴더 연결 {snapshot.ProjectStates.Count}개 · 수집 자료 {InboxItems.Count}개";

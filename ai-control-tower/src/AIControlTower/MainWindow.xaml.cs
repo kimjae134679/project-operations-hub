@@ -5,6 +5,8 @@ using AIControlTower.Models;
 using AIControlTower.Services;
 using AIControlTower.ViewModels;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace AIControlTower;
 
@@ -21,11 +23,14 @@ public partial class MainWindow : Window
         _viewModel = new(settings);
         InitializeComponent();
         DataContext = _viewModel;
+        SourceInitialized += (_, _) => { var dark = 1; DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int)); };
         Loaded += async (_, _) => await InitializeAsync();
         SizeChanged += (_, _) => ApplyResponsiveLayout();
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) ApplyResponsiveLayout(); };
         Closed += (_, _) => _viewModel.Dispose();
     }
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
 
     public Task InitializeAsync() => _initializeTask ??= InitializeCoreAsync();
 

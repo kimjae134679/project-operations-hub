@@ -55,6 +55,27 @@ public static class UiVerification
         await vm.RefreshAsync();
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         Capture(window, Path.Combine(outputDirectory, "connections.png"));
+        await vm.SyncCommunicationAsync(true);
+        tabs.SelectedIndex = 2;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        if (vm.Notices.Count == 0) throw new InvalidOperationException("Actual notices did not load.");
+        vm.SelectedNotice = vm.Notices.FirstOrDefault(n => n.Notice.Id == "N-0005") ?? vm.Notices.First();
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        Capture(window, Path.Combine(outputDirectory, "notices.png"));
+        window.Width = 1060; window.Height = 720;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        CheckVisibleControl(window, "NoticeBody");
+        Capture(window, Path.Combine(outputDirectory, "notices-compact.png"));
+        window.Width = 1460; window.Height = 920;
+        tabs.SelectedIndex = 3;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        Capture(window, Path.Combine(outputDirectory, "communication.png"));
+        window.Width = 1060; window.Height = 720;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
+        CheckVisibleControl(window, "CommunicationProjectList");
+        CheckVisibleControl(window, "InboxList");
+        Capture(window, Path.Combine(outputDirectory, "communication-compact.png"));
+        window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 0;
         var oldWidth = window.Width; var oldHeight = window.Height;
         window.Width = 1060; window.Height = 720;
@@ -99,9 +120,21 @@ public static class UiVerification
             Catalog = vm.Projects.Select(p => new { p.DisplayName, p.Description, p.RoleLabel, p.Path, p.EvidenceDate, Programs = p.Functions.SelectMany(f => f.Programs).Select(item => new { item.DisplayName, item.KindLabel, item.ActionLabel, item.Path, item.CanLaunch, item.HasEditorLauncher }).ToArray() }).ToArray(),
             Statuses = vm.Statuses.Select(s => new { s.DisplayName, s.State, s.Detail }).ToArray(),
             RemoteConsolidationRequested = consolidateRemote,
+            Notices = vm.Notices.Select(n => new { n.Title, n.VersionLabel, n.ReadSummary }).ToArray(),
+            CommunicationProjects = vm.CommunicationProjects.ToArray(),
+            CollectedItems = vm.InboxItems.Count,
+            CommunicationIssues = vm.CommunicationErrors.ToArray(),
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static void CheckVisibleControl(MainWindow window, string name)
+    {
+        var element = (FrameworkElement)window.FindName(name);
+        var root = (FrameworkElement)window.Content;
+        var bounds = element.TransformToAncestor(root).TransformBounds(new Rect(0,0,element.ActualWidth,element.ActualHeight));
+        if (!element.IsVisible || element.ActualWidth < 100 || element.ActualHeight < 80 || bounds.Right > root.ActualWidth + 1 || bounds.Bottom > root.ActualHeight + 1)
+            throw new InvalidOperationException("Communication control clipped: " + name + " " + bounds);
     }
     private static object[] CheckInspectorControls(MainWindow window)
     {

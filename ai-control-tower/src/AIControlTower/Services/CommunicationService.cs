@@ -385,7 +385,7 @@ public sealed class CommunicationService
     { if (string.IsNullOrWhiteSpace(value) || value.Length > 256 || value.Any(c => c < 32)) throw new InvalidDataException("Invalid actor/session."); }
     private static bool HasSecret(string text) => SecretPattern.IsMatch(text);
     private static StringComparer PathComparer => OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-    private static bool IsFileError(Exception ex) => ex is IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or KeyNotFoundException or RegexMatchTimeoutException;
+    private static bool IsFileError(Exception ex) => ex is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or KeyNotFoundException or RegexMatchTimeoutException;
     private static void Hold(List<CommunicationIssue> errors, string? id, string code)
     {
         var message = code switch
