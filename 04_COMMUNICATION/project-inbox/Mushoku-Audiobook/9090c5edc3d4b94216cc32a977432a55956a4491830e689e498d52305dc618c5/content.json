@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "Mushoku-Audiobook-20261006-video-samples",
+  "revision": 2,
+  "title": "기존 영상의 추가 음원 표본 정리",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "receivedAt": "2026-10-06T05:39:26+09:00",
+  "updatedAt": "2026-10-06T06:09:31.884962+09:00",
+  "request": {
+    "summary": "기존 영상에서 아직 확인하지 않은 음원 자료를 추가 수집하고 표본을 정리",
+    "details": "본편 자동제작은 유지하며 기존 영상·음원에서 유용한 대사와 감정/전투 자료를 더 확보. 바탕화면 금지, 기존 참조 보존, 목소리 통일성 유지.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "11장면·83전사후보·18캐릭터별묶음을 확보하고 검증 완료라고 진행 답변함",
+    "details": "실제로 보낸 진행 답변: 11배역 단일 화면 표본 재생, 원본과 제작용 목소리 설정 유지, 재생/캐시 검증 완료. 본편144·145준비/146진행도 전달. 마지막 코드·소통방 정리 진행 중이라고 알림. 최종 답변은 아직 전송 전.",
+    "source": "current_chat"
+  },
+  "status": "completed",
+  "workDone": [
+    "11원본장면610초 확보, 자동전사후보83개 정리",
+    "11배역18개 연속발화묶음122.56초와 캐릭터별 TSV/단일플레이어 페이지 생성",
+    "일본어/미그루드 가상언어/기합·전투효과음 구분; 전사제외음원10개 별도보존",
+    "출처시간/SHA/승인상태 기록; 현재 cast_lock·고정앵커 변경 없음",
+    "CPU전용 재개·캐시 재사용 수집기 구현",
+    "수집기·인수인계 GitHub 동기화 완료:0e8e8dbf7005b7e2fb1710f78f623ec1292b5c07"
+  ],
+  "verification": [
+    {
+      "name": "파일과 원본/제작설정 보존",
+      "result": "pass",
+      "evidence": [
+        "voice_resource_pack/review/20261006_미정리영상_추가표본/verification.json: 전체디코딩, 원본SHA/캐스트 불변, WAV·MP3 SHA·mtime 캐시불변"
+      ]
+    },
+    {
+      "name": "PC·모바일 단일화면 재생",
+      "result": "pass",
+      "evidence": [
+        "headless Chrome1366x900/390x844: 18선택표본/총112버튼, 다른표본 실제재생, 플레이어1개, 추가창0, 가로넘침0"
+      ]
+    },
+    {
+      "name": "배역 음색과 연기 청취승인",
+      "result": "not_run",
+      "evidence": [
+        "프레임/자막과 ASR 분류는 청취승인이 아님. 모델학습이나 현재제작참조에 적용하지 않음"
+      ]
+    },
+    {
+      "name": "GitHub 코드 반영",
+      "result": "pass",
+      "evidence": [
+        "git push origin main 성공, git ls-remote refs/heads/main 과 HEAD 일치:0e8e8dbf7005b7e2fb1710f78f623ec1292b5c07",
+        "원본영상/음원/전사/사설계획은 커밋 제외. 컨트롤타워의 별도 AGENTS 변경 보존"
+      ]
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}
