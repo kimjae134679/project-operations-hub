@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "root",
+  "sessionId": "20261005-voice-feedback",
+  "checkedAt": "2026-10-05T10:53:44.459328+00:00",
+  "applicationStatus": "applied",
+  "note": "청취피드백40개를 전체162/163화에 반영했다. 선호Qwen3.76원본 보존,319WAV/원문/MP3디코딩 확인,PC모바일 각32배역검사·각8비교재생검사 통과. 제작소스77개는src로 이동,원문참조모델환경보존. 바탕화면 변경 없음.",
+  "evidence": [
+    "D:\\AI\\VoiceAudiobook\\output\\battle_feedback_20261005\\final_delivery_verification.json"
+  ],
+  "appliedAt": "2026-10-05T14:32:53.836145+00:00"
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator262",
+  "checkedAt": "2026-10-05T11:05:08.320677+00:00",
+  "applicationStatus": "applied",
+  "note": "사용자 Unity가 닫혀 있음을 확인한 뒤 직렬 테스트/빌드. 지정 v33 PID와 리스너 확인 후 서버 교체.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T14:48:08.339601+00:00"
+}

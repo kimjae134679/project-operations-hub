@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator262",
+  "checkedAt": "2026-10-05T11:05:08.316442+00:00",
+  "applicationStatus": "applied",
+  "note": "기존 RDC와 검증된 직렬 빌드 경로 사용. Astra 및 서브에이전트 사용 없음.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T14:48:08.252288+00:00"
+}

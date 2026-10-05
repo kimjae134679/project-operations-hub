@@ -1,8 +1,8 @@
 # 공지 확인 현황
 
-<!-- communication-state-sha256: 8977c505bf42eb7d99a06b7a20a9d2bd2c73bd8ba147a922628fae2cc30c7191 -->
+<!-- communication-state-sha256: 864ac2fea4c882bf7bfcf193ff109a35b4cd8b4fbc9e4d800b25bf7cbeddfe09 -->
 
-생성 시각: 2026-10-05 21:29:46 KST / 2026-10-05 12:29:46 UTC
+생성 시각: 2026-10-05 23:48:16 KST / 2026-10-05 14:48:16 UTC
 
 프로젝트 기록은 누군가 해당 범위에서 확인했다는 뜻입니다. 전체 AI의 확인·적용 완료가 아닙니다. 자동 배포는 읽음 확인이 아닙니다.
 
