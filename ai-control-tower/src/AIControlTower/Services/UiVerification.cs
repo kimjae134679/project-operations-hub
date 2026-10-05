@@ -175,9 +175,9 @@ public static class UiVerification
             else idle = true;
             if (vm.RosterHealthy) timestamps.Add(vm.RosterCheckedAt);
         }
-        if (!busy || !idle || !vm.ReduceMotion && maxAngle <= 0)
+        if (!busy || !idle || maxAngle <= 0)
             throw new InvalidOperationException("Roster refresh indicator does not reflect live request activity.");
-        return new { BusyObserved = busy, IdleObserved = idle, MaxRotationAngle = maxAngle, ReducedMotion = vm.ReduceMotion, SuccessfulTimestampChanges = timestamps.Count, PollIntervalSeconds = 1 };
+        return new { BusyObserved = busy, IdleObserved = idle, MaxRotationAngle = maxAngle, ScreenTransitionsReduced = vm.ReduceMotion, SuccessfulTimestampChanges = timestamps.Count, PollIntervalSeconds = 1 };
     }
     private static string ThemeColor(MainWindow window, string key) =>
         (window.FindResource(key) as SolidColorBrush)?.Color.ToString()
