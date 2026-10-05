@@ -120,6 +120,7 @@ public static class UiVerification
             window.Width = oldWidth; window.Height = oldHeight;
             await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         }
+        var wheelChecks = await MouseWheelVerification.VerifyListsAsync(window);
         var summary = new
         {
             CheckedAt = DateTimeOffset.Now, vm.ProjectsCount, vm.ProgramsCount, vm.RunningCount,
@@ -128,6 +129,7 @@ public static class UiVerification
             Controls = Walk(window).OfType<Button>().Where(b => b.Content is string).Select(b => new { Name = b.Content, b.IsEnabled, b.ActualWidth, b.ActualHeight }).ToArray(),
             CompactControls = compactControls,
             SearchVerified = searchVerified,
+            MouseWheelChecks = wheelChecks,
             ValidationState = program?.Status,
             Catalog = vm.Projects.Select(p => new { p.DisplayName, p.Description, p.RoleLabel, p.Path, p.EvidenceDate, Programs = p.Functions.SelectMany(f => f.Programs).Select(item => new { item.DisplayName, item.KindLabel, item.ActionLabel, item.Path, item.CanLaunch, item.HasEditorLauncher }).ToArray() }).ToArray(),
             Statuses = vm.Statuses.Select(s => new { s.DisplayName, s.State, s.Detail }).ToArray(),

@@ -23,6 +23,7 @@ public partial class MainWindow : Window
         _viewModel = new(settings);
         InitializeComponent();
         DataContext = _viewModel;
+        PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
         SourceInitialized += (_, _) => { var dark = 1; DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int)); };
         Loaded += async (_, _) => await InitializeAsync();
         SizeChanged += (_, _) => ApplyResponsiveLayout();
@@ -50,14 +51,14 @@ public partial class MainWindow : Window
         if (ContentShell is null) return;
         var compact = ActualHeight < 820;
         var narrow = ActualWidth < 1220;
-        ContentShell.Margin = compact ? new Thickness(20, 14, 20, 10) : new Thickness(24);
+        ContentShell.Margin = new Thickness(narrow ? 12 : 16);
         PageHeader.Margin = new Thickness(0, 0, 0, compact ? 8 : 14);
-        WorkspaceContent.Margin = new Thickness(0, compact ? 10 : 16, 0, 0);
-        CatalogColumn.Width = new GridLength(narrow ? 286 : 328);
-        InspectorColumn.Width = new GridLength(narrow ? 254 : 280);
-        ProjectHeader.Padding = new Thickness(compact ? 16 : 20);
+        WorkspaceContent.Margin = new Thickness(0, compact ? 16 : 20, 0, 0);
+        CatalogColumn.Width = new GridLength(narrow ? 216 : 238);
+        InspectorColumn.Width = new GridLength(narrow ? 220 : 258);
+        ProjectHeader.Padding = new Thickness(narrow ? 18 : 24);
         ProjectHeader.Margin = new Thickness(0, 0, 0, compact ? 12 : 16);
-        ProjectTitle.FontSize = narrow ? 23 : 26;
+        ProjectTitle.FontSize = narrow ? 27 : 32;
         ProjectDescription.MaxHeight = compact ? 22 : 44;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
         JobLogList.Height = compact ? 65 : 100;

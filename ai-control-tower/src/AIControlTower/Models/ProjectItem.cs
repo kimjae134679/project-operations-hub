@@ -12,6 +12,7 @@ public sealed class ProjectItem
     public IReadOnlyList<FunctionItem> Functions { get; set; } = [];
     private string _displayName = "";
     public string DisplayName { get => string.IsNullOrWhiteSpace(_displayName) ? Name : _displayName; set => _displayName = value; }
+    public string Monogram => string.IsNullOrEmpty(DisplayName) ? "·" : System.Globalization.StringInfo.GetNextTextElement(DisplayName);
     public string Description { get; set; } = "용도가 아직 확인되지 않은 프로젝트 폴더입니다.";
     public string FolderRole { get; set; } = "unreviewed";
     public string RoleLabel { get; set; } = "새로 발견";
