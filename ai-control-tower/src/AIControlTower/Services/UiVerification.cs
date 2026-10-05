@@ -136,6 +136,7 @@ public static class UiVerification
             CommunicationProjects = vm.CommunicationProjects.ToArray(),
             CollectedItems = vm.InboxItems.Count,
             CommunicationIssues = vm.CommunicationErrors.ToArray(),
+            CommunicationDiagnostics = vm.JobLogs.Where(line=>line.Contains("소통 진단 · ")).ToArray(),
             Server = vm.ServerSnapshot,
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };

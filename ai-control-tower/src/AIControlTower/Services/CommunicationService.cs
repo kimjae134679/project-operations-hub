@@ -11,6 +11,7 @@ namespace AIControlTower.Services;
 /// <summary>Local file transport only. Delivery never generates a read/application receipt.</summary>
 public sealed class CommunicationService
 {
+    public event Action<string>? Diagnostic;
     public const int MaximumFileBytes = 1024 * 1024;
     public const int MaximumFilesPerFolder = 300;
     private readonly SemaphoreSlim _syncLock = new(1, 1);
@@ -94,12 +95,14 @@ public sealed class CommunicationService
             var count = 0; var delivered = 0; var mailbox = "";
             var readFiles = 0;
             var before = errors.Count;
+            var phase = "프로젝트 경로 확인";
             try
             {
                 ValidateId(target.ProjectId);
                 if (!board.Projects.Contains(target.ProjectId) || duplicateIds.Contains(target.ProjectId) || duplicateRoots.Contains(CanonicalRoot(target.RootPath)))
                     throw new InvalidDataException("Unregistered or duplicate project.");
                 var projectRoot = ExistingRoot(target.RootPath);
+                phase = "소통 폴더 준비";
                 mailbox = Inside(projectRoot, "_통합소통");
                 var received = EnsureDirectory(projectRoot, "_통합소통/받은공지");
                 var outbox = EnsureDirectory(projectRoot, "_통합소통/보낼자료");
@@ -112,6 +115,7 @@ public sealed class CommunicationService
                     catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "receipt_retry"); }
                 }
                 var current = board.Notices.Values.Where(n => Applicable(n, target.ProjectId)).ToArray();
+                phase = "공지 본문 전달";
                 // Board snapshot must still be coherent immediately before replacing the local delivery marker.
                 foreach (var n in current)
                 {
@@ -131,6 +135,7 @@ public sealed class CommunicationService
                 };
                 // No local read/receipt files are made by delivery. Inactive old bodies remain historical; manifest is authoritative.
                 await AtomicWrite(received, "manifest.json", JsonSerializer.SerializeToUtf8Bytes(localManifest, JsonOptions), true, ct).ConfigureAwait(false);
+                phase = "기록 도우미 갱신";
                 var helperSource = Inside(root, "scripts/project_notice.py");
                 if (File.Exists(helperSource))
                 {
@@ -144,6 +149,7 @@ public sealed class CommunicationService
                     "기록도우미.py가 배포되면 이 폴더에서 다음 명령으로 확인합니다. 프로그램은 도우미를 자동 실행하거나 확인 기록을 대신 작성하지 않습니다.\n\n" +
                     "```text\npython 기록도우미.py check --actor Sol --read\npython 기록도우미.py ack --actor Sol --session 본인작업세션 --notice N-0001 --status pending --note \"본인이 실제 읽었고 적용 대기 이유\"\n```\n\n" +
                     "본문을 실제 읽은 뒤 현재 revision·hash를 사용하세요. 적용 완료에는 구체적인 설명·근거를 남깁니다. 받은공지의 manifest.json이 현재 전달 목록의 원본입니다. 로컬 배포·수집과 GitHub 공유 완료는 별개입니다. 다른 독립 채팅을 자동으로 깨우지 않습니다.\n";
+                phase = "소통 안내 갱신";
                 await AtomicWrite(mailbox, "README.md", Encoding.UTF8.GetBytes(instructions), true, ct).ConfigureAwait(false);
                 try { await UpdateEntryHint(projectRoot, target.ProjectId, ct).ConfigureAwait(false); }
                 catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "entry_hint_held"); }
@@ -217,7 +223,7 @@ public sealed class CommunicationService
                     catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "outbox_retry"); }
                 }
             }
-            catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "project_unavailable"); }
+            catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "project_unavailable"); Diagnostic?.Invoke(target.ProjectId+" · "+phase+" · "+ex.GetType().Name+" · 0x"+ex.HResult.ToString("X8")); }
             states.Add(new(target.ProjectId, target.RootPath, mailbox, delivered, count, errors.Count == before ? "연결됨" : "일부 보류"));
         }
         try { await ReadCentral(root, board, receipts, items, publish, errors, ct).ConfigureAwait(false); }
