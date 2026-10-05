@@ -7,7 +7,8 @@
   "actorId": "/root/app_cleanup",
   "sessionId": "20261006-reader-production",
   "checkedAt": "2026-10-05T10:58:46.792284+00:00",
-  "applicationStatus": "pending",
-  "note": "본문/128회차 제작목록 디자인: 실제 제품 공식 자료 확인 및 1366/390 검증 적용 중",
-  "evidence": []
+  "applicationStatus": "applied",
+  "note": "Apple Books 공식 회차선택 및 Audiobookshelf 공식 라이브러리 자료 참고. 한국어 행동버튼/제목설명줄바꿈/접이식128목록/1366와390 실제Chrome검증: 기존본문32/왕복33/128설계37각통과. 제작완료 및 음성승인과 구분.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T18:17:50.349267+00:00"
 }

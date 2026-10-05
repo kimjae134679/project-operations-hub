@@ -7,7 +7,8 @@
   "actorId": "/root/app_cleanup",
   "sessionId": "20261006-reader-production",
   "checkedAt": "2026-10-05T10:58:46.842480+00:00",
-  "applicationStatus": "pending",
-  "note": "본인 소통 기록과 구현 검증 요약을 프로젝트 보낼자료에 갱신 예정",
-  "evidence": []
+  "applicationStatus": "applied",
+  "note": "본인 작업 및 검증범위를 보낼자료에 기록. 입력/원문/음성/모델/current전체본 보존. 중앙수집 성공으로 확대하지 않고 root 인수인계 전달.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T18:17:50.628472+00:00"
 }
