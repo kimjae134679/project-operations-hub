@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator260",
+  "checkedAt": "2026-10-05T11:05:08.316442+00:00",
+  "applicationStatus": "applied",
+  "note": "공유 RDC 재사용, 원본 코드 검토와 폐기 가능한 TCP 계정/포트 검사. Astra 및 서브에이전트 사용 안 함.",
+  "evidence": [],
+  "appliedAt": "2026-10-05T11:05:08.614182+00:00"
+}

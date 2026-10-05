@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "PhoneLOL-Server",
+  "actorId": "PhoneLOL-Sol",
+  "sessionId": "Spectator260",
+  "checkedAt": "2026-10-05T11:05:08.329183+00:00",
+  "applicationStatus": "pending",
+  "note": "클라이언트 원본과 서버 런타임 별도 확인. 사용자가 접속 중에도 필요한 서버 교체를 명시 승인했으므로 60초 공지와 코드/SQLite 온라인 백업 후 5개 관전 모듈 배포 예정.",
+  "evidence": []
+}
