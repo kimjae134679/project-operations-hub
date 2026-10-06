@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "Mushoku-Audiobook-20261006-outside-unattended-production",
+  "revision": 2,
+  "title": "외출 중 본편 15~24 새 원본 참조 연속 제작",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-source-production-1830",
+  "receivedAt": "2026-10-06T18:30:40+09:00",
+  "updatedAt": "2026-10-06T18:59:39.260195+09:00",
+  "request": {
+    "summary": "지금 밖이라 확인할 수 없으니 나머지도 제작할 것",
+    "details": "사용자가 “나 밖이라 지금뭐못해서 나머지도 제작해”라고 요청했다. 기존 선택 범위 본편15~24의 새 원본 참조 제작을 진행한다. 록시 선호 원본·기존 데이터·바탕화면 금지·생성 제외 범위를 보존한다.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "배역12개 실제 검사 통과 후 본편15~24/128개 연속 제작이 제144화에서 시작됐다고 실제 진행 답변함",
+    "details": "오디오북 담당 /root. 사용자 외출 중 자율 제작 권한으로 새 영상 참조판을 별도 시작했다. 록시 정확한 선호3.2초와 이전 완성7개를 보존했다. 실제 새 본편 발화 144-0021 생성과 supervisor/controller/worker를 확인했다. 음성 인식/파형 라이브러리 충돌은 프로세스 분리로 해결했고 이미 생성한 파일을 재사용했다. 전체128개 완료와 청취 승인은 아직 아니다. GitHub 원격 commit b51eb375f5b5bf33f3c3048e25ffc5a9f985bdda 확인.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "새 활성 제작판 output/production_15_24_source_20261006 및 완성 폴더 audiobooks/01_CURRENT/20261006_본편15부터_영상참조 구성",
+    "128개 검수 대본 복사·원문 SHA/순서/기존 생성제외 검사 통과",
+    "원본 확인11배역 VoxCPM2 reference_only/seed20261006 고정·록시 CosyVoice3 선호3.2초 그대로·배우 표본 미확정 배역 설계 고정",
+    "12배역 실제 생성·대사·파형·속도 검사 통과, 심한 문제0·유사도 검토표시2개 보존",
+    "CPU int8 음성인식을 별도 프로세스로 분리하고 기존 모델 스냅샷 해시 고정·완료 작업 재실행 모델 로딩 생략",
+    "새 제작판 고정 환경변수·중복 잠금·본인PID 확인·사용자 중지 보존·로그인 검증단계/본편 자동복구 연결",
+    "회귀검사7개·제작 EXE 새 경로·청취 EXE 확인·실제 supervisor/controller/제144화 새발화 생성 확인",
+    "사용안내·인수인계·코드만 GitHub 반영: b51eb375f5b5bf33f3c3048e25ffc5a9f985bdda"
+  ],
+  "verification": [
+    {
+      "name": "source_scope_and_original_preservation",
+      "result": "pass",
+      "evidence": [
+        "output/production_15_24_source_20261006/preflight.json:128 prepared;missing0;blocked0",
+        "output/production_15_24_source_20261006/preparation_verified.json",
+        "output/production_15_24/pause.flag",
+        "audiobooks/01_CURRENT/20261006_본편15부터:old7 preserved"
+      ]
+    },
+    {
+      "name": "actual_cast_qa",
+      "result": "pass",
+      "evidence": [
+        "output/production_15_24_source_20261006/validation/verified.json:12 clips severe0",
+        "output/production_15_24_source_20261006/validation/quality_checks.json:ASR0.788-1.0;CPS3.26-7.47;identity review2"
+      ]
+    },
+    {
+      "name": "runtime_and_recovery",
+      "result": "pass",
+      "evidence": [
+        "test/test_source_production_edition.py:7 pass",
+        "temp/production_app_check.json",
+        "temp/app_check.json",
+        "output/production_15_24_source_20261006/status.json:chapter144 generating",
+        "output/production_15_24_source_20261006/supervisor.json",
+        "output/production_15_24_source_20261006/worker_progress.json:144-0021"
+      ]
+    },
+    {
+      "name": "git_remote",
+      "result": "pass",
+      "evidence": [
+        "output/production_15_24_source_20261006/git_verified.json:b51eb375f5b5bf33f3c3048e25ffc5a9f985bdda",
+        "docs/SOURCE_PRODUCTION_EDITION.md",
+        "프로젝트_사용안내.md"
+      ]
+    }
+  ],
+  "nextActions": [
+    "로컬 감독 프로세스가 선택128개를 순서대로 생성·검사·MP3/본문 게시",
+    "반복 실패 회차와 화자/연기 검토표시는 보존하고 나머지 회차 계속 진행",
+    "사용자가 귀가 후 새 판의 청취 취향을 판단하면 후보정·배역 조정"
+  ],
+  "blockers": [],
+  "supersedes": []
+}
