@@ -3,3 +3,4 @@ body{margin:0;background:var(--bg);color:var(--text);font-size:15px;line-height:
 @media(min-width:700px){.cards{grid-template-columns:repeat(2,1fr)}main{padding:16px 32px 116px}header{padding:28px 32px 12px}.summary{max-width:660px}.stat{padding:20px}.stat b{font-size:32px}.collections{flex-wrap:wrap}.tools input{max-width:440px}.setting{padding:20px}}
 @media(max-width:375px){header{padding:18px 16px 12px}.brand{gap:8px}.brand h1{font-size:18px}.logo{width:36px;height:36px}header button{padding:9px}main{padding:6px 16px 116px}.stat{padding:12px}.stat b{font-size:23px}.card{padding:14px}.dialogBody{padding:8px 16px 18px}.dialogHead{padding:16px 16px 8px}#selectBar{gap:5px;padding:8px}#selectBar button{padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.filters button,.cardActions button,#selectBar button{min-height:44px}
