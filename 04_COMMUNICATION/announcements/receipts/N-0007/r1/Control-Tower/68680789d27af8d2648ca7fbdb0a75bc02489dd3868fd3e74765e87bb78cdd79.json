@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0007",
+  "revision": 1,
+  "contentSha256": "3f0edd4e30dbb06fb14d4d1e29c5edd3cb2c8146ec589787bb7afe904250a9f8",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "checkedAt": "2026-10-06T02:51:39.734872+00:00",
+  "applicationStatus": "applied",
+  "note": "본인의 조사와 추가 구현 지시를 별도 recordId의 공식 task_exchange JSON으로 기록했다. 예정 답변을 실제 답변으로 적지 않았고 미실행 검증과 부모 통합 대기를 구분했다.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs",
+    "_통합소통/보낼자료/task-40657a46af4d06b55a1c301b13ff2798ced500b7bcbf7d490b063f0df3b43522-r1.json"
+  ],
+  "appliedAt": "2026-10-06T02:51:40.874499+00:00"
+}

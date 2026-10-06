@@ -21,7 +21,8 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public string? Warning { get; init; }
     public string StateLabel => Warning ?? Exchange?.StateLabel ?? "전달 자료";
     public string RevisionLabel => Exchange is { } record ? $"기록 {record.Revision} · {record.ActorId}" : "";
-    public string ReadableBody => Exchange?.Markdown ?? (Body.TrimStart().StartsWith('{') || Body.TrimStart().StartsWith('[') ? "```json\n" + Body + "\n```" : Body);
+    public string Author { get; init; } = "";
+    public string ReadableBody => CommunicationArticle.Read(Body,Exchange);
 }
 
 public sealed partial class MainViewModel
@@ -214,8 +215,8 @@ public sealed partial class MainViewModel
             var row = new InboxRow(NameFor(item.ProjectId), exchange?.Title ?? item.Title,
                 exchange?.RequestSummary ?? item.Preview, body, Path.Combine(CommunicationHubPath,item.CentralPath),
                 (exchange?.UpdatedAt ?? item.CollectedAt).ToOffset(TimeSpan.FromHours(9)).ToString("MM/dd HH:mm") + " KST")
-                { ProjectId = item.ProjectId, Exchange = exchange, Warning = warning };
-            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning)
+                { ProjectId = item.ProjectId, Exchange = exchange, Warning = warning, Author = exchange is null ? "" : _communicationActorNames.GetValueOrDefault(exchange.ActorId,exchange.ActorId) };
+            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning && previous.Author == row.Author)
                 row = previous;
             _allInboxRows.Add(row);
         }

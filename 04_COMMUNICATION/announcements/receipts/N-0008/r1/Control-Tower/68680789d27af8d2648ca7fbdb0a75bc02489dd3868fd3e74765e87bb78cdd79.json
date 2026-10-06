@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 1,
+  "contentSha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "checkedAt": "2026-10-06T03:05:03.488501+00:00",
+  "applicationStatus": "pending",
+  "note": "Read current notice and local guide; independent review found link base issue. Parent handles guide and final UI verification.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/ProjectGuideWindow.xaml.cs"
+  ]
+}

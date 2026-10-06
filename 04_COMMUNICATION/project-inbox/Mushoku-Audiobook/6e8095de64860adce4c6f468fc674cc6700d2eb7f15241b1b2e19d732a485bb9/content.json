@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "Mushoku-Audiobook-20261006-finish-source-rebuild-1811",
+  "revision": 1,
+  "title": "전체 영상 재추출 결과·사용안내·Git·소통 기록 마무리",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "receivedAt": "2026-10-06T18:11:48+09:00",
+  "updatedAt": "2026-10-06T18:17:47.753288+09:00",
+  "request": {
+    "summary": "중단된 작업을 계속하여 남은 음원 목록 정리와 Git·통합소통방 기록을 마무리할 것",
+    "details": "현재 채팅의 “해라” 지시에 따라 원격 연결을 재확인하고 이미 완성된 음원은 재합성하지 않고 보존한다. 기존 지시의 록시 보존·원본 표본 정리·현재/이전 분리·D드라이브 작업·바탕화면 금지를 유지한다.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "연결 복구와 17개 MP3 및 검사 보존을 확인했고 새 공지에 맞춰 프로젝트 안내와 중복 음원 표시를 정리한다고 실제 진행 답변함",
+    "details": "오디오북 담당 /root. 실제 17개 영상에서 얻은 2,149개 후보와 한국어 새 비교 16개·록시 원본 대조 1개를 보존한다. 통합소통방 N-0007/N-0008을 읽고 로컬 사용안내의 최신 링크를 갱신했다. 음성·원본·비공개 검토 JSON은 Git에 올리지 않는다.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "PC 원격 연결 복구 및 완성 MP3 17개·대사 검사 17개 확인",
+    "프로젝트_사용안내.md의 새 음원·원본 표본·기존판·현재 제작 일시정지 상태 갱신",
+    "같은 비교의 WAV·MP3 표시 묶기와 private 재추출 자료 Git 제외",
+    "자동복구의 PID 재사용 구별 및 64비트 프로세스 핸들 처리, 미완료 WAV 보존·복구, 이 프로젝트 백그라운드 자식 실행 창 숨김 보완"
+  ],
+  "verification": [
+    {
+      "name": "saved_audios",
+      "result": "pass",
+      "evidence": [
+        "comparison/01_CURRENT/20261006_영상원본_음색재제작/rebuild_status.json",
+        "quality_checks.json:17 records",
+        "output/production_15_24/pause.flag"
+      ]
+    },
+    {
+      "name": "updated_catalog_and_ui",
+      "result": "not_run",
+      "evidence": [
+        "temp/final_catalog_and_resume_check.log"
+      ]
+    }
+  ],
+  "nextActions": [
+    "중복 정리된 목록과 앱 이동·재생 및 완료 작업 재실행 확인",
+    "최신 인수인계·본인 공지 적용 기록·명령/답변 완료 기록",
+    "코드·안내만 Git에 반영하고 원격 commit 일치 확인"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 namespace AIControlTower;
 public partial class App : Application
 {
@@ -6,8 +6,80 @@ public partial class App : Application
     private EventWaitHandle? _activate;
     private RegisteredWaitHandle? _listener;
     private bool _owns;
+    private CancellationTokenSource? _remoteLifetime;
+    private System.Windows.Interop.HwndSource? _shutdownWindow;
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+    {
+        e.Cancel = false;
+        _remoteLifetime?.Cancel();
+        base.OnSessionEnding(e);
+    }
+    private bool StartRemoteSupervisor(StartupEventArgs e)
+    {
+        var control = Array.IndexOf(e.Args, "--remote-control");
+        if (control >= 0)
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            _ = RunRemoteControlAsync(control + 1 < e.Args.Length ? e.Args[control + 1] : "invalid");
+            return true;
+        }
+        if (!e.Args.Contains("--remote-supervisor")) return false;
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        _remoteLifetime = new CancellationTokenSource();
+        // Invisible top-level HWND receives Windows logoff/shutdown broadcasts.
+        _shutdownWindow = new System.Windows.Interop.HwndSource(
+            new System.Windows.Interop.HwndSourceParameters("AIControlTower Remote Recovery")
+            { Width = 0, Height = 0, WindowStyle = unchecked((int)0x80000000) });
+        _shutdownWindow.AddHook((IntPtr hwnd, int message, IntPtr wparam, IntPtr lparam, ref bool handled) =>
+        {
+            if (message == 0x0011) { handled = true; return new IntPtr(1); }
+            if (message == 0x0016 && wparam != IntPtr.Zero)
+            { _remoteLifetime.Cancel(); Dispatcher.BeginInvoke(() => Shutdown()); handled = true; }
+            return IntPtr.Zero;
+        });
+        _ = RunSupervisorAsync();
+        return true;
+    }
+    private async Task RunRemoteControlAsync(string action)
+    {
+        var exitCode = 0;
+        try
+        {
+            var bridge = new Services.RemoteBridgeService(new Services.ProcessRunner());
+            var detail = action switch
+            {
+                "start" => await bridge.EnsureRunningAsync(CancellationToken.None),
+                "stop" => await new Services.RemoteSupervisor(bridge).StopAsync(CancellationToken.None),
+                "repair" => (await new Services.InstallationService().RestoreDesktopCommanderStartupAsync(
+                    Path.GetDirectoryName(Environment.ProcessPath!)!, CancellationToken.None)).Detail,
+                _ => throw new ArgumentException("알 수 없는 원격 제어 요청")
+            };
+            Directory.CreateDirectory(Services.ControlTowerSettings.DataDirectory);
+            File.WriteAllText(Path.Combine(Services.ControlTowerSettings.DataDirectory, "remote-control-result.json"),
+                System.Text.Json.JsonSerializer.Serialize(new { Action = action, Detail = detail, UpdatedUtc = DateTimeOffset.UtcNow, ExitCode = 0 }));
+        }
+        catch (Exception ex)
+        {
+            exitCode = 1;
+            try
+            {
+                Directory.CreateDirectory(Services.ControlTowerSettings.DataDirectory);
+                File.WriteAllText(Path.Combine(Services.ControlTowerSettings.DataDirectory, "remote-control-result.json"),
+                    System.Text.Json.JsonSerializer.Serialize(new { Action = action, Detail = Services.ProcessRunner.Sanitize(ex.Message), UpdatedUtc = DateTimeOffset.UtcNow, ExitCode = 1 }));
+            }
+            catch (IOException) { }
+        }
+        finally { await Dispatcher.InvokeAsync(() => Shutdown(exitCode)); }
+    }
+    private async Task RunSupervisorAsync()
+    {
+        try { await new Services.RemoteSupervisor(new Services.RemoteBridgeService(new Services.ProcessRunner())).RunAsync(_remoteLifetime!.Token); }
+        catch (OperationCanceledException) { }
+        finally { await Dispatcher.InvokeAsync(() => Shutdown()); }
+    }
     protected override void OnStartup(StartupEventArgs e)
     {
+        if (StartRemoteSupervisor(e)) return;
         _instance = new Mutex(false, @"Local\AIControlTower.Application");
         _activate = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\AIControlTower.Activate");
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
@@ -45,6 +117,7 @@ public partial class App : Application
     }
     protected override void OnExit(ExitEventArgs e)
     {
+        _remoteLifetime?.Cancel(); _shutdownWindow?.Dispose(); _remoteLifetime?.Dispose();
         _listener?.Unregister(null); _activate?.Dispose();
         if (_owns) _instance?.ReleaseMutex();
         _instance?.Dispose(); base.OnExit(e);

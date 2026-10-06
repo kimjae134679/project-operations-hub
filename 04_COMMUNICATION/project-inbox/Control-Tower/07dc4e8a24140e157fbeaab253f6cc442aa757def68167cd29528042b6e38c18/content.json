@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-project-guides",
+  "revision": 1,
+  "title": "프로젝트별 자료 위치·사용 안내를 먼저 읽는 방식",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-reading-tools",
+  "receivedAt": "2026-10-06T11:46:55+09:00",
+  "updatedAt": "2026-10-06T03:06:29.540240+00:00",
+  "request": {
+    "summary": "각 프로젝트 안에서 모든자료위치·설명·필요한이미지까지 안내를 작성하고 AI가그안내를먼저읽으며함께작업하도록바꾸기.",
+    "details": "예:무직전생 모든음원듣기·다른소리·그외자료어디있는지. TXT/guide가능. 실제현장에서위치와역할작성,중앙요약과로컬원본구분.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "프로젝트루트사용안내를두고먼저읽는방식으로바꾸며 음원·실행·결과·보관·참고를정리하고 필요한이미지와관리화면안내창을연결한다고실제로답했습니다. 실제안내7개와171링크위치검증도진행답변으로전달했습니다.",
+    "details": "다른AI읽음·재생성공은대필하지않음.최종답변대기.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "실제카탈로그6루트+별도운영서버 안내7개작성",
+    "오디오북음원·배역비교·원본표본·추가소리·현재/이전·입력/진행/환경정리",
+    "N0008·template·AGENTS/정책·사람용지도업데이트",
+    "앱안내창·로컬자료링크·이미지표시구현"
+  ],
+  "verification": [
+    {
+      "name": "10문서171개실제위치링크",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/docs/PROJECT-GUIDES-20261006.json"
+      ]
+    },
+    {
+      "name": "단일EXE에서안내7개읽기",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [
+    "최종앱화면·가이드읽기검증",
+    "N8중앙배포·안내창설치·기록공유확인"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

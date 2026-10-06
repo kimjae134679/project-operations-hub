@@ -1,0 +1,911 @@
+{
+  "checkedAt": "2026-10-06T12:10:05+09:00",
+  "guideCount": 9,
+  "projectGuideCount": 7,
+  "installedToolGuideCount": 2,
+  "documents": [
+    {
+      "path": "D:\\A_KJ\\AI\\PhoneLoL_02\\프로젝트_사용안내.md",
+      "sha256": "63c57b971586ef087604062d254cc9d03884a98760008c9f0479154e3861de07",
+      "linkCount": 28,
+      "links": [
+        {
+          "target": "PhoneLOL-02/Builds/",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/",
+          "exists": true
+        },
+        {
+          "target": "Automation/OpenUnity.ps1",
+          "exists": true
+        },
+        {
+          "target": "Docs/TEST_SPECTATOR_0.24.4.md",
+          "exists": true
+        },
+        {
+          "target": "README.md",
+          "exists": true
+        },
+        {
+          "target": "Docs/FEATURES_0.24.7.md",
+          "exists": true
+        },
+        {
+          "target": "Docs/ARTIFACTS_0.24.7.json",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/Assets/",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/Packages/",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/ProjectSettings/",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/Builds/",
+          "exists": true
+        },
+        {
+          "target": "Docs/",
+          "exists": true
+        },
+        {
+          "target": "HANDOFF.md",
+          "exists": true
+        },
+        {
+          "target": "ISSUES.md",
+          "exists": true
+        },
+        {
+          "target": "Automation/",
+          "exists": true
+        },
+        {
+          "target": "Automation/Server/",
+          "exists": true
+        },
+        {
+          "target": "Recovery/",
+          "exists": true
+        },
+        {
+          "target": "RECOVERY_STATUS.md",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/Library/",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/Logs/",
+          "exists": true
+        },
+        {
+          "target": "PhoneLOL-02/UserSettings/",
+          "exists": true
+        },
+        {
+          "target": "C:/Users/user/Documents/MultiGod/PhoneLOL_LocalRuntime/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/PhoneLOL/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/PhoneLoL_02-CloudTest/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/PhoneLOL-Recovery-v11511/",
+          "exists": true
+        },
+        {
+          "target": "AGENTS.md",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/받은공지/manifest.json",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/보낼자료/",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\AI\\VoiceAudiobook\\프로젝트_사용안내.md",
+      "sha256": "430c01998f6bf2dcb9bfae96dba5481f8d382ce9e276df628ca355302a325f5d",
+      "linkCount": 66,
+      "links": [
+        {
+          "target": "무직전생.exe",
+          "exists": true
+        },
+        {
+          "target": "오디오북제작.exe",
+          "exists": true
+        },
+        {
+          "target": "voice_resource_pack/review/20261006_미정리영상_추가표본/00_표본듣기.html",
+          "exists": true
+        },
+        {
+          "target": "audiobooks/01_CURRENT/20261006_본편15부터/",
+          "exists": true
+        },
+        {
+          "target": "output/production_15_24/00_제작목록.html",
+          "exists": true
+        },
+        {
+          "target": "audiobooks/01_CURRENT/20261005_162-163_전투피드백반영/",
+          "exists": true
+        },
+        {
+          "target": "comparison/01_CURRENT/20261006_다른장면_배역별_긴대사/00_비교듣기.html",
+          "exists": true
+        },
+        {
+          "target": "comparison/02_BASELINES/",
+          "exists": true
+        },
+        {
+          "target": "audiobooks/90_ARCHIVE/",
+          "exists": true
+        },
+        {
+          "target": "comparison/90_ARCHIVE/",
+          "exists": true
+        },
+        {
+          "target": "output/directed/",
+          "exists": true
+        },
+        {
+          "target": "anime_sources/",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/video-downloader/downloads/",
+          "exists": true
+        },
+        {
+          "target": "voice_resource_pack/README_전달용.txt",
+          "exists": true
+        },
+        {
+          "target": "voice_resource_pack/final/",
+          "exists": true
+        },
+        {
+          "target": "voice_resource_pack/manual_anchors/",
+          "exists": true
+        },
+        {
+          "target": "voice_resource_pack/review/20261006_미정리영상_추가표본/",
+          "exists": true
+        },
+        {
+          "target": "voice_resource_pack/review/",
+          "exists": true
+        },
+        {
+          "target": "voices/",
+          "exists": true
+        },
+        {
+          "target": "voices_clean/",
+          "exists": true
+        },
+        {
+          "target": "voice_candidates/",
+          "exists": true
+        },
+        {
+          "target": "source_review/contact_sheets/",
+          "exists": true
+        },
+        {
+          "target": "source_review/",
+          "exists": true
+        },
+        {
+          "target": "reference_lab/roxy/",
+          "exists": true
+        },
+        {
+          "target": "anime_transcripts/",
+          "exists": true
+        },
+        {
+          "target": "input/",
+          "exists": true
+        },
+        {
+          "target": "00_START_HERE/TXT_내용과_순서.txt",
+          "exists": true
+        },
+        {
+          "target": "00_START_HERE/전회차_시간순_더빙목록.txt",
+          "exists": true
+        },
+        {
+          "target": "dubbing_ready_v2/",
+          "exists": true
+        },
+        {
+          "target": "dubbing_ready/",
+          "exists": true
+        },
+        {
+          "target": "annotated_stage1/",
+          "exists": true
+        },
+        {
+          "target": "annotated_stage2/",
+          "exists": true
+        },
+        {
+          "target": "annotated_stage2_compact/",
+          "exists": true
+        },
+        {
+          "target": "annotated_stage2_v2/",
+          "exists": true
+        },
+        {
+          "target": "director/",
+          "exists": true
+        },
+        {
+          "target": "output/production_15_24/review/",
+          "exists": true
+        },
+        {
+          "target": "00_START_HERE/CURRENT_HANDOFF.md",
+          "exists": true
+        },
+        {
+          "target": "00_START_HERE/본편15부터_설정과실행.txt",
+          "exists": true
+        },
+        {
+          "target": "00_START_HERE/본편15부터_회차안내.txt",
+          "exists": true
+        },
+        {
+          "target": "00_START_HERE/자동제작_연결끊김과복구.txt",
+          "exists": true
+        },
+        {
+          "target": "output/production_15_24/status.json",
+          "exists": true
+        },
+        {
+          "target": "output/production_15_24/worker_progress.json",
+          "exists": true
+        },
+        {
+          "target": "output/production_15_24/review/",
+          "exists": true
+        },
+        {
+          "target": "output/production_15_24/logs/",
+          "exists": true
+        },
+        {
+          "target": "src/",
+          "exists": true
+        },
+        {
+          "target": "app/",
+          "exists": true
+        },
+        {
+          "target": "ui/",
+          "exists": true
+        },
+        {
+          "target": "docs/",
+          "exists": true
+        },
+        {
+          "target": "CosyVoice/",
+          "exists": true
+        },
+        {
+          "target": "engines/",
+          "exists": true
+        },
+        {
+          "target": "models/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Models/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Workspace/VoiceBench/",
+          "exists": true
+        },
+        {
+          "target": "assets/README.md",
+          "exists": true
+        },
+        {
+          "target": "assets/local/",
+          "exists": true
+        },
+        {
+          "target": "docs/RUNTIME_LOCATIONS.md",
+          "exists": true
+        },
+        {
+          "target": "tools/legacy_launchers/",
+          "exists": true
+        },
+        {
+          "target": "tools/experiments/",
+          "exists": true
+        },
+        {
+          "target": "temp/",
+          "exists": true
+        },
+        {
+          "target": "work/",
+          "exists": true
+        },
+        {
+          "target": "test/",
+          "exists": true
+        },
+        {
+          "target": "AGENTS.md",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/받은공지/manifest.json",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/보낼자료/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Applications/VoiceStudio/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Applications/Zonos2/프로젝트_사용안내.md",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\AI\\video-downloader\\프로젝트_사용안내.md",
+      "sha256": "ef846460d41849c509f84b72530d42f16341ccd05ca2f3db765784ce4a165f6e",
+      "linkCount": 24,
+      "links": [
+        {
+          "target": "links.txt",
+          "exists": true
+        },
+        {
+          "target": "run.bat",
+          "exists": true
+        },
+        {
+          "target": "downloads/",
+          "exists": true
+        },
+        {
+          "target": "result_summary.txt",
+          "exists": true
+        },
+        {
+          "target": "links.txt",
+          "exists": true
+        },
+        {
+          "target": "downloads/",
+          "exists": true
+        },
+        {
+          "target": "result_summary.txt",
+          "exists": true
+        },
+        {
+          "target": "supported_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "under_10min_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "unknown_duration_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "unsupported_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "external_player_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "browser_iframe_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "browser_media_urls.txt",
+          "exists": true
+        },
+        {
+          "target": "logs/",
+          "exists": true
+        },
+        {
+          "target": "archive/",
+          "exists": true
+        },
+        {
+          "target": "downloader.py",
+          "exists": true
+        },
+        {
+          "target": "tools/",
+          "exists": true
+        },
+        {
+          "target": "temp/",
+          "exists": true
+        },
+        {
+          "target": "cache/",
+          "exists": true
+        },
+        {
+          "target": "README.txt",
+          "exists": true
+        },
+        {
+          "target": "AGENTS.md",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/받은공지/manifest.json",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/보낼자료/",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\프로젝트_사용안내.md",
+      "sha256": "59466d59888f6b28381a5d3504ef04da4819937572ff3051eb14d2865a79a855",
+      "linkCount": 26,
+      "links": [
+        {
+          "target": "D:/A_KJ/AI/Applications/AIControlTower/AIControlTower.exe",
+          "exists": true
+        },
+        {
+          "target": "000_사용자용/11_프로젝트와_폴더_안내.md",
+          "exists": true
+        },
+        {
+          "target": "000_사용자용/02_설치_도구_현황.md",
+          "exists": true
+        },
+        {
+          "target": "000_사용자용/07_Jev_현재상태.md",
+          "exists": true
+        },
+        {
+          "target": "000_사용자용/10_도구_활용_추천.md",
+          "exists": true
+        },
+        {
+          "target": "000_사용자용/",
+          "exists": true
+        },
+        {
+          "target": "project.catalog.json",
+          "exists": true
+        },
+        {
+          "target": "AGENTS.md",
+          "exists": true
+        },
+        {
+          "target": "00_SYSTEM/CONTROLLER.md",
+          "exists": true
+        },
+        {
+          "target": "01_CONTROL/USER_POLICIES.md",
+          "exists": true
+        },
+        {
+          "target": "02_PROJECTS/",
+          "exists": true
+        },
+        {
+          "target": "01_CONTROL/",
+          "exists": true
+        },
+        {
+          "target": "03_KNOWLEDGE/",
+          "exists": true
+        },
+        {
+          "target": "04_COMMUNICATION/announcements/manifest.json",
+          "exists": true
+        },
+        {
+          "target": "04_COMMUNICATION/announcements/PROTOCOL.md",
+          "exists": true
+        },
+        {
+          "target": "04_COMMUNICATION/project-inbox/",
+          "exists": true
+        },
+        {
+          "target": "04_COMMUNICATION/threads/",
+          "exists": true
+        },
+        {
+          "target": "04_COMMUNICATION/rooms/",
+          "exists": true
+        },
+        {
+          "target": "04_COMMUNICATION/mailboxes/",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/보낼자료/",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/확인기록/",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/받은공지/",
+          "exists": true
+        },
+        {
+          "target": "05_TEMPLATES/",
+          "exists": true
+        },
+        {
+          "target": "ai-control-tower/",
+          "exists": true
+        },
+        {
+          "target": "ai-control-tower/docs/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/ControlTowerData/",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\자동매매주식관련\\프로젝트_사용안내.md",
+      "sha256": "47f5a315826dd37c9bd110e483275d1514fa715a3c732b207a34906b75b40e33",
+      "linkCount": 0,
+      "links": []
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\청약관련\\프로젝트_사용안내.md",
+      "sha256": "739005ca9cca0613f6dfd3df68058982b56a1030863c7be77dbe706c043daa28",
+      "linkCount": 0,
+      "links": []
+    },
+    {
+      "path": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime\\프로젝트_사용안내.md",
+      "sha256": "a316bcbb730b0e2e0e4b2d708b57b489c92037d26470011b5f16c0df86afecf4",
+      "linkCount": 14,
+      "links": [
+        {
+          "target": "D:/A_KJ/AI/PhoneLoL_02/README.md",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Projects/project-operations-hub/ai-control-tower/docs/MULTIPLAYER_SERVER.md",
+          "exists": true
+        },
+        {
+          "target": "logs/",
+          "exists": true
+        },
+        {
+          "target": "AGENTS.md",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/받은공지/manifest.json",
+          "exists": true
+        },
+        {
+          "target": "00_PHONELOL_TEST_HERE/",
+          "exists": true
+        },
+        {
+          "target": "local_data/",
+          "exists": true
+        },
+        {
+          "target": "logs/",
+          "exists": true
+        },
+        {
+          "target": "archive/",
+          "exists": true
+        },
+        {
+          "target": "archive_legacy_launchers/",
+          "exists": true
+        },
+        {
+          "target": "recovery/",
+          "exists": true
+        },
+        {
+          "target": "tools/",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/보낼자료/",
+          "exists": true
+        },
+        {
+          "target": "_통합소통/확인기록/",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\000_사용자용\\11_프로젝트와_폴더_안내.md",
+      "sha256": "dc6f0f5192aea84dd4ef934b7a358d5c3c2eafd8af1d988bdcf7cd220e9ac71b",
+      "linkCount": 15,
+      "links": [
+        {
+          "target": "D:/A_KJ/AI/PhoneLoL_02/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "C:/Users/user/Documents/MultiGod/PhoneLOL_LocalRuntime/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/video-downloader/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "../프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/자동매매주식관련/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/청약관련/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "02_설치_도구_현황.md",
+          "exists": true
+        },
+        {
+          "target": "07_Jev_현재상태.md",
+          "exists": true
+        },
+        {
+          "target": "10_도구_활용_추천.md",
+          "exists": true
+        },
+        {
+          "target": "08_AI_관제탑.md",
+          "exists": true
+        },
+        {
+          "target": "../05_TEMPLATES/PROJECT_GUIDE.md",
+          "exists": true
+        },
+        {
+          "target": "../project.catalog.json",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Applications/VoiceStudio/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Applications/Zonos2/프로젝트_사용안내.md",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\05_TEMPLATES\\PROJECT_GUIDE.md",
+      "sha256": "b42806db0141a215657fa7aafed308cef13ab188397ce4b37a89935442024d13",
+      "linkCount": 0,
+      "links": []
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\04_COMMUNICATION\\announcements\\notices\\N-0008.md",
+      "sha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292",
+      "linkCount": 2,
+      "links": [
+        {
+          "target": "../../../05_TEMPLATES/PROJECT_GUIDE.md",
+          "exists": true
+        },
+        {
+          "target": "../../../000_사용자용/11_프로젝트와_폴더_안내.md",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\Applications\\VoiceStudio\\프로젝트_사용안내.md",
+      "sha256": "5e93b13ebfcc6c98ced574962fab739ddd57b9a74ffb2d73cee4f03a7b8b82c6",
+      "linkCount": 15,
+      "links": [
+        {
+          "target": "VoiceStudio_DriveD.exe",
+          "exists": true
+        },
+        {
+          "target": "VoiceStudio.exe",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/docs/VOICESTUDIO_LOCAL.md",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/프로젝트_사용안내.md",
+          "exists": true
+        },
+        {
+          "target": "./",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Data/VoiceStudio/Library/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Data/VoiceStudio/Library/voices/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Data/VoiceStudio/Library/outputs/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Data/VoiceStudio/Library/dub_jobs/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Data/VoiceStudio/Roaming/VoiceStudio/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Models/OmniVoice/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Cache/VoiceStudio/",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Workspace/VoiceBench/voicestudio-env/",
+          "exists": true
+        },
+        {
+          "target": "resources/README.md",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/tools/voicestudio/VoiceStudio_DriveD.cs",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "path": "D:\\A_KJ\\AI\\Applications\\Zonos2\\프로젝트_사용안내.md",
+      "sha256": "a4f5f6e7259348a68259d74a72284e3e8924f2e68a60f91272ae8fd261699cd3",
+      "linkCount": 15,
+      "links": [
+        {
+          "target": "zonos2-app.exe",
+          "exists": true
+        },
+        {
+          "target": "zonos2-server.exe",
+          "exists": true
+        },
+        {
+          "target": "zonos2-cli.exe",
+          "exists": true
+        },
+        {
+          "target": "start-zonos2.bat",
+          "exists": true
+        },
+        {
+          "target": "start-zonos2.ps1",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Models/ZONOS2/",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/docs/ZONOS_LOCAL.md",
+          "exists": true
+        },
+        {
+          "target": "./",
+          "exists": true
+        },
+        {
+          "target": "D:/A_KJ/AI/Models/ZONOS2/",
+          "exists": true
+        },
+        {
+          "target": "default_voices/",
+          "exists": true
+        },
+        {
+          "target": "emotion_directions/",
+          "exists": true
+        },
+        {
+          "target": "web/tts_ui.html",
+          "exists": true
+        },
+        {
+          "target": "scripts/",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/output/battle_action_20261005/",
+          "exists": true
+        },
+        {
+          "target": "D:/AI/VoiceAudiobook/프로젝트_사용안내.md",
+          "exists": true
+        }
+      ]
+    }
+  ],
+  "missing": [],
+  "performed": "문서 로컬 링크와 경로 존재만 확인; 앱/모델/재생/서비스는 실행하지 않음"
+}

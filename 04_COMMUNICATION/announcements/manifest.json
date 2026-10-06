@@ -133,6 +133,21 @@
       "id": "/root/efficiency_research",
       "name": "도구·확인 절차 검토 AI",
       "mailbox": ""
+    },
+    {
+      "id": "/root/record_protocol",
+      "name": "안내·디자인 정리 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/review_ui",
+      "name": "화면·도구 검토 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/project_guides",
+      "name": "프로젝트 안내 담당 AI",
+      "mailbox": ""
     }
   ],
   "notices": [
@@ -219,6 +234,30 @@
       "required": true,
       "active": true,
       "contentSha256": "3f0edd4e30dbb06fb14d4d1e29c5edd3cb2c8146ec589787bb7afe904250a9f8"
+    },
+    {
+      "id": "N-0008",
+      "revision": 1,
+      "title": "프로젝트 자료 위치와 사용 안내 먼저 읽기",
+      "path": "notices/N-0008.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292"
+    },
+    {
+      "id": "N-0009",
+      "revision": 1,
+      "title": "부팅 창과 종료 방해 없는 백그라운드 실행",
+      "path": "notices/N-0009.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "4cf1d9e1a61213e75efd2abcf6f416b31a981454b9ef0f24f5c60c211ade0073"
     }
   ]
 }

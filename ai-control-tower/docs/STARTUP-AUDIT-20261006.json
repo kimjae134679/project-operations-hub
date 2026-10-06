@@ -1,0 +1,187 @@
+{
+  "timestamp": "2026-10-06T18:14:00+09:00",
+  "device": "KJW",
+  "mode": "read-only-system-audit",
+  "confirmedStartupEntries": [
+    {
+      "name": "InvestmentLabAutonomous.cmd",
+      "path": "C:\\Users\\user\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\InvestmentLabAutonomous.cmd",
+      "body": "@echo off\nstart \"\" /b \"C:\\TempPy13\\pythonw.exe\" \"C:\\KJ\\Github\\Investment Lab\\scripts\\run_autonomous_live.py\" --loop\nexit /b 0",
+      "finding": "A Startup CMD entry launches a console before pythonw; probable brief CMD flash."
+    },
+    {
+      "name": "AIControlTower-RemoteBridge.vbs",
+      "path": "C:\\Users\\user\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\AIControlTower-RemoteBridge.vbs",
+      "body": "Set shell = CreateObject(\"WScript.Shell\")\nshell.Run \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"\"C:\\Users\\user\\AppData\\Local\\AIControlTower\\RemoteBridge.ps1\"\"\", 0, False",
+      "finding": "Hidden parent. Script calls npx.cmd synchronously, no recovery after existing-instance reuse or nonzero exit."
+    },
+    {
+      "name": "PhoneLOL_REMOTE_STACK_AUTOSTART.vbs",
+      "body": "Set Shell = CreateObject(\"WScript.Shell\")\nShell.Run \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"\"C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime\\START_REMOTE_STACK.ps1\"\"\", 0, False",
+      "entry": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime\\START_REMOTE_STACK.ps1",
+      "downstream": "00_PHONELOL_TEST_HERE\\PHONELOL_TEST_V213.ps1 -Action Start -NoMonitor -LocalOnly:$LocalOnly"
+    },
+    {
+      "name": "PhoneLOL-Central-Server-Autostart",
+      "kind": "scheduled-task",
+      "action": "powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime\\recovery\\CENTRAL_AUTHORITY_CONTROL_V33.ps1\" -Action Start",
+      "downstream": "Start-Process powershell -WindowStyle Hidden -> recovery\\START_CENTRAL_AUTHORITY_SERVER_V33.ps1 -> python.exe -u server_central_authority_v33.py | Tee-Object",
+      "finding": "Overlaps Startup remote-stack and Portwarp entry. Both parent launchers use Hidden; no current visible console confirmed."
+    },
+    {
+      "name": "PhoneLOL-Portwarp.lnk",
+      "target": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime\\tools\\portwarp\\pwrp.exe",
+      "args": "connect [tunnel-id] --detach --local-host 127.0.0.1"
+    },
+    {
+      "name": "AIControlTower",
+      "kind": "HKCU Run",
+      "target": "D:\\A_KJ\\AI\\Applications\\AIControlTower\\AIControlTower.exe"
+    }
+  ],
+  "visibleConsoles": [],
+  "processEvidence": [
+    {
+      "pid": 16760,
+      "name": "powershell.exe",
+      "script": "recovery\\START_CENTRAL_AUTHORITY_SERVER_V33.ps1",
+      "child": 19820
+    },
+    {
+      "pid": 19820,
+      "name": "python.exe",
+      "program": "server_central_authority_v33.py"
+    },
+    {
+      "pid": 27256,
+      "name": "powershell.exe",
+      "script": "C:\\Users\\user\\AppData\\Local\\AIControlTower\\RemoteBridge.ps1",
+      "chain": "27256 -> cmd 24904 -> npx node27268 -> cmd19632 -> remote node7656"
+    },
+    {
+      "pid": 20284,
+      "name": "pythonw.exe",
+      "program": "run_autonomous_live.py --loop",
+      "child": 26032
+    },
+    {
+      "pid": 26032,
+      "name": "pythonw.exe",
+      "program": "run_autonomous_live.py --loop --background-child",
+      "finding": "Source has detached background spawn; two processes alone not evidence duplicate jobs"
+    }
+  ],
+  "shutdownEvidence": {
+    "diagnosticsPerformance": "Get-WinEvent ListLog returned no log; no events 200..203 retrieved",
+    "actualBlocker": "Not conclusively identified from present logs",
+    "thirdParty": [
+      {
+        "application": "logioptionsplus_agent.exe",
+        "version": "1.89.5126.0",
+        "module": "RPCRT4.dll",
+        "code": "c0020043",
+        "times": [
+          "2026-10-06 18:05:20",
+          "2026-10-06 18:04:33",
+          "2026-10-06 12:24:06"
+        ],
+        "finding": "Repeated actual application crashes; not proof shutdown blocker"
+      },
+      {
+        "application": "chrome.exe",
+        "event": "Application Hang 1002",
+        "time": "2026-10-05 02:22:29"
+      },
+      {
+        "application": "ZBrush.exe",
+        "event": "Application Hang 1002",
+        "time": "2026-10-04 19:30:35"
+      }
+    ],
+    "aiPrograms": [
+      {
+        "application": "AIControlTower.exe",
+        "events": "Application Error1000",
+        "times": [
+          "2026-10-05 04:18:11",
+          "2026-10-05 04:18:15",
+          "2026-10-05 04:18:58",
+          "2026-10-05 04:19:02"
+        ],
+        "codes": [
+          "e0434352",
+          "c000041d"
+        ]
+      },
+      {
+        "application": "GameplayBalanceTests.exe / HPTests.exe",
+        "finding": "Test harness crashes Oct3..4; likely intentional failing tests, not persistent startup entries"
+      }
+    ],
+    "falsePositives": [
+      "CodexSandboxService.OpenAI.Codex Event1000 says service running; Event1002 says stopped, Level4 informational. Not application crashes/hangs.",
+      "Latest WER1001 kernel reports reference old 2025 dump paths despite 2026 re-report timestamps. Not evidence new bluescreens today."
+    ]
+  },
+  "restoreSettings": {
+    "RestartApps": "absent at checked HKCU Winlogon",
+    "PersistBrowsers": "absent at checked Explorer Advanced",
+    "WindowsTerminal": "no matching settings.json found",
+    "RunOnce": []
+  },
+  "otherStartupPrograms": [
+    "Skydimo",
+    "OneDrive/Lists",
+    "EpicGamesLauncher",
+    "KakaoTalk",
+    "Steam",
+    "WallpaperEngine",
+    "TinySpider",
+    "GPTAnimalAlarm",
+    "GoogleDriveFS",
+    "Norgate Data Updater",
+    "Microsoft Copilot",
+    "Autodesk Access",
+    "YouCam10",
+    "AhnLab Safe Transaction",
+    "Java updater",
+    "Adobe Creative Cloud/CCXProcess",
+    "Wizvera Delfino",
+    "MarkAny EPSBroker",
+    "Ollama",
+    "Crossplay launchers",
+    "oCamTask",
+    "StartAUEP"
+  ],
+  "relevantTasks": [
+    {
+      "name": "AI Ops Runner",
+      "state": "Disabled"
+    },
+    {
+      "name": "PhoneLOL-0201-Shutdown",
+      "state": "Ready",
+      "nextRun": null,
+      "finding": "Past one-time shutdown entry, no upcoming trigger; do not claim active"
+    },
+    {
+      "name": "VoiceAudiobook_15_24_AutoResume",
+      "state": "Ready",
+      "executable": "D:\\AI\\envs\\cosyvoice\\pythonw.exe",
+      "lastResult": 0
+    },
+    {
+      "name": "VoiceAudiobook_SourceVoiceRebuild_Resume",
+      "state": "Ready",
+      "executable": "D:\\AI\\envs\\cosyvoice\\pythonw.exe",
+      "lastResult": 0
+    }
+  ],
+  "recommendations": [
+    "Replace InvestmentLab startup CMD with hidden VBS pythonw launcher, preserving loop arguments.",
+    "Use a persistent remote supervisor that reuses remote process but keeps monitoring, retries nonzero exits, and respects explicit program stop state.",
+    "Do not add universal AutoEndTasks/force shutdown: unrelated unsaved apps must not be killed.",
+    "Keep remote supervisor disabled during Windows shutdown/logoff to avoid resurrection or delayed shutdown.",
+    "Track third-party crash/hang evidence separately from proven AI startup issues."
+  ]
+}

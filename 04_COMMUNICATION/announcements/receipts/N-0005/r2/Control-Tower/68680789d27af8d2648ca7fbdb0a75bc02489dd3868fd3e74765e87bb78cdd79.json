@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0005",
+  "revision": 2,
+  "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "checkedAt": "2026-10-06T02:51:39.701057+00:00",
+  "applicationStatus": "applied",
+  "note": "본인이 작성한 명령·실제 답변·한 일·검증·남은 일을 본인 보낼자료에 기록했다. 원본 프로젝트나 설치 폴더를 옮기지 않았다.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs",
+    "_통합소통/보낼자료/task-40657a46af4d06b55a1c301b13ff2798ced500b7bcbf7d490b063f0df3b43522-r1.json"
+  ],
+  "appliedAt": "2026-10-06T02:51:40.582518+00:00"
+}

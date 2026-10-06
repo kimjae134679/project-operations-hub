@@ -35,3 +35,10 @@ n8n bridge는 현재 `127.0.0.1:5678`에만 연결하며 외부 공개 endpoint�
 - [작업별 선택과 과용 비용](../03_KNOWLEDGE/CANDIDATE_CATALOG/TOOL_SELECTION_PLAYBOOK.md)을 사용합니다. 과거 탐색을 고정 규칙으로 삼지 않고 최신 공식 자료와 실제 환경을 다시 비교합니다.
 - Jev 사용은 허용되었습니다. 0.2.0 설치, Windows 사용자 환경의 키 존재, Codex ChatGPT 로그인 확인과 실제 라우팅 왕복은 별개입니다. 추가 결제는 이 허가에 포함되지 않습니다.
 - 원격 연결의 여러 Node PID는 부모·자식일 수 있으므로 독립 연결 수와 구분합니다. n8n은 Node 이름 대신 실제 healthz를 확인합니다. GitHub Actions 서비스와 AI Ops 예약 작업을 혼동하지 않습니다.
+
+## 2026-10-06 관제탑 표시와 설치 안내
+
+관제탑0.7.0의 도구·연결에는 등록된 상태11개를 모두 표시합니다. 설치됨은 실제 연결·업무 성공과 다릅니다. Remote Desktop Commander와 Jev 제품명을 유지하며 n8n·GPT 전달·Aider·HyperFrames도 숨기지 않습니다.
+
+- [VoiceStudio 사용 안내](D:/A_KJ/AI/Applications/VoiceStudio/프로젝트_사용안내.md): D실행기, 기존 음원·배역·더빙작업·공유모델·환경 위치.
+- [Zonos2 사용 안내](D:/A_KJ/AI/Applications/Zonos2/프로젝트_사용안내.md): 앱/CLI/server와 외부Q8 모델 위치. 기본 BAT의 q6 신규다운로드 가능성 때문에 자동 실행하지 않습니다.

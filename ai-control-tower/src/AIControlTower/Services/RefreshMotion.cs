@@ -9,6 +9,9 @@ public static class RefreshMotion
 {
     public static readonly DependencyProperty ActiveProperty = DependencyProperty.RegisterAttached("Active", typeof(bool), typeof(RefreshMotion), new PropertyMetadata(false, Changed));
     public static readonly DependencyProperty ReduceMotionProperty = DependencyProperty.RegisterAttached("ReduceMotion", typeof(bool), typeof(RefreshMotion), new PropertyMetadata(false, Changed));
+    public static readonly DependencyProperty DurationMillisecondsProperty = DependencyProperty.RegisterAttached("DurationMilliseconds",typeof(double),typeof(RefreshMotion),new PropertyMetadata(1400d));
+    public static void SetDurationMilliseconds(DependencyObject target,double value) => target.SetValue(DurationMillisecondsProperty,value);
+    public static double GetDurationMilliseconds(DependencyObject target) => (double)target.GetValue(DurationMillisecondsProperty);
     private static readonly DependencyProperty StateProperty = DependencyProperty.RegisterAttached("State", typeof(State), typeof(RefreshMotion));
     public static void SetActive(DependencyObject target, bool value) => target.SetValue(ActiveProperty, value);
     public static bool GetActive(DependencyObject target) => (bool)target.GetValue(ActiveProperty);
@@ -52,7 +55,7 @@ public static class RefreshMotion
     {
         state.Running = true;
         var generation = ++state.Generation;
-        var animation = new DoubleAnimation(0, 360, TimeSpan.FromMilliseconds(800)) { FillBehavior = FillBehavior.HoldEnd };
+        var animation = new DoubleAnimation(0, 360, TimeSpan.FromMilliseconds(Math.Clamp(GetDurationMilliseconds(element),600,3000))) { FillBehavior = FillBehavior.HoldEnd };
         animation.Completed += (_, _) =>
         {
             if (generation != state.Generation) return;

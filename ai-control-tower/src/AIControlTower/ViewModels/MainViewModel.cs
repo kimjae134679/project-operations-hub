@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Threading;
 using AIControlTower.Models;
@@ -44,7 +44,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
         var runner = new ProcessRunner();
         _providers = [new DesktopCommanderStatusProvider(runner), new JevStatusProvider(runner), new CodexStatusProvider(runner),
-            new GitHubCliStatusProvider(runner), new N8nStatusProvider(runner), new AiOpsRunnerStatusProvider(runner), new DeliveryChainProvider(runner)];
+            new GitHubCliStatusProvider(runner), new N8nStatusProvider(runner), new AiOpsRunnerStatusProvider(runner), new DeliveryChainProvider(runner), new InstalledToolStatusProvider("aider"), new InstalledToolStatusProvider("hyperframes"), new InstalledToolStatusProvider("voicestudio"), new InstalledToolStatusProvider("zonos2")];
         _jobs.Log += OnJobLog;
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         _timer.Tick += async (_, _) =>
@@ -55,7 +55,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (_needsDiscovery || DateTime.UtcNow - _lastScan > TimeSpan.FromMinutes(1)) await DiscoverAsync();
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
-        _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(RosterRefreshSeconds) };
         _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
         if (enablePolling)
         {
@@ -66,7 +66,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public ObservableCollection<ProjectItem> Projects { get; } = [];
     public ObservableCollection<ToolStatusViewModel> Statuses { get; } = [];
+    private string _toolSearch = "";
+    public string ToolSearch { get => _toolSearch; set { if (SetProperty(ref _toolSearch,value)) OnPropertyChanged(nameof(FilteredToolStatuses)); } }
     public IReadOnlyList<ToolStatusViewModel> UserFacingStatuses => Statuses.Where(s => s.IsUserFacing).ToArray();
+    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => UserFacingStatuses.Where(s => Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel)).ToArray();
     public ObservableCollection<string> JobLogs { get; } = [];
     public event EventHandler? CatalogRefreshing;
     public event EventHandler? CatalogRefreshed;
@@ -216,7 +219,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 if (existing is null) Statuses.Add(new ToolStatusViewModel(result)); else existing.Update(result);
             }
             _lastStatus = DateTime.UtcNow;
-            OnPropertyChanged(nameof(UserFacingStatuses));
+            OnPropertyChanged(nameof(UserFacingStatuses)); OnPropertyChanged(nameof(FilteredToolStatuses));
             Message = "연결 상태 확인 · " + DateTime.Now.ToString("HH:mm:ss");
             UpdateRunningProperties();
         }
@@ -332,13 +335,18 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task ConsolidateRemoteStartupAsync()
     {
-        try { Message = _remote.ConsolidateStartup(Environment.GetFolderPath(Environment.SpecialFolder.Startup), ControlTowerSettings.DataDirectory); AddLog(Message); await RefreshAsync(); }
+        try { Message = _remote.ConsolidateStartup(Environment.GetFolderPath(Environment.SpecialFolder.Startup), ControlTowerSettings.DataDirectory); Message += " " + await _remote.ConfigureNativeStartupAsync(Environment.ProcessPath!, _lifetime.Token); AddLog(Message); await RefreshAsync(); }
         catch (Exception ex) { Message = "시작 경로 통합 실패 · " + ProcessRunner.Sanitize(ex.Message); AddLog(Message); }
     }
     public async Task EnsureRemoteRunningAsync()
     {
         try { Message = await _remote.EnsureRunningAsync(_lifetime.Token); AddLog(Message); }
         catch (Exception ex) { Message = "공유 연결 요청 실패 · " + ProcessRunner.Sanitize(ex.Message); }
+    }
+    public async Task StopRemoteRunningAsync()
+    {
+        try { Message = await new RemoteSupervisor(_remote).StopAsync(_lifetime.Token); AddLog(Message); await RefreshAsync(); }
+        catch (Exception ex) { Message = "원격 연결 중지 실패 · " + ProcessRunner.Sanitize(ex.Message); }
     }
     private void UpdateProgramState(ProgramItem program, string state)
     {

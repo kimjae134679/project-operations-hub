@@ -120,9 +120,16 @@ public sealed class CommunicationService
                 // Board snapshot must still be coherent immediately before replacing the local delivery marker.
                 foreach (var n in current)
                 {
+                    phase = "공지 원본 검사 · " + n.Notice.Id;
                     var fresh = await ReadText(Inside(root, "04_COMMUNICATION/announcements/" + n.SourcePath), ct).ConfigureAwait(false);
                     if (ContentHash(fresh) != n.Notice.ContentSha256) throw new InvalidDataException("Notice changed during sync.");
-                    await AtomicWrite(received, n.Notice.Id + ".md", Encoding.UTF8.GetBytes(n.Notice.Body), true, ct).ConfigureAwait(false);
+                    phase = "전달 본문 비교 · " + n.Notice.Id;
+                    var localBody = Inside(received, n.Notice.Id + ".md");
+                    if (!File.Exists(localBody) || ContentHash(await ReadText(localBody, ct).ConfigureAwait(false)) != n.Notice.ContentSha256)
+                    {
+                        phase = "공지 본문 갱신 · " + n.Notice.Id;
+                        await AtomicWrite(received, n.Notice.Id + ".md", Encoding.UTF8.GetBytes(n.Notice.Body), true, ct).ConfigureAwait(false);
+                    }
                     delivered++;
                 }
                 var localManifest = new
@@ -237,7 +244,7 @@ public sealed class CommunicationService
                     catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "outbox_retry"); }
                 }
             }
-            catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "project_unavailable"); Diagnostic?.Invoke(target.ProjectId+" · "+phase+" · "+ex.GetType().Name+" · 0x"+ex.HResult.ToString("X8")); }
+            catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "project_unavailable"); Diagnostic?.Invoke(target.ProjectId+" · "+phase+" · "+ex.GetType().Name+" · 0x"+ex.HResult.ToString("X8")+" · "+ProcessRunner.Sanitize(ex.Message)); }
             states.Add(new(target.ProjectId, target.RootPath, mailbox, delivered, count, errors.Count == before ? "연결됨" : "일부 보류"));
         }
         try { await ReadCentral(root, board, receipts, items, publish, errors, ct).ConfigureAwait(false); }
@@ -452,7 +459,7 @@ public sealed class CommunicationService
         const string begin = "<!-- control-tower:communication-entry:begin -->";
         const string end = "<!-- control-tower:communication-entry:end -->";
         var block = begin + "\n## 통합 공지·인수인계\n\n" +
-            "이 소통함의 프로젝트 ID: `" + projectId + "`. 작업 시작·재개·인수인계 때 `_통합소통/받은공지/manifest.json`과 본인 확인 기록을 비교하고 새·변경 공지만 실제로 읽습니다. 최신 사용자 지시와 이 프로젝트의 기존 작업 규칙이 우선입니다.\n\n" +
+            "이 소통함의 프로젝트 ID: `" + projectId + "`. 먼저 실제 프로젝트 루트의 프로젝트_사용안내.md를 읽어 입력·결과·참고·보관 위치와 행동을 확인하고, 바뀐 위치·용도는 해당 안내에 갱신합니다. 없는 안내와 확인하지 않은 위치는 미확인으로 남깁니다. 작업 시작·재개·인수인계 때 `_통합소통/받은공지/manifest.json`과 본인 확인 기록을 비교하고 새·변경 공지만 실제로 읽습니다. 최신 사용자 지시와 이 프로젝트의 기존 작업 규칙이 우선입니다.\n\n" +
             "읽은 AI는 `_통합소통/README.md`의 현재 도우미 명령으로 본인 작성자·세션의 읽음·적용 기록을 남깁니다. 공지 전달은 읽음이 아니며 다른 AI를 대신 체크하지 않습니다. 적용 대기·막힘은 이유를 남깁니다. 공유할 요약·인수인계는 `_통합소통/보낼자료`에 두면 관리 앱이 수집합니다. 받은 명령·실제 답변·진행·검증·남은 일은 task_exchange JSON으로 첫 수신·변경·종료 때 계속 기록하고 revision을 올려 이전 기록을 보존합니다. 형식은 허브 `05_TEMPLATES/TASK_EXCHANGE.md`, 작성은 현재 기록도우미 `record --input 파일.json`을 사용합니다. 자동 수집은 채팅 감시나 명령 자동 작성을 뜻하지 않습니다. 연결·동기화가 실패했으면 최신이라고 단정하지 않습니다.\n" + end;
         var path = Inside(projectRoot, "AGENTS.md");
         var existed = File.Exists(path);

@@ -69,6 +69,26 @@ public sealed class CommunicationServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task ProtectedNoticeWithEquivalentBomAndLineEndingsIsPreserved()
+    {
+        await Service().Sync(Hub,[Target]);
+        var path=Path.Combine(Local("받은공지"),"N-0001.md");
+        var body="\uFEFF# 공지\r\n실제로 읽고 본인 확인 기록만 작성합니다.\r\n";
+        File.WriteAllText(path,body,new UTF8Encoding(false));
+        File.SetAttributes(path,FileAttributes.ReadOnly);
+        try
+        {
+            var original=File.ReadAllBytes(path);
+            var result=await Service().Sync(Hub,[Target]);
+            Assert.Empty(result.Errors);
+            Assert.Equal(original,File.ReadAllBytes(path));
+            Assert.Equal(1,Assert.Single(result.ProjectStates).DeliveredCount);
+            Assert.Empty(result.Receipts);
+        }
+        finally { File.SetAttributes(path,FileAttributes.Normal); }
+    }
+
+    [Fact]
     public async Task EntryHintPreservesExistingRulesAndDoesNotChurnOrAcknowledge()
     {
         var path=Path.Combine(Project,"AGENTS.md");var original="\uFEFF# 기존 지침\r\n이 지침은 그대로 보존합니다.\r\n";

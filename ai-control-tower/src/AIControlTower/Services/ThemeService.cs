@@ -22,45 +22,93 @@ public static class ThemeService
         }
     }
 
+    // Neutral surfaces; blue-violet is reserved for emphasis and focus.
     internal static Dictionary<string, string> Palette(bool dark) => dark ? new()
     {
-        ["CanvasBrush"]="#171C1B", ["SurfaceBrush"]="#252D2A", ["RaisedBrush"]="#303B36",
-        ["LineBrush"]="#48534D", ["TextBrush"]="#F5F4EC", ["MutedBrush"]="#C0C9C0",
-        ["AccentBrush"]="#C7E59A", ["AccentInkBrush"]="#FFFFFF", ["DangerBrush"]="#FFA7AD",
-        ["RailBrush"]="#202923", ["RailTextBrush"]="#F1F3E9", ["RailMutedBrush"]="#B8C8B3",
-        ["RailHoverBrush"]="#354137", ["RailSelectedBrush"]="#43513D", ["RailEdgeBrush"]="#526246",
-        ["SelectionBrush"]="#384335", ["HoverBrush"]="#303A33", ["FocusBrush"]="#D7EEAD",
-        ["ShadowBrush"]="#0C110E", ["SheetBackBrush"]="#39483A", ["SheetMiddleBrush"]="#45563D",
-        ["HeroBrush"]="#303B31", ["ChipBrush"]="#394433", ["ChipInkBrush"]="#E4EDD7",
-        ["BadgeBrush"]="#DDE9BE", ["BadgeInkBrush"]="#25301D", ["ScrollThumbBrush"]="#7F9185",
-        ["DisabledBrush"]="#323B36", ["DisabledInkBrush"]="#AFB8AD", ["ButtonFootBrush"]="#111810",
-        ["HighlightBrush"]="#21FFFFFF"
+        ["CanvasBrush"]="#15171D",
+        ["SurfaceBrush"]="#1D2028",
+        ["RaisedBrush"]="#262A35",
+        ["LineBrush"]="#66728A",
+        ["TextBrush"]="#F3F5FA",
+        ["MutedBrush"]="#B8C0D0",
+        ["AccentBrush"]="#A3AFFE",
+        ["AccentInkBrush"]="#FFFFFF",
+        ["DangerBrush"]="#FFB4BC",
+        ["RailBrush"]="#191C24",
+        ["RailTextBrush"]="#F3F5FA",
+        ["RailMutedBrush"]="#B8C0D0",
+        ["RailHoverBrush"]="#282E3C",
+        ["RailSelectedBrush"]="#313954",
+        ["RailEdgeBrush"]="#66728A",
+        ["SelectionBrush"]="#313954",
+        ["HoverBrush"]="#2B3040",
+        ["FocusBrush"]="#B3BDFF",
+        ["ShadowBrush"]="#101218",
+        ["SheetBackBrush"]="#222631",
+        ["SheetMiddleBrush"]="#2C3140",
+        ["HeroBrush"]="#252A37",
+        ["ChipBrush"]="#323A56",
+        ["ChipInkBrush"]="#EDF0FF",
+        ["BadgeBrush"]="#363D65",
+        ["BadgeInkBrush"]="#EDF0FF",
+        ["ScrollThumbBrush"]="#8E99AE",
+        ["DisabledBrush"]="#252A35",
+        ["DisabledInkBrush"]="#AAB4C8",
+        ["ButtonFootBrush"]="#1D2028",
+        ["HighlightBrush"]="#00FFFFFF"
     } : new()
     {
-        ["CanvasBrush"]="#EDEDE6", ["SurfaceBrush"]="#FFFDF7", ["RaisedBrush"]="#E8EADD",
-        ["LineBrush"]="#CDD1C2", ["TextBrush"]="#222B24", ["MutedBrush"]="#545F51",
-        ["AccentBrush"]="#3E5726", ["AccentInkBrush"]="#FFFFFF", ["DangerBrush"]="#A1273C",
-        ["RailBrush"]="#263126", ["RailTextBrush"]="#FCFCF1", ["RailMutedBrush"]="#C4D0BC",
-        ["RailHoverBrush"]="#354535", ["RailSelectedBrush"]="#46583C", ["RailEdgeBrush"]="#769163",
-        ["SelectionBrush"]="#E1E8D2", ["HoverBrush"]="#EFF0E5", ["FocusBrush"]="#425F25",
-        ["ShadowBrush"]="#C2C8B8", ["SheetBackBrush"]="#BBC6A6", ["SheetMiddleBrush"]="#CCD5B9",
-        ["HeroBrush"]="#F6F5E9", ["ChipBrush"]="#E2E8D3", ["ChipInkBrush"]="#3D4D30",
-        ["BadgeBrush"]="#DDE9BE", ["BadgeInkBrush"]="#25301D", ["ScrollThumbBrush"]="#8A9680",
-        ["DisabledBrush"]="#E1E4D9", ["DisabledInkBrush"]="#55614F", ["ButtonFootBrush"]="#AFB7A1",
-        ["HighlightBrush"]="#72FFFFFF"
+        ["CanvasBrush"]="#F2F4F8",
+        ["SurfaceBrush"]="#FFFFFF",
+        ["RaisedBrush"]="#EBEEF4",
+        ["LineBrush"]="#7E8A9F",
+        ["TextBrush"]="#1F2634",
+        ["MutedBrush"]="#536077",
+        ["AccentBrush"]="#4757BC",
+        ["AccentInkBrush"]="#FFFFFF",
+        ["DangerBrush"]="#A82B44",
+        ["RailBrush"]="#F7F8FB",
+        ["RailTextBrush"]="#1F2634",
+        ["RailMutedBrush"]="#536077",
+        ["RailHoverBrush"]="#E8ECF4",
+        ["RailSelectedBrush"]="#E2E7FA",
+        ["RailEdgeBrush"]="#7E8A9F",
+        ["SelectionBrush"]="#E2E7FA",
+        ["HoverBrush"]="#EEF1F8",
+        ["FocusBrush"]="#4757BC",
+        ["ShadowBrush"]="#DCE1EA",
+        ["SheetBackBrush"]="#DCE1EB",
+        ["SheetMiddleBrush"]="#EBEFF5",
+        ["HeroBrush"]="#F4F5FB",
+        ["ChipBrush"]="#E7EBF7",
+        ["ChipInkBrush"]="#34417D",
+        ["BadgeBrush"]="#E7EAFB",
+        ["BadgeInkBrush"]="#34417D",
+        ["ScrollThumbBrush"]="#79869C",
+        ["DisabledBrush"]="#E6E9EF",
+        ["DisabledInkBrush"]="#596378",
+        ["ButtonFootBrush"]="#FFFFFF",
+        ["HighlightBrush"]="#00FFFFFF"
     };
 
+    // Keep the existing brush keys, with identical stops for flat surfaces.
     internal static Dictionary<string, string[]> Gradients(bool dark) => dark ? new()
     {
-        ["ButtonFace"]=["#3B463D","#303B33"], ["ActionFace"]=["#53733B","#3B5529"],
-        ["CardFace"]=["#2D362F","#252D28"], ["SelectionFace"]=["#3D4937","#333F31"],
-        ["RimBrush"]=["#61715B","#43503E"], ["RailMaterial"]=["#2D382C","#202920"],
-        ["HeroFace"]=["#35422F","#2B352D"]
+        ["ButtonFace"]=["#292E3C","#292E3C"],
+        ["ActionFace"]=["#5361C4","#5361C4"],
+        ["CardFace"]=["#1D2028","#1D2028"],
+        ["SelectionFace"]=["#313954","#313954"],
+        ["RimBrush"]=["#66728A","#66728A"],
+        ["RailMaterial"]=["#191C24","#191C24"],
+        ["HeroFace"]=["#252A37","#252A37"]
     } : new()
     {
-        ["ButtonFace"]=["#FFFDF7","#E4E7DA"], ["ActionFace"]=["#48662F","#304921"],
-        ["CardFace"]=["#FFFDF7","#F0F0E5"], ["SelectionFace"]=["#EAF0DC","#DDE5CD"],
-        ["RimBrush"]=["#E9ECDF","#BBC5AF"], ["RailMaterial"]=["#344331","#253025"],
-        ["HeroFace"]=["#FCFBEF","#EAEDD9"]
+        ["ButtonFace"]=["#FFFFFF","#FFFFFF"],
+        ["ActionFace"]=["#4757BC","#4757BC"],
+        ["CardFace"]=["#FFFFFF","#FFFFFF"],
+        ["SelectionFace"]=["#E2E7FA","#E2E7FA"],
+        ["RimBrush"]=["#7E8A9F","#7E8A9F"],
+        ["RailMaterial"]=["#F7F8FB","#F7F8FB"],
+        ["HeroFace"]=["#F4F5FB","#F4F5FB"]
     };
 }

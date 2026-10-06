@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "checkedAt": "2026-10-06T02:51:39.625851+00:00",
+  "applicationStatus": "pending",
+  "note": "제품명과 쉬운 용도를 병기하고 미설치와 오류를 구분했다. 부모 담당 화면 통합과 실제 사용자 흐름 검증이 남았다.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs",
+    "_통합소통/보낼자료/task-40657a46af4d06b55a1c301b13ff2798ced500b7bcbf7d490b063f0df3b43522-r1.json"
+  ]
+}

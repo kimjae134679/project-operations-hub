@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-control-tower-reading-tools",
+  "revision": 1,
+  "title": "버튼·색상·게시글 읽기·갱신 속도·도구 접근성 개선",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-reading-tools",
+  "receivedAt": "2026-10-06T11:43:11+09:00",
+  "updatedAt": "2026-10-06T02:44:52.011Z",
+  "request": {
+    "summary": "초록색과 버튼 디자인을 바꾸고 소통방을 게시글처럼 편하게 읽도록 개선. 1초 갱신/회전 속도 조정, 프로젝트 한글 축약 제거, 원격 데스크톱/Jev 등 도구가 보이게 복원.",
+    "details": "사용자 첨부3개 화면 참조. 실제 설치본과 최신 코드·등록을 확인하고 작업 완료 및 설치까지 진행. 사람이 이해하는 전체 이름과 행동을 표시하며 AI JSON 원본과 실제 명령/답변 기록 유지.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "올려준 화면과 현재 설치본을 확인하고 버튼·초록색·게시글 읽기·갱신 주기와 회전 속도·프로젝트 이름·도구 누락을 확인해 수정하겠다고 실제 답변했습니다.",
+    "details": "현재 진행답변 기록. 아직 수정/검증 완료를 주장하지 않았습니다.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "최신 main 갱신",
+    "현재 운영규칙 및 공지목록7개 동일버전 확인",
+    "도구 접근성 독립 읽기검토 분업"
+  ],
+  "verification": [
+    {
+      "name": "새 설치본 실제 화면/기능",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [
+    "현재 디자인·갱신·도구 경로 확인",
+    "구현 및 실제 화면검증·설치"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

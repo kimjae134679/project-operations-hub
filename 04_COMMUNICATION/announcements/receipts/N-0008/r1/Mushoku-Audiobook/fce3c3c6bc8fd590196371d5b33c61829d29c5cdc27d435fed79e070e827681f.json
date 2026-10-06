@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 1,
+  "contentSha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "checkedAt": "2026-10-06T09:13:04.933449+00:00",
+  "applicationStatus": "applied",
+  "note": "루트 사용안내를 읽고 새 MP3·원본 표본·이전판·자동복구·본편 일시정지의 실제 위치와 행동을 갱신하여 Git에 반영했다.",
+  "evidence": [
+    "../프로젝트_사용안내.md"
+  ],
+  "appliedAt": "2026-10-06T09:24:24.526845+00:00"
+}

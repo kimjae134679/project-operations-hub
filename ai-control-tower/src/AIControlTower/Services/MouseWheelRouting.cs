@@ -28,7 +28,8 @@ public static class MouseWheelRouting
     }
 
     private static bool IsNativeInteraction(DependencyObject value) =>
-        value is TextBoxBase or PasswordBox or ComboBox or ComboBoxItem or Popup or RangeBase or MenuBase;
+        value is not RichTextBox { IsReadOnly:true, VerticalScrollBarVisibility:ScrollBarVisibility.Disabled }
+        && value is TextBoxBase or PasswordBox or ComboBox or ComboBoxItem or Popup or RangeBase or MenuBase;
 
     private static bool CanScroll(ScrollViewer viewer, int delta) =>
         viewer.IsVisible && viewer.IsEnabled && viewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "task20261006-silent-startup-remote-recovery",
+  "revision": 1,
+  "title": "부팅 콘솔·종료 방해 조사와 원격 자동 복구",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-startup-recovery",
+  "receivedAt": "2026-10-06T18:06:54+09:00",
+  "updatedAt": "2026-10-06T18:13:30.466988+09:00",
+  "request": {
+    "summary": "부팅 CMD·PowerShell과 종료 방해를 조사·정리하고 원격 연결 자동 시작·복구·관리 앱 종료를 구현. 남은 작업 마무리.",
+    "details": "원격 연결은 컴퓨터 로그인 직후 시작하고 비정상 종료는 복구, 관리 앱에서 의도적으로 끄면 이번 로그인 동안 유지. 소통 게시글·중립 디자인·도구·프로젝트 안내 개편도 완료.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "AI 자동 실행 일부가 부팅 창 원인. 종료 방해 프로그램은 아직 확정하지 못함. 화면 QA는 통과, 시작 방식과 감시기 수정 진행.",
+    "details": "실제 전달한 진행 답변 요약. 최종 답변 대기.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "현재 시작 파일·예약 작업·프로세스와 이벤트 기록 조사",
+    "기존 UI119테스트·33테마 검사·11도구·9안내 확인",
+    "오디오북 공지 전달 오류 재시도 해결 확인"
+  ],
+  "verification": [
+    {
+      "name": "기존 화면 개편 실제 QA",
+      "result": "pass",
+      "evidence": [
+        "D:\\A_KJ\\AI\\Workspace\\control-tower-resume-qa-20261006\\ui-verification.json"
+      ]
+    }
+  ],
+  "nextActions": [
+    "원격 복구 감시기 구현·검증",
+    "자동 시작 항목 숨김 정리",
+    "설치·GitHub·소통 기록 완료"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

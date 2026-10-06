@@ -15,3 +15,5 @@
 - `TASK_EXCHANGE.template.json`: 받은 명령·실제 답변·결과의 공식 기록 양식
 - `TASK_EXCHANGE.schema.json`: 구조화 기록 스키마
 - `TASK_EXCHANGE.md`: 버전·상태·도우미와 사람용 요약 작성법
+
+- PROJECT_GUIDE.md: 실제 프로젝트의 자료 위치·설명·사용 행동을 쓰는 기준. 프로젝트 루트 프로젝트_사용안내.md로 작성하고 AI 시작 시 읽습니다.

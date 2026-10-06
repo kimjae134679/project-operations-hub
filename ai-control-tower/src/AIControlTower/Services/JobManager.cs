@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text.Json;
 using AIControlTower.Models;
 
@@ -151,7 +151,7 @@ public sealed class JobManager
             try { job.Cancellation.Cancel(); job.Group.Terminate(); }
             catch (ObjectDisposedException) { continue; }
             // Shutdown must not depend on a dispatcher continuation to terminate a child.
-            try { if (!job.Process.HasExited) { job.Process.Kill(true); job.Process.WaitForExit(3000); } }
+            try { if (!job.Process.HasExited) { job.Process.Kill(true); } }
             catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception) { }
         }
     }

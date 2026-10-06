@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0006",
+  "revision": 1,
+  "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "checkedAt": "2026-10-06T02:51:39.716901+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "현재 담당은 도구 표시 구현으로 게임·서버를 수정하지 않는다. 소스·배포·서버 역할과 실제 서버 경로 구분을 실제 읽었다.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs",
+    "_통합소통/보낼자료/task-40657a46af4d06b55a1c301b13ff2798ced500b7bcbf7d490b063f0df3b43522-r1.json"
+  ]
+}

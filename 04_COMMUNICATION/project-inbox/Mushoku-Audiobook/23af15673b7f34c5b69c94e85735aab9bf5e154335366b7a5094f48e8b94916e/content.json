@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "Mushoku-Audiobook-20261006-source-wide-voice-rebuild",
+  "revision": 2,
+  "title": "전체 17개 영상 표본 재추출 및 록시 외 음성 재제작",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "receivedAt": "2026-10-06T11:51:21+09:00",
+  "updatedAt": "2026-10-06T18:24:23.758302+09:00",
+  "request": {
+    "summary": "이미 내려받은 영상 음원을 전부 활용하여 표본부터 다시 정리하고 록시 외 목소리를 다시 만들 것",
+    "details": "록시는 기존 선호 기준 유지\n일부 영상만 추출한 기존 표본 정리 범위는 불충분\n기존 제작과 새 참조 후보 및 새 한국어 비교 MP3를 분리",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "MP3 17개·전체 음원 목록·사용안내·Git 반영을 마쳤다고 실제 진행 답변함",
+    "details": "오디오북 담당 /root. 17개 기존 영상에서 2,149개 새 원본 음성 후보를 정리했고, 새 한국어 비교 16개와 록시 3.2초 원본 대조 1개를 완성했다. 무직전생.exe의 목소리 비교·전체 음원에서 한 창으로 재생·이전/다음 이동한다. 이전 비교는 보관함으로 분리했다. 코드와 안내 GitHub 반영 및 원격 commit 3b8f33064ed83470f624ae6c6275a29caf02041e 일치 확인. 본편 제작은 일시정지 상태이고 새 연기의 사용자 청취 승인은 아직 아니다. 현재 채팅에 실행 위치와 완료 상태를 답변했다.",
+    "source": "current_chat"
+  },
+  "status": "completed",
+  "workDone": [
+    "17개 기존 영상의 전체 비보류 구간 재전사·2,149개 원본 후보 SHA 검증·화자 후보별/회차별 표본 뷰어",
+    "11개 역할 참조 배경 분리 및 3개 원본 전투 상황 표본 보존",
+    "VoxCPM2 8개·Qwen3 6개·CosyVoice3 2개 한국어 새 비교와 록시 변경 없는 대조 1개 MP3 완료",
+    "같은 음원의 WAV/MP3 형식을 한 항목으로 묶어 현재 비교 17개 표시·이전 비교 원본 보존 보관",
+    "단일 창 전체 음원·목소리 비교·원본 표본 이동, 이전/다음·문장 재생 및 좁은 화면 표시",
+    "프로젝트_사용안내.md·최신 인수인계·실행/복구 문서 갱신",
+    "완료 파일 해시 재검사 후 무합성 종료·PID 출생시각으로 재사용 구별·중단 산출물 보존·본인 작업 자식 창 숨김",
+    "코드/문서만 GitHub commit 3b8f33064ed83470f624ae6c6275a29caf02041e 반영, 원본·미디어·비공개 JSON Git 제외·본편 pause 보존"
+  ],
+  "verification": [
+    {
+      "name": "source_and_roxy_hashes",
+      "result": "pass",
+      "evidence": [
+        "voice_resource_pack/rebuild/20261006_전체영상_재추출/verification.json",
+        "comparison/01_CURRENT/20261006_영상원본_음색재제작/auditions.json: Roxy SHA a0c997a889c1bc2ffd5ba7f3fa75b2d3d964c5aca043df18aaa8eb25c676757b"
+      ]
+    },
+    {
+      "name": "17_mp3_decode_and_asr",
+      "result": "pass",
+      "evidence": [
+        "comparison/01_CURRENT/20261006_영상원본_음색재제작/quality_checks.json",
+        "comparison/01_CURRENT/20261006_영상원본_음색재제작/rebuild_status.json",
+        "temp/source_rebuild_git_final.json:17 MP3/WAV hashes rechecked"
+      ]
+    },
+    {
+      "name": "catalog_and_ui",
+      "result": "pass",
+      "evidence": [
+        "reference_lab/catalog/catalog.json:current 17; source bytes and mtimes unchanged",
+        "comparison/01_CURRENT/20261006_영상원본_음색재제작/verification/ui_checks.json:24 pass",
+        "temp/app_check.json"
+      ]
+    },
+    {
+      "name": "completed_resume_and_pid_reuse",
+      "result": "pass",
+      "evidence": [
+        "temp/final_catalog_and_resume_check.log:ALREADY_COMPLETE",
+        "temp/record_rebuild_finish_1811.py:current birth match and mismatched birth tests passed"
+      ]
+    },
+    {
+      "name": "git_remote_and_pause",
+      "result": "pass",
+      "evidence": [
+        "temp/source_rebuild_git_final.json:HEAD/remote 3b8f33064ed83470f624ae6c6275a29caf02041e",
+        "output/production_15_24/pause.flag",
+        "프로젝트_사용안내.md",
+        "00_START_HERE/CURRENT_HANDOFF.md"
+      ]
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}

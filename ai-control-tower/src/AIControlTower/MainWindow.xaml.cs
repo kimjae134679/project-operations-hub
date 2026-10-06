@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using AIControlTower.Models;
@@ -93,7 +93,7 @@ public partial class MainWindow : Window
         ProjectHeaderBody.Margin = new Thickness(0,0,7,compact ? 2 : 18);
         ProjectHeader.Margin = new Thickness(0, 0, 0, compact ? 12 : 16);
         ProjectTitle.FontSize = narrow ? 27 : 32;
-        ProjectDescription.MaxHeight = compact ? 22 : 44;
+        ProjectDescription.MaxHeight = compact ? 44 : 60;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
         JobLogList.Height = compact ? 65 : 100;
         ReceiptList.MaxHeight = compact ? 80 : 130;
@@ -167,9 +167,31 @@ public partial class MainWindow : Window
         FadeIn(WorkspaceContent);
     }
 
+    private bool _articleExpanded;
+    private void ToggleArticleWidth_Click(object sender, RoutedEventArgs e)
+    {
+        _articleExpanded = !_articleExpanded;
+        ArticleListPanel.Visibility = _articleExpanded ? Visibility.Collapsed : Visibility.Visible;
+        ArticleListColumn.Width = new GridLength(_articleExpanded ? 0 : 320);
+        ArticleGapColumn.Width = new GridLength(_articleExpanded ? 0 : 18);
+        ArticleExpandButton.Content = _articleExpanded ? "목록 함께 보기" : "본문 넓게";
+    }
+    private void OpenProjectGuide_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.SelectedProject is { } project)
+            new ProjectGuideWindow(project.DisplayName, project.Path) { Owner = this }.Show();
+    }
+    private void OpenTool_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: ToolStatusViewModel tool }) return;
+        if (tool.RawName == "Jev Router") { Jev_Click(sender, e); return; }
+        _viewModel.OpenTool(tool.Id);
+    }
+
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
-    private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true); }
+    private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(true); await _viewModel.RefreshServerAsync(true); }
+    private void OpenServerGuide_Click(object sender,RoutedEventArgs e) => new ProjectGuideWindow("멀티의 신 서버",_viewModel.ServerRootPath) { Owner=this }.Show();
     private void OpenServerFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerFolder();
     private void OpenServerMailbox_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerMailbox();
     private void OpenServerSource_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(false);
@@ -197,6 +219,11 @@ public partial class MainWindow : Window
     private async void Discover_Click(object sender, RoutedEventArgs e) => await _viewModel.DiscoverAsync();
     private async void ConsolidateRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.ConsolidateRemoteStartupAsync();
     private async void EnsureRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.EnsureRemoteRunningAsync();
+    private async void StopRemote_Click(object sender, RoutedEventArgs e)
+    {
+        if (MessageBox.Show(this, "원격 연결을 끄면 연결된 AI의 PC 작업도 끊깁니다. 이번 로그인 동안은 자동 복구를 멈추고, 다음 로그인에는 다시 켭니다.", "원격 연결 중지", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+            await _viewModel.StopRemoteRunningAsync();
+    }
     private void OpenProject_Click(object sender, RoutedEventArgs e) => _viewModel.OpenProject();
     private void OpenProgram_Click(object sender, RoutedEventArgs e) => _viewModel.OpenProgram();
     private async void LaunchProgram_Click(object sender, RoutedEventArgs e) => await _viewModel.ActivateSelectedProgramAsync();
@@ -253,7 +280,7 @@ public partial class MainWindow : Window
     private async void Uninstall_Click(object sender, RoutedEventArgs e)
     {
         var path = ResolveInstallPath();
-        if (MessageBox.Show(this, "관제탑의 자동 시작 등록과 설치 폴더를 제거합니다.\n프로젝트 폴더는 그대로 유지됩니다.\n\n" + path, "관제탑 제거", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK) return;
+        if (MessageBox.Show(this, "관리 화면의 자동 시작을 제거합니다.\n원격 연결·자동 복구·프로젝트 자료와 실행 파일은 유지합니다.\n\n" + path, "관제탑 제거", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK) return;
         var result = await _installationService.UninstallAsync(path, CancellationToken.None);
         MessageBox.Show(this, result.Detail, "관제탑 제거", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }
