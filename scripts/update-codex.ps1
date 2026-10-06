@@ -21,15 +21,17 @@ function Test-BridgeControl {
  }while([DateTime]::UtcNow -lt $deadline)
  if(!$status -or !$status.localReady){throw 'Bridge local channel did not become ready'}
  $jobId='repair-check-'+[guid]::NewGuid().ToString('N')
- $job=@{id=$jobId;target='PC';deviceId=$status.device;projectId='Control-Tower';toolId='codex-repair-self-check';createdAt=[DateTimeOffset]::UtcNow.ToString('o');expiresAt=[DateTimeOffset]::UtcNow.AddMinutes(5).ToString('o');action='run_command';args=@{cwd=$root;python='print("REMOTE_CONTROL_OK")';timeoutSeconds=20}}
+ # Python 3.10 ISO parsing accepts six fractional digits, not .NET's seven.
+ $timeFormat="yyyy-MM-dd'T'HH:mm:ss.ffffffzzz"
+ $job=@{id=$jobId;target='PC';deviceId=$status.device;projectId='Control-Tower';toolId='codex-repair-self-check';createdAt=[DateTimeOffset]::UtcNow.ToString($timeFormat,[Globalization.CultureInfo]::InvariantCulture);expiresAt=[DateTimeOffset]::UtcNow.AddMinutes(5).ToString($timeFormat,[Globalization.CultureInfo]::InvariantCulture);action='run_command';args=@{cwd=$root;python='print("REMOTE_CONTROL_OK")';timeoutSeconds=20}}
  Invoke-RestMethod -Method Post -Uri ($endpoint.baseUrl+'/v1/jobs') -Headers $headers -ContentType 'application/json' -Body ($job|ConvertTo-Json -Depth 8 -Compress) -TimeoutSec 10|Out-Null
  $deadline=[DateTime]::UtcNow.AddSeconds(35)
  do {
   $result=Invoke-RestMethod -Uri ($endpoint.baseUrl+'/v1/jobs/'+$jobId) -Headers $headers -TimeoutSec 5
-  if($result.state -in @('completed','failed','stopped','timed_out','interrupted')){break}
+  if($result.result){break}
   Start-Sleep -Milliseconds 250
  }while([DateTime]::UtcNow -lt $deadline)
- if($result.state -ne 'completed' -or !$result.result.data.succeeded -or $result.result.data.stdout -notmatch 'REMOTE_CONTROL_OK'){throw ('Bridge command self-check failed; job '+$jobId+' state '+$result.state)}
+ if($result.result.outcome -ne 'completed' -or !$result.result.data.succeeded -or $result.result.data.stdout -notmatch 'REMOTE_CONTROL_OK'){throw ('Bridge command self-check failed; job '+$jobId+' state '+$result.state+' outcome '+$result.result.outcome)}
  return @{localReady=$true;commandRoundtrip='pass';relayConnected=[bool]$status.relayConnected;jobId=$jobId}
 }
 function Invoke-Quiet([string]$file,[string[]]$arguments,[string]$name,[int]$timeout=600){
