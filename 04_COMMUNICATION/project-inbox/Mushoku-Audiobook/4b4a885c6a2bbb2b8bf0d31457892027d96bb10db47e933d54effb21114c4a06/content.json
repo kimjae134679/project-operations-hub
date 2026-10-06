@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "Mushoku-Audiobook-20261006-all-sample-catalog",
+  "revision": 1,
+  "title": "흩어진 전체 표본 정리와 새 본편 음원 위치 안내",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "receivedAt": "2026-10-06T11:44:27+09:00",
+  "updatedAt": "2026-10-06T11:48:04.491320+09:00",
+  "request": {
+    "summary": "이전에 더 많았던 표본을 찾아 정리하고 이번 음원 위치를 안내",
+    "details": "이전 표본·현재 표본·생성중 본편을 혼동하지 않게 접근경로 정리. 기존 원본과 선호참조 보존, 바탕화면 금지.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "이번 본편 저장 폴더와 6개 완성 화를 안내했고 이전 비교 표본도 남아 있다고 답변",
+    "details": "실제 진행답변:144·145·147·148·149·150완료,152검사중,146·151보류. 현재비교7/기준6/과거비교65MP3 확인. 전체목록 작성 진행이라고 알림.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "현재 본편·표본 폴더 실제 확인",
+    "과거 비교·기준·개별 실험 WAV와 MP3 보존 확인"
+  ],
+  "verification": [
+    {
+      "name": "실제 파일과 제작상태 확인",
+      "result": "pass",
+      "evidence": [
+        "output/production_15_24/status.json와 실제 audiobooks/01_CURRENT MP3 대조",
+        "comparison/01_CURRENT 7MP3,02_BASELINES6MP3,90_ARCHIVE65MP3"
+      ]
+    }
+  ],
+  "nextActions": [
+    "전체 표본 색인과 프로그램 단일창 진입점 생성 및 검증"
+  ],
+  "blockers": [],
+  "supersedes": []
+}
