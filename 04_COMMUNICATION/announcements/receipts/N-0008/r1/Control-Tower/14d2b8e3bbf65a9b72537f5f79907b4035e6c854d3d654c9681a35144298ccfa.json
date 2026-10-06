@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 1,
+  "contentSha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-startup-recovery",
+  "checkedAt": "2026-10-06T03:06:30.241279+00:00",
+  "applicationStatus": "applied",
+  "note": "로컬 프로젝트 안내를 실제 읽고 9개 연결·QA를 확인. 이번 시작/복구 변경 안내도 프로젝트 로컬 안내에 반영.",
+  "evidence": [],
+  "appliedAt": "2026-10-06T09:14:38.333558+00:00"
+}
