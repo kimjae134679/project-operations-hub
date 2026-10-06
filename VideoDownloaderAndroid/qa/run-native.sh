@@ -18,4 +18,10 @@ adb shell am instrument -w kr.co.kjw.videodownloader/.SmokeInstrumentation | tee
 grep -q 'PASS: UI bridge' ../dist/qa/native.txt
 if grep -q 'FAIL:' ../dist/qa/native.txt; then exit 1; fi
 adb shell am start -n kr.co.kjw.videodownloader/.MainActivity
-sleep 1
+for attempt in $(seq 1 30); do
+  adb shell uiautomator dump /sdcard/vd-window.xml >/dev/null
+  adb pull /sdcard/vd-window.xml ../dist/qa/android-window.xml >/dev/null
+  if grep -q '링크 추가' ../dist/qa/android-window.xml; then break; fi
+  sleep 1
+done
+grep -q '링크 추가' ../dist/qa/android-window.xml
