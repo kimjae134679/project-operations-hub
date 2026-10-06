@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using AIControlTower.Models;
@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private readonly MainViewModel _viewModel;
     private readonly InstallationService _installationService = new();
     private JevControlWindow? _jevWindow;
+    private NoticeReceiptsWindow? _receiptWindow;
     private ListBox? _activeProgramList;
     private Task? _initializeTask;
     private double _catalogOffset;
@@ -96,7 +97,7 @@ public partial class MainWindow : Window
         ProjectDescription.MaxHeight = compact ? 44 : 60;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
         JobLogList.Height = compact ? 65 : 100;
-        ReceiptList.MaxHeight = compact ? 80 : 130;
+
         LogPanel.Margin = new Thickness(0, compact ? 8 : 14, 0, 0);
         var hideMetadata = compact && _viewModel.HasSelectedCommands;
         ProgramInspector.Padding = new Thickness(compact ? 14 : 20);
@@ -165,6 +166,7 @@ public partial class MainWindow : Window
     {
         if (e.OriginalSource != sender || WorkspaceContent is null) return;
         FadeIn(WorkspaceContent);
+        if (CommunicationTab.IsSelected) _viewModel.MarkCommunicationViewed();
     }
 
     private bool _articleExpanded;
@@ -175,6 +177,14 @@ public partial class MainWindow : Window
         ArticleListColumn.Width = new GridLength(_articleExpanded ? 0 : 320);
         ArticleGapColumn.Width = new GridLength(_articleExpanded ? 0 : 18);
         ArticleExpandButton.Content = _articleExpanded ? "목록 함께 보기" : "본문 넓게";
+    }
+    private void OpenNoticeReceipts_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.NoticeReceiptFilter = (sender as FrameworkElement)?.Tag as string ?? "전체";
+        if (_receiptWindow is { IsLoaded: true }) { _receiptWindow.Activate(); return; }
+        _receiptWindow = new NoticeReceiptsWindow(_viewModel) { Owner = this };
+        _receiptWindow.Closed += (_,_) => _receiptWindow = null;
+        _receiptWindow.Show();
     }
     private void OpenProjectGuide_Click(object sender, RoutedEventArgs e)
     {

@@ -7,6 +7,7 @@ public sealed partial class MainViewModel
 {
     public void OpenTool(string name)
     {
+        if (name == "project-bridge") { PcConnection.OpenJobsCommand.Execute(null); return; }
         if(name is "voicestudio" or "zonos2")
         {
             var folder=Path.Combine(@"D:\A_KJ\AI\Applications",name=="voicestudio" ? "VoiceStudio" : "Zonos2");

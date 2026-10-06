@@ -25,6 +25,11 @@ public static class ThemeService
     // Neutral surfaces; blue-violet is reserved for emphasis and focus.
     internal static Dictionary<string, string> Palette(bool dark) => dark ? new()
     {
+        ["StatusRunningFace"]="#153D3A", ["StatusRunningInk"]="#9BE8D0",
+        ["StatusSuccessFace"]="#24374A", ["StatusSuccessInk"]="#C4DFFF",
+        ["StatusWarningFace"]="#46371B", ["StatusWarningInk"]="#FFD88C",
+        ["StatusErrorFace"]="#4A2530", ["StatusErrorInk"]="#FFC3CE",
+        ["StatusNeutralFace"]="#303440", ["StatusNeutralInk"]="#D9DEEB",
         ["CanvasBrush"]="#15171D",
         ["SurfaceBrush"]="#1D2028",
         ["RaisedBrush"]="#262A35",
@@ -58,6 +63,11 @@ public static class ThemeService
         ["HighlightBrush"]="#00FFFFFF"
     } : new()
     {
+        ["StatusRunningFace"]="#E0F3EB", ["StatusRunningInk"]="#16644E",
+        ["StatusSuccessFace"]="#E5EFFA", ["StatusSuccessInk"]="#285682",
+        ["StatusWarningFace"]="#FFF0CC", ["StatusWarningInk"]="#7B5310",
+        ["StatusErrorFace"]="#FCE5E9", ["StatusErrorInk"]="#A12643",
+        ["StatusNeutralFace"]="#E9ECF2", ["StatusNeutralInk"]="#515C70",
         ["CanvasBrush"]="#F2F4F8",
         ["SurfaceBrush"]="#FFFFFF",
         ["RaisedBrush"]="#EBEEF4",
@@ -112,3 +122,4 @@ public static class ThemeService
         ["HeroFace"]=["#F4F5FB","#F4F5FB"]
     };
 }
+

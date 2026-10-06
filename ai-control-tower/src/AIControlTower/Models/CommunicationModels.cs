@@ -31,6 +31,7 @@ public sealed record CommunicationInboxItem(string ProjectId, string ContentSha2
     [JsonIgnore] public string Title { get; init; } = "";
     [JsonIgnore] public string Preview { get; init; } = "";
     [JsonIgnore] public string? Body { get; init; }
+    [JsonIgnore] public bool IsThread { get; init; }
 }
 public sealed record CommunicationIssue(string? ProjectId, string Code, string Message);
 public sealed record CommunicationSnapshot(IReadOnlyList<CommunicationNotice> Notices,

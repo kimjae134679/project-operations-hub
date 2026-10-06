@@ -17,6 +17,36 @@ public sealed class CommunicationServiceTests : IDisposable
     private CommunicationTarget Target => new("PhoneLOL", Project, "멀티의 신");
     private CommunicationService Service() => new(TimeSpan.Zero);
 
+    [Fact]
+    public async Task ExistingThreadDocumentsAppearWithoutChangingTheirSourceOrClaimingReading()
+    {
+        var room=Path.Combine(Hub,"04_COMMUNICATION","threads","T-1-room");
+        Directory.CreateDirectory(room);
+        var path=Path.Combine(room,"THREAD.md");
+        var raw=Encoding.UTF8.GetBytes("# Room\r\n## 2026-10-06 KST — Post\r\n작성자: Sol\r\nBody\r\n");
+        File.WriteAllBytes(path,raw);
+        File.WriteAllText(Path.Combine(room,"README.md"),"Not a post");
+        var result=await Service().Sync(Hub,[]);
+        var thread=Assert.Single(result.InboxItems);
+        Assert.True(thread.IsThread);
+        Assert.Equal("Room",thread.Title);
+        Assert.Equal("Shared-Communication",thread.ProjectId);
+        Assert.Equal(raw,File.ReadAllBytes(path));
+        Assert.Empty(result.Receipts);
+        Assert.DoesNotContain(thread.CentralPath,result.PublishablePaths);
+    }
+
+    [Fact]
+    public async Task ThreadContainingCredentialIsHeldBeforeDisplay()
+    {
+        var room=Path.Combine(Hub,"04_COMMUNICATION","threads","T-1-room");
+        Directory.CreateDirectory(room);
+        File.WriteAllText(Path.Combine(room,"THREAD.md"),"# Room\naccess_token=private-value-keep-offscreen\n");
+        var result=await Service().Sync(Hub,[]);
+        Assert.Empty(result.InboxItems);
+        Assert.Contains(result.Errors,e=>e.Code=="secret_held");
+    }
+
     public CommunicationServiceTests()
     {
         Directory.CreateDirectory(Board); Directory.CreateDirectory(Project);

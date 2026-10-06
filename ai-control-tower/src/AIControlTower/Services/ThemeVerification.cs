@@ -36,7 +36,7 @@ internal static class ThemeVerification
                         var colors = CheckRenderedText(window);
                         results.Add(new { Theme = mode, Layout = layout.Name, Tab = tab, TextCount = colors.Count, MinimumContrast = colors.DefaultIfEmpty(21).Min() });
                         UiVerification.Capture(window, Path.Combine(output,$"{mode}-{layout.Name}-{tab}.png"));
-                        if (tab == 2)
+                        if (tabs.SelectedItem == window.FindName("NoticeTab"))
                         {
                             var reader=(RichTextBox)window.FindName("NoticeBody");
                             var expected=(SolidColorBrush)window.FindResource("TextBrush");
@@ -58,6 +58,16 @@ internal static class ThemeVerification
                     UiVerification.Capture(jev,Path.Combine(output,mode+"-jev.png"));
                 }
                 finally { jev.Close(); }
+                var receipts = new NoticeReceiptsWindow(vm) { Owner = window };
+                try
+                {
+                    receipts.Show();
+                    await receipts.Dispatcher.InvokeAsync(receipts.UpdateLayout,DispatcherPriority.Render);
+                    var colors=CheckRenderedText(receipts);
+                    results.Add(new { Theme=mode, Window="공지 확인 현황",TextCount=colors.Count,MinimumContrast=colors.DefaultIfEmpty(21).Min() });
+                    UiVerification.Capture(receipts,Path.Combine(output,mode+"-notice-receipts.png"));
+                }
+                finally { receipts.Close(); }
                 if(vm.SelectedProject!=project || vm.SelectedProgram!=program || vm.ProjectSearch!=projectSearch || vm.ProgramSearch!=programSearch)
                     throw new InvalidOperationException("Theme switching changed the selected task or search.");
             }

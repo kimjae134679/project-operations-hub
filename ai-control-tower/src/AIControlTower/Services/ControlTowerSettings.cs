@@ -17,7 +17,8 @@ public sealed class ControlTowerSettings
     public string MultiplayerServerRoot { get; set; } = @"C:\Users\user\Documents\MultiGod\PhoneLOL_LocalRuntime";
     [System.Text.Json.Serialization.JsonIgnore]
     public bool IsTemporary { get; set; }
-    public static string DataDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AIControlTower");
+    public static string DataDirectory => Environment.GetEnvironmentVariable("AI_CONTROL_TOWER_DATA") is { Length: > 0 } configured && Path.IsPathFullyQualified(configured)
+        ? Path.GetFullPath(configured) : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AIControlTower");
     public static string SettingsPath => Path.Combine(DataDirectory, "settings.json");
     public static ControlTowerSettings Load()
     {

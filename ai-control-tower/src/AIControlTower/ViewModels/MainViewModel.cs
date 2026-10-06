@@ -8,6 +8,7 @@ namespace AIControlTower.ViewModels;
 
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
+    public PcConnectionViewModel PcConnection { get; } = new();
     private readonly IReadOnlyList<IStatusProvider> _providers;
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private readonly SemaphoreSlim _discoveryLock = new(1, 1);
@@ -19,6 +20,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
     private readonly DispatcherTimer _timer;
     private readonly DispatcherTimer _serverLiveTimer;
+    private readonly DispatcherTimer _pcLiveTimer;
     private readonly Dispatcher _dispatcher;
     private readonly CancellationTokenSource _lifetime = new();
     private readonly Dictionary<string, string> _programStates = new(StringComparer.OrdinalIgnoreCase);
@@ -40,16 +42,18 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true)
     {
         _settings = settings ?? ControlTowerSettings.Load();
+        _settings.AutoCommunication = true;
         InitializeCommunication();
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
         var runner = new ProcessRunner();
-        _providers = [new DesktopCommanderStatusProvider(runner), new JevStatusProvider(runner), new CodexStatusProvider(runner),
+        _providers = [new ProjectBridgeStatusProvider(), new DesktopCommanderStatusProvider(runner), new JevStatusProvider(runner), new CodexStatusProvider(runner),
             new GitHubCliStatusProvider(runner), new N8nStatusProvider(runner), new AiOpsRunnerStatusProvider(runner), new DeliveryChainProvider(runner), new InstalledToolStatusProvider("aider"), new InstalledToolStatusProvider("hyperframes"), new InstalledToolStatusProvider("voicestudio"), new InstalledToolStatusProvider("zonos2")];
         _jobs.Log += OnJobLog;
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         _timer.Tick += async (_, _) =>
         {
             UpdateRunningProperties();
+            await PcConnection.PollAsync();
             await RefreshServerAsync();
             if (AutoCommunication) await SyncCommunicationAsync();
             if (_needsDiscovery || DateTime.UtcNow - _lastScan > TimeSpan.FromMinutes(1)) await DiscoverAsync();
@@ -57,11 +61,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         };
         _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(RosterRefreshSeconds) };
         _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
+        _pcLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+        _pcLiveTimer.Tick += async (_, _) => await PcConnection.PollAsync();
         if (enablePolling)
         {
             JobManager.RecoverInterruptedRuns();
             if (!_settings.IsTemporary) _timer.Start();
             _serverLiveTimer.Start();
+            _pcLiveTimer.Start();
         }
     }
     public ObservableCollection<ProjectItem> Projects { get; } = [];
@@ -211,6 +218,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         try
         {
             IsRefreshing = true;
+            await PcConnection.PollAsync();
             var results = await Task.WhenAll(_providers.Select(provider => provider.CheckAsync(_lifetime.Token)));
             if (_disposed) return;
             foreach (var result in results)
@@ -364,7 +372,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog;
+        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _pcLiveTimer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog; PcConnection.Dispose();
         // Semaphores remain available for in-flight finally blocks during shutdown.
     }
 }

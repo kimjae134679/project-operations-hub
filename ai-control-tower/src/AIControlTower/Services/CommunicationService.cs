@@ -257,6 +257,22 @@ public sealed class CommunicationService
     private async Task ReadCentral(string root, Board board, List<CommunicationReceiptItem> receipts,
         List<CommunicationInboxItem> items, HashSet<string> publish, List<CommunicationIssue> errors, CancellationToken ct)
     {
+        // Existing public project rooms are readable alongside collected task records.
+        // These documents remain untouched and are not manufactured as comments/receipts.
+        foreach(var path in EnumerateSafe(Inside(root,"04_COMMUNICATION/threads"),errors,null,10000))
+        {
+            if(!Path.GetFileName(path).Equals("THREAD.md",StringComparison.OrdinalIgnoreCase)) continue;
+            try
+            {
+                var body=await ReadText(path,ct).ConfigureAwait(false);
+                if(HasSecret(body)) { Hold(errors,null,"secret_held"); continue; }
+                var relative=Path.GetRelativePath(root,path).Replace('\\','/');
+                var title=body.Split('\n').FirstOrDefault(l=>l.StartsWith("# "))?.TrimStart('#',' ') ?? Path.GetFileName(Path.GetDirectoryName(path))!;
+                items.Add(new("Shared-Communication",ContentHash(body),relative,relative,new DateTimeOffset(File.GetLastWriteTimeUtc(path),TimeSpan.Zero))
+                    { Body=body,Title=title,Preview="공용 소통방의 게시글",IsThread=true });
+            }
+            catch(Exception ex) when(IsFileError(ex)) { Hold(errors,null,"thread_retry"); }
+        }
         var receiptRoot = Inside(root, "04_COMMUNICATION/announcements/receipts");
         foreach (var path in EnumerateSafe(receiptRoot, errors, null, 10000))
         {

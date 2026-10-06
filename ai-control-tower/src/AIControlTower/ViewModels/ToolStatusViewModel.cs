@@ -10,6 +10,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     public string RawName => _status.DisplayName;
     public string DisplayName => RawName switch
     {
+        "ProjectBridge" => "ProjectBridge · 공용 PC 작업",
         "Remote Desktop Commander" => "Remote Desktop Commander · PC 원격 연결",
         "Jev Router" => "Jev Router · AI 작업 분배",
         "Codex" => "Codex · AI 코드 작업",
@@ -27,6 +28,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     public bool IsUserFacing => true;
     public string ActionLabel => Id switch
     {
+        "project-bridge" => "공용 PC 작업",
         "desktop-commander" => "원격 연결 화면",
         "jev" => "Jev 작업 전달",
         "n8n" => "자동화 화면",
@@ -35,6 +37,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     };
     public string Category => Id switch
     {
+        "project-bridge" => "PC 연결",
         "desktop-commander" => "PC 연결",
         "jev" or "codex" or "aider" => "AI 작업",
         "github-cli" => "저장소",
@@ -45,6 +48,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     };
     public string Purpose => RawName switch
     {
+        "ProjectBridge" => "여러 도구와 프로젝트가 같은 PC 연결에서 파일·빌드·명령·화면 작업을 나눠 처리합니다.",
         "Remote Desktop Commander" => "AI가 이 PC에서 작업할 수 있게 연결합니다. 현재 연결을 공유해 사용합니다.",
         "Jev Router" => "작업에 맞는 AI 모델을 고르는 선택 도구입니다. 실제 작업 왕복은 아직 확인하지 않았습니다.",
         "Codex" => "프로젝트 코드를 읽고 고치는 AI 작업 도구입니다.",
