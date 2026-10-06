@@ -1,0 +1,40 @@
+{
+  "actorId": "ProjectBridge/KJW-80ea388278fd",
+  "blockers": [
+    "prerequisite_failed"
+  ],
+  "nextActions": [
+    "로컬 기록 확인 후 새 작업 ID로 요청"
+  ],
+  "projectId": "Mushoku-Audiobook",
+  "receivedAt": "2026-10-06T13:21:22+00:00",
+  "recordId": "bridge-20261006-qa-v1-audit",
+  "recordType": "task_exchange",
+  "request": {
+    "details": "사용자가 요청한 프로젝트 전용 작업 큐",
+    "source": "04_COMMUNICATION/remote-bridge/queue.json",
+    "summary": "원본 표본 점검"
+  },
+  "response": {
+    "details": "{\"code\": \"prerequisite_failed\"}",
+    "source": "project_bridge_operational_result",
+    "summary": "원본 표본 점검 확인 필요"
+  },
+  "revision": 1,
+  "schemaVersion": 1,
+  "sessionId": "KJW-80ea388278fd",
+  "status": "blocked",
+  "supersedes": [],
+  "title": "원본 표본 점검",
+  "updatedAt": "2026-10-06T14:25:01.120488+00:00",
+  "verification": [
+    {
+      "evidence": [
+        "04_COMMUNICATION/remote-bridge/results/KJW-80ea388278fd/20261006-qa-v1-audit.json"
+      ],
+      "name": "로컬 작업 결과",
+      "result": "fail"
+    }
+  ],
+  "workDone": []
+}
