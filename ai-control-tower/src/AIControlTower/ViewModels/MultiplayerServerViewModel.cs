@@ -4,8 +4,30 @@ using AIControlTower.Services;
 
 namespace AIControlTower.ViewModels;
 
+public sealed record RosterRefreshOption(int Seconds, string Label);
+public sealed record RefreshSpeedOption(int Milliseconds, string Label);
+
 public sealed partial class MainViewModel
 {
+    public RosterRefreshOption[] RosterRefreshOptions { get; } = [new(1,"1초"),new(3,"3초"),new(5,"5초"),new(10,"10초")];
+    public RefreshSpeedOption[] RefreshSpeedOptions { get; } = [new(1000,"빠르게"),new(1400,"보통"),new(2000,"느리게")];
+    public int RosterRefreshSeconds
+    {
+        get => new[]{1,3,5,10}.Contains(_settings.RosterRefreshSeconds) ? _settings.RosterRefreshSeconds : 3;
+        set
+        {
+            if (!new[]{1,3,5,10}.Contains(value) || value==RosterRefreshSeconds) return;
+            _settings.RosterRefreshSeconds=value; _serverLiveTimer.Interval=TimeSpan.FromSeconds(value);
+            SaveSettings(); OnPropertyChanged(); OnPropertyChanged(nameof(RosterStatus));
+        }
+    }
+    public int RefreshTurnMilliseconds
+    {
+        get => new[]{1000,1400,2000}.Contains(_settings.RefreshTurnMilliseconds) ? _settings.RefreshTurnMilliseconds : 1400;
+        set { if (!new[]{1000,1400,2000}.Contains(value) || value==RefreshTurnMilliseconds) return; _settings.RefreshTurnMilliseconds=value; SaveSettings(); OnPropertyChanged(); }
+    }
+    private bool _isRefreshingRosterManually;
+    public bool IsRefreshingRosterManually { get => _isRefreshingRosterManually; private set { if(SetProperty(ref _isRefreshingRosterManually,value)) OnPropertyChanged(nameof(RosterStatus)); } }
     private readonly MultiplayerServerService _serverMonitor = new();
     private readonly SemaphoreSlim _serverLock = new(1,1);
     private DateTime _lastServerCheck = DateTime.MinValue;
@@ -66,14 +88,20 @@ public sealed partial class MainViewModel
     public bool IsUpdatingRoster { get => _isUpdatingRoster; private set { SetProperty(ref _isUpdatingRoster, value); OnPropertyChanged(nameof(RosterStatus)); } }
     public bool RosterHealthy => _rosterHealthy;
     public bool RosterEmpty => _rosterHealthy && ServerPlayers.Count == 0;
-    public string RosterStatus => IsUpdatingRoster ? "접속자 갱신 중…" : _rosterHealth;
+    public string RosterStatus => IsRefreshingRosterManually ? "접속자 확인 중…" : _rosterHealthy ? $"{RosterRefreshSeconds}초마다 자동 갱신" : _rosterHealth;
     public string RosterCheckedAt => _rosterCheckedAt is { } time ? "마지막 확인 " + time.LocalDateTime.ToString("HH:mm:ss") : "";
-    public async Task RefreshRosterAsync()
+    public async Task RefreshRosterAsync(bool manual = false)
     {
-        if (_disposed || !await _rosterLock.WaitAsync(0)) return;
+        if (_disposed) return;
         try
         {
-            IsUpdatingRoster = true;
+            if(manual) await _rosterLock.WaitAsync(_lifetime.Token);
+            else if(!await _rosterLock.WaitAsync(0)) return;
+        }
+        catch(OperationCanceledException) { return; }
+        try
+        {
+            IsUpdatingRoster = true; IsRefreshingRosterManually = manual;
             var result = await _rosterMonitor.FetchAsync(_lifetime.Token);
             _rosterHealthy = result.IsHealthy;
             _rosterHealth = result.IsHealthy ? "1초마다 자동 갱신" : result.Health + (ServerPlayers.Count > 0 ? " · 이전 목록" : "");
@@ -96,7 +124,7 @@ public sealed partial class MainViewModel
             foreach (var property in new[] { nameof(RosterHealthy), nameof(RosterEmpty), nameof(RosterStatus), nameof(RosterCheckedAt) }) OnPropertyChanged(property);
         }
         catch (OperationCanceledException) { }
-        finally { IsUpdatingRoster = false; _rosterLock.Release(); }
+        finally { IsUpdatingRoster = false; IsRefreshingRosterManually = false; OnPropertyChanged(nameof(RosterStatus)); _rosterLock.Release(); }
     }
     public void OpenServerFolder() => OpenExisting(ServerRootPath);
     public void OpenServerMailbox() => OpenExisting(Path.Combine(ServerRootPath,"_통합소통"));

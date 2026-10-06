@@ -1,0 +1,1093 @@
+{
+  "CheckedAt": "2026-10-06T18:35:43.8181673+09:00",
+  "ProjectsCount": 6,
+  "ProgramsCount": 27,
+  "RunningCount": 0,
+  "Project": "PhoneLoL_02",
+  "Program": "\uCD5C\uADFC \uC791\uC5C5\uC6A9 \uC124\uCE58\uD30C\uC77C",
+  "ProgramState": "\uC2E4\uD589 \uC804",
+  "Background": "#FFF2F4F8",
+  "Text": "#FF1F2634",
+  "FontSize": 14,
+  "Controls": [
+    {
+      "Name": "\uC5B4\uB450\uC6B4 \uD654\uBA74",
+      "IsEnabled": true,
+      "ActualWidth": 100,
+      "ActualHeight": 40
+    },
+    {
+      "Name": "\uD504\uB85C\uC81D\uD2B8 \uC0C8\uB85C\uACE0\uCE68",
+      "IsEnabled": true,
+      "ActualWidth": 142,
+      "ActualHeight": 40
+    },
+    {
+      "Name": "\uC0AC\uC6A9 \uC548\uB0B4 \uC77D\uAE30",
+      "IsEnabled": true,
+      "ActualWidth": 112,
+      "ActualHeight": 40
+    },
+    {
+      "Name": "\uD3F4\uB354 \uBCF4\uAE30",
+      "IsEnabled": true,
+      "ActualWidth": 82,
+      "ActualHeight": 40
+    },
+    {
+      "Name": "\uC124\uCE58\uD30C\uC77C \uC704\uCE58 \uBCF4\uAE30",
+      "IsEnabled": true,
+      "ActualWidth": 242,
+      "ActualHeight": 40
+    },
+    {
+      "Name": "\uC124\uCE58\uD30C\uC77C \uC704\uCE58 \uBCF4\uAE30",
+      "IsEnabled": true,
+      "ActualWidth": 0,
+      "ActualHeight": 0
+    },
+    {
+      "Name": "\uC911\uC9C0",
+      "IsEnabled": false,
+      "ActualWidth": 0,
+      "ActualHeight": 0
+    }
+  ],
+  "CompactControls": [
+    {
+      "Name": "\uC2E4\uD589 \uBA85\uB839",
+      "VisibleInsideInspector": true,
+      "Bounds": "15,58,216,42"
+    },
+    {
+      "Name": "\uC120\uD0DD\uD55C \uAC80\uC0AC \uC2E4\uD589",
+      "VisibleInsideInspector": true,
+      "Bounds": "15,108,216,40"
+    },
+    {
+      "Name": "\uC704\uCE58 \uBCF4\uAE30",
+      "VisibleInsideInspector": true,
+      "Bounds": "15,156,156,40"
+    },
+    {
+      "Name": "\uC911\uC9C0",
+      "VisibleInsideInspector": true,
+      "Bounds": "179,156,52,40"
+    }
+  ],
+  "SearchVerified": true,
+  "MouseWheelChecks": [
+    {
+      "Layout": "wide",
+      "List": "projects",
+      "Delta": -240,
+      "Before": 0,
+      "After": 2,
+      "Restored": 0,
+      "ViewportConstrainedForTest": false,
+      "OriginalDeltaPreserved": true
+    },
+    {
+      "Layout": "wide",
+      "List": "programs",
+      "Delta": -240,
+      "Before": 0,
+      "After": 48,
+      "Restored": 0,
+      "ViewportConstrainedForTest": false,
+      "OriginalDeltaPreserved": true
+    },
+    {
+      "Layout": "compact",
+      "List": "projects",
+      "Delta": -240,
+      "Before": 0,
+      "After": 3,
+      "Restored": 0,
+      "ViewportConstrainedForTest": false,
+      "OriginalDeltaPreserved": true
+    },
+    {
+      "Layout": "compact",
+      "List": "programs",
+      "Delta": -240,
+      "Before": 0,
+      "After": 48,
+      "Restored": 0,
+      "ViewportConstrainedForTest": false,
+      "OriginalDeltaPreserved": true
+    }
+  ],
+  "ContrastChecks": [
+    {
+      "Name": "ProjectTitle",
+      "Layout": "wide",
+      "IsVisible": true,
+      "Foreground": "#FF1F2634",
+      "ExpectedTextColor": "#FF1F2634",
+      "MatchesTextBrush": true
+    },
+    {
+      "Name": "InspectorTitle",
+      "Layout": "wide",
+      "IsVisible": true,
+      "Foreground": "#FF1F2634",
+      "ExpectedTextColor": "#FF1F2634",
+      "MatchesTextBrush": true
+    },
+    {
+      "Name": "ServerHeading",
+      "Layout": "wide",
+      "IsVisible": true,
+      "Foreground": "#FF1F2634",
+      "ExpectedTextColor": "#FF1F2634",
+      "MatchesTextBrush": true
+    },
+    {
+      "Name": "ServerHeading",
+      "Layout": "compact",
+      "IsVisible": true,
+      "Foreground": "#FF1F2634",
+      "ExpectedTextColor": "#FF1F2634",
+      "MatchesTextBrush": true
+    },
+    {
+      "Name": "ProjectTitle",
+      "Layout": "compact",
+      "IsVisible": true,
+      "Foreground": "#FF1F2634",
+      "ExpectedTextColor": "#FF1F2634",
+      "MatchesTextBrush": true
+    },
+    {
+      "Name": "InspectorTitle",
+      "Layout": "compact",
+      "IsVisible": true,
+      "Foreground": "#FF1F2634",
+      "ExpectedTextColor": "#FF1F2634",
+      "MatchesTextBrush": true
+    }
+  ],
+  "ThemeChecks": [
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 0,
+      "TextCount": 54,
+      "MinimumContrast": 5.153564898266735
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 1,
+      "TextCount": 41,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 2,
+      "TextCount": 43,
+      "MinimumContrast": 5.076762011927176
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 3,
+      "TextCount": 41,
+      "MinimumContrast": 5.076762011927176
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 4,
+      "TextCount": 30,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 0,
+      "TextCount": 43,
+      "MinimumContrast": 5.153564898266735
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 1,
+      "TextCount": 33,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 2,
+      "TextCount": 33,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 3,
+      "TextCount": 37,
+      "MinimumContrast": 5.076762011927176
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 4,
+      "TextCount": 30,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Window": "AI \uC791\uC5C5 \uC804\uB2EC",
+      "TextCount": 11,
+      "MinimumContrast": 4.960631663702933
+    },
+    {
+      "Theme": "dark",
+      "Layout": "wide",
+      "Tab": 0,
+      "TextCount": 54,
+      "MinimumContrast": 5.41965959517859
+    },
+    {
+      "Theme": "dark",
+      "Layout": "wide",
+      "Tab": 1,
+      "TextCount": 41,
+      "MinimumContrast": 7.84209961936664
+    },
+    {
+      "Theme": "dark",
+      "Layout": "wide",
+      "Tab": 2,
+      "TextCount": 43,
+      "MinimumContrast": 5.488718629382712
+    },
+    {
+      "Theme": "dark",
+      "Layout": "wide",
+      "Tab": 3,
+      "TextCount": 41,
+      "MinimumContrast": 5.488718629382712
+    },
+    {
+      "Theme": "dark",
+      "Layout": "wide",
+      "Tab": 4,
+      "TextCount": 30,
+      "MinimumContrast": 7.84209961936664
+    },
+    {
+      "Theme": "dark",
+      "Layout": "compact",
+      "Tab": 0,
+      "TextCount": 43,
+      "MinimumContrast": 5.41965959517859
+    },
+    {
+      "Theme": "dark",
+      "Layout": "compact",
+      "Tab": 1,
+      "TextCount": 33,
+      "MinimumContrast": 7.84209961936664
+    },
+    {
+      "Theme": "dark",
+      "Layout": "compact",
+      "Tab": 2,
+      "TextCount": 33,
+      "MinimumContrast": 7.84209961936664
+    },
+    {
+      "Theme": "dark",
+      "Layout": "compact",
+      "Tab": 3,
+      "TextCount": 37,
+      "MinimumContrast": 5.488718629382712
+    },
+    {
+      "Theme": "dark",
+      "Layout": "compact",
+      "Tab": 4,
+      "TextCount": 30,
+      "MinimumContrast": 7.84209961936664
+    },
+    {
+      "Theme": "dark",
+      "Window": "AI \uC791\uC5C5 \uC804\uB2EC",
+      "TextCount": 11,
+      "MinimumContrast": 6.892517235771214
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 0,
+      "TextCount": 54,
+      "MinimumContrast": 5.153564898266735
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 1,
+      "TextCount": 41,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 2,
+      "TextCount": 43,
+      "MinimumContrast": 5.076762011927176
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 3,
+      "TextCount": 41,
+      "MinimumContrast": 5.076762011927176
+    },
+    {
+      "Theme": "light",
+      "Layout": "wide",
+      "Tab": 4,
+      "TextCount": 30,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 0,
+      "TextCount": 43,
+      "MinimumContrast": 5.153564898266735
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 1,
+      "TextCount": 33,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 2,
+      "TextCount": 33,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 3,
+      "TextCount": 37,
+      "MinimumContrast": 5.076762011927176
+    },
+    {
+      "Theme": "light",
+      "Layout": "compact",
+      "Tab": 4,
+      "TextCount": 30,
+      "MinimumContrast": 5.463191439523468
+    },
+    {
+      "Theme": "light",
+      "Window": "AI \uC791\uC5C5 \uC804\uB2EC",
+      "TextCount": 11,
+      "MinimumContrast": 4.960631663702933
+    }
+  ],
+  "GuideChecks": [
+    {
+      "DisplayName": "\uBA40\uD2F0\uC758 \uC2E0",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\A_KJ\\AI\\PhoneLoL_02\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "\uBB34\uC9C1\uC804\uC0DD \uC624\uB514\uC624\uBD81",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\AI\\VoiceAudiobook\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "\uC601\uC0C1\u00B7\uC74C\uC6D0 \uC800\uC7A5",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\AI\\video-downloader\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "\uC804\uCCB4 \uD504\uB85C\uC81D\uD2B8 \uAD00\uB9AC",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "\uC8FC\uC2DD \uC790\uB3D9\uB9E4\uB9E4",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\A_KJ\\AI\\\uC790\uB3D9\uB9E4\uB9E4\uC8FC\uC2DD\uAD00\uB828\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "\uCCAD\uC57D \uB3C4\uAD6C",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\A_KJ\\AI\\\uCCAD\uC57D\uAD00\uB828\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "\uBA40\uD2F0\uC758 \uC2E0 \uC11C\uBC84",
+      "GuideLoaded": true,
+      "GuideFilePath": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "VoiceStudio",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\A_KJ\\AI\\Applications\\VoiceStudio\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    },
+    {
+      "DisplayName": "Zonos2",
+      "GuideLoaded": true,
+      "GuideFilePath": "D:\\A_KJ\\AI\\Applications\\Zonos2\\\uD504\uB85C\uC81D\uD2B8_\uC0AC\uC6A9\uC548\uB0B4.md"
+    }
+  ],
+  "ArticleReadingChecks": {
+    "FontSize": 16,
+    "LineHeight": 28,
+    "Before": 0,
+    "After": 48,
+    "Restored": 0,
+    "ExpandedWidth": 1020,
+    "CompactEnd": {
+      "Layout": "compact",
+      "Title": "\uBD80\uD305 \uCF58\uC194\u00B7\uC885\uB8CC \uBC29\uD574 \uC870\uC0AC\uC640 \uC6D0\uACA9 \uC790\uB3D9 \uBCF5\uAD6C",
+      "ExpectedFinalText": "\u2014 \uC124\uCE58\uBCF8 \uCD5C\uC885 \uD654\uBA74 \uAC80\uC0AC\u00B7GitHub\u00B7\uC644\uB8CC \uAE30\uB85D \uC218\uC9D1 \uD655\uC778",
+      "NativeTextLength": 658,
+      "Blocks": 20,
+      "ReaderHeight": 956,
+      "ContentEnd": "376,894,0,21",
+      "VisibleEnd": "376,172,0,21",
+      "ViewportHeight": 248,
+      "ScrollableHeight": 861,
+      "BottomOffset": 861,
+      "BottomReached": true
+    },
+    "ExpandedEnd": {
+      "Layout": "wide-compact",
+      "Title": "\uBD80\uD305 \uCF58\uC194\u00B7\uC885\uB8CC \uBC29\uD574 \uC870\uC0AC\uC640 \uC6D0\uACA9 \uC790\uB3D9 \uBCF5\uAD6C",
+      "ExpectedFinalText": "\u2014 \uC124\uCE58\uBCF8 \uCD5C\uC885 \uD654\uBA74 \uAC80\uC0AC\u00B7GitHub\u00B7\uC644\uB8CC \uAE30\uB85D \uC218\uC9D1 \uD655\uC778",
+      "NativeTextLength": 658,
+      "Blocks": 20,
+      "ReaderHeight": 872,
+      "ContentEnd": "376,810,0,21",
+      "VisibleEnd": "376,172,0,21",
+      "ViewportHeight": 248,
+      "ScrollableHeight": 777,
+      "BottomOffset": 777,
+      "BottomReached": true
+    }
+  },
+  "CatalogRefresh": {
+    "SelectionPreserved": true,
+    "SearchPreserved": true,
+    "FoldPreserved": true,
+    "ScrollPreserved": true,
+    "Before": 2,
+    "After": 2
+  },
+  "KeyColors": {
+    "Text": "#FF1F2634",
+    "Canvas": "#FFF2F4F8",
+    "Surface": "#FFFFFFFF"
+  },
+  "ValidationState": "succeeded \u00B7 exit 0",
+  "Catalog": [
+    {
+      "DisplayName": "\uBA40\uD2F0\uC758 \uC2E0",
+      "Description": "\uD734\uB300\uD3F0 \uAC8C\uC784\uC758 \uAC1C\uBC1C\u00B7\uC124\uCE58\uD30C\uC77C\u00B7\uC11C\uBC84 \uC6B4\uC601\uC744 \uBAA8\uC544 \uB461\uB2C8\uB2E4.",
+      "RoleLabel": "\uD604\uC7AC \uAC1C\uBC1C",
+      "Path": "D:\\A_KJ\\AI\\PhoneLoL_02",
+      "EvidenceDate": "2026-10-05",
+      "Programs": [
+        {
+          "DisplayName": "\uCD5C\uADFC \uC791\uC5C5\uC6A9 \uC124\uCE58\uD30C\uC77C",
+          "KindLabel": "\uD734\uB300\uD3F0 \uC124\uCE58\uD30C\uC77C",
+          "ActionLabel": "\uC124\uCE58\uD30C\uC77C \uC704\uCE58 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLoL_02\\PhoneLOL-02\\Builds\\PhoneLOL-0.24.7.apk",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC0AC\uC6A9 \uD655\uC778\uB41C \uC644\uB8CC\uBCF8 \u00B7 0.23.4",
+          "KindLabel": "\uD655\uC778\uB41C \uC124\uCE58\uD30C\uC77C",
+          "ActionLabel": "\uC644\uB8CC\uBCF8 \uC704\uCE58 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLoL_02\\PhoneLOL-02\\Builds\\PhoneLOL-0.23.4.apk",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC0C8 \uAE30\uB2A5\u00B7\uBC84\uC804\uBCC4 \uC548\uB0B4",
+          "KindLabel": "\uC0AC\uC6A9 \uC548\uB0B4",
+          "ActionLabel": "\uC548\uB0B4 \uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLoL_02\\Docs",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "Unity\uC5D0\uC11C \uAC8C\uC784 \uC218\uC815",
+          "KindLabel": "\uAC8C\uC784 \uD3B8\uC9D1\uAE30",
+          "ActionLabel": "Unity\uB85C \uC5F4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLoL_02\\PhoneLOL-02",
+          "CanLaunch": false,
+          "HasEditorLauncher": true
+        },
+        {
+          "DisplayName": "\uD604\uC7AC \uC791\uC5C5\u00B7\uC778\uC218\uC778\uACC4",
+          "KindLabel": "\uC791\uC5C5 \uAE30\uB85D",
+          "ActionLabel": "\uC778\uC218\uC778\uACC4 \uD30C\uC77C \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLoL_02\\HANDOFF.md",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uAC8C\uC784 \uC774\uC804 \uAC1C\uBC1C\uBCF8",
+          "KindLabel": "\uC774\uC804 \uAC1C\uBC1C",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLOL",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uAC8C\uC784 \uC2E4\uD5D8\uC6A9 \uC0AC\uBCF8",
+          "KindLabel": "\uACFC\uAC70 \uD14C\uC2A4\uD2B8",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLoL_02-CloudTest",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uAC8C\uC784 \uBCF5\uAD6C \uC790\uB8CC",
+          "KindLabel": "\uBCF5\uAD6C \uC790\uB8CC",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\PhoneLOL-Recovery-v11511",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC6B4\uC601 \uC911\uC778 \uC11C\uBC84 \uD3F4\uB354",
+          "KindLabel": "\uC11C\uBC84 \uC6B4\uC601",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        }
+      ]
+    },
+    {
+      "DisplayName": "\uBB34\uC9C1\uC804\uC0DD \uC624\uB514\uC624\uBD81",
+      "Description": "\uC18C\uC124 \uD14D\uC2A4\uD2B8\uB97C \uBD84\uC11D\uD558\uACE0 \uB4F1\uC7A5\uC778\uBB3C\uBCC4 \uC74C\uC131\uC73C\uB85C \uC81C\uC791\uD558\uB294 \uD504\uB85C\uC81D\uD2B8\uC785\uB2C8\uB2E4.",
+      "RoleLabel": "\uC2E4\uC81C \uC81C\uC791 \uD3F4\uB354",
+      "Path": "D:\\AI\\VoiceAudiobook",
+      "EvidenceDate": "2026-10-05",
+      "Programs": [
+        {
+          "DisplayName": "\uCD5C\uC2E0 \uC804\uCCB4\uD654 \uC74C\uC131\u00B7\uBCF8\uBB38",
+          "KindLabel": "\uC81C\uC791 \uACB0\uACFC",
+          "ActionLabel": "\uCD5C\uC2E0 \uC74C\uC131\u00B7\uBCF8\uBB38 \uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\AI\\VoiceAudiobook\\audiobooks\\01_CURRENT",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uBAA9\uC18C\uB9AC \uBE44\uAD50 \uB4E3\uAE30",
+          "KindLabel": "\uBE44\uAD50 \uC790\uB8CC",
+          "ActionLabel": "\uBE44\uAD50 \uACB0\uACFC \uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\AI\\VoiceAudiobook\\comparison",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uD604\uC7AC \uC81C\uC791 \uC0C1\uD0DC",
+          "KindLabel": "\uC791\uC5C5 \uC548\uB0B4",
+          "ActionLabel": "\uC81C\uC791 \uAE30\uB85D \uBCF4\uAE30",
+          "Path": "D:\\AI\\VoiceAudiobook\\00_START_HERE\\CURRENT_HANDOFF.md",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC624\uB514\uC624\uBD81 \uCF54\uB4DC \uBCF4\uAD00\uBCF8",
+          "KindLabel": "\uC774\uC804 \uC790\uB8CC",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\txt_\uBB34\uC9C1\uC804\uC0DD",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC0C8 \uC74C\uC131 \uBAA8\uB378 \uBCF4\uAD00",
+          "KindLabel": "\uBAA8\uB378 \uC790\uB8CC",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Models",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC74C\uC131 \uC5D4\uC9C4 \uAC80\uD1A0 \uD658\uACBD",
+          "KindLabel": "\uBCC4\uB3C4 \uAC80\uD1A0",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Workspace\\VoiceBench",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "OmniVoice \uACF5\uC2DD \uC18C\uC2A4",
+          "KindLabel": "\uAC80\uD1A0\uC6A9 \uC18C\uC2A4",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Workspace\\VoiceBench\\omnivoice-source",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        }
+      ]
+    },
+    {
+      "DisplayName": "\uC601\uC0C1\u00B7\uC74C\uC6D0 \uC800\uC7A5",
+      "Description": "\uC8FC\uC18C \uBAA9\uB85D\uC5D0 \uC788\uB294 \uC601\uC0C1\uACFC \uC74C\uC6D0\uC744 PC\uC5D0 \uC800\uC7A5\uD569\uB2C8\uB2E4. \uC624\uB514\uC624\uBD81\uC6A9 \uC790\uB8CC\uB97C \uBAA8\uC744 \uB54C\uB3C4 \uC0AC\uC6A9\uD569\uB2C8\uB2E4.",
+      "RoleLabel": "\uC2E4\uC81C \uC2E4\uD589 \uD3F4\uB354",
+      "Path": "D:\\AI\\video-downloader",
+      "EvidenceDate": "2026-10-05",
+      "Programs": [
+        {
+          "DisplayName": "\uC800\uC7A5\uD560 \uC8FC\uC18C \uBAA9\uB85D",
+          "KindLabel": "\uC785\uB825 \uBAA9\uB85D",
+          "ActionLabel": "\uC8FC\uC18C \uBAA9\uB85D \uBCF4\uAE30",
+          "Path": "D:\\AI\\video-downloader\\links.txt",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uBAA9\uB85D \uB2E4\uC6B4\uB85C\uB4DC",
+          "KindLabel": "\uC800\uC7A5 \uB3C4\uAD6C",
+          "ActionLabel": "\uB2E4\uC6B4\uB85C\uB4DC \uC2DC\uC791",
+          "Path": "D:\\AI\\video-downloader\\downloader.py",
+          "CanLaunch": true,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC800\uC7A5\uB41C \uC601\uC0C1\u00B7\uC74C\uC6D0",
+          "KindLabel": "\uC800\uC7A5 \uACB0\uACFC",
+          "ActionLabel": "\uC800\uC7A5 \uACB0\uACFC \uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\AI\\video-downloader\\downloads",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uCD5C\uADFC \uC2E4\uD589 \uC694\uC57D",
+          "KindLabel": "\uACB0\uACFC \uAE30\uB85D",
+          "ActionLabel": "\uACB0\uACFC \uD30C\uC77C \uBCF4\uAE30",
+          "Path": "D:\\AI\\video-downloader\\result_summary.txt",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        }
+      ]
+    },
+    {
+      "DisplayName": "\uC804\uCCB4 \uD504\uB85C\uC81D\uD2B8 \uAD00\uB9AC",
+      "Description": "\uC5EC\uB7EC \uD504\uB85C\uC81D\uD2B8\uB97C \uC5F0\uACB0\uD558\uACE0 \uACF5\uD1B5 \uC791\uC5C5 \uAE30\uC900\uACFC \uC778\uC218\uC778\uACC4\uB97C \uAD00\uB9AC\uD558\uB294 \uACF5\uAC04\uC785\uB2C8\uB2E4.",
+      "RoleLabel": "\uAD00\uB9AC \uAE30\uC900",
+      "Path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub",
+      "EvidenceDate": "2026-10-05",
+      "Programs": [
+        {
+          "DisplayName": "\uC774 \uAD00\uB9AC \uD654\uBA74\uC758 \uC0AC\uC6A9\uBC95",
+          "KindLabel": "\uC0AC\uC6A9 \uC548\uB0B4",
+          "ActionLabel": "\uC0AC\uC6A9 \uC548\uB0B4 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\000_\uC0AC\uC6A9\uC790\uC6A9\\08_AI_\uAD00\uC81C\uD0D1.md",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uB3C4\uAD6C\uB97C \uC798 \uC4F0\uB294 \uBC29\uBC95",
+          "KindLabel": "\uB3C4\uAD6C \uC548\uB0B4",
+          "ActionLabel": "\uB3C4\uAD6C \uC548\uB0B4 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\000_\uC0AC\uC6A9\uC790\uC6A9\\10_\uB3C4\uAD6C_\uD65C\uC6A9_\uCD94\uCC9C.md",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uAD00\uB9AC \uD504\uB85C\uADF8\uB7A8 \uAC1C\uBC1C \uC18C\uC2A4",
+          "KindLabel": "\uC6B4\uC601 \uC790\uB8CC",
+          "ActionLabel": "\uC790\uB8CC \uC704\uCE58 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\ai-control-tower",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uAD00\uC81C\uD0D1 \uC810\uAC80",
+          "KindLabel": "\uC810\uAC80 \uB3C4\uAD6C",
+          "ActionLabel": "\uC120\uD0DD\uD55C \uAC80\uC0AC \uC2E4\uD589",
+          "Path": "D:\\A_KJ\\AI\\Projects\\project-operations-hub\\ai-control-tower",
+          "CanLaunch": true,
+          "HasEditorLauncher": false
+        },
+        {
+          "DisplayName": "\uC124\uCE58\uB41C \uAD00\uB9AC \uD504\uB85C\uADF8\uB7A8",
+          "KindLabel": "\uC124\uCE58 \uC704\uCE58",
+          "ActionLabel": "\uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\Applications\\AIControlTower",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        }
+      ]
+    },
+    {
+      "DisplayName": "\uC8FC\uC2DD \uC790\uB3D9\uB9E4\uB9E4",
+      "Description": "\uC790\uB3D9\uB9E4\uB9E4 \uD504\uB85C\uC81D\uD2B8\uB97C \uC900\uBE44\uD558\uB358 \uD3F4\uB354\uC785\uB2C8\uB2E4. \uC2E4\uD589 \uAE30\uB2A5\uC740 \uC544\uC9C1 \uB4F1\uB85D\uB418\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4.",
+      "RoleLabel": "\uC900\uBE44 \uC911",
+      "Path": "D:\\A_KJ\\AI\\\uC790\uB3D9\uB9E4\uB9E4\uC8FC\uC2DD\uAD00\uB828",
+      "EvidenceDate": "2026-10-05",
+      "Programs": [
+        {
+          "DisplayName": "\uC8FC\uC2DD \uD504\uB85C\uC81D\uD2B8 \uD3F4\uB354",
+          "KindLabel": "\uC900\uBE44 \uD3F4\uB354",
+          "ActionLabel": "\uC900\uBE44 \uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\\uC790\uB3D9\uB9E4\uB9E4\uC8FC\uC2DD\uAD00\uB828",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        }
+      ]
+    },
+    {
+      "DisplayName": "\uCCAD\uC57D \uB3C4\uAD6C",
+      "Description": "\uCCAD\uC57D \uD504\uB85C\uC81D\uD2B8\uB97C \uC900\uBE44\uD558\uB358 \uD3F4\uB354\uC785\uB2C8\uB2E4. \uC2E4\uD589 \uAE30\uB2A5\uC740 \uC544\uC9C1 \uB4F1\uB85D\uB418\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4.",
+      "RoleLabel": "\uC900\uBE44 \uC911",
+      "Path": "D:\\A_KJ\\AI\\\uCCAD\uC57D\uAD00\uB828",
+      "EvidenceDate": "2026-10-05",
+      "Programs": [
+        {
+          "DisplayName": "\uCCAD\uC57D \uD504\uB85C\uC81D\uD2B8 \uD3F4\uB354",
+          "KindLabel": "\uC900\uBE44 \uD3F4\uB354",
+          "ActionLabel": "\uC900\uBE44 \uD3F4\uB354 \uBCF4\uAE30",
+          "Path": "D:\\A_KJ\\AI\\\uCCAD\uC57D\uAD00\uB828",
+          "CanLaunch": false,
+          "HasEditorLauncher": false
+        }
+      ]
+    }
+  ],
+  "Statuses": [
+    {
+      "DisplayName": "Remote Desktop Commander \u00B7 PC \uC6D0\uACA9 \uC5F0\uACB0",
+      "State": "Running",
+      "Detail": "\uC5F0\uACB0 \uD504\uB85C\uC138\uC2A4 \uD2B8\uB9AC 1\uAC1C \u00B7 \uC790\uC2DD \uD3EC\uD568 2\uAC1C \u00B7 \uC2DC\uC791 \uB4F1\uB85D 1\uAC1C. \uC628\uB77C\uC778/\uC778\uC99D\uC740 \uC6D0\uACA9 \uC11C\uBE44\uC2A4\uC5D0\uC11C \uBCC4\uB3C4 \uD655\uC778\uD569\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "Jev Router \u00B7 AI \uC791\uC5C5 \uBD84\uBC30",
+      "State": "Ready",
+      "Detail": "\uC124\uCE58 \uD30C\uC77C\u00B7\uD0A4 \uC874\uC7AC \uD655\uC778. \uC778\uC99D\u00B7\uB77C\uC6B0\uD305 \uC655\uBCF5\u00B7\uC5C5\uBB34 \uC131\uACF5\uC740 \uBBF8\uAC80\uC99D\uC774\uBA70 \uD544\uC694\uD560 \uB54C \uC120\uD0DD \uC0AC\uC6A9\uD569\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "Codex \u00B7 AI \uCF54\uB4DC \uC791\uC5C5",
+      "State": "Ready",
+      "Detail": "\uB85C\uADF8\uC778 \uC0C1\uD0DC\uB97C \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "GitHub CLI \u00B7 \uC800\uC7A5\uC18C \uC5F0\uACB0",
+      "State": "Ready",
+      "Detail": "\uB85C\uADF8\uC778 \uC0C1\uD0DC\uB97C \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "n8n \u00B7 \uC791\uC5C5 \uC790\uB3D9\uD654",
+      "State": "Unknown",
+      "Detail": "healthz \uC5F0\uACB0 \uBD88\uAC00. Node \uD504\uB85C\uC138\uC2A4\uB9CC\uC73C\uB85C Running\uC744 \uD45C\uC2DC\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "GitHub Actions \u00B7 \uC790\uB3D9 \uBE4C\uB4DC \uC5F0\uACB0",
+      "State": "Running",
+      "Detail": "Actions Runner \uC11C\uBE44\uC2A4\uAC00 \uC2E4\uD589 \uC911\uC785\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "GPT \u2192 Jev \u00B7 \uC791\uC5C5 \uC804\uB2EC \uC0C1\uD0DC",
+      "State": "Unknown",
+      "Detail": "\uC678\uBD80 GPT \uC138\uC158\uC758 \uC804\uB2EC \uC5EC\uBD80\uB294 \uB85C\uCEEC\uC5D0\uC11C \uD655\uC778\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+    },
+    {
+      "DisplayName": "Aider \u00B7 AI \uCF54\uB4DC \uC218\uC815",
+      "State": "Ready",
+      "Detail": "\uC124\uCE58 \uD30C\uC77C \uD655\uC778. \uC2E4\uD589\u00B7\uBAA8\uB378 \uC5F0\uACB0\u00B7\uC2E4\uC81C \uC791\uC5C5 \uC131\uACF5\uC740 \uBBF8\uAC80\uC99D\uC785\uB2C8\uB2E4. \uC124\uCE58 \uC704\uCE58: C:\\Users\\user\\.local\\bin\\aider.exe"
+    },
+    {
+      "DisplayName": "HyperFrames \u00B7 \uC601\uC0C1 \uC81C\uC791",
+      "State": "Ready",
+      "Detail": "\uC124\uCE58 \uD30C\uC77C \u00B7 \uBC84\uC804 0.8.40 \uD655\uC778. \uC2E4\uD589\u00B7\uBAA8\uB378 \uC5F0\uACB0\u00B7\uC2E4\uC81C \uC791\uC5C5 \uC131\uACF5\uC740 \uBBF8\uAC80\uC99D\uC785\uB2C8\uB2E4. \uC124\uCE58 \uC704\uCE58: C:\\Users\\user\\AppData\\Roaming\\npm\\node_modules\\hyperframes\\package.json"
+    },
+    {
+      "DisplayName": "VoiceStudio \u00B7 \uC74C\uC131 \uC81C\uC791",
+      "State": "Ready",
+      "Detail": "\uC124\uCE58 \uD30C\uC77C \uD655\uC778. \uC2E4\uD589\u00B7\uBAA8\uB378 \uC5F0\uACB0\u00B7\uC2E4\uC81C \uC791\uC5C5 \uC131\uACF5\uC740 \uBBF8\uAC80\uC99D\uC785\uB2C8\uB2E4. \uC124\uCE58 \uC704\uCE58: D:\\A_KJ\\AI\\Applications\\VoiceStudio\\VoiceStudio.exe"
+    },
+    {
+      "DisplayName": "Zonos2 \u00B7 \uC74C\uC131 \uBAA8\uB378",
+      "State": "Ready",
+      "Detail": "\uC124\uCE58 \uD30C\uC77C \uD655\uC778. \uC2E4\uD589\u00B7\uBAA8\uB378 \uC5F0\uACB0\u00B7\uC2E4\uC81C \uC791\uC5C5 \uC131\uACF5\uC740 \uBBF8\uAC80\uC99D\uC785\uB2C8\uB2E4. \uC124\uCE58 \uC704\uCE58: D:\\A_KJ\\AI\\Applications\\Zonos2\\zonos2-app.exe"
+    }
+  ],
+  "RemoteConsolidationRequested": false,
+  "Notices": [
+    {
+      "Title": "\uACF5\uC9C0 \uD655\uC778\uACFC \uAE30\uB85D",
+      "VersionLabel": "\uBC84\uC804 2",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 14\uBA85"
+    },
+    {
+      "Title": "\uC0AC\uB78C\uC774 \uC774\uD574\uD558\uB294 \uD654\uBA74\uACFC \uD3F4\uB354",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 16\uBA85"
+    },
+    {
+      "Title": "\uB3C4\uAD6C\uC640 \uBD84\uC5C5\uC744 \uC801\uC808\uD558\uAC8C \uC0AC\uC6A9",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 16\uBA85"
+    },
+    {
+      "Title": "\uAD00\uB9AC \uC571\uACFC \uACF5\uC720 \uC6D0\uACA9 \uC5F0\uACB0",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 16\uBA85"
+    },
+    {
+      "Title": "\uD504\uB85C\uC81D\uD2B8 \uC18C\uD1B5 \uD3F4\uB354\uC640 \uC790\uB8CC \uC815\uB9AC",
+      "VersionLabel": "\uBC84\uC804 2",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 13\uBA85"
+    },
+    {
+      "Title": "\uBA40\uD2F0\uC758 \uC2E0 \uC11C\uBC84 \uC5F0\uACB0\uACFC \uC6B4\uC601 \uAD6C\uBD84",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 14\uBA85"
+    },
+    {
+      "Title": "\uBC1B\uC740 \uBA85\uB839\uACFC AI \uB2F5\uBCC0 \uAE30\uB85D",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 5\uBA85"
+    },
+    {
+      "Title": "\uD504\uB85C\uC81D\uD2B8 \uC790\uB8CC \uC704\uCE58\uC640 \uC0AC\uC6A9 \uC548\uB0B4 \uBA3C\uC800 \uC77D\uAE30",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 4\uBA85"
+    },
+    {
+      "Title": "\uBD80\uD305 \uCC3D\uACFC \uC885\uB8CC \uBC29\uD574 \uC5C6\uB294 \uBC31\uADF8\uB77C\uC6B4\uB4DC \uC2E4\uD589",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D \uC5C6\uC74C"
+    }
+  ],
+  "CommunicationProjects": [
+    {
+      "Id": "HealthAPK",
+      "Name": "\uC6B4\uB3D9\uC571",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "Investment-Lab",
+      "Name": "\uC8FC\uC2DD \uC790\uB3D9\uB9E4\uB9E4",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "ChungYack",
+      "Name": "\uCCAD\uC57D",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "PhoneLOL",
+      "Name": "\uBA40\uD2F0\uC758 \uC2E0",
+      "Root": "D:\\A_KJ\\AI\\PhoneLoL_02",
+      "Delivery": "\uC5F0\uACB0\uB428",
+      "Read": "6/9\uAC1C \uACF5\uC9C0 \u00B7 2\uBA85",
+      "Applied": "\uC801\uC6A9 \uAE30\uB85D 47\uAC74"
+    },
+    {
+      "Id": "PhoneLOL-Server",
+      "Name": "\uBA40\uD2F0\uC758 \uC2E0 \uC11C\uBC84",
+      "Root": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime",
+      "Delivery": "\uC5F0\uACB0\uB428",
+      "Read": "6/9\uAC1C \uACF5\uC9C0 \u00B7 2\uBA85",
+      "Applied": "\uC801\uC6A9 \uAE30\uB85D 52\uAC74"
+    },
+    {
+      "Id": "Market-Radar",
+      "Name": "\uC8FC\uC2DD \uC571",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "Figure-01",
+      "Name": "\uD53C\uADDC\uC5B4 \uB9CC\uB4E4\uAE30",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "Tiny-Village",
+      "Name": "\uB3D9\uBB3C\uC758\uC232",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "Threads",
+      "Name": "\uCF58\uD150\uCE20 \uC81C\uC791",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "Mushoku-Audiobook",
+      "Name": "\uBB34\uC9C1\uC804\uC0DD \uC624\uB514\uC624\uBD81",
+      "Root": "D:\\AI\\VoiceAudiobook",
+      "Delivery": "\uC5F0\uACB0\uB428",
+      "Read": "8/9\uAC1C \uACF5\uC9C0 \u00B7 6\uBA85",
+      "Applied": "\uC801\uC6A9 \uAE30\uB85D 37\uAC74"
+    },
+    {
+      "Id": "Burgundy",
+      "Name": "\uBC84\uAC74\uB514 \uBCF4\uB4DC\uAC8C\uC784",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "SideMemojang",
+      "Name": "\uC0AC\uC774\uB4DC\uBA54\uBAA8\uC7A5",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "Control-Tower",
+      "Name": "\uD1B5\uD569\uC18C\uD1B5\uBC29\u00B7\uCEE8\uD2B8\uB864\uD0C0\uC6CC",
+      "Root": "D:\\A_KJ\\AI\\Projects\\project-operations-hub",
+      "Delivery": "\uC5F0\uACB0\uB428",
+      "Read": "8/9\uAC1C \uACF5\uC9C0 \u00B7 7\uBA85",
+      "Applied": "\uC801\uC6A9 \uAE30\uB85D 48\uAC74"
+    },
+    {
+      "Id": "Video-Downloader",
+      "Name": "\uC601\uC0C1\u00B7\uC74C\uC6D0 \uC800\uC7A5",
+      "Root": "D:\\AI\\video-downloader",
+      "Delivery": "\uC5F0\uACB0\uB428",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "FinanceOne",
+      "Name": "\uAC00\uACC4\uBD80",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    },
+    {
+      "Id": "ASCII-Aquarium",
+      "Name": "\uC544\uC2A4\uD0A4 \uC218\uC871\uAD00",
+      "Root": "",
+      "Delivery": "\uD3F4\uB354 \uC5F0\uACB0 \uD544\uC694",
+      "Read": "\uBBF8\uD655\uC778",
+      "Applied": "\u2014"
+    }
+  ],
+  "CollectedItems": 123,
+  "CommunicationIssues": [],
+  "CommunicationDiagnostics": [],
+  "Server": {
+    "IsHealthy": true,
+    "Health": "\uC11C\uBC84 \uC751\uB2F5 \uD655\uC778\uB428",
+    "ObservedAt": "2026-10-06T09:35:35+00:00",
+    "FetchedAt": "2026-10-06T09:35:35.5683517+00:00",
+    "Total": {
+      "Online": 0,
+      "Preparing": 0,
+      "Playing": 0
+    },
+    "Modes": [
+      {
+        "Key": "ranked",
+        "Name": "\uB7AD\uD06C\uB300\uC804",
+        "Online": 0,
+        "Preparing": 0,
+        "Playing": 0
+      },
+      {
+        "Key": "ranked1v1",
+        "Name": "1vs1\uB300\uC804",
+        "Online": 0,
+        "Preparing": 0,
+        "Playing": 0
+      },
+      {
+        "Key": "modeBattle",
+        "Name": "\uBAA8\uB4DC\uB300\uC804",
+        "Online": 0,
+        "Preparing": 0,
+        "Playing": 0
+      },
+      {
+        "Key": "mode",
+        "Name": "\uBAA8\uB4DC",
+        "Online": 0,
+        "Preparing": 0,
+        "Playing": 0
+      },
+      {
+        "Key": "urf",
+        "Name": "URF",
+        "Online": 0,
+        "Preparing": 0,
+        "Playing": 0
+      },
+      {
+        "Key": "urf5",
+        "Name": "URF5",
+        "Online": 0,
+        "Preparing": 0,
+        "Playing": 0
+      }
+    ],
+    "Policy": {
+      "LatestBuild": 241,
+      "LatestVersion": "0.22.1",
+      "MinimumBuild": 0,
+      "BlockedBuilds": [],
+      "Revision": 9
+    },
+    "PolicyHealth": "\uC811\uC18D \uC815\uCC45 \uC751\uB2F5 \uD655\uC778\uB428"
+  },
+  "Roster": {
+    "RosterHealthy": true,
+    "PlayerCount": 0,
+    "RosterStatus": "3\uCD08\uB9C8\uB2E4 \uC790\uB3D9 \uAC31\uC2E0",
+    "RosterCheckedAt": "\uB9C8\uC9C0\uB9C9 \uD655\uC778 18:35:43"
+  },
+  "RosterLiveChecks": {
+    "AutomaticMotionQuiet": true,
+    "ManualRequestObserved": true,
+    "ManualAngle": 40.44520285714286,
+    "PollIntervalSeconds": 3,
+    "TurnMilliseconds": 1400
+  },
+  "RefreshMotionChecks": {
+    "MotionDisabledByWindows": false,
+    "OneTurnVerified": true,
+    "AngleBeforeRequestEnd": 37.77516,
+    "AngleAfterRequestEnd": 78.93339428571429,
+    "IdleAngle": 0,
+    "ReducedMotionAngle": 0
+  },
+  "Note": "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
+}

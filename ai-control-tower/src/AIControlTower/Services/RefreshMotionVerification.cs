@@ -28,7 +28,7 @@ public static class RefreshMotionVerification
             await Task.Delay(140);
             var after = ((RotateTransform)icon.RenderTransform).Angle;
             if (before <= 0 || after <= before) throw new InvalidOperationException("Short refresh snapped or stopped before one full turn.");
-            await Task.Delay(650);
+            await Task.Delay((int)RefreshMotion.GetDurationMilliseconds(icon)+150);
             var completed = ((RotateTransform)icon.RenderTransform).Angle;
             if (Math.Abs(completed) > 0.01) throw new InvalidOperationException("Refresh did not return naturally to idle.");
             RefreshMotion.SetActive(icon, true);

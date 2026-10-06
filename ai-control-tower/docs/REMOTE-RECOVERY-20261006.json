@@ -1,0 +1,61 @@
+﻿{
+    "VerifiedAt":  "2026-10-06T18:32:15.7313122+09:00",
+    "Checks":  [
+                   {
+                       "Name":  "Initial remote process",
+                       "Pass":  true,
+                       "Detail":  "Roots=1",
+                       "At":  "2026-10-06T18:28:35.0824934+09:00"
+                   },
+                   {
+                       "Name":  "Duplicate watcher suppressed",
+                       "Pass":  true,
+                       "Detail":  "Watchers=1",
+                       "At":  "2026-10-06T18:28:38.8650501+09:00"
+                   },
+                   {
+                       "Name":  "Unexpected remote termination recovered",
+                       "Pass":  true,
+                       "Detail":  "OldPID=3244 NewPID=26296",
+                       "At":  "2026-10-06T18:28:43.1721123+09:00"
+                   },
+                   {
+                       "Name":  "Watchdog restarted cached remote",
+                       "Pass":  true,
+                       "Detail":  "Restarts=1 Errors=0",
+                       "At":  "2026-10-06T18:28:43.2102154+09:00"
+                   },
+                   {
+                       "Name":  "Management stop persists without respawn",
+                       "Pass":  true,
+                       "Detail":  "Roots=0 Enabled=False",
+                       "At":  "2026-10-06T18:28:59.0082520+09:00"
+                   },
+                   {
+                       "Name":  "Management start resumes recovery",
+                       "Pass":  true,
+                       "Detail":  "Roots=1",
+                       "At":  "2026-10-06T18:29:05.5512507+09:00"
+                   },
+                   {
+                       "Name":  "Windows shutdown query accepted promptly",
+                       "Pass":  true,
+                       "Detail":  "HWND=985492 Return=1 Accepted=1 ElapsedMs=6 Win32=203",
+                       "At":  "2026-10-06T18:32:15.7313122+09:00"
+                   },
+                   {
+                       "Name":  "No visible console windows after recovery",
+                       "Pass":  true,
+                       "Detail":  "VisibleConsoles=0",
+                       "At":  "2026-10-06T18:29:05.6913934+09:00"
+                   },
+                   {
+                       "Name":  "Native login task remains running",
+                       "Pass":  true,
+                       "Detail":  "TaskState=Running",
+                       "At":  "2026-10-06T18:29:06.4088103+09:00"
+                   }
+               ],
+    "ActualRebootTested":  false,
+    "Scope":  "Same-session native process recovery, app control, shutdown query. No actual PC shutdown or reboot."
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0001",
+  "revision": 2,
+  "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_guides",
+  "sessionId": "20261006-reading-tools-guides",
+  "checkedAt": "2026-10-06T02:58:47.390474+00:00",
+  "applicationStatus": "applied",
+  "note": "프로젝트 안내 담당으로 실제 공지 본문을 읽고 자료 위치/행동/기록/원본 보존 규칙을 적용했습니다. 로컬 안내 7개·N8·양식·정책을 작성하고 경로 존재를 검증했습니다. 앱·개별 프로젝트 실행/음성 청취/다른 AI 읽음은 검증하지 않았습니다.",
+  "evidence": [
+    "프로젝트_사용안내.md",
+    "05_TEMPLATES/PROJECT_GUIDE.md",
+    "ai-control-tower/docs/PROJECT-GUIDES-20261006.json"
+  ],
+  "appliedAt": "2026-10-06T02:58:47.595532+00:00"
+}

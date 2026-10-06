@@ -76,10 +76,36 @@ public static class UiVerification
         Capture(window, Path.Combine(outputDirectory, "communication.png"));
         window.Width = 1060; window.Height = 720;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
-        CheckVisibleControl(window, "CommunicationProjectList");
+        var projectSelector=(ComboBox)window.FindName("CommunicationProjectList");
+        if(!projectSelector.IsVisible || projectSelector.ActualWidth<200 || projectSelector.ActualHeight<32) throw new InvalidOperationException("Communication project selector is clipped.");
         CheckVisibleControl(window, "InboxList");
-        CheckVisibleControl(window, "InboxBody");
+        CheckVisibleControl(window, "ArticleScroll");
+        var articleReader=(RichTextBox)window.FindName("InboxBody");
+        if(articleReader.FontSize<16 || articleReader.Document.Blocks.Count==0) throw new InvalidOperationException("Article reader is empty or too small.");
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ApplicationIdle);
+        var compactArticleEnd=await VerifyArticleEnd(window,vm,outputDirectory,"compact");
         Capture(window, Path.Combine(outputDirectory, "communication-compact.png"));
+        var articleScroll=(ScrollViewer)window.FindName("ArticleScroll");
+        articleScroll.ScrollToTop();
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ContextIdle);
+        var articleBefore=articleScroll.VerticalOffset;
+        MouseWheelVerification.RaiseWheel(articleReader,-240);
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ContextIdle);
+        var articleAfter=articleScroll.VerticalOffset;
+        if(articleScroll.ScrollableHeight>0 && articleAfter<=articleBefore) throw new InvalidOperationException("Mouse wheel swallowed over article body.");
+        MouseWheelVerification.RaiseWheel(articleReader,240);
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ContextIdle);
+        var articleRestored=articleScroll.VerticalOffset;
+        if(articleAfter>0 && articleRestored>=articleAfter) throw new InvalidOperationException("Article reverse wheel swallowed.");
+        ((Button)window.FindName("ArticleExpandButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        var expandedWidth=((FrameworkElement)window.FindName("ArticlePanel")).ActualWidth;
+        if(((FrameworkElement)window.FindName("ArticleListPanel")).IsVisible || expandedWidth<900) throw new InvalidOperationException("Wide article mode did not expose the page.");
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ApplicationIdle);
+        var expandedArticleEnd=await VerifyArticleEnd(window,vm,outputDirectory,"wide-compact");
+        Capture(window,Path.Combine(outputDirectory,"communication-reading-wide-compact.png"));
+        ((Button)window.FindName("ArticleExpandButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        var articleReadingChecks=new { FontSize=articleReader.FontSize,LineHeight=articleReader.Document.LineHeight,Before=articleBefore,After=articleAfter,Restored=articleRestored,ExpandedWidth=expandedWidth,CompactEnd=compactArticleEnd,ExpandedEnd=expandedArticleEnd };
         window.Width = 1460; window.Height = 920;
         tabs.SelectedIndex = 4;
         await vm.RefreshServerAsync(true);
@@ -134,6 +160,40 @@ public static class UiVerification
         }
         var wheelChecks = await MouseWheelVerification.VerifyListsAsync(window);
         var themeChecks = await ThemeVerification.RunAsync(window, outputDirectory);
+        var guideChecks=new List<object>();
+        foreach(var entry in vm.Projects)
+        {
+            var guide=new ProjectGuideWindow(entry.DisplayName,entry.Path) { Owner=window };
+            try
+            {
+                guide.Show(); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
+                if(!guide.GuideLoaded) throw new InvalidOperationException("Project guide missing: "+entry.DisplayName);
+                guideChecks.Add(new { entry.DisplayName,guide.GuideLoaded,guide.GuideFilePath });
+                if(entry.Id=="audiobook") Capture(guide,Path.Combine(outputDirectory,"audiobook-guide.png"));
+            }
+            finally { guide.Close(); }
+        }
+        var serverGuide=new ProjectGuideWindow("멀티의 신 서버",vm.ServerRootPath) { Owner=window };
+        try
+        {
+            serverGuide.Show(); await serverGuide.Dispatcher.InvokeAsync(serverGuide.UpdateLayout,DispatcherPriority.Render);
+            if(!serverGuide.GuideLoaded) throw new InvalidOperationException("Operational server guide missing.");
+            guideChecks.Add(new { DisplayName="멀티의 신 서버",serverGuide.GuideLoaded,serverGuide.GuideFilePath });
+        }
+        finally { serverGuide.Close(); }
+        foreach(var toolName in new[] { "VoiceStudio", "Zonos2" })
+        {
+            var guide=new ProjectGuideWindow(toolName,Path.Combine(@"D:\A_KJ\AI\Applications",toolName)) { Owner=window };
+            try
+            {
+                guide.Show(); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
+                if(!guide.GuideLoaded) throw new InvalidOperationException("Tool guide missing: "+toolName);
+                guideChecks.Add(new { DisplayName=toolName,guide.GuideLoaded,guide.GuideFilePath });
+            }
+            finally { guide.Close(); }
+        }
+        if(vm.Statuses.Count!=11 || !vm.Statuses.Any(s=>s.Id=="desktop-commander") || !vm.Statuses.Any(s=>s.Id=="jev"))
+            throw new InvalidOperationException("Registered tools were hidden or dropped.");
         var catalogRefresh = await VerifyCatalogRefresh(window, vm);
         var summary = new
         {
@@ -146,6 +206,8 @@ public static class UiVerification
             MouseWheelChecks = wheelChecks,
             ContrastChecks = contrastChecks,
             ThemeChecks = themeChecks,
+            GuideChecks = guideChecks,
+            ArticleReadingChecks = articleReadingChecks,
             CatalogRefresh = catalogRefresh,
             KeyColors = new { Text = ThemeColor(window, "TextBrush"), Canvas = ThemeColor(window, "CanvasBrush"), Surface = ThemeColor(window, "SurfaceBrush") },
             ValidationState = program?.Status,
@@ -164,6 +226,36 @@ public static class UiVerification
             Note = "Native running WPF client rendered at 96 dpi. PNGs exclude the OS titlebar; actual data and command results."
         };
         File.WriteAllText(Path.Combine(outputDirectory, "ui-verification.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static async Task<object> VerifyArticleEnd(MainWindow window,MainViewModel vm,string output,string layout)
+    {
+        var reader=(RichTextBox)window.FindName("InboxBody");
+        var scroll=(ScrollViewer)window.FindName("ArticleScroll");
+        var text=new System.Windows.Documents.TextRange(reader.Document.ContentStart,reader.Document.ContentEnd).Text.Trim();
+        var source=System.Text.RegularExpressions.Regex.Replace(vm.SelectedInbox?.ReadableBody ?? "",@"(?s)<!--.*?-->","");
+        var lastLine=source.Replace("\r","").Split('\n').LastOrDefault(line=>!string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("```"))?.Trim() ?? "";
+        lastLine=System.Text.RegularExpressions.Regex.Replace(lastLine,@"\[([^\]]+)\]\([^)]+\)","$1").Replace("**","").Replace("`","");
+        if(lastLine.StartsWith("#"))lastLine=lastLine.TrimStart('#').Trim();
+        if(lastLine.StartsWith("- "))lastLine="— "+lastLine[2..];
+        if(lastLine.Length==0 || !text.EndsWith(lastLine,StringComparison.Ordinal))
+            throw new InvalidOperationException("Native article is missing the actual record's final text: "+lastLine);
+        var end=reader.Document.ContentEnd.GetCharacterRect(System.Windows.Documents.LogicalDirection.Backward);
+        if(end.IsEmpty || end.Height<=0 || end.Bottom>reader.ActualHeight+1 || reader.Document.Blocks.Count>2 && reader.ActualHeight<reader.FontSize*3)
+            throw new InvalidOperationException($"Article body clipped before its final paragraph: height={reader.ActualHeight}, end={end}, blocks={reader.Document.Blocks.Count}");
+        scroll.ScrollToBottom();
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ApplicationIdle);
+        end=reader.Document.ContentEnd.GetCharacterRect(System.Windows.Documents.LogicalDirection.Backward);
+        var visibleEnd=reader.TransformToAncestor(scroll).TransformBounds(end);
+        var bottomReached=Math.Abs(scroll.VerticalOffset-scroll.ScrollableHeight)<1;
+        if(!bottomReached || visibleEnd.Top<-1 || visibleEnd.Bottom>scroll.ViewportHeight+1)
+            throw new InvalidOperationException($"Final article paragraph is unreachable: end={visibleEnd}, viewport={scroll.ViewportHeight}, offset={scroll.VerticalOffset}/{scroll.ScrollableHeight}");
+        Capture(window,Path.Combine(output,"communication-reading-"+layout+"-bottom.png"));
+        var result=new { Layout=layout,Title=vm.SelectedInbox?.Title,ExpectedFinalText=lastLine,NativeTextLength=text.Length,
+            Blocks=reader.Document.Blocks.Count,ReaderHeight=reader.ActualHeight,ContentEnd=end.ToString(),VisibleEnd=visibleEnd.ToString(),
+            ViewportHeight=scroll.ViewportHeight,ScrollableHeight=scroll.ScrollableHeight,BottomOffset=scroll.VerticalOffset,BottomReached=bottomReached };
+        scroll.ScrollToTop();
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ApplicationIdle);
+        return result;
     }
     private static async Task<object> VerifyCatalogRefresh(MainWindow window, MainViewModel vm)
     {
@@ -194,27 +286,22 @@ public static class UiVerification
         await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
         return new { SelectionPreserved=true, SearchPreserved=true, FoldPreserved=true, ScrollPreserved=true,Before=before,After=after };
     }
-    private static async Task<object> VerifyRosterActivity(MainWindow window, MainViewModel vm, string output)
+    private static async Task<object> VerifyRosterActivity(MainWindow window,MainViewModel vm,string output)
     {
-        var watch = System.Diagnostics.Stopwatch.StartNew();
-        var busy = false; var idle = false; var captured = false; double maxAngle = 0;
-        var timestamps = new HashSet<string>();
-        while (watch.Elapsed < TimeSpan.FromSeconds(2.7))
-        {
-            await Task.Delay(40);
-            await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
-            if (vm.IsUpdatingRoster)
-            {
-                busy = true;
-                if (window.FindName("RosterSpinner") is TextBlock { RenderTransform: RotateTransform rotation }) maxAngle = Math.Max(maxAngle, rotation.Angle);
-                if (!captured) { Capture(window, Path.Combine(output, "server-updating.png")); captured = true; }
-            }
-            else idle = true;
-            if (vm.RosterHealthy) timestamps.Add(vm.RosterCheckedAt);
-        }
-        if (!idle || (!vm.ReduceMotion && SystemParameters.ClientAreaAnimation && maxAngle <= 0))
-            throw new InvalidOperationException("Roster refresh indicator does not reflect live request activity.");
-        return new { BusyObserved = busy, IdleObserved = idle, MaxRotationAngle = maxAngle, ScreenTransitionsReduced = vm.ReduceMotion, SuccessfulTimestampChanges = timestamps.Count, PollIntervalSeconds = 1 };
+        var icon=(TextBlock)window.FindName("RosterSpinner");
+        await vm.RefreshRosterAsync();
+        await Task.Delay((int)RefreshMotion.GetDurationMilliseconds(icon)+80);
+        if(Math.Abs(((RotateTransform)icon.RenderTransform).Angle)>0.01 || vm.IsRefreshingRosterManually)
+            throw new InvalidOperationException("Automatic polling started the manual refresh animation.");
+        var request=vm.RefreshRosterAsync(true);
+        var manualObserved=vm.IsRefreshingRosterManually;
+        await Task.Delay(120);
+        var angle=((RotateTransform)icon.RenderTransform).Angle;
+        Capture(window,Path.Combine(output,"server-updating.png"));
+        await request;
+        if(!manualObserved || (!vm.ReduceMotion && SystemParameters.ClientAreaAnimation && angle<=0))
+            throw new InvalidOperationException("Manual refresh indicator did not turn smoothly.");
+        return new { AutomaticMotionQuiet=true,ManualRequestObserved=manualObserved,ManualAngle=angle,PollIntervalSeconds=vm.RosterRefreshSeconds,TurnMilliseconds=vm.RefreshTurnMilliseconds };
     }
     private static string ThemeColor(MainWindow window, string key) =>
         (window.FindResource(key) as SolidColorBrush)?.Color.ToString()

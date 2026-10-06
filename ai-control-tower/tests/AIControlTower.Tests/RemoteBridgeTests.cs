@@ -1,4 +1,4 @@
-using AIControlTower.Services;
+﻿using AIControlTower.Services;
 namespace AIControlTower.Tests;
 public sealed class RemoteBridgeTests
 {
@@ -15,8 +15,8 @@ public sealed class RemoteBridgeTests
             var service = new RemoteBridgeService(new ProcessRunner()); service.ConsolidateStartup(startup, data);
             Assert.Equal(RemoteBridgeService.LauncherName, Path.GetFileName(Assert.Single(Directory.GetFiles(startup))));
             Assert.Equal("original", File.ReadAllText(Assert.Single(Directory.GetFiles(Path.Combine(data, "backups"), "DesktopCommanderRemote.cmd.bak", SearchOption.AllDirectories))));
-            Assert.Contains("System.Threading.Mutex", File.ReadAllText(Path.Combine(data, "RemoteBridge.ps1")));
-            Assert.Contains("--no-install", File.ReadAllText(Path.Combine(data, "RemoteBridge.ps1")));
+            Assert.Contains("--remote-supervisor", File.ReadAllText(Path.Combine(startup, RemoteBridgeService.LauncherName)));
+            Assert.DoesNotContain("powershell.exe", File.ReadAllText(Path.Combine(startup, RemoteBridgeService.LauncherName)));
             service.ConsolidateStartup(startup, data); Assert.Single(Directory.GetFiles(startup));
         }
         finally { Directory.Delete(root, true); }
@@ -28,8 +28,9 @@ public sealed class RemoteBridgeTests
         Directory.CreateDirectory(startup); File.WriteAllText(Path.Combine(startup, "DesktopCommanderRemote.cmd"), "original");
         try
         {
-            var service = new RemoteBridgeService(new ProcessRunner()); service.ConsolidateStartup(startup, data);
-            Assert.Contains(data, File.ReadAllText(Path.Combine(startup, RemoteBridgeService.LauncherName)));
+            var executable = Path.Combine(root, "한글 앱.exe"); File.WriteAllText(executable, "fixture");
+            var service = new RemoteBridgeService(new ProcessRunner()); service.ConsolidateStartup(startup, data, executable);
+            Assert.Contains(executable, File.ReadAllText(Path.Combine(startup, RemoteBridgeService.LauncherName)));
             service.RestoreStartup(startup, data);
             Assert.Equal("DesktopCommanderRemote.cmd", Path.GetFileName(Assert.Single(Directory.GetFiles(startup))));
             Assert.Equal("original", File.ReadAllText(Path.Combine(startup, "DesktopCommanderRemote.cmd")));
