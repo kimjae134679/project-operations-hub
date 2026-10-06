@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 2,
+  "contentSha256": "63b5e40aef6a2907dea7693e0d6956255a45342efe626edbd1b6f7f535330e0f",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-startup-recovery",
+  "checkedAt": "2026-10-06T09:51:35.775723+00:00",
+  "applicationStatus": "applied",
+  "note": "본인이 실제 읽고 안내 기준 통합·시작 항목 숨김·원격 감시·로그인 실행·관리 끄기·종료 허용 구현에 적용. 설치본167코드·33UI·9원격 검사 통과.",
+  "evidence": [
+    "ai-control-tower/docs/REMOTE-RECOVERY-20261006.json"
+  ],
+  "appliedAt": "2026-10-06T09:52:19.613404+00:00"
+}
