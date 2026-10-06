@@ -29,7 +29,24 @@ try{
  $first=[scriptblock]::Create($source)
  & $first -SourceDirectory $RuntimeDirectory
  if(!(Test-Path -LiteralPath (Join-Path $fixture 'fixture-started.txt'))){throw 'First install did not reach startup'}
+ # Reproduce a real Windows image lock at the exact owned launcher path.
+ $exeName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0xc5f0,0xacb0,0x2e,0x65,0x78,0x65) -join '')
+ $image=Join-Path $fixture $exeName
+ $fixtureSource=Join-Path $fixture 'running-image.cs'
+ [IO.File]::WriteAllText($fixtureSource,'class TestImage { static void Main(){System.Threading.Thread.Sleep(120000);} }')
+ $native=$ast.Find({param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $a.Name -eq 'Invoke-HiddenTool'},$true)
+ . ([scriptblock]::Create($native.Extent.Text))
+ $csc=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+ $compile=Invoke-HiddenTool $csc @('/nologo','/target:winexe',('/out:'+$image),$fixtureSource) $fixture
+ if($compile.ExitCode -ne 0){throw 'Running-image fixture compile failed'}
+ $runningImage=Start-Process -FilePath $image -WorkingDirectory $fixture -WindowStyle Hidden -PassThru
+ Start-Sleep -Milliseconds 200
+ $locked=$false;$probe=$null
+ try{$probe=[IO.File]::Open($image,[IO.FileMode]::Open,[IO.FileAccess]::Write,[IO.FileShare]::Read)}catch{$locked=$true}finally{if($probe){$probe.Dispose()}}
+ if(!$locked){throw 'Actual executable image lock did not reproduce'}
  & $first -SourceDirectory $RuntimeDirectory
+ if(!$runningImage.WaitForExit(2000)){throw 'Installer did not stop its exact owned running launcher'}
+ Write-Output 'PASS: real Windows EXE lock reproduced; exact owned image stopped and destination write access rechecked before replacement.'
  $cfg=Get-Content -LiteralPath $cfgPath -Raw -Encoding UTF8|ConvertFrom-Json
  if($cfg.unknownSetting -ne 'preserve-me' -or $cfg.deviceId -ne 'upgrade-fixture'){throw 'Existing config changed unrelated data'}
  if($cfg.protectedRoots -isnot [Array] -or $cfg.protectedRoots.Count -ne 1){throw 'Scalar migration did not produce one-item array'}
@@ -60,6 +77,10 @@ try{
  if([IO.File]::ReadAllText($short) -ne 'ok'){throw 'Writer did not truncate'}
  Write-Output 'PASS: actual production writer truncates shorter replacement and preserves Hidden.'
 }finally{
+ if($runningImage -and !$runningImage.HasExited){
+  $owned=Get-Process -Id $runningImage.Id -ErrorAction SilentlyContinue
+  if($owned -and $owned.Path -eq $image -and $owned.StartTime -eq $runningImage.StartTime){Stop-Process -Id $owned.Id -Force;$runningImage.WaitForExit(3000)|Out-Null}
+ }
  $resolved=[IO.Path]::GetFullPath($fixture)
  if($resolved.StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -like 'ProjectBridgeUpgradeTest_*'){
   Remove-Item -LiteralPath $resolved -Recurse -Force

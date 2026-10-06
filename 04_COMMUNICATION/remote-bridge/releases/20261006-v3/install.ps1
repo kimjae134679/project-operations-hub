@@ -13,11 +13,15 @@ $installMutex=New-Object -TypeName System.Threading.Mutex -ArgumentList @($false
 try{$hasInstallLock=$installMutex.WaitOne(0)}catch [System.Threading.AbandonedMutexException]{$hasInstallLock=$true}
 if(!$hasInstallLock){ $installMutex.Dispose();throw 'Another ProjectBridge install is running' }
 $installTouched=$false;$installationCommitted=$false;$backup=$null;$priorFlags=@{}
-function Assert-OwnedFileWritable([string]$Path){
+function Assert-OwnedFileWritable([string]$Path,[switch]$DeferImageWriteCheck){
  if([IO.File]::Exists($Path)){
   $info=Get-Item -LiteralPath $Path -Force
   if($info.PSIsContainer -or ($info.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw ('Install file is not a regular file: '+$Path)}
   if(($info.Attributes -band [IO.FileAttributes]::ReadOnly) -ne 0){throw ('Install file is read-only; installation was not changed: '+$Path)}
+  # Windows locks executable images while they run. Only the installer's two
+  # compiled image destinations may defer this probe until the owned stop.
+  # Attribute/reparse checks still run now; all write probes run before copy.
+  if($DeferImageWriteCheck){return}
   $stream=$null
   try{$stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Write,[IO.FileShare]::Read)}
   finally{if($stream){$stream.Dispose()}}
@@ -34,9 +38,9 @@ function Write-OwnedUtf8([string]$Path,[string]$Text){
   $stream.Write($bytes,0,$bytes.Length);$stream.SetLength($bytes.Length);$stream.Flush($true)
  }finally{if($stream){$stream.Dispose()}}
 }
-function Assert-InstallWritable([string]$Root,[string[]]$RelativeFiles){
+function Assert-InstallWritable([string]$Root,[string[]]$RelativeFiles,[string[]]$DeferredImages=@()){
  # Check real upgrade destinations before the running bridge is stopped.
- foreach($name in $RelativeFiles){Assert-OwnedFileWritable (Join-Path $Root $name)}
+ foreach($name in $RelativeFiles){Assert-OwnedFileWritable (Join-Path $Root $name) -DeferImageWriteCheck:($name -in $DeferredImages)}
  $ancestor=$Root
  while(![IO.Directory]::Exists($ancestor)){
   $parent=Split-Path -Parent $ancestor
@@ -219,8 +223,8 @@ try {
   if($tested.Output){Write-Output $tested.Output};if($tested.Error){Write-Output $tested.Error}
   if($tested.ExitCode -ne 0){throw 'Bridge release tests failed; existing installation remains untouched'}
  }finally{Set-Location -LiteralPath $priorLocation.Path}
- Assert-InstallWritable $target (@($destinations.Values)+@('config.json'))
- if($ValidateOnly){Write-Output 'Preflight passed: all release hashes, native compilation, staged tests and destination write access; existing installation untouched.';return}
+ Assert-InstallWritable $target (@($destinations.Values)+@('config.json')) @($exeName,'Runtime\DesktopAutomation.exe')
+ if($ValidateOnly){Write-Output 'Preflight passed: release hashes, compilation, tests and non-image write access. Compiled image write access is checked after owned stop during install; existing installation untouched.';return}
  # All downloads, hashes, compilation and tests have passed before stopping v2.
  New-Item -ItemType Directory -Force -Path $target,$statePath,$runtimePath|Out-Null
  $backup=Join-Path $statePath ('install-backups\'+[DateTime]::UtcNow.ToString('yyyyMMdd_HHmmss_ffff'))
@@ -246,10 +250,10 @@ try {
  }
  # The recorded bridge child is separate from audiobook production; only this
  # exact child and the native launcher at this installation path may be stopped.
- foreach($info in @(Get-CimInstance Win32_Process -Filter ("Name='"+$exeName+"'") -ErrorAction SilentlyContinue)){
-  if($info.ExecutablePath -eq $exePath){
-   $candidate=Get-Process -Id $info.ProcessId -ErrorAction SilentlyContinue
-   if($candidate){$birth=$candidate.StartTime.ToUniversalTime().ToString('o');$live=Get-Process -Id $candidate.Id -ErrorAction SilentlyContinue;if($live -and $live.Path -eq $exePath -and $live.StartTime.ToUniversalTime().ToString('o') -eq $birth){Stop-Process -Id $live.Id -Force}}
+ foreach($candidate in @(Get-Process -Name ([IO.Path]::GetFileNameWithoutExtension($exeName)) -ErrorAction SilentlyContinue)){
+  if($candidate.Path -eq $exePath){
+   $birth=$candidate.StartTime.ToUniversalTime().ToString('o');$live=Get-Process -Id $candidate.Id -ErrorAction SilentlyContinue
+   if($live -and $live.Path -eq $exePath -and $live.StartTime.ToUniversalTime().ToString('o') -eq $birth){Stop-Process -Id $live.Id -Force;if(!$live.WaitForExit(10000)){throw 'Owned launcher did not exit; no install files replaced'}}
   }
  }
  if($child -and !$child.WaitForExit(10000)){
@@ -257,6 +261,9 @@ try {
   if($live -and $live.StartTime.ToUniversalTime().ToString('o') -eq [string]$ticket.startedAt -and $live.Path -in $pythonPaths){Stop-Process -Id $live.Id -Force}
  }
  try {
+  # Do not replace anything until every deferred running-image probe passes.
+  # An unrelated holder remains an error, never a reason to kill more processes.
+  Assert-InstallWritable $target (@($destinations.Values)+@('config.json'))
   foreach($name in $destinations.Keys){
    $destination=Join-Path $target $destinations[$name];New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)|Out-Null;Copy-Item -LiteralPath (Join-Path $stage $name) -Destination $destination -Force
   }
