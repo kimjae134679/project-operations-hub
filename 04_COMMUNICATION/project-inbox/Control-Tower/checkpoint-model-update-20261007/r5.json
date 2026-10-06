@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "projectId": "Control-Tower",
+  "toolId": "codex-continuity-20261007",
+  "at": "2026-10-06T18:16:57.444Z",
+  "status": "prepared_actual_install_blocked",
+  "sourceCommit": "12eb1774045bb59c6bfee090c34aaa578fa5ef15",
+  "manifestSha256": "9708d5e0c700664d9c48e0bb8b7c27c6de59fc35d29917cf680e3690591342ad",
+  "implemented": [
+    "make_dir",
+    "move_file",
+    "delete_file (recoverable)",
+    "restore_file",
+    "local MCP plugin marketplace"
+  ],
+  "validation": {
+    "fullSuite": "94 PASS",
+    "actualMcpFileLifecycle": "PASS",
+    "actualHiddenCommand": "PLUGIN_CONTROL_OK PASS",
+    "stdioInitializeToolsStatus": "PASS",
+    "nativeWindowsPs5Upgrade": "install/reinstall/readonly abort PASS,94 tests each",
+    "publishedBlobHashChecks": "PASS"
+  },
+  "actual": {
+    "DDriveInstall": "NOT_RUN",
+    "pluginRegistration": "NOT_RUN",
+    "hostPermissionsChanged": false,
+    "independentRecovery": "planned_not_installed",
+    "continuousImplementation": "unfinished"
+  },
+  "blockedReason": "Current sandbox cannot write D installation or change host approval policy. Native Computer Use initialization rejected by approval policy never. Do not use plugin as sandbox bypass.",
+  "nextCommand": "$pluginCommit='12eb1774045bb59c6bfee090c34aaa578fa5ef15'; & ([scriptblock]::Create((irm \"https://raw.githubusercontent.com/kimjae134679/project-operations-hub/$pluginCommit/scripts/install-projectbridge-plugin.ps1\"))) -Commit $pluginCommit -ManifestSha256 '9708d5e0c700664d9c48e0bb8b7c27c6de59fc35d29917cf680e3690591342ad'"
+}
