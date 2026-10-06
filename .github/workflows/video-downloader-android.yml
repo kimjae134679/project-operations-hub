@@ -15,6 +15,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - name: Start with fresh QA evidence
+        run: rm -rf VideoDownloaderAndroid/dist
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
