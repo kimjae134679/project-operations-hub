@@ -13,6 +13,49 @@ SOURCE = Path(__file__).resolve().parents[1] / 'DesktopAutomation.cs'
 
 
 class DesktopHelperContract(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows installer file-access preflight')
+    def test_installer_existing_config_preflight_is_nondestructive_and_fails_before_mutation(self):
+        import base64
+        installer=SOURCE.with_name('install.ps1');text=installer.read_text(encoding='utf-8-sig')
+        self.assertIn('function Assert-ExistingConfigWritable(',text)
+        self.assertGreaterEqual(text.count(' Assert-ExistingConfigWritable $configPath'),2)
+        first=text.index(' Assert-ExistingConfigWritable $configPath')
+        last=text.rindex(' Assert-ExistingConfigWritable $configPath')
+        self.assertLess(first,text.index(' $base=$null')+len(' $base=$null')+150)
+        self.assertLess(last,text.index(' New-Item -ItemType Directory -Force -Path $target,$statePath,$runtimePath'))
+        self.assertLess(last,text.index(" [IO.File]::WriteAllText((Join-Path $statePath 'stop.flag'),'installation pause')"))
+        with tempfile.TemporaryDirectory() as temp:
+            script=r'''
+$ErrorActionPreference='Stop';$errors=$null;$tokens=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('INSTALL_PATH',[ref]$tokens,[ref]$errors)
+if($errors){throw 'Installer parse failed'}
+$function=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Assert-ExistingConfigWritable'},$true)
+if(!$function){throw 'Config preflight missing'}
+Invoke-Expression $function.Extent.Text
+$root='ROOT_PATH';$config=Join-Path $root 'config.json';$flag=Join-Path $root 'stop.flag'
+[IO.File]::WriteAllText($config,'{"deviceId":"fixture","keep":"unchanged"}')
+[IO.File]::WriteAllText($flag,'existing user choice')
+$before=[IO.File]::ReadAllBytes($config);$stamp=[IO.File]::GetLastWriteTimeUtc($config)
+Assert-ExistingConfigWritable $config
+if([IO.File]::GetLastWriteTimeUtc($config) -ne $stamp){throw 'Writable probe changed write time'}
+$hold=[IO.File]::Open($config,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+try {
+ $blocked=$false
+ try{Assert-ExistingConfigWritable $config}catch{if($_.Exception.Message -notmatch 'config_not_writable_before_install'){throw};$blocked=$true}
+ if(!$blocked){throw 'Read-only sharing did not fail closed'}
+}finally{$hold.Dispose()}
+$after=[IO.File]::ReadAllBytes($config)
+if([Convert]::ToBase64String($before) -ne [Convert]::ToBase64String($after)){throw 'Probe modified original config'}
+if([IO.File]::ReadAllText($flag) -ne 'existing user choice'){throw 'Probe changed existing stop choice'}
+$missing=Join-Path $root 'missing.json';Assert-ExistingConfigWritable $missing
+if(Test-Path -LiteralPath $missing){throw 'Probe created config file'}
+$bad=Join-Path $root 'directory.json';[IO.Directory]::CreateDirectory($bad)|Out-Null
+$blocked=$false;try{Assert-ExistingConfigWritable $bad}catch{$blocked=$true}
+if(!$blocked){throw 'Directory config was accepted'}
+'''.replace('INSTALL_PATH',str(installer).replace("'","''")).replace('ROOT_PATH',temp.replace("'","''"))
+            command=base64.b64encode(script.encode('utf-16le')).decode('ascii')
+            result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-EncodedCommand',command],capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=20,creationflags=subprocess.CREATE_NO_WINDOW)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
     @unittest.skipUnless(os.name=='nt','Windows staged installer regression')
     def test_installer_function_contract_runs_from_isolated_payload_stage(self):
         import base64

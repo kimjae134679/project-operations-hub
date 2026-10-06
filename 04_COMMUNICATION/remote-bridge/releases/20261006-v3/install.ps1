@@ -12,6 +12,18 @@ $installMutex=New-Object -TypeName System.Threading.Mutex -ArgumentList @($false
 try{$hasInstallLock=$installMutex.WaitOne(0)}catch [System.Threading.AbandonedMutexException]{$hasInstallLock=$true}
 if(!$hasInstallLock){ $installMutex.Dispose();throw 'Another ProjectBridge install is running' }
 $installTouched=$false;$installationCommitted=$false;$backup=$null;$priorFlags=@{}
+function Assert-ExistingConfigWritable([string]$Path){
+ # Request the access the later config update needs without writing, creating,
+ # truncating, changing permissions, or stopping an existing bridge.
+ if(!(Test-Path -LiteralPath $Path)){return}
+ $stream=$null
+ try{
+  $item=Get-Item -LiteralPath $Path -Force
+  if($item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Existing config is not a regular file'}
+  $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read)
+ }catch{throw 'config_not_writable_before_install'}
+ finally{if($stream){$stream.Dispose()}}
+}
 function Invoke-HiddenTool([string]$File,[string[]]$Arguments,[string]$WorkingDirectory){
  $info=New-Object Diagnostics.ProcessStartInfo
  $info.FileName=$File;$info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.WindowStyle='Hidden'
@@ -61,14 +73,16 @@ $guideName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0x5f,0xc0ac,0xc6a9,0xc548,0xb0
 $target='D:\A_KJ\AI\Applications\ProjectBridge'
 $runtimePath=Join-Path $target 'Runtime'
 $statePath=Join-Path $target 'state'
+$configPath=Join-Path $target 'config.json'
 $exePath=Join-Path $target $exeName
-$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py')
+$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py','tests/test_file_crud.py','tests/test_mcp_control.py')
 foreach($hash in $ApprovedBundleSha256){if($hash -notmatch '^[a-f0-9]{64}$'){throw 'Invalid approved bundle hash'}}
 $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $stage=Join-Path $tempRoot ('ProjectBridge3_'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $stage|Out-Null
 try {
  $base=$null
+ Assert-ExistingConfigWritable $configPath
  if($SourceDirectory){
   $source=[IO.Path]::GetFullPath($SourceDirectory)
   $manifestFile=Join-Path $source 'release_manifest.json'
@@ -146,7 +160,7 @@ try {
    if($existingShortcut.TargetPath -ne $exePath -or $existingShortcut.Arguments -ne '--background'){throw 'Unowned startup shortcut preserved'}
   }
  }
- $configPath=Join-Path $target 'config.json';$cfg=@{}
+ $cfg=@{}
  if(Test-Path -LiteralPath $configPath){
   $old=Get-Content -LiteralPath $configPath -Raw -Encoding UTF8|ConvertFrom-Json
   foreach($property in $old.PSObject.Properties){$cfg[$property.Name]=$property.Value}
@@ -164,7 +178,7 @@ try {
  if(!$cfg.maxWorkers){$cfg.maxWorkers=4}
  $priorUiHelper=[string]$cfg.uiHelper
  $cfg.uiHelper=Join-Path $runtimePath 'DesktopAutomation.exe'
- $cfg.protectedRoots=@($cfg.protectedRoots)+@([Environment]::GetFolderPath('Desktop'))|Sort-Object -Unique
+ $cfg.protectedRoots=@(@($cfg.protectedRoots)+@([Environment]::GetFolderPath('Desktop'))|Sort-Object -Unique)
  if(!$cfg.pollSeconds){$cfg.pollSeconds=90}
  $cfg.approvedBundleSha256=@(@($cfg.approvedBundleSha256)+@($ApprovedBundleSha256)|Where-Object{$_}|Sort-Object -Unique)
  $python=[string]$cfg.python
@@ -183,6 +197,8 @@ try {
   if($tested.ExitCode -ne 0){throw 'Bridge release tests failed; existing installation remains untouched'}
  }finally{Set-Location -LiteralPath $priorLocation.Path}
  # All downloads, hashes, compilation and tests have passed before stopping v2.
+ # Recheck after staging: permissions/sharing may have changed meanwhile.
+ Assert-ExistingConfigWritable $configPath
  New-Item -ItemType Directory -Force -Path $target,$statePath,$runtimePath|Out-Null
  $backup=Join-Path $statePath ('install-backups\'+[DateTime]::UtcNow.ToString('yyyyMMdd_HHmmss_ffff'))
  New-Item -ItemType Directory -Path $backup -Force|Out-Null

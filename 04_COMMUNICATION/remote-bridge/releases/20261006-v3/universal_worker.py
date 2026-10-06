@@ -9,8 +9,8 @@ QUEUE='_pc_bridge/queue.json'
 RESULTS='_pc_bridge/results'
 ID=re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$')
 PROJECT=re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}$')
-ACTIONS=frozenset(('capabilities','read_file','write_file','list_dir','run_command','start_process','process_status','stop_process','ui_control'))
-NAMES={'capabilities':'PC 기능 확인','read_file':'파일 읽기','write_file':'파일 수정','list_dir':'폴더 확인','run_command':'명령 실행','start_process':'장기 작업 시작','process_status':'작업 상태 확인','stop_process':'등록 작업 중지','ui_control':'화면 확인·조작'}
+ACTIONS=frozenset(('capabilities','read_file','write_file','list_dir','make_dir','move_file','delete_file','restore_file','run_command','start_process','process_status','stop_process','ui_control'))
+NAMES={'capabilities':'PC 기능 확인','read_file':'파일 읽기','write_file':'파일 수정','list_dir':'폴더 확인','make_dir':'폴더 생성','move_file':'파일 이동','delete_file':'파일 보관 삭제','restore_file':'파일 복구','run_command':'명령 실행','start_process':'장기 작업 시작','process_status':'작업 상태 확인','stop_process':'등록 작업 중지','ui_control':'화면 확인·조작'}
 class UniversalError(Exception):pass
 def now():return dt.datetime.now(dt.timezone.utc).isoformat()
 def digest(raw):return hashlib.sha256(raw).hexdigest()
@@ -51,7 +51,9 @@ def validate_job(job,device,at=None):
 def resource_keys(job):
  args=job['args'];action=job['action'];keys=set('explicit:'+x for x in job.get('resourceKeys',[]))
  if action=='ui_control':keys.add('desktop-input')
- if action in ('read_file','write_file') and isinstance(args.get('path'),str):keys.add('file:'+os.path.normcase(str(Path(args['path']).resolve())))
+ if action in ('read_file','write_file','make_dir','move_file','delete_file') and isinstance(args.get('path'),str):keys.add('file:'+os.path.normcase(str(Path(args['path']).resolve())))
+ if action=='move_file' and isinstance(args.get('destination'),str):keys.add('file:'+os.path.normcase(str(Path(args['destination']).resolve())))
+ if action=='restore_file':keys.add('trash:'+str(args.get('trashId')))
  if action in ('run_command','start_process') and isinstance(args.get('cwd'),str):keys.add('cwd:'+os.path.normcase(str(Path(args['cwd']).resolve())))
  if action in ('process_status','stop_process'):keys.add('process:'+str(args.get('processId')))
  return keys
@@ -62,7 +64,7 @@ class UniversalWorker:
   self.device=self.config.get('deviceId','');self.private=private;self.public=public
   if not ID.fullmatch(self.device):raise UniversalError('invalid_device_id')
   self.journal_path=self.state/'universal_journal.json';self.journal=read(self.journal_path,{})
-  self.lock=threading.RLock();self.active={};self.held=set();self.stop_event=threading.Event();self.thread=None
+  self.lock=threading.RLock();self.active={};self.monitoring={};self.held=set();self.stop_event=threading.Event();self.thread=None
   self.detached_states={};self.detached_cursor=0
   self.last_hello=0;self.relay_code=None;self.relay_available=False
   self.worker_count=max(1,min(16,int(self.config.get('maxWorkers',4))))
@@ -76,6 +78,15 @@ class UniversalWorker:
    if record.get('state')=='started':
     record['result']=self.make_result(jid,record['jobHash'],'interrupted',{'code':'interrupted_review_before_new_job_id'})
     record['state']='finished'
+   elif record.get('state')=='monitoring' or self.registered_process(record):
+    # A ticket acceptance is not child completion. Recover its reservation,
+    # including v3 journals that prematurely marked acceptance as published.
+    if record.get('state')=='published':record['publicationRevision']=record.get('publicationRevision',1)+1
+    record.setdefault('acceptedResult',json.loads(json.dumps(record.get('result',{}))))
+    record['state']='monitoring'
+    job=record.get('job')
+    self.monitoring[jid]=resource_keys(self.scoped_job(job)[0]) if job else set()
+  self.refresh_processes()
   self.checkpoint()
   for jid,record in self.journal.items():self.save_record(jid,record)
  def checkpoint(self):
@@ -99,8 +110,47 @@ class UniversalWorker:
  def save_record(self,jid,record):
   job=record.get('job')
   if job:atomic(self.scope(job)[0]/'journal'/(jid+'.json'),record)
+ def registered_process(self,record):
+  accepted=record.get('acceptedResult',record.get('result',{}))
+  pid=accepted.get('data',{}).get('processId')
+  return record.get('action')=='start_process' and accepted.get('outcome')=='completed' and isinstance(pid,str) and re.fullmatch(r'[a-f0-9]{32}',pid) is not None and not record.get('processFinished')
+ def reserve_resources(self):
+  self.held=set().union(*self.monitoring.values(),*(keys for future,keys in self.active.values()))
+ def refresh_processes(self):
+  for jid in list(self.monitoring):
+   record=self.journal[jid];process=self.live_process(record,maximum=65536)
+   if process is None:process={'stage':'interrupted','running':False,'done':True,'succeeded':False,'error':'registered_process_missing'}
+   state=self.effective_state(record,process);self.detached_states[jid]=state
+   result=self.make_result(jid,record['jobHash'],state,process)
+   result['acceptedAt']=record['acceptedResult'].get('finishedAt')
+   if state in ('starting','running'):
+    result.pop('finishedAt',None)
+   else:
+    if isinstance(process.get('finishedAt'),(int,float)):result['finishedAt']=dt.datetime.fromtimestamp(process['finishedAt'],dt.timezone.utc).isoformat()
+    record['state']='finished';record['processFinished']=True;del self.monitoring[jid]
+   if record.get('result')!=result or record.get('state')=='finished':
+    record['result']=result;atomic(self.state/'local_results'/(jid+'.json'),result);self.save_record(jid,record);self.checkpoint()
+  self.reserve_resources()
+ def control_reservations(self,job):
+  if job['action'] not in ('process_status','stop_process'):return set()
+  _,state=self.scoped_job(job);pid=job['args'].get('processId');owned=set()
+  for jid,keys in self.monitoring.items():
+   row=self.journal[jid];accepted=row.get('acceptedResult',{})
+   if accepted.get('data',{}).get('processId')!=pid:continue
+   parent=row.get('job') or {'projectId':row.get('projectId','Control-Tower'),'toolId':'ProjectBridge'}
+   _,parent_state=self.scoped_job({**parent,'action':'process_status','args':{'processId':pid}})
+   if parent_state==state:owned.update(keys)
+  # Never bypass another live owner's reservation, even if its key overlaps.
+  for jid,keys in self.monitoring.items():
+   row=self.journal[jid];parent=row.get('job') or {'projectId':row.get('projectId','Control-Tower'),'toolId':'ProjectBridge'}
+   parent_pid=row.get('acceptedResult',{}).get('data',{}).get('processId')
+   _,parent_state=self.scoped_job({**parent,'action':'process_status','args':{'processId':parent_pid}})
+   if parent_pid!=pid or parent_state!=state:owned.difference_update(keys)
+  for future,keys in self.active.values():owned.difference_update(keys)
+  return owned
  def live_process(self,record,maximum=0):
-  accepted=record.get('result',{})
+  if record.get('processFinished'):return None
+  accepted=record.get('acceptedResult',record.get('result',{}))
   if record.get('action')!='start_process' or accepted.get('outcome')!='completed':return None
   pid=accepted.get('data',{}).get('processId')
   if not isinstance(pid,str) or not re.fullmatch(r'[a-f0-9]{32}',pid):return None
@@ -124,8 +174,7 @@ class UniversalWorker:
    paused=(self.state/'disconnected.flag').exists()
    rows=list(self.journal.items());candidates=[];active=set(self.active);jobs=[]
    for jid,r in rows:
-    result=r.get('result',{});pid=result.get('data',{}).get('processId')
-    if r.get('action')=='start_process' and result.get('outcome')=='completed' and isinstance(pid,str) and re.fullmatch(r'[a-f0-9]{32}',pid):
+    if self.registered_process(r):
      if self.detached_states.get(jid) not in ('completed','failed','timed_out','stopped'):candidates.append((jid,r))
    pending_ids={jid for jid,r in candidates}
    if candidates:
@@ -165,7 +214,7 @@ class UniversalWorker:
     if old['jobHash']!=key:raise UniversalError('general_job_id_reused')
     return {'accepted':True,'id':jid,'duplicate':True,'state':old['state']}
    validate_job(job,self.device)
-   if sum(r.get('state') in ('queued','started') for r in self.journal.values())>=250:raise UniversalError('local_queue_full')
+   if sum(r.get('state') in ('queued','started','monitoring') for r in self.journal.values())>=250:raise UniversalError('local_queue_full')
    def reaches(current,seen):
     if current==jid:return True
     if current in seen:return False
@@ -179,14 +228,17 @@ class UniversalWorker:
    row=self.journal.get(jid)
    if row is None:raise UniversalError('job_not_found')
    output=json.loads(json.dumps({'id':jid,'state':row['state'],'result':row.get('result')}))
+   if row.get('processFinished'):output['state']=self.effective_state(row);output['process']=json.loads(json.dumps(row['result']['data']))
    process=self.live_process(row,maximum=65536)
    if process is not None:
     state=self.effective_state(row,process);self.detached_states[jid]=state;output['state']=state;output['process']=process
-    output['acceptedResult']=json.loads(json.dumps(row['result']))
-    output['result'].update(outcome=state,data=process,acceptedAt=row['result'].get('finishedAt'))
+    accepted=row.get('acceptedResult',row['result'])
+    output['acceptedResult']=json.loads(json.dumps(accepted))
+    output['result'].update(outcome=state,data=process,acceptedAt=accepted.get('finishedAt'))
     output['result'].pop('finishedAt',None)
     if isinstance(process.get('finishedAt'),(int,float)):
      output['result']['finishedAt']=dt.datetime.fromtimestamp(process['finishedAt'],dt.timezone.utc).isoformat()
+   elif 'acceptedResult' in row:output['acceptedResult']=json.loads(json.dumps(row['acceptedResult']))
    return output
  def execute(self,jid,record,prerequisite_failed=False):
   job=record['job']
@@ -208,7 +260,16 @@ class UniversalWorker:
    for jid,(future,keys) in list(self.active.items()):
     if future.done():
      record=self.journal[jid];record['result']=future.result();record['state']='finished'
-     atomic(self.state/'local_results'/(jid+'.json'),record['result']);self.save_record(jid,record);del self.active[jid];self.held.difference_update(keys);self.checkpoint()
+     if self.registered_process(record):
+      record['acceptedResult']=json.loads(json.dumps(record['result']));record['state']='monitoring';self.monitoring[jid]=keys
+      # Never expose an accepted launch as a completed canonical file, even
+      # in the checkpoint window before the first owner-status refresh.
+      accepted=record['acceptedResult'];stage=self.effective_state(record,accepted['data'])
+      record['result']=self.make_result(jid,record['jobHash'],stage,accepted['data'])
+      record['result']['acceptedAt']=accepted.get('finishedAt')
+      if stage in ('starting','running'):record['result'].pop('finishedAt',None)
+     atomic(self.state/'local_results'/(jid+'.json'),record['result']);self.save_record(jid,record);del self.active[jid];self.checkpoint()
+   self.refresh_processes()
    if self.stop_event.is_set() or (self.state/'stop.flag').exists() or (self.state/'disconnected.flag').exists():self.ui();return
    for jid,record in list(self.journal.items()):
     if len(self.active)>=self.worker_count:break
@@ -217,9 +278,9 @@ class UniversalWorker:
      record['result']=self.make_result(jid,record['jobHash'],'failed',{'code':'general_job_expired_or_invalid_time'});record['state']='finished'
      atomic(self.state/'local_results'/(jid+'.json'),record['result']);self.save_record(jid,record);self.checkpoint();continue
     deps=[self.journal.get(x) for x in record['job'].get('dependsOn',[])]
-    if any(x is None or x.get('state') in ('queued','started') for x in deps):continue
+    if any(x is None or x.get('state') in ('queued','started','monitoring') for x in deps):continue
     scoped,_=self.scoped_job(record['job']);keys=resource_keys(scoped)
-    if keys&self.held:continue
+    if keys&(self.held-self.control_reservations(record['job'])):continue
     record['state']='started';record['startedAt']=now();self.save_record(jid,record);self.checkpoint()
     failed=any(d.get('result',{}).get('outcome')!='completed' for d in deps)
     self.held.update(keys);self.active[jid]=(self.pool.submit(self.execute,jid,record,failed),keys)
@@ -228,15 +289,15 @@ class UniversalWorker:
   self.verify_private();self.private.publish(self.result_path(jid),record['result'])
   if self.public is None:return
   result=record['result'];ok=result['outcome']=='completed';title=NAMES[record.get('action','capabilities')]
-  finished=result['finishedAt'];rid='pc-bridge-'+jid;project=record.get('projectId','Control-Tower')
-  item={'schemaVersion':1,'recordType':'task_exchange','recordId':rid,'revision':1,'title':'PC 작업 · '+title,'projectId':project,'actorId':'ProjectBridge/'+self.device,'sessionId':self.device,'receivedAt':record.get('createdAt',finished),'updatedAt':finished,
+  finished=result['finishedAt'];rid='pc-bridge-'+jid;project=record.get('projectId','Control-Tower');revision=record.get('publicationRevision',1)
+  item={'schemaVersion':1,'recordType':'task_exchange','recordId':rid,'revision':revision,'title':'PC 작업 · '+title,'projectId':project,'actorId':'ProjectBridge/'+self.device,'sessionId':self.device,'receivedAt':record.get('createdAt',finished),'updatedAt':finished,
    'request':{'summary':title,'details':'사용자가 요청한 공용 PC 작업. 세부 내용은 비공개 경로에 보관.','source':'private_pc_bridge_queue'},
    'response':{'summary':title+(' 완료' if ok else ' 확인 필요'),'details':'실제 결과는 비공개 PC 작업 경로에서 확인합니다. 파일·명령·로그·화면은 공개하지 않습니다.','source':'project_bridge_operational_result'},
    'status':'completed' if ok else 'blocked','workDone':[title] if ok else [],'verification':[{'name':'실제 작업 결과','result':'pass' if ok else 'fail','evidence':['private_pc_bridge_result:'+self.device+'/'+jid]}],
    'nextActions':[] if ok else ['비공개 실제 결과 확인'],'blockers':[] if ok else ['private_operation_requires_review'],'supersedes':[]}
   h=digest(serialized(item));base='04_COMMUNICATION/project-inbox/'+project+'/'+h;self.public.publish(base+'/content.json',item)
   source_hash=digest(json.dumps([project,item['actorId'],rid],ensure_ascii=False).encode())
-  self.public.publish(base+'/item.json',{'projectId':project,'contentSha256':h,'sourceName':'task-'+source_hash+'-r1.json','centralPath':base+'/content.json','collectedAt':finished})
+  self.public.publish(base+'/item.json',{'projectId':project,'contentSha256':h,'sourceName':'task-'+source_hash+'-r'+str(revision)+'.json','centralPath':base+'/content.json','collectedAt':finished})
  def publish_pending(self):
   with self.lock:pending=[(jid,json.loads(json.dumps(r))) for jid,r in self.journal.items() if r.get('state')=='finished' and r.get('source','github')=='github']
   for jid,record in pending:

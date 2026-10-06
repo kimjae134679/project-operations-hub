@@ -102,7 +102,7 @@ class SchedulerTests(unittest.TestCase):
    for code in (0,7):
     jid='detached'+str(code);j=job(jid,'start_process',{'python':"from pathlib import Path\nimport time,sys\np=Path('release"+str(code)+"')\nwhile not p.exists():time.sleep(.03)\nsys.exit("+str(code)+")",'timeoutSeconds':30},projectId='Live',toolId='Codex-owner')
     gate=w.scope(j)[1]/('release'+str(code));gates.append(gate);w.submit(j);self.drain(w,timeout=30)
-    accepted=json.loads(json.dumps(w.journal[jid]['result']));pid=accepted['data']['processId'];handles.append(actions.OWNED_RUNNERS.get(pid))
+    accepted=json.loads(json.dumps(w.journal[jid]['acceptedResult']));pid=accepted['data']['processId'];handles.append(actions.OWNED_RUNNERS.get(pid))
     until=time.monotonic()+30
     while time.monotonic()<until:
      detail=w.get_job(jid)
@@ -121,7 +121,8 @@ class SchedulerTests(unittest.TestCase):
      if detail['state'] not in ('starting','running'):break
      time.sleep(.03)
     self.assertEqual(detail['state'],'completed' if code==0 else 'failed');self.assertEqual(detail['result']['outcome'],detail['state'])
-    self.assertEqual(w.status()['activeJobCount'],0);self.assertEqual(w.journal[jid]['result'],accepted)
+    self.assertEqual(w.status()['activeJobCount'],0);self.assertEqual(w.journal[jid]['acceptedResult'],accepted)
+    w.pump();self.assertEqual(w.journal[jid]['result']['outcome'],detail['state'])
     self.assertEqual(w.status()['jobs'][-2]['state'],detail['state'])
   finally:
    for gate in gates:
@@ -130,9 +131,10 @@ class SchedulerTests(unittest.TestCase):
     if handle is not None:handle.wait(timeout=35)
  def test_detached_terminal_phases_and_active_count_do_not_double_count(self):
   from concurrent.futures import Future
-  pid='c'*32;w=self.worker(lambda *args:{'processId':pid});j=job('phases','start_process');w.submit(j);self.drain(w)
+  pid='c'*32;w=self.worker(lambda *args:{'processId':pid});j=job('phases','start_process')
   folder=w.scope(j)[0]/'processes'/pid;u.atomic(folder/'ticket.json',{'processId':pid,'ownerNonce':'test-nonce'})
-  accepted=json.loads(json.dumps(w.journal[j['id']]['result']))
+  u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':'running'});w.submit(j);self.drain(w)
+  accepted=json.loads(json.dumps(w.journal[j['id']]['acceptedResult']))
   for stage in ('starting','running','timed_out','stopped','interrupted','failed'):
    u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':stage})
    self.assertEqual(w.get_job(j['id'])['state'],stage)
@@ -141,11 +143,12 @@ class SchedulerTests(unittest.TestCase):
   w.active[j['id']]=(Future(),set())
   try:self.assertEqual(w.status()['activeJobCount'],1)
   finally:del w.active[j['id']]
-  self.assertEqual(w.journal[j['id']]['result'],accepted)
+  self.assertEqual(w.journal[j['id']]['acceptedResult'],accepted)
  def test_old_detached_owner_remains_counted_and_visible_after_newer_history(self):
-  pid='d'*32;w=self.worker(lambda *args:{'processId':pid});j=job('old-live','start_process');w.submit(j);self.drain(w)
+  pid='d'*32;w=self.worker(lambda *args:{'processId':pid});j=job('old-live','start_process')
   folder=w.scope(j)[0]/'processes'/pid;u.atomic(folder/'ticket.json',{'processId':pid,'ownerNonce':'test-nonce'})
   u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':'running'})
+  w.submit(j);self.drain(w)
   for n in range(150):w.journal['new'+str(n)]={'state':'finished','action':'capabilities','result':{'outcome':'completed'}}
   status=w.status();self.assertEqual(status['activeJobCount'],1);self.assertEqual(len(status['jobs']),100)
   self.assertEqual(status['jobs'][0]['id'],'old-live');self.assertEqual(status['jobs'][0]['state'],'running')
@@ -161,4 +164,114 @@ class SchedulerTests(unittest.TestCase):
   with patch.object(w,'live_process',side_effect=probe) as live:
    self.assertEqual(w.status()['activeJobCount'],130);self.assertEqual(live.call_count,100)
    w.status();self.assertEqual(live.call_count,200);self.assertEqual(len(visited),130)
+
+class DetachedLifecycleTests(unittest.TestCase):
+ tearDown=SchedulerTests.tearDown
+ worker=SchedulerTests.worker
+ drain=SchedulerTests.drain
+ def setUp(self):
+  SchedulerTests.setUp(self);self.pid='e'*32;self.calls=[];self.folder=None
+ def execute(self,j,config,state):
+  self.calls.append(j['id'])
+  if j['action']=='start_process':
+   self.folder=state/'processes'/self.pid
+   u.atomic(self.folder/'ticket.json',{'processId':self.pid,'ownerNonce':'test-owner'})
+   self.phase('running')
+   return {'processId':self.pid,'stage':'running','running':True,'done':False,'succeeded':False}
+  if j['action'] in ('stop_process','process_status'):
+   from universal_actions import process_status
+   if j['action']=='stop_process':self.phase('stopped')
+   return process_status(self.pid,state)
+  return {}
+ def phase(self,stage,code=None):
+  value={'ownerNonce':'test-owner','stage':stage,'finishedAt':time.time()}
+  if code is not None:value['returnCode']=code
+  u.atomic(self.folder/'status.json',value)
+ def accept(self,w):
+  until=time.monotonic()+3
+  while time.monotonic()<until:
+   w.pump()
+   if w.journal['parent'].get('result'):return
+   time.sleep(.01)
+  self.fail('parent acceptance was not saved')
+ def parent(self):return job('parent','start_process',projectId='One',resourceKeys=['project-lock'])
+ def test_live_child_holds_dependencies_and_resources_but_not_executor_slots(self):
+  u.atomic(self.home/'config.json',{'deviceId':'test-device','maxWorkers':1})
+  w=self.worker(self.execute);w.submit(self.parent());self.accept(w)
+  w.submit(job('after',dependsOn=['parent']));w.submit(job('same',resourceKeys=['project-lock']))
+  w.submit(job('unrelated',projectId='Two'));w.pump();time.sleep(.05);w.pump()
+  self.assertNotIn('after',self.calls);self.assertNotIn('same',self.calls)
+  self.assertIn('unrelated',self.calls);self.assertEqual(w.journal['parent']['state'],'monitoring')
+  self.phase('completed',0);self.drain(w)
+  self.assertIn('after',self.calls);self.assertIn('same',self.calls)
+  self.assertEqual(w.journal['parent']['result']['outcome'],'completed')
+  self.assertEqual(w.journal['parent']['acceptedResult']['data']['stage'],'running')
+ def test_terminal_failure_timeout_stop_and_interruption_block_successors(self):
+  for stage,code,outcome in [('completed',7,'failed'),('timed_out',None,'timed_out'),('stopped',None,'stopped'),('interrupted',None,'interrupted'),('failed_to_start',None,'failed')]:
+   with self.subTest(stage=stage):
+    # A fresh journal per terminal case, with the same controlled registered owner.
+    self.home=self.home/stage;u.atomic(self.home/'config.json',{'deviceId':'test-device'})
+    self.calls=[];w=self.worker(self.execute);w.submit(self.parent());self.accept(w)
+    w.submit(job('after',dependsOn=['parent']));self.phase(stage,code);self.drain(w)
+    self.assertNotIn('after',self.calls)
+    self.assertEqual(w.journal['parent']['result']['outcome'],outcome)
+    self.assertEqual(w.journal['after']['result']['data']['code'],'general_prerequisite_failed')
+    self.assertEqual(u.read(w.state/'local_results/parent.json')['outcome'],outcome)
+ def test_restart_recovers_registered_running_child_without_relaunch(self):
+  w=self.worker(self.execute);w.submit(self.parent());self.accept(w)
+  w.submit(job('after',dependsOn=['parent']));w.submit(job('same',resourceKeys=['project-lock']))
+  w.stop();w.pool.shutdown(wait=True);w=self.worker(self.execute);w.pump();time.sleep(.05);w.pump()
+  self.assertEqual(self.calls,['parent']);self.assertEqual(w.journal['parent']['state'],'monitoring')
+  self.phase('completed',0);self.drain(w);self.assertEqual(self.calls.count('parent'),1)
+  self.assertIn('after',self.calls);self.assertIn('same',self.calls)
+ def test_restart_migrates_legacy_published_acceptance_and_republishes_final(self):
+  w=self.worker(self.execute);j=self.parent();w.submit(j);self.accept(w)
+  row=w.journal['parent'];row['result']=row.pop('acceptedResult');row['state']='published';w.checkpoint()
+  w.stop();w.pool.shutdown(wait=True);w=self.worker(self.execute)
+  w.submit(job('after',dependsOn=['parent']));w.pump();time.sleep(.05);w.pump()
+  self.assertNotIn('after',self.calls);self.assertEqual(w.journal['parent']['state'],'monitoring')
+  self.phase('completed',9);self.drain(w);self.assertEqual(w.journal['parent']['state'],'finished')
+  self.assertEqual(w.journal['parent']['result']['outcome'],'failed')
+ def test_matching_owner_control_does_not_deadlock_behind_its_resources(self):
+  u.atomic(self.home/'config.json',{'deviceId':'test-device','maxWorkers':1})
+  w=self.worker(self.execute);j=self.parent();w.submit(j);self.accept(w)
+  w.submit(job('status','process_status',{'processId':self.pid},projectId='One',resourceKeys=['project-lock']))
+  w.submit(job('stop','stop_process',{'processId':self.pid},projectId='One',resourceKeys=['project-lock']))
+  w.submit(job('after',dependsOn=['parent']));self.drain(w)
+  self.assertIn('status',self.calls);self.assertIn('stop',self.calls);self.assertNotIn('after',self.calls)
+  self.assertEqual(w.journal['parent']['result']['outcome'],'stopped')
+ def test_relay_does_not_publish_launch_as_task_success(self):
+  from test_universal_worker import Client
+  private=Client();public=Client();w=u.UniversalWorker(self.home,private,public,self.execute);self.workers.append(w)
+  w.submit(self.parent(),source='github');self.accept(w);w.publish_pending()
+  self.assertEqual(private.writes,[]);self.assertEqual(public.writes,[])
+  self.phase('completed',8);self.drain(w);w.publish_pending()
+  self.assertEqual(private.values[w.result_path('parent')]['outcome'],'failed')
+  self.assertNotIn('task success',json.dumps(public.values))
+  self.assertEqual(w.journal['parent']['state'],'published')
+ def test_running_launch_is_never_written_as_completed_canonical_result(self):
+  from unittest.mock import patch
+  written=[];atomic=u.atomic
+  def observe(path,value):
+   if Path(path)==self.home/'state/local_results/parent.json':written.append(json.loads(json.dumps(value)))
+   return atomic(path,value)
+  w=self.worker(self.execute)
+  with patch.object(u,'atomic',side_effect=observe):w.submit(self.parent());self.accept(w)
+  self.assertTrue(written);self.assertTrue(all(result['outcome']=='running' for result in written))
+  self.assertTrue(all('finishedAt' not in result for result in written))
+ def test_legacy_published_acceptance_final_result_uses_new_public_revision(self):
+  from test_universal_worker import Client
+  private=Client();public=Client();w=u.UniversalWorker(self.home,private,public,self.execute);self.workers.append(w)
+  w.submit(self.parent(),source='github');self.accept(w)
+  row=w.journal['parent'];row['result']=row.pop('acceptedResult');row['state']='published'
+  w.publish('parent',row);w.checkpoint();w.stop();w.pool.shutdown(wait=True)
+  w=u.UniversalWorker(self.home,private,public,self.execute);self.workers.append(w)
+  self.phase('completed',8);self.drain(w);w.publish_pending()
+  records=[value for path,value in public.writes if path.endswith('/content.json')]
+  self.assertEqual([record['revision'] for record in records],[1,2])
+  self.assertEqual([record['status'] for record in records],['completed','blocked'])
+  self.assertEqual(records[0]['recordId'],records[1]['recordId'])
+  self.assertTrue(any(value['sourceName'].endswith('-r2.json') for path,value in public.writes if path.endswith('/item.json')))
+
+
 if __name__=='__main__':unittest.main()

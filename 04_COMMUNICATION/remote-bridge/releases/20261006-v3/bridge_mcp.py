@@ -5,6 +5,14 @@ from pathlib import Path
 TOOLS=[{'name':'pc_status','description':'공용 PC 연결·작업 상태 확인','inputSchema':{'type':'object','properties':{},'additionalProperties':False}},
  {'name':'pc_submit','description':'파일·빌드·설치·장기 작업·화면 조작 제출. 작업 ID로 결과 조회.','inputSchema':{'type':'object','required':['action','args'],'properties':{'action':{'type':'string','enum':['capabilities','read_file','write_file','list_dir','run_command','start_process','process_status','stop_process','ui_control']},'args':{'type':'object'},'id':{'type':'string'},'projectId':{'type':'string'},'toolId':{'type':'string'},'dependsOn':{'type':'array','items':{'type':'string'}},'resourceKeys':{'type':'array','items':{'type':'string'}}},'additionalProperties':False}},
  {'name':'pc_result','description':'등록 작업 실제 결과 조회','inputSchema':{'type':'object','required':['id'],'properties':{'id':{'type':'string','pattern':'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$'}},'additionalProperties':False}}]
+TOOLS[1]['description']='Submit an authorized PC operation and poll pc_result(id). read_file/list_dir/make_dir: args.path absolute. write_file: path, expectedSha256 (null only for new file), contentUtf8 or contentBase64. move_file: path, destination, expectedSha256. delete_file: path, expectedSha256; returns recoverable trashId. restore_file: trashId, expectedSha256 in the same projectId/toolId scope. Commands: argv or python or powershell, optional cwd and timeoutSeconds. Use start_process for long work; process_status/stop_process require owned processId. Never treat accepted as completed.'
+for tool in TOOLS:
+ tool['annotations']={'readOnlyHint':tool['name']!='pc_submit','destructiveHint':tool['name']=='pc_submit','idempotentHint':tool['name']!='pc_submit','openWorldHint':False}
+TOOLS[1]['inputSchema']['properties']['action']['enum'].extend(['make_dir','move_file','delete_file','restore_file'])
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+ def redirect_request(self,*args,**kwargs):raise ValueError('local_endpoint_redirect_refused')
+
 class Adapter:
  def __init__(self,home,tool_id=None):self.home=Path(home);self.tool_id=tool_id or 'mcp-'+uuid.uuid4().hex
  def request(self,path,data=None):
@@ -14,7 +22,8 @@ class Adapter:
   if url.scheme!='http' or url.hostname!='127.0.0.1' or not url.port or url.path:raise ValueError('invalid_local_endpoint')
   raw=None if data is None else json.dumps(data).encode()
   headers={'X-ProjectBridge-Token':endpoint['token'],'Content-Type':'application/json'}
-  with urllib.request.urlopen(urllib.request.Request(base+path,data=raw,headers=headers),timeout=10) as response:return json.load(response)
+  opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
+  with opener.open(urllib.request.Request(base+path,data=raw,headers=headers),timeout=10) as response:return json.load(response)
  def call(self,name,args):
   if name=='pc_status':return dict(self.request('/v1/status'),callerToolId=self.tool_id)
   if name=='pc_result':
