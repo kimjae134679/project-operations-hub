@@ -44,7 +44,7 @@
     },
     {
       "path": "프로젝트_사용안내.md",
-      "sha256": "8b1acea50442bffada1e53af70e56f3cf607ed64f28acbff49515c6d6a982ede"
+      "sha256": "d0982650bf560597ad19ff1bc9619ed3fc553949e861aed25fcf48632ea3c270"
     },
     {
       "path": "tests/test_bridge.py",

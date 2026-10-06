@@ -3,7 +3,8 @@
  [ValidatePattern('^[a-f0-9]{64}$')][string]$ManifestSha256,
  [string]$SourceDirectory,
  [string[]]$ApprovedBundleSha256=@(),
- [switch]$StartAtLogin
+ [switch]$StartAtLogin,
+ [switch]$ValidateOnly
 )
 $ErrorActionPreference='Stop'
 $runningInstaller=$null
@@ -90,7 +91,8 @@ try {
   $seen[$row.path]=$true;$file=Join-Path $stage $row.path
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $file)|Out-Null
   if($SourceDirectory){Copy-Item -LiteralPath (Join-Path $source $row.path) -Destination $file}else{Invoke-WebRequest -UseBasicParsing -Uri ($base+$row.path) -OutFile $file}
-  if((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -ne $row.sha256){throw 'Release file hash mismatch'}
+  $actualHash=(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+  if($actualHash -ne $row.sha256){throw ('Release file hash mismatch: '+$row.path+' expected '+$row.sha256+' got '+$actualHash)}
  }
  if(@($manifest.files).Count -ne $allowed.Count){throw 'Incomplete release manifest'}
  # The installer is the trusted entry script, outside the payload manifest.
@@ -182,6 +184,7 @@ try {
   if($tested.Output){Write-Output $tested.Output};if($tested.Error){Write-Output $tested.Error}
   if($tested.ExitCode -ne 0){throw 'Bridge release tests failed; existing installation remains untouched'}
  }finally{Set-Location -LiteralPath $priorLocation.Path}
+ if($ValidateOnly){Write-Output 'Preflight passed: all release hashes, native compilation and staged tests; existing installation untouched.';return}
  # All downloads, hashes, compilation and tests have passed before stopping v2.
  New-Item -ItemType Directory -Force -Path $target,$statePath,$runtimePath|Out-Null
  $backup=Join-Path $statePath ('install-backups\'+[DateTime]::UtcNow.ToString('yyyyMMdd_HHmmss_ffff'))
