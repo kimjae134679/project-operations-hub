@@ -30,9 +30,15 @@ try {
  $npmScript=Join-Path (Split-Path $npm) 'node_modules\npm\bin\npm-cli.js'
  if(!(Test-Path -LiteralPath $npmScript)){throw 'npm CLI entry missing'}
  $report.installedVersion='0.160.1'
- Invoke-Quiet $node @($npmScript,'install','-g','@openai/codex@0.160.1','--no-audit','--no-fund','--fetch-retries=0','--fetch-timeout=30000') 'npm-update'|Out-Null
  $package=Join-Path $env:APPDATA 'npm\node_modules\@openai\codex'
- $metadata=Get-Content -LiteralPath (Join-Path $package 'package.json') -Raw|ConvertFrom-Json
+ $packageJson=Join-Path $package 'package.json'
+ $existingVersion=$null
+ if(Test-Path -LiteralPath $packageJson){try{$existingVersion=(Get-Content -LiteralPath $packageJson -Raw|ConvertFrom-Json).version}catch{}}
+ if($existingVersion -ne '0.160.1'){
+  $report.phase='npm_update';Save-Report
+  Invoke-Quiet $node @($npmScript,'install','-g','@openai/codex@0.160.1','--no-audit','--no-fund','--fetch-retries=0','--fetch-timeout=30000') 'npm-update'|Out-Null
+ } else { $report.updateSkipped='already_current';Save-Report }
+ $metadata=Get-Content -LiteralPath $packageJson -Raw|ConvertFrom-Json
  if($metadata.version -ne '0.160.1'){throw 'Updated global package version mismatch'}
  $exe=Join-Path $package 'node_modules\@openai\codex-win32-x64\vendor\x86_64-pc-windows-msvc\bin\codex.exe'
  if(!(Test-Path -LiteralPath $exe)){throw 'Updated native Codex executable missing'}
@@ -41,16 +47,24 @@ try {
  if($BridgeCommit){
   if(!$ManifestSha256){throw 'Manifest SHA required for bridge repair'}
   $url='https://raw.githubusercontent.com/kimjae134679/project-operations-hub/'+$BridgeCommit+'/04_COMMUNICATION/remote-bridge/releases/20261006-v3/install.ps1'
-  $installer=(Invoke-WebRequest -UseBasicParsing -Uri $url).Content
+  $report.phase='bridge_download';Save-Report
+  $installerPath=Join-Path $root ('bridge-install-'+$BridgeCommit+'.ps1')
+  Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $installerPath -TimeoutSec 30
+  $installer=[IO.File]::ReadAllText($installerPath,[Text.Encoding]::UTF8).TrimStart([char]0xFEFF)
+  $tokens=$null;$parseErrors=$null
+  $ast=[System.Management.Automation.Language.Parser]::ParseInput($installer,[ref]$tokens,[ref]$parseErrors)
+  if(@($parseErrors).Count -gt 0 -or !$ast.ParamBlock){throw 'Downloaded installer has no valid parameter block'}
+  $report.phase='bridge_install';Save-Report
   & ([scriptblock]::Create($installer)) -Commit $BridgeCommit -ManifestSha256 $ManifestSha256 -StartAtLogin
   $report.bridgeRepair='installer_completed_check_local_and_relay_separately'
  }
+ $report.phase='model_smoke';Save-Report
  $smoke=Invoke-Quiet $exe @('exec','--ignore-user-config','--ephemeral','--json','--model','gpt-6.1-sol','--sandbox','workspace-write','--skip-git-repo-check','-C',$root,'Return exactly CODEX_6_1_OK. Do not use tools or change files.') 'model-smoke' 120
  if($smoke -notmatch 'CODEX_6_1_OK' -or $smoke -match '"type"\s*:\s*"turn.failed"'){throw '6.1 model smoke did not complete'}
  $report.modelSmoke='pass';Save-Report
  $report.state='completed';$report.finishedAt=[DateTimeOffset]::UtcNow.ToString('o');Save-Report
  Write-Output 'Codex updated and 6.1 model smoke passed. Detailed results are saved in the existing work folder.'
 } catch {
- $report.state='blocked';$report.reason=$_.Exception.Message;$report.finishedAt=[DateTimeOffset]::UtcNow.ToString('o');Save-Report
+ $report.state='blocked';$report.reason=$_.Exception.Message;$report.errorId=$_.FullyQualifiedErrorId;$report.errorLine=$_.InvocationInfo.ScriptLineNumber;$report.errorPosition=$_.InvocationInfo.PositionMessage;$report.finishedAt=[DateTimeOffset]::UtcNow.ToString('o');Save-Report
  throw
 }
