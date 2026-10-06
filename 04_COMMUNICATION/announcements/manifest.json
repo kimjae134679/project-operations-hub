@@ -237,7 +237,7 @@
     },
     {
       "id": "N-0008",
-      "revision": 1,
+      "revision": 2,
       "title": "프로젝트 자료 위치와 사용 안내 먼저 읽기",
       "path": "notices/N-0008.md",
       "targets": [
@@ -245,7 +245,7 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292"
+      "contentSha256": "63b5e40aef6a2907dea7693e0d6956255a45342efe626edbd1b6f7f535330e0f"
     },
     {
       "id": "N-0009",

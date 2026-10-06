@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "reader-followup-20261006-152014",
+  "revision": 2,
+  "title": "소통방·도구·사용 안내 수정 재개 — PC 연결 대기",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "work-20261006-reader-followup",
+  "receivedAt": "2026-10-06T15:20:14+09:00",
+  "updatedAt": "2026-10-06T15:44:30.336043+09:00",
+  "request": {
+    "summary": "중단된 통합소통방 개선을 마저 진행하라.",
+    "details": "앞선 지시를 유지: 초록색·버튼·한 글자 프로젝트 배지 수정, 게시글처럼 읽는 소통방, 갱신 간격과 회전 속도 분리, 전체 도구 표시, 각 담당자 실제 프로젝트 사용 안내 작성·확인, 명령·실제 답변 기록.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "수정 소스 17개를 작업 중 PR #22에 올렸고 공통 안내·공지·기록은 PR #21로 main에 반영했다. PC 연결 후 통합·Windows 검증·설치가 남아 있다.",
+    "details": "실제 전달한 진행 답변 요약. 최종 답변 대기. Python 29개와 정적 대비 계산 통과. Windows 빌드·실행·설치는 미실행이며 다른 AI 공지 읽음·프로젝트 안내 작성도 대신 표시하지 않는다.",
+    "source": "current_chat"
+  },
+  "status": "blocked",
+  "workDone": [
+    "GitHub main의 소스·공통 정책·현재 기록 형식 확인",
+    "중립 테마·버튼·프로젝트 이름·게시글 본문 소스 수정",
+    "전체 도구 표시와 제품명, 자동 조회 간격·수동 회전 속도 옵션 소스 수정",
+    "프로젝트 안내 읽기와 실제 로컬 자료 링크·설명 이미지 소스 작성",
+    "N-0008·안내 기준·본인 프로젝트 사용 안내 작성. 각 PC 전달과 다른 AI 읽음은 미확인",
+    "이번 기록은 중앙 직접 등록용이며 PC 보낼자료 자동 수집은 미실행",
+    "프로젝트 안내 기준·N-0008·본인 기록 PR #21 병합: 29c8c2395bb8232672901c37ced8a2d1c130cbc6",
+    "수정 소스 17개 작업 중 PR #22로 보존: 7ecba9b20a1e8a9efd4b62fa5506b2668580d56b",
+    "기존 중앙 기록을 보존하고 PR 최종 변경 파일 확인. 이번 임시 캐시 정리"
+  ],
+  "verification": [
+    {
+      "name": "Python 공지·기록 도우미",
+      "result": "pass",
+      "evidence": [
+        "python -m unittest discover -s scripts -p test_*.py: 29 tests OK"
+      ]
+    },
+    {
+      "name": "공지 manifest·본문 해시",
+      "result": "pass",
+      "evidence": [
+        "python scripts/notice_board.py validate: 통과"
+      ]
+    },
+    {
+      "name": "정적 XAML·팔레트 대비",
+      "result": "pass",
+      "evidence": [
+        "XML 파싱 3개 통과",
+        "reader-static-verification.json: 밝음 5.8313:1, 어두움 6.4383:1"
+      ]
+    },
+    {
+      "name": "WPF 빌드·실행·설치 및 공지 권한 오류",
+      "result": "not_run",
+      "evidence": []
+    },
+    {
+      "name": "GitHub 반영",
+      "result": "pass",
+      "evidence": [
+        "PR #21 merged",
+        "PR #22 draft: 17 files, unexpected changes 0"
+      ]
+    }
+  ],
+  "nextActions": [
+    "PC 연결 후 미게시 로컬 소스와 안내 파일 보존·비교·통합",
+    "Windows 빌드·테스트·실제 화면과 긴 본문·안내 링크·갱신 확인",
+    "오디오북 소통 폴더 권한 오류 재현·수정, 백업 후 설치본 교체",
+    "N-0008의 실제 PC 전달과 담당자 본인 기록 확인"
+  ],
+  "blockers": [
+    "Desktop Commander KJW ping 오프라인; 원격 명령 시간 초과",
+    "현재 Scratch .NET SDK 없음; Windows 빌드·설치 검증 불가"
+  ],
+  "supersedes": []
+}
