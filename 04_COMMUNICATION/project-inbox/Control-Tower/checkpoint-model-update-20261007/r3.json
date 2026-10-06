@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "checkpoint-model-update-20261007",
+  "revision": 3,
+  "title": "대화 중단 대비와 6.1 실행기 업데이트·원격 복구",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "checkpoint-model-update-20261007",
+  "receivedAt": "2026-10-07T02:03:26+09:00",
+  "updatedAt": "2026-10-06T17:38:49.091Z",
+  "request": {
+    "summary": "중단 전 기록·다음 명령을 저장하고 가능하면 끊긴 뒤 작업을 이어가기, 6.1 우선, 실행기 업데이트",
+    "details": "새 원격 우선·기존 원격 유지·Astra 제외·별도 창 없이 실행·프로젝트별 분리. 사용자 후속 지시: 필요한 직접 실행은 사용자에게 전달. 사용자 추가 지시: “지금 원격켜져있는거아니야? ... 니가 다 할수있개만들고 저것도해결하고 실행해 기록도 꾸준히해”.",
+    "source": "current_user_messages"
+  },
+  "response": {
+    "summary": "원격은 온라인이지만 실제 설치 설정 오류로 쓰기와 명령 실행이 막혀 있음을 확인했다.",
+    "details": "수정본 e0f9dc86a28a4f5a6cf210d37672c17b0d311dc4 게시. 전체 설치 사전검증 83 테스트, 배포18파일 정확해시, 실제 Windows PS5/로컬 API/숨김 자식 실행 왕복까지 통과. 실제 PC 복구와 6.1 모델 호출은 아직 실행되지 않음. 초기 복구 실행 경로가 막혀 사용자 PC 실행 필요.",
+    "source": "actual_assistant_work_and_commentary"
+  },
+  "status": "blocked",
+  "workDone": [
+    "ProjectBridge 3.0 heartbeat와 현재 연결 확인",
+    "새 원격 read_file로 실행기 실패와 설정 상태 확인",
+    "단일 보호 폴더 배열의 PowerShell 직렬화 오류 수정 및 scalar 호환 방어",
+    "Windows 검사 83개 통과",
+    "숨김 Codex 0.160.1 업데이트·명시적 gpt-6.1-sol smoke helper 작성 및 PowerShell 파서 확인",
+    "N-0010 공지와 공통 정책 업데이트 준비",
+    "Codex actual 0.160.1 설치 완료 확인; 업데이트 중복 실행 생략",
+    "Windows PS5 BOM param 실패 재현·수정",
+    "정확한 GitHub18파일과 manifest 일치 확인, 실제 전체 installer ValidateOnly pass",
+    "새 selfcheck를 실제 PS5와 인증 로컬 API·숨김 실행기로 왕복 검사; 실패 결과 거부 확인",
+    "비공개 continuation 최신 source commit·다음 명령·미실행 상태 기록"
+  ],
+  "verification": [
+    {
+      "name": "Windows full installer preflight",
+      "result": "pass",
+      "evidence": [
+        "ValidateOnly staged hashes, native compile, 83 tests OK; actual install untouched"
+      ]
+    },
+    {
+      "name": "Exact published payload hashes",
+      "result": "pass",
+      "evidence": [
+        "18/18 GitHub base64 blobs match manifest; manifest SHA241ded661cd038914c2630810f0c2529342d5cb9be0cf0f1ef1915119e1fe20d"
+      ]
+    },
+    {
+      "name": "Windows helper actual local control harness",
+      "result": "pass",
+      "evidence": [
+        "PS5 invoked real authenticated API and real hidden executor; stdout REMOTE_CONTROL_OK; failed result rejected"
+      ]
+    },
+    {
+      "name": "Published helper byte-for-text agreement",
+      "result": "pass",
+      "evidence": [
+        "Pinned e0f9dc86a28a4f5a6cf210d37672c17b0d311dc4 matches tested helper"
+      ]
+    },
+    {
+      "name": "User PC Codex update",
+      "result": "pass",
+      "evidence": [
+        "Actual installed codex-cli 0.160.1"
+      ]
+    },
+    {
+      "name": "User PC bridge repair and actual remote command",
+      "result": "not_run",
+      "evidence": [
+        "Online read works; installed scalar protectedRoots blocks mutations; own session D write denied; old remote quota paused"
+      ]
+    },
+    {
+      "name": "User PC gpt-6.1-sol model smoke",
+      "result": "not_run",
+      "evidence": [
+        "Runs after actual bridge repair; never Astra"
+      ]
+    }
+  ],
+  "nextActions": [
+    "고정 helper PC 실행: 보호 설정 복구 및 실제 인증 명령 selfcheck 후 gpt-6.1-sol smoke",
+    "checks/codex-update-result.json과 최신 relay 상태 확인; 새 원격 실제 큐 왕복 확인",
+    "지속 작업 구현 저장 요청 재개; 프로젝트와 요청자별 기록·명령·진행·결과 지속 저장"
+  ],
+  "blockers": [
+    "실제 사용자 PC 복구 실행 경로 막힘: 보호 설정 오류·현재 세션 D쓰기 불가·기존 원격 한도",
+    "새 원격 실제 명령 성공과 6.1 model smoke 미실행",
+    "연속 작업 실행기 구현·배포 미완료"
+  ],
+  "supersedes": [
+    "04_COMMUNICATION/project-inbox/Control-Tower/checkpoint-model-update-20261007/r2.json"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "actorId": "ProjectBridge/KJW-80ea388278fd",
+  "blockers": [],
+  "nextActions": [],
+  "projectId": "Control-Tower",
+  "receivedAt": "2026-10-06T14:25:34.110Z",
+  "recordId": "pc-bridge-hub-20261006-link-capabilities-01",
+  "recordType": "task_exchange",
+  "request": {
+    "details": "사용자가 요청한 비공개 PC 작업. 상세 명령은 비공개 통로에 보관.",
+    "source": "private_pc_bridge_queue",
+    "summary": "PC 기능 확인"
+  },
+  "response": {
+    "details": "상세 결과는 비공개 PC 연결 통로에서 확인합니다. 원문·명령·로그·화면은 공개하지 않습니다.",
+    "source": "project_bridge_operational_result",
+    "summary": "PC 기능 확인 완료"
+  },
+  "revision": 1,
+  "schemaVersion": 1,
+  "sessionId": "KJW-80ea388278fd",
+  "status": "completed",
+  "supersedes": [],
+  "title": "PC 연결 · PC 기능 확인",
+  "updatedAt": "2026-10-06T14:25:38.015220+00:00",
+  "verification": [
+    {
+      "evidence": [
+        "private_pc_bridge_result:KJW-80ea388278fd/hub-20261006-link-capabilities-01"
+      ],
+      "name": "로컬 작업 결과",
+      "result": "pass"
+    }
+  ],
+  "workDone": [
+    "PC 기능 확인"
+  ]
+}

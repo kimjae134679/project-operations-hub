@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "projectId": "Control-Tower",
+  "toolId": "codex-continuity-20261007",
+  "at": "2026-10-06T18:45:20.457Z",
+  "status": "actual_pc_plugin_installed",
+  "jobId": "plugin-desktop-install-20261007-01",
+  "actual": {
+    "folder": "Desktop/ProjectBridge_PC_Control",
+    "marketplaceCommandExit": 0,
+    "pluginInstallExit": 0,
+    "pluginListExit": 0,
+    "installed": true,
+    "enabled": true,
+    "version": "3.0.1",
+    "userAccountCacheVerified": true,
+    "remoteCommandRoundtrip": "PASS",
+    "hostPermissionsChanged": false,
+    "bridgeReinstalled": false,
+    "newSessionRequired": true
+  },
+  "authorization": "User explicitly requested desktop placement and installation after download link failure; narrow exception to no Desktop files preference",
+  "remaining": "New Codex conversation to load installed plugin tools. Web custom MCP and independent backup not deployed."
+}

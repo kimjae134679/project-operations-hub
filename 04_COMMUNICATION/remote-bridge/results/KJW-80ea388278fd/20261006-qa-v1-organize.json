@@ -1,0 +1,13 @@
+{
+  "bridgeVersion": "2.0.0",
+  "data": {
+    "code": "prerequisite_failed"
+  },
+  "device": "KJW-80ea388278fd",
+  "finishedAt": "2026-10-06T14:24:51.837127+00:00",
+  "jobId": "20261006-qa-v1-organize",
+  "jobSha256": "80b4170da909e150759fc86b8a3f7054ea3c2092edf763b8099c99379e8fc506",
+  "outcome": "failed",
+  "project": "Mushoku-Audiobook",
+  "schemaVersion": 1
+}

@@ -1,0 +1,85 @@
+{
+  "bridgeVersion": "2.0.0",
+  "data": {
+    "locations": [
+      {
+        "counts": {
+          ".json": 2217,
+          ".mkv": 0,
+          ".mp3": 3,
+          ".mp4": 0,
+          ".wav": 2192
+        },
+        "location": "voice_resource_pack/rebuild"
+      },
+      {
+        "counts": {
+          ".json": 7,
+          ".mkv": 0,
+          ".mp3": 0,
+          ".mp4": 0,
+          ".wav": 7
+        },
+        "location": "voices"
+      },
+      {
+        "counts": {
+          ".json": 0,
+          ".mkv": 0,
+          ".mp3": 0,
+          ".mp4": 0,
+          ".wav": 4
+        },
+        "location": "voices_clean"
+      },
+      {
+        "counts": {
+          ".json": 3,
+          ".mkv": 0,
+          ".mp3": 0,
+          ".mp4": 0,
+          ".wav": 48
+        },
+        "location": "voice_candidates"
+      },
+      {
+        "counts": {
+          ".json": 65,
+          ".mkv": 0,
+          ".mp3": 17,
+          ".mp4": 0,
+          ".wav": 17
+        },
+        "location": "comparison/01_CURRENT"
+      },
+      {
+        "counts": {
+          ".json": 2,
+          ".mkv": 0,
+          ".mp3": 0,
+          ".mp4": 0,
+          ".wav": 5
+        },
+        "location": "reference_lab"
+      },
+      {
+        "counts": {
+          ".json": 0,
+          ".mkv": 0,
+          ".mp3": 0,
+          ".mp4": 17,
+          ".wav": 0
+        },
+        "location": "anime_sources"
+      }
+    ],
+    "note": "Counts only. No media, transcripts, source text or unrestricted filenames uploaded."
+  },
+  "device": "KJW-80ea388278fd",
+  "finishedAt": "2026-10-06T14:24:38.387325+00:00",
+  "jobId": "20261006-qa-v1-inventory",
+  "jobSha256": "41b2b683a3a1058b25e9cf26952e1b54fea6924d34855192b70108ee0727ce78",
+  "outcome": "completed",
+  "project": "Mushoku-Audiobook",
+  "schemaVersion": 1
+}

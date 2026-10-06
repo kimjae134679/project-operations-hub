@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "checkpoint-model-update-20261007",
+  "revision": 1,
+  "title": "대화 중단 대비와 6.1 실행기 업데이트·원격 복구",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "checkpoint-model-update-20261007",
+  "receivedAt": "2026-10-07T02:03:26+09:00",
+  "updatedAt": "2026-10-06T17:13:46.831Z",
+  "request": {
+    "summary": "중단 전 기록·다음 명령을 저장하고 가능하면 끊긴 뒤 작업을 이어가기, 6.1 우선, 실행기 업데이트",
+    "details": "새 원격 우선·기존 원격 유지·Astra 제외·별도 창 없이 실행·프로젝트별 분리. 사용자 후속 지시: 필요한 직접 실행은 사용자에게 전달.",
+    "source": "current_user_messages"
+  },
+  "response": {
+    "summary": "새 원격 읽기·상태 확인에 실제 사용했고 설정 오류로 수정·명령이 막혀 있음을 설명했다.",
+    "details": "수정 코드 83개 검사 통과와 PC 적용 대기를 보고했다. 사용자 PC에서 1회 복구·업데이트 명령이 필요함을 전달했다. 최종 실행 명령 전달 대기.",
+    "source": "actual_assistant_commentary"
+  },
+  "status": "blocked",
+  "workDone": [
+    "ProjectBridge 3.0 heartbeat와 현재 연결 확인",
+    "새 원격 read_file로 실행기 실패와 설정 상태 확인",
+    "단일 보호 폴더 배열의 PowerShell 직렬화 오류 수정 및 scalar 호환 방어",
+    "Windows 검사 83개 통과",
+    "숨김 Codex 0.160.1 업데이트·명시적 gpt-6.1-sol smoke helper 작성 및 PowerShell 파서 확인",
+    "N-0010 공지와 공통 정책 업데이트 준비",
+    "검증한 수정본·업데이트 helper를 고정 커밋으로 게시: b5a6aa7a5a07fdbf9668f8bb284f127b30684e53"
+  ],
+  "verification": [
+    {
+      "name": "Windows Python tests",
+      "result": "pass",
+      "evidence": [
+        "83 tests OK, 15.290s"
+      ]
+    },
+    {
+      "name": "Update helper PowerShell parser",
+      "result": "pass",
+      "evidence": [
+        "parserErrors=0"
+      ]
+    },
+    {
+      "name": "Actual Codex update/model roundtrip",
+      "result": "not_run",
+      "evidence": [
+        "현재 실행 환경 다운로드 EACCES; 기존 원격 월한도; 새 원격 설정 오류"
+      ]
+    },
+    {
+      "name": "Actual installed bridge repair",
+      "result": "not_run",
+      "evidence": [
+        "Source prepared; user one-time execution required"
+      ]
+    }
+  ],
+  "nextActions": [
+    "사용자 PC에서 고정 업데이트·복구 helper를 한 번 실행",
+    "actualVersion·modelSmoke 및 새 원격 local/relay 상태 확인",
+    "기존 연속 작업 요청을 실제 지원 모델로 재개: 프로젝트·요청자별 지속 큐, 예약·재시작 복구, 로컬 기록 자동 수집",
+    "긴 작업을 작은 단위로 나눠 다음 명령을 기록"
+  ],
+  "blockers": [
+    "PC 적용과 실제 6.1 smoke 대기",
+    "연속 작업 실행기 구현·배포 미완료"
+  ],
+  "supersedes": []
+}
