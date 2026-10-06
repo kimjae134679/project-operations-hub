@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 1,
+  "contentSha256": "b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-reading-tools",
+  "checkedAt": "2026-10-06T03:06:30.241279+00:00",
+  "applicationStatus": "applied",
+  "note": "실제프로젝트사용안내7개·안내창·자료위치링크/이미지·guide-first관리진입을구현했고 실제경로 검증과AI본인기록을구분합니다. 다른AI읽기대필하지않습니다.",
+  "evidence": [
+    "ai-control-tower/docs/PROJECT-GUIDES-20261006.json"
+  ],
+  "appliedAt": "2026-10-06T03:06:30.431237+00:00"
+}
