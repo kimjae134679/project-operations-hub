@@ -1,12 +1,15 @@
 param(
  [Parameter(Mandatory=$true)][ValidatePattern('^[a-f0-9]{40}$')][string]$Commit,
- [Parameter(Mandatory=$true)][ValidatePattern('^[a-f0-9]{64}$')][string]$ManifestSha256
+ [ValidatePattern('^[a-f0-9]{64}$')][string]$ManifestSha256,
+ [switch]$PluginOnly
 )
 $ErrorActionPreference='Stop'
 [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
 $base='https://raw.githubusercontent.com/kimjae134679/project-operations-hub/'+$Commit+'/'
 $bridge='D:\A_KJ\AI\Applications\ProjectBridge'
 $package=Join-Path $bridge 'PluginMarketplace'
+if(!$PluginOnly){
+if(!$ManifestSha256){throw 'ManifestSha256 is required for bridge installation'}
 $installer=Join-Path ([IO.Path]::GetTempPath()) ('ProjectBridgeInstall_'+[guid]::NewGuid().ToString('N')+'.ps1')
 Invoke-WebRequest -UseBasicParsing -Uri ($base+'04_COMMUNICATION/remote-bridge/releases/20261006-v3/install.ps1') -OutFile $installer
 $source=[IO.File]::ReadAllText($installer,[Text.Encoding]::UTF8).TrimStart([char]0xFEFF)
@@ -14,8 +17,9 @@ $tokens=$null;$errors=$null;$ast=[System.Management.Automation.Language.Parser]:
 if(@($errors).Count -or !$ast.ParamBlock){throw 'Pinned installer parse failure'}
 & ([scriptblock]::Create($source)) -Commit $Commit -ManifestSha256 $ManifestSha256 -StartAtLogin
 Remove-Item -LiteralPath $installer
+}
 # Fetch only the declarative plugin configuration, never an arbitrary executable.
-foreach($relative in @('.codex-plugin/marketplace.json','plugins/projectbridge-local/.codex-plugin/plugin.json','plugins/projectbridge-local/.mcp.json')){
+foreach($relative in @('.agents/plugins/marketplace.json','plugins/projectbridge-local/.codex-plugin/plugin.json','plugins/projectbridge-local/.mcp.json')){
  $destination=Join-Path $package $relative
  New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force|Out-Null
  Invoke-WebRequest -UseBasicParsing -Uri ($base+$relative) -OutFile $destination
