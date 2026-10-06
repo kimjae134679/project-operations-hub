@@ -1,0 +1,18 @@
+{
+  "type": "static_palette_checks",
+  "results": [
+    {
+      "theme": "dark",
+      "minimumContrast": 6.438289077647033,
+      "pairs": 41,
+      "result": "pass"
+    },
+    {
+      "theme": "light",
+      "minimumContrast": 5.831306538088743,
+      "pairs": 41,
+      "result": "pass"
+    }
+  ],
+  "nativeWindowsRendering": "not_run"
+}
