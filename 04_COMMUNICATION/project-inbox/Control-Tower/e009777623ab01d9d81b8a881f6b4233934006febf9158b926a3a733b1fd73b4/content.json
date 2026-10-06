@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-local-project-guides",
+  "revision": 2,
+  "title": "프로젝트마다 실제 자료 위치와 사용 안내 작성",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_guides",
+  "sessionId": "20261006-reading-tools-guides",
+  "receivedAt": "2026-10-06T11:46:55+09:00",
+  "updatedAt": "2026-10-06T11:59:50+09:00",
+  "request": {
+    "summary": "각 프로젝트에 자료 위치와 설명을 적고 AI가 그 안내를 먼저 읽도록 변경",
+    "details": "실제 카탈로그 6개 진입점의 입력·결과·참고·이전 자료·실행방법을 확인하여 프로젝트_사용안내.md 작성. 오디오북 음원 감상 위치를 빠뜨리지 않음. 원본 이동·삭제 및 비밀값/소설 원문 복사 금지. 부모는 앱·카탈로그·화면·배포 담당.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "부모에게 로컬 안내 7개·공통 안내/규칙·N8·171개 경로 검증 완료를 보고함",
+    "details": "실제로 전달한 부모 메시지: 가이드 7개와 2열 자료표·N8 및 해시·정책 append·모든 로컬 링크 PASS를 보고했습니다. 게임 README의 누락된 0.24.5 테스트 링크를 알렸으며 우리 안내는 존재하는 0.24.4 기준과 후속 변경 구분으로 수정했습니다. 이 기록은 위임 문서 범위 완료이며 앱·전체 작업 배포 완료는 부모가 검증합니다. 최종 사용자 답변 대기.",
+    "source": "agent_message:/root"
+  },
+  "status": "completed",
+  "workDone": [
+    "현재 카탈로그 6개 루트와 별도 운영 서버에 프로젝트_사용안내.md 총7개 작성",
+    "오디오북 최신/이전/비교/선호/원본영상/참조표본/추가표본/검토이미지/입력대본/진행복구/코드환경/소통 범주를 실제 자료에 연결",
+    "허브 사용자 지도11·양식PROJECT_GUIDE·N8·AGENTS·USER_POLICIES·사용자규칙05·templates목록 갱신",
+    "작은창용2열표로 정리하고 모든171개 로컬 링크 존재 확인",
+    "N1~N8 실제 읽고 /root/project_guides 본인의 Control-Tower receipt8개만 작성; 다른AI확인대필 없음",
+    "게임 README의 존재하지 않는 TEST_SPECTATOR_0.24.5.md를 발견해 부모에게 보고; 우리안내는 실제0.24.4 기본문서에 연결"
+  ],
+  "verification": [
+    {
+      "name": "로컬 자료 링크 존재",
+      "result": "pass",
+      "evidence": [
+        "7개 프로젝트 안내+허브3문서 총10문서171개 로컬 링크 존재, 누락0",
+        "ai-control-tower/docs/PROJECT-GUIDES-20261006.json"
+      ]
+    },
+    {
+      "name": "공지 목록·본문 해시·기록 구조",
+      "result": "pass",
+      "evidence": [
+        "py -3.11 scripts/notice_board.py --root D:/A_KJ/AI/Projects/project-operations-hub validate",
+        "N8 SHA256 b495b1b5a7e2024888e88b94b6227e1559a5be6aead82b7d0b0c337e2cb0e292"
+      ]
+    },
+    {
+      "name": "앱 화면·음성재생·게임/서버 실행",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-control-tower-reading-tools",
+  "revision": 2,
+  "title": "버튼·색상·게시글 읽기·갱신 속도·도구 접근성 개선",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-reading-tools",
+  "receivedAt": "2026-10-06T11:43:11+09:00",
+  "updatedAt": "2026-10-06T03:06:29.540240+00:00",
+  "request": {
+    "summary": "초록색과 버튼 디자인을 바꾸고 소통방을 게시글처럼 편하게 읽도록 개선. 1초 갱신/회전 속도 조정, 프로젝트 한글 축약 제거, 원격 데스크톱/Jev 등 도구가 보이게 복원.",
+    "details": "사용자 첨부3개 화면 참조. 실제 설치본과 최신 코드·등록을 확인하고 작업 완료 및 설치까지 진행. 사람이 이해하는 전체 이름과 행동을 표시하며 AI JSON 원본과 실제 명령/답변 기록 유지.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "원격/Jev가 이름변경·연결관리 안에숨겨져찾기어려웠다고 설명했고 제품명·도구목록 복원, 한글첫글자 배지제거, 게시글형 읽기와 갱신/회전분리조정을 실제진행답변으로 전달했습니다. 작은창본문과 임시프로젝트오등록을 발견해 고친다고 말했고 안내7개·171위치 확인도 전달했습니다.",
+    "details": "최종 완료 답변은 아직 전달하지 않았습니다. 실제 완성 설치본의 화면 검증 중입니다.",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "최신 main 갱신",
+    "현재 운영규칙 및 공지목록7개 동일버전 확인",
+    "도구 접근성 독립 읽기검토 분업",
+    "white/slate·charcoal/slate중립색·flat버튼",
+    "전체프로젝트한글이름·첫글자배지제거",
+    "게시글제목+본문통합스크롤·본문넓게·16px/28px읽기",
+    "도구9개표시·검색·제품명·각행동복원",
+    "자동갱신1/3/5/10초(기본3)·수동회전1/1.4/2초(기본1.4)분리",
+    "가이드창·로컬링크·이미지지원",
+    "n8n명칭/문서링크기준/본문휠/손상이미지예외 리뷰지적교정",
+    "임시Workspace·관리Data/Tools폴더자동프로젝트등록제외"
+  ],
+  "verification": [
+    {
+      "name": "Windows .NET Release118개",
+      "result": "pass",
+      "evidence": [
+        "D:\\A_KJ\\AI\\Workspace\\control-tower-reading-test.log"
+      ]
+    },
+    {
+      "name": "Python29개",
+      "result": "pass",
+      "evidence": [
+        "D:\\A_KJ\\AI\\Workspace\\control-tower-reading-python.log"
+      ]
+    },
+    {
+      "name": "첫 nativeQA 작은창본문28높이 발견",
+      "result": "fail",
+      "evidence": [
+        "D:\\A_KJ\\AI\\Workspace\\control-tower-reading-ui\\ui-verification-error.txt"
+      ]
+    },
+    {
+      "name": "최종 EXE nativeUI 검증",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [
+    "최종단일EXE화면/가이드/휠/회전검증",
+    "설치·GitHub병합·중앙기록공유·임시정리"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

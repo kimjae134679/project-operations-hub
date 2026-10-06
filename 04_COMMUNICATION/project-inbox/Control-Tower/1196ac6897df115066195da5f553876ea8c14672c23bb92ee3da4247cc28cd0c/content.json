@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-local-project-guides",
+  "revision": 4,
+  "title": "프로젝트마다 실제 자료 위치와 사용 안내 작성",
+  "projectId": "Control-Tower",
+  "actorId": "/root/project_guides",
+  "sessionId": "20261006-reading-tools-guides",
+  "receivedAt": "2026-10-06T11:46:55+09:00",
+  "updatedAt": "2026-10-06T12:10:56+09:00",
+  "request": {
+    "summary": "각 프로젝트에 자료 위치와 설명을 적고 AI가 그 안내를 먼저 읽도록 변경",
+    "details": "실제 카탈로그 6개 진입점의 입력·결과·참고·이전 자료·실행방법을 확인하여 프로젝트_사용안내.md 작성. 오디오북 음원 감상 위치를 빠뜨리지 않음. 원본 이동·삭제 및 비밀값/소설 원문 복사 금지. 부모는 앱·카탈로그·화면·배포 담당.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "부모에게 설치 음성도구 안내2개와 전체205개 경로 검증 완료를 보고함",
+    "details": "실제 부모 메시지로 VoiceStudio/Zonos2 로컬 안내 작성·오디오북/지도 연결·9개안내(7프로젝트+2설치도구)·12문서205개경로존재PASS를 보고했습니다. VoiceStudio D경로실행기와데이터/설정/모델/환경을구분했고, Zonos2 기본BAT미연결과기존외부Q8모델·UTF8입력방식 구분을 전달했습니다. 앱 QA/배포는부모담당이며이번에프로그램/모델을실행하지않았습니다. 최종사용자답변대기.",
+    "source": "agent_message:/root"
+  },
+  "status": "completed",
+  "workDone": [
+    "현재 카탈로그 6개 루트와 별도 운영 서버에 프로젝트_사용안내.md 총7개 작성",
+    "오디오북 최신/이전/비교/선호/원본영상/참조표본/추가표본/검토이미지/입력대본/진행복구/코드환경/소통 범주를 실제 자료에 연결",
+    "허브 사용자 지도11·양식PROJECT_GUIDE·N8·AGENTS·USER_POLICIES·사용자규칙05·templates목록 갱신",
+    "작은창용2열표로 정리하고 모든171개 로컬 링크 존재 확인",
+    "N1~N8 실제 읽고 /root/project_guides 본인의 Control-Tower receipt8개만 작성; 다른AI확인대필 없음",
+    "게임 README의 존재하지 않는 TEST_SPECTATOR_0.24.5.md를 발견해 부모에게 보고; 우리안내는 실제0.24.4 기본문서에 연결",
+    "VoiceStudio 설치도구 안내: 0.5.6 파일정보·D용실행기·공유OmniVoice·Library/생성음성/프로필·설정·캐시·별도환경 위치 구분",
+    "Zonos2 설치도구 안내: native GUI/CLI/server·기존 외부Q8/DAC/spk모델·기본 BAT q6 다운로드 연결과 현재 미연결·UTF8 HTTP벤치 경로를 구분",
+    "오디오북 안내와 허브 사용자11에 설치도구 링크 연결, 프로젝트7개+설치도구2개 총9안내로 정리"
+  ],
+  "verification": [
+    {
+      "name": "로컬 자료 링크 존재",
+      "result": "pass",
+      "evidence": [
+        "12문서205개 로컬링크 존재 확인, 누락0",
+        "ai-control-tower/docs/PROJECT-GUIDES-20261006.json"
+      ]
+    },
+    {
+      "name": "설치정보와 데이터 경로",
+      "result": "pass",
+      "evidence": [
+        "VoiceStudio.exe ProductVersion0.5.6.0 및 실제 D용실행기소스/번들README 확인",
+        "Zonos2 start-zonos2.ps1 기본모델경로/종류와 Models/ZONOS2 실제파일메타정보 확인",
+        "앱/model폴더 및 ZONOS2_MODEL_DIR/QUANT 설정은 없음, 외부Q8모델 존재"
+      ]
+    },
+    {
+      "name": "앱/모델/서버실행·새합성·사용자청취",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}

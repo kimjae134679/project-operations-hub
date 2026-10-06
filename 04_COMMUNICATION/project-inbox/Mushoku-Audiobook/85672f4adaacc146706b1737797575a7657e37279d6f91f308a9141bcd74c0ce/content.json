@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "Mushoku-Audiobook-20261006-source-wide-voice-rebuild",
+  "revision": 1,
+  "title": "전체 17개 영상 표본 재추출 및 록시 외 음성 재제작",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-production-15-24",
+  "receivedAt": "2026-10-06T11:51:21+09:00",
+  "updatedAt": "2026-10-06T12:01:38.530259+09:00",
+  "request": {
+    "summary": "이미 내려받은 영상 음원을 전부 활용하여 표본부터 다시 정리하고 록시 외 목소리를 다시 만들 것",
+    "details": "록시는 기존 선호 기준 유지\n일부 영상만 추출한 기존 표본 정리 범위는 불충분\n기존 제작과 새 참조 후보 및 새 한국어 비교 MP3를 분리",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "일부 구간만 추출한 범위 오류를 인정하고 기존 본편을 일시정지한 뒤 17개 영상의 새 표본 수집과 한국어 비교 더빙을 시작함",
+    "details": "록시 기존 3.2초 기준은 그대로 보존\n본편 음색 설정을 자동으로 교체하지 않음",
+    "source": "current_chat"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "오디오북제작.exe --pause 실행; pause.flag 확인",
+    "17개 영상 전체의 비보류 구간을 대상으로 캐시된 faster-whisper-small 로컬 추출 시작",
+    "파일별 SHA256 및 중단 후 재사용 가능한 manifest와 새 표본 인덱스 구현"
+  ],
+  "verification": [
+    {
+      "name": "production_pause",
+      "result": "pass",
+      "evidence": [
+        "output/production_15_24/pause.flag"
+      ]
+    },
+    {
+      "name": "full_source_extraction",
+      "result": "not_run",
+      "evidence": [
+        "temp/source_rebuild_scan.log"
+      ]
+    }
+  ],
+  "nextActions": [
+    "17개 영상의 추출 완료 및 범위 기록 확인",
+    "참조 화자 및 대사 확인과 배경음 분리",
+    "록시를 보존하며 새 한국어 판단용 MP3 생성 및 재생 검증"
+  ],
+  "blockers": [],
+  "supersedes": []
+}

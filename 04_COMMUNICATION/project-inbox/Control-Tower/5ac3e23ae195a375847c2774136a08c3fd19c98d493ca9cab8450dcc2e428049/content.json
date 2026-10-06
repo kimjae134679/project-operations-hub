@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "review-ui-article-height-native-20261006",
+  "revision": 1,
+  "title": "게시글 본문 전체 높이 수정과 마지막 단락 native 검증",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "receivedAt": "2026-10-06T03:22:04.538Z",
+  "updatedAt": "2026-10-06T03:22:40.353335+00:00",
+  "request": {
+    "summary": "한 줄만 보이는 RichTextBox 본문을 전체 읽도록 수정하고 실제 마지막 단락 QA 강화",
+    "details": "부모가 NoticeDocument.cs와 UiVerification.cs 전용 수정 권한을 부여했다. 전체 제목·본문은 외부 ArticleScroll 하나에서 스크롤되고 마지막 단락까지 읽혀야 한다. 이후 MainWindow InboxBody에 AutoHeight 한 속성 추가도 허용했다. 기존 QA PID28204와 외부 연결 서비스는 유지한다. receivedAt은 정확한 부모 메시지 수신 timestamp가 제공되지 않아 첫 공식 기록 작성 시각이다.",
+    "source": "parent_agent_message:/root"
+  },
+  "response": {
+    "summary": "전체 본문 높이를 계산하는 AutoHeight 구현과 실제 기록 마지막 줄 native 검증을 완료하고 부모에게 결과를 전달했다.",
+    "details": "실제로 전달: NoticeDocument에서 본문 변경/Loaded/너비 변경 이후 ContextIdle에 전체 문서 끝 geometry와 extent로 높이를 맞추고, InboxBody에 AutoHeight=True 한 속성만 추가했다. QA는 ApplicationIdle 이후 실제 기록 마지막 문자열, reader 내부 끝 geometry, 외부 ScrollToBottom 이후 마지막 줄 viewport 가시성과 바닥 PNG를 검사한다. 부모 native 보고 compact Reader1292/end1230과 wide Reader1068/end1006으로 마지막 줄을 읽을 수 있음이 확인됐다. 위쪽에서 본문이 적게 보이는 별도 문제는 부모의 header/filter 세로 압축 담당으로 구분했고 추가 소스 수정 없이 자체 기록/임시 native probe 정리를 진행한다고 전달했다. N-0008 공지 전달 Unauthorized 해결과 전체 배포/Git는 부모 담당이며 본 기록의 완료는 본문 높이와 끝 검증에 한정한다.",
+    "source": "collaboration.send_message:/root"
+  },
+  "status": "completed",
+  "workDone": [
+    "NoticeDocument AutoHeight 첨부 속성: 본문·Loaded·너비 변화 이후 실제 문서 끝 geometry/ExtentHeight/DesiredSize로 높이 계산",
+    "MainWindow InboxBody에 AutoHeight=True 한 속성 추가",
+    "UiVerification은 실제 기록 마지막 텍스트 일치와 본문 내부 geometry를 검사",
+    "compact 및 wide 외부 스크롤 바닥에서 마지막 줄이 viewport 안에 보이는지 검증하고 바닥 PNG 저장",
+    "기존 QA PID와 연결 서비스 유지; 부모가 빌드/native QA 실행",
+    "본인 숨김 native probe 임시 스크립트 정리"
+  ],
+  "verification": [
+    {
+      "name": "현재 실제 기록 마지막 텍스트와 외부 스크롤 바닥 native 검증",
+      "result": "pass",
+      "evidence": [
+        "D:\\A_KJ\\AI\\Workspace\\control-tower-reading-ui-release\\ui-verification.json",
+        "Permanent evidence destination (parent final QA copy pending): ai-control-tower/docs/screens-reading-tools/ui-verification.json",
+        "{\"Layout\": \"compact\", \"Title\": \"프로젝트마다 실제 자료 위치와 사용 안내 작성\", \"ExpectedFinalText\": \"기록된 추가 작업 없음\", \"NativeTextLength\": 1211, \"Blocks\": 22, \"ReaderHeight\": 1292, \"ContentEnd\": \"161,1230,0,21\", \"VisibleEnd\": \"161,112,0,21\", \"ViewportHeight\": 188, \"ScrollableHeight\": 1264, \"BottomOffset\": 1264, \"BottomReached\": true}",
+        "{\"Layout\": \"wide-compact\", \"Title\": \"프로젝트마다 실제 자료 위치와 사용 안내 작성\", \"ExpectedFinalText\": \"기록된 추가 작업 없음\", \"NativeTextLength\": 1211, \"Blocks\": 22, \"ReaderHeight\": 1068, \"ContentEnd\": \"161,1006,0,21\", \"VisibleEnd\": \"161,112,0,21\", \"ViewportHeight\": 188, \"ScrollableHeight\": 1040, \"BottomOffset\": 1040, \"BottomReached\": true}"
+      ]
+    },
+    {
+      "name": "본문 영역 정방향/역방향 wheel native 검증",
+      "result": "pass",
+      "evidence": [
+        "ArticleReadingChecks: {\"Before\": 0, \"After\": 48, \"Restored\": 0, \"ExpandedWidth\": 1020}"
+      ]
+    },
+    {
+      "name": "전체 빌드·배포·N-0008 전달 최종 상태",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}
