@@ -1,0 +1,329 @@
+--------- beginning of main
+10-06 13:43:38.041   860   985 D EGL_emulation: app_time_stats: avg=199.96ms min=199.45ms max=200.25ms count=6
+10-06 13:43:38.222   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:38.222   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:38.707  2147  2164 D EGL_emulation: app_time_stats: avg=2723.83ms min=2723.83ms max=2723.83ms count=1
+10-06 13:43:39.240   860   985 D EGL_emulation: app_time_stats: avg=199.92ms min=199.11ms max=200.36ms count=6
+10-06 13:43:39.522   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:39.525   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+--------- beginning of kernel
+10-06 13:43:40.145     0     0 W healthd : battery l=100 v=5000 t=25.0 h=2 st=2 c=900000 fc=3000000 cc=10 chg=a
+10-06 13:43:40.240   860   985 D EGL_emulation: app_time_stats: avg=200.02ms min=199.64ms max=200.33ms count=5
+10-06 13:43:40.484  2147  2164 D EGL_emulation: app_time_stats: avg=888.46ms min=865.17ms max=911.75ms count=2
+10-06 13:43:40.605   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:40.605   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:41.151   346   378 I netd    : tetherGetStats() -> {[]} <0.29ms>
+10-06 13:43:41.154   346   378 I netd    : bandwidthSetGlobalAlert(2097152) <0.16ms>
+--------- beginning of system
+10-06 13:43:41.372   539   633 D ActivityManager: freezing 1034 com.android.settings
+10-06 13:43:41.441   860   985 D EGL_emulation: app_time_stats: avg=200.10ms min=199.10ms max=200.96ms count=6
+10-06 13:43:41.455   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:41.455   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:42.644   860   985 D EGL_emulation: app_time_stats: avg=200.39ms min=199.02ms max=203.43ms count=6
+10-06 13:43:42.661   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:42.662   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:43.171  2147  2164 D EGL_emulation: app_time_stats: avg=1343.52ms min=886.17ms max=1800.88ms count=2
+10-06 13:43:43.505   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:43.505   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:43.840   860   985 D EGL_emulation: app_time_stats: avg=199.45ms min=196.58ms max=201.22ms count=6
+10-06 13:43:44.571   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:44.572   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:44.581   539  1581 W BatteryExternalStatsWorker: error reading Bluetooth stats: 11
+10-06 13:43:44.841   860   985 D EGL_emulation: app_time_stats: avg=200.02ms min=199.44ms max=200.75ms count=5
+10-06 13:43:44.971  2147  2164 D EGL_emulation: app_time_stats: avg=899.58ms min=890.36ms max=908.80ms count=2
+10-06 13:43:45.655   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:45.655   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:46.040   860   985 D EGL_emulation: app_time_stats: avg=199.84ms min=199.53ms max=200.39ms count=6
+10-06 13:43:46.505   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:46.505   860  1297 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-06 13:43:46.771  2147  2164 D EGL_emulation: app_time_stats: avg=899.93ms min=887.36ms max=912.50ms count=2
+10-06 13:43:47.040   860   985 D EGL_emulation: app_time_stats: avg=200.08ms min=199.82ms max=200.37ms count=5
+10-06 13:43:47.163  1390  1563 W MediaProvider: isAppCloneUserPair for user 0: false
+10-06 13:43:47.165  1390  1563 I MediaProvider: Open with lower FS for /storage/emulated/0/Download/VideoDownloader/.pending-1791899027-slow [slow].mp4. Uid: 10148
+10-06 13:43:47.167  1390  1563 W MediaProvider: Ignoring mutation of date_expires from kr.co.kjw.videodownloader
+10-06 13:43:47.168  1390  1563 D MediaProvider: Moving /storage/emulated/0/Download/VideoDownloader/.pending-1791899027-slow [slow].mp4 to /storage/emulated/0/Download/VideoDownloader/slow [slow].mp4
+10-06 13:43:47.170  1390  1560 D WM-SystemJobScheduler: Scheduling work ID 9801919f-6e06-47b2-b4b3-4ead1691c7d4Job ID 5
+10-06 13:43:47.173   463   463 I SampleTable: There are reordered frames present.
+10-06 13:43:47.176   463   463 I SampleTable: There are reordered frames present.
+10-06 13:43:47.183   539  1581 D ActivityManager: Stop FGS timeout: ServiceRecord{ff4833b u0 kr.co.kjw.videodownloader/.DownloadService c:kr.co.kjw.videodownloader}
+10-06 13:43:47.183   539  1581 W ForegroundServiceTypeLoggerModule: FGS stop call for: 10148 has no types!
+10-06 13:43:47.183   539  1581 D OomAdjuster: Not killing cached processes
+10-06 13:43:47.316   539   539 I NotificationService: Cannot find enqueued record for key: 0|kr.co.kjw.videodownloader|1|null|10148
+10-06 13:43:47.586   539  2070 I ActivityManager: Force stopping kr.co.kjw.videodownloader appid=10148 user=0: finished inst
+10-06 13:43:47.587  2135  2135 I app_process: System.exit called, status: 0
+10-06 13:43:47.587  2135  2135 I AndroidRuntime: VM exiting with result code 0.
+10-06 13:43:47.704     0     0 I binder  : 539:2070 ioctl 400c620e 74e4895eb354 returned -11
+10-06 13:43:47.709     0     0 I binder  : 539:2070 ioctl 400c620e 74e4895eb354 returned -11
+10-06 13:43:47.591   539  2070 E ActivityManager: Unable to freeze binder for 2147: -11
+10-06 13:43:47.592   539  2070 D CompatChangeReporter: Compat change id reported: 151861875; UID 10148; state: ENABLED
+10-06 13:43:47.592   539   561 D DisplayManagerService: Drop pending events for gone uid 10148
+10-06 13:43:47.592   539  2070 I ActivityManager: Killing 2147:kr.co.kjw.videodownloader/u0a148 (adj 0): stop kr.co.kjw.videodownloader due to finished inst
+10-06 13:43:47.596   539  2070 W ActivityTaskManager: Force removing ActivityRecord{ce9ee04 u0 kr.co.kjw.videodownloader/.MainActivity t8 f}}: app died, no saved state
+10-06 13:43:47.596  2204  2204 I cr_ChildProcessService: Destroying ChildProcessService pid=2204
+10-06 13:43:47.598   539   782 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+10-06 13:43:47.598  2204  2204 I ocessService0:0: System.exit called, status: 0
+10-06 13:43:47.598  2204  2204 I AndroidRuntime: VM exiting with result code 0, cleanup skipped.
+10-06 13:43:47.599   860   904 V WindowManagerShell: Transition requested (#7): android.os.BinderProxy@1fe2f48 TransitionRequestInfo { type = CLOSE, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=false baseIntent=Intent { flg=0x10000000 cmp=kr.co.kjw.videodownloader/.MainActivity } baseActivity=null topActivity=null origActivity=null realActivity=ComponentInfo{kr.co.kjw.videodownloader/kr.co.kjw.videodownloader.MainActivity} numActivities=0 lastActiveTime=29097 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@55241e1} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=null launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= falseisLetterboxEducationEnabled= false isLetterboxDoubleTapEnabled= false topActivityEligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false cameraCompatTaskInfo=CameraCompatTaskInfo { cameraCompatControlState=hidden freeformCameraCompatMode=inactive}}}, pipTask = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 7 }
+10-06 13:43:47.603   539   782 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+10-06 13:43:47.603   539   782 D InetDiagMessage: Destroyed live tcp sockets for uids={10148} in 8ms
+10-06 13:43:47.603   539   782 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+10-06 13:43:47.604   539   782 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+10-06 13:43:47.607   539   782 D InetDiagMessage: Destroyed live tcp sockets for uids={20148} in 4ms
+10-06 13:43:47.612   425   425 I adbd    : Remote process closed the socket (on MSG_PEEK)
+10-06 13:43:47.615   539   988 I ImeTracker: kr.co.kjw.videodownloader:600084f5: onRequestHide at ORIGIN_SERVER reason HIDE_REMOVE_CLIENT fromUser false
+10-06 13:43:47.615   539   988 I ImeTracker: kr.co.kjw.videodownloader:600084f5: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-06 13:43:47.615   347   347 I Zygote  : Process 2147 exited due to signal 9 (Killed)
+10-06 13:43:47.615   346   378 I netd    : tetherGetStats() -> {[]} <3.54ms>
+10-06 13:43:47.615   539   782 D ConnectivityService: releasing NetworkRequest [ REQUEST id=64, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10148 RequestorUid: 10148 RequestorPkg: kr.co.kjw.videodownloader UnderlyingNetworks: Null] ] (release request)
+10-06 13:43:47.731     0     0 I binder  : release 2147:2161 transaction 110271 out, still active
+10-06 13:43:47.615   539   576 I libprocessgroup: Removed cgroup /sys/fs/cgroup/uid_10148/pid_2147
+10-06 13:43:47.616   539   832 I WindowManager: WIN DEATH: Window{c3ae09 u0 kr.co.kjw.videodownloader/kr.co.kjw.videodownloader.MainActivity}
+10-06 13:43:47.616   539   832 W InputManager-JNI: Input channel object 'c3ae09 kr.co.kjw.videodownloader/kr.co.kjw.videodownloader.MainActivity (client)' was disposed without first being removed with the input manager!
+10-06 13:43:47.617   539  2070 I ActivityManager: Killing 2204:com.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a148i0 (adj 0): isolated not needed
+10-06 13:43:47.621   539   832 I AppWidgetServiceImpl: startListening() 0
+10-06 13:43:47.621   416   416 I BpBinder: onLastStrongRef automatically unlinking death recipients: 
+10-06 13:43:47.734     0     0 I binder  : undelivered transaction 110291, process died.
+10-06 13:43:47.738     0     0 I binder  : undelivered transaction 110292, process died.
+10-06 13:43:47.626  1273  1273 D StatsLog: LAUNCHER_ONRESUME
+10-06 13:43:47.632   860   904 D WindowManagerShell: setLauncherKeepClearAreaHeight: visible=true, height=294
+10-06 13:43:47.634   539   557 V ActivityManager: Got obituary of 2147:kr.co.kjw.videodownloader
+10-06 13:43:47.753     0     0 I binder  : 2070:539 reply target not found
+10-06 13:43:47.758     0     0 I binder  : 539:2070 transaction reply to 0:0 failed 110386/29189/0, size 4-0 line 3194
+10-06 13:43:47.760     0     0 I binder  : undelivered transaction 110325, process died.
+10-06 13:43:47.645   539   564 W ActivityTaskManager: Unable to send transaction to client proc kr.co.kjw.videodownloader: no app thread
+10-06 13:43:47.646   539   576 I libprocessgroup: Removed cgroup /sys/fs/cgroup/uid_99000/pid_2204
+10-06 13:43:47.762     0     0 I binder  : send failed reply for transaction 110271, target dead
+10-06 13:43:47.647   933   933 I Zygote  : Process 2204 exited cleanly (0)
+10-06 13:43:47.654   539   561 D DisplayManagerService: Drop pending events for gone uid 99000
+10-06 13:43:47.647  1273  1273 D BaseDepthController: setSurface:
+10-06 13:43:47.647  1273  1273 D BaseDepthController: 	mWaitingOnSurfaceValidity: false
+10-06 13:43:47.647  1273  1273 D BaseDepthController: 	mSurface: Surface(name=com.android.launcher3/com.android.launcher3.uioverrides.QuickstepLauncher)/@0x85531b2
+10-06 13:43:47.658   539   582 W KernelCpuProcStringReader: File not found. It's normal if not implemented: /proc/uid_concurrent_policy_time
+10-06 13:43:47.658   539   563 W ActivityManager: setHasOverlayUi called on unknown pid: 2147
+10-06 13:43:47.658   539   563 V WindowManager: Unknown focus tokens, dropping reportFocusChanged
+10-06 13:43:47.666   539  2070 W ActivityTaskManager: callingPackage for (uid=2000, pid=2474) has no WPC
+10-06 13:43:47.670   539  2070 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_ORIENTATION_OVERRIDE
+10-06 13:43:47.671   539  2070 V GrammaticalInflectionUtils: AttributionSource: AttributionSource { uid = 10148, packageName = null, attributionTag = null, token = android.os.Binder@566dd01, deviceId = 0, next = null } does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+10-06 13:43:47.671   539  2070 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES
+10-06 13:43:47.671   539  2070 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_MIN_ASPECT_RATIO_OVERRIDE
+10-06 13:43:47.674   539  2070 V SplashScreenExceptionList: SplashScreen checking exception for package kr.co.kjw.videodownloader (target sdk:35) -> false
+10-06 13:43:47.675   539  2070 I ActivityTaskManager: Add Task{137bfed #8 type=standard A=10148:kr.co.kjw.videodownloader} to hidden list because adding Task{a9b4b82 #9 type=standard A=10148:kr.co.kjw.videodownloader}
+10-06 13:43:47.676   539  2070 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=kr.co.kjw.videodownloader/.MainActivity} with LAUNCH_MULTIPLE from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+10-06 13:43:47.683  1273  1273 I TopTaskTracker: onTaskMovedToFront: (moved taskInfo to front) taskId=7, baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=com.android.launcher3/.uioverrides.QuickstepLauncher }
+10-06 13:43:47.686   539  1816 D CompatChangeReporter: Compat change id reported: 309578419; UID 10148; state: ENABLED
+10-06 13:43:47.686   539   563 V GrammaticalInflectionUtils: AttributionSource: AttributionSource { uid = 10148, packageName = null, attributionTag = null, token = android.os.Binder@566dd01, deviceId = 0, next = null } does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+10-06 13:43:47.695  1273  1273 W SplitSelectStateCtor: Missing session instanceIds
+10-06 13:43:47.695  1273  1273 D StatsLog: LAUNCHER_SPLIT_SELECTION_EXIT_INTERRUPTED
+10-06 13:43:47.702   860   975 D SplashScreenView: Build android.window.SplashScreenView{29890d5 V.E...... ......ID 0,0-0,0}
+10-06 13:43:47.702   860   975 D SplashScreenView: Icon: view: android.widget.ImageView{d4c0ea V.ED..... ......I. 0,0-0,0 #1020504 android:id/splashscreen_icon_view} drawable: com.android.wm.shell.startingsurface.SplashscreenIconDrawableFactory$ImmobileIconDrawable@c599fdb size: 420
+10-06 13:43:47.702   860   975 D SplashScreenView: Branding: view: android.view.View{f3ffa78 G.ED..... ......I. 0,0-0,0 #1020503 android:id/splashscreen_branding_view} drawable: null size w: 0 h: 0
+10-06 13:43:47.704   860   904 D WindowManagerShell: setLauncherKeepClearAreaHeight: visible=false, height=294
+10-06 13:43:47.708  1273  1273 I TopTaskTracker: onTaskMovedToFront: (moved taskInfo to front) taskId=9, baseIntent=Intent { flg=0x10000000 cmp=kr.co.kjw.videodownloader/.MainActivity }
+10-06 13:43:47.713   347   347 D Zygote  : Forked child process 2480
+10-06 13:43:47.720   539  1816 D CoreBackPreview: Window{4aa24ef u0 Splash Screen kr.co.kjw.videodownloader}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@51b0285, mPriority=0, mIsAnimationCallback=false}
+10-06 13:43:47.722   539   575 I ActivityManager: Start proc 2480:kr.co.kjw.videodownloader/u0a148 for next-top-activity {kr.co.kjw.videodownloader/kr.co.kjw.videodownloader.MainActivity}
+10-06 13:43:47.733  2480  2480 I videodownloader: Late-enabling -Xcheck:jni
+10-06 13:43:47.761  2480  2480 I videodownloader: Using CollectorTypeCMC GC.
+10-06 13:43:47.762  2480  2480 W videodownloader: Unexpected CPU variant for x86: x86_64.
+10-06 13:43:47.762  2480  2480 W videodownloader: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+10-06 13:43:47.764   539   564 W ActivityTaskManager: Unable to send transaction to client proc kr.co.kjw.videodownloader: no app thread
+10-06 13:43:47.777  2480  2480 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+10-06 13:43:47.777   425   433 I adbd    : jdwp connection from 2480
+10-06 13:43:47.862  2480  2480 W ziparchive: Unable to open '/data/app/~~tPIobgaKYhjBj4_mILX-qQ==/kr.co.kjw.videodownloader-pZsDsiOL1mCIfo2JU1J8DA==/base.dm': No such file or directory
+10-06 13:43:47.863  2480  2480 W ziparchive: Unable to open '/data/app/~~tPIobgaKYhjBj4_mILX-qQ==/kr.co.kjw.videodownloader-pZsDsiOL1mCIfo2JU1J8DA==/base.dm': No such file or directory
+10-06 13:43:47.905  2480  2480 D nativeloader: Configuring clns-7 for other apk /data/app/~~tPIobgaKYhjBj4_mILX-qQ==/kr.co.kjw.videodownloader-pZsDsiOL1mCIfo2JU1J8DA==/base.apk. target_sdk_version=35, uses_libraries=, library_path=/data/app/~~tPIobgaKYhjBj4_mILX-qQ==/kr.co.kjw.videodownloader-pZsDsiOL1mCIfo2JU1J8DA==/lib/x86_64:/data/app/~~tPIobgaKYhjBj4_mILX-qQ==/kr.co.kjw.videodownloader-pZsDsiOL1mCIfo2JU1J8DA==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/kr.co.kjw.videodownloader
+10-06 13:43:47.905  2479  2479 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+10-06 13:43:47.905  2479  2479 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+10-06 13:43:47.906  2480  2480 D CompatChangeReporter: Compat change id reported: 202956589; UID 10148; state: ENABLED
+10-06 13:43:47.918   140   140 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+10-06 13:43:47.918  2479  2495 I Gralloc4: mapper 4.x is not supported
+10-06 13:43:48.031     0     0 I servicemanager: Caller(pid=2479,uid=2000,sid=u:r:shell:s0) Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest. No alternative instances declared in VINTF.
+10-06 13:43:47.921  2480  2480 V GraphicsEnvironment: Currently set values for:
+10-06 13:43:47.921  2480  2480 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+10-06 13:43:47.923  2480  2480 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+10-06 13:43:47.923  2480  2480 V GraphicsEnvironment: Global.Settings values are invalid: number of packages: 0, number of values: 0
+10-06 13:43:47.923  2480  2480 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+10-06 13:43:47.945  1390  1583 W MediaProvider: isAppCloneUserPair for user 0: false
+10-06 13:43:47.954  2480  2480 D CompatChangeReporter: Compat change id reported: 279646685; UID 10148; state: ENABLED
+10-06 13:43:47.961   539  1816 D CompatChangeReporter: Compat change id reported: 324203798; UID 10148; state: ENABLED
+10-06 13:43:47.968   539   560 V WindowManager: Sent Transition (#7) createdAt=10-06 13:43:47.596 via request=TransitionRequestInfo { type = CLOSE, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=false baseIntent=Intent { flg=0x10000000 cmp=kr.co.kjw.videodownloader/.MainActivity } baseActivity=null topActivity=null origActivity=null realActivity=ComponentInfo{kr.co.kjw.videodownloader/kr.co.kjw.videodownloader.MainActivity} numActivities=0 lastActiveTime=29097 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{98adca3 Task{137bfed #8 type=standard A=10148:kr.co.kjw.videodownloader}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=null launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= falseisLetterboxEducationEnabled= false isLetterboxDoubleTapEnabled= false topActivityEligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false cameraCompatTaskInfo=CameraCompatTaskInfo { cameraCompatControlState=hidden freeformCameraCompatMode=inactive}}}, pipTask = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 7 }
+10-06 13:43:47.968   539   560 V WindowManager:     startWCT=WindowContainerTransaction { changes = {} hops = [] errorCallbackToken=null taskFragmentOrganizer=null }
+10-06 13:43:47.968   539   560 V WindowManager:     info={id=7 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+10-06 13:43:47.968   539   560 V WindowManager:         {WCT{RemoteToken{86c167e Task{a9b4b82 #9 type=standard A=10148:kr.co.kjw.videodownloader}}} m=OPEN f=MOVE_TO_TOP leash=Surface(name=Task=9)/@0xe100000 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},
+10-06 13:43:47.968   539   560 V WindowManager:         {WCT{RemoteToken{98adca3 Task{137bfed #8 type=standard A=10148:kr.co.kjw.videodownloader}}} m=CLOSE f=NONE leash=Surface(name=Task=8)/@0xd26e034 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},
+10-06 13:43:47.968   539   560 V WindowManager:         {null m=TO_FRONT f=IS_WALLPAPER leash=Surface(name=WallpaperWindowToken{ea7af91 token=android.os.Binder@9305b8})/@0xfbadeb2 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}
+10-06 13:43:47.968   539   560 V WindowManager:     ]}
+10-06 13:43:47.967   860  1616 V WindowManagerShell: onTransitionReady(transaction=2314987372889)
+10-06 13:43:47.971   860   904 V WindowManagerShell: onTransitionReady (#7) android.os.BinderProxy@1fe2f48: {id=7 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@f3e35cb} m=OPEN f=MOVE_TO_TOP leash=Surface(name=Task=9)/@0x6776d89 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},{WCT{android.window.IWindowContainerToken$Stub$Proxy@7e2f1a8} m=CLOSE f=NONE leash=Surface(name=Task=8)/@0x52f918e sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},{null m=TO_FRONT f=IS_WALLPAPER leash=Surface(name=WallpaperWindowToken{ea7af91 token=android.os.Binder@9305b8})/@0x56e6daf sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+10-06 13:43:47.972   860   904 V WindowManagerShell: Playing animation for (#7) android.os.BinderProxy@1fe2f48@0
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultMixedHandler@75fdba1
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.keyguard.KeyguardTransitionHandler@841c1c6
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.pip.PipTransition@22e0587
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.activityembedding.ActivityEmbeddingController@b1acb4
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.recents.RecentsTransitionHandler@57d90dd
+10-06 13:43:47.972   860   904 V ShellRecents: RecentsTransitionHandler.startAnimation: no controller found
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.splitscreen.StageCoordinator@883452
+10-06 13:43:47.972   860   904 V WindowManagerShell:  try handler com.android.wm.shell.transition.RemoteTransitionHandler@35b7323
+10-06 13:43:47.972   860   904 V WindowManagerShell: Transition doesn't have explicit remote, search filters for match for {id=7 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@f3e35cb} m=OPEN f=MOVE_TO_TOP leash=Surface(name=Task=9)/@0x6776d89 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},{WCT{android.window.IWindowContainerToken$Stub$Proxy@7e2f1a8} m=CLOSE f=NONE leash=Surface(name=Task=8)/@0x52f918e sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},{null m=TO_FRONT f=IS_WALLPAPER leash=Surface(name=WallpaperWindowToken{ea7af91 token=android.os.Binder@9305b8})/@0x56e6daf sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+10-06 13:43:47.975   860   904 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x100 checks=[{atype=home independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=TOP topActivity=ComponentInfo{com.android.launcher3/com.android.launcher3.uioverrides.QuickstepLauncher} launchCookie=null},{atype=standard independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@b16e020, appThread = android.app.IApplicationThread$Stub$Proxy@9c75dd9, debugName = QuickstepLaunchHome }}
+10-06 13:43:47.976   860   904 V WindowManagerShell:  Delegate animation for (#7) to null
+10-06 13:43:47.976   860   904 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultTransitionHandler@751439e
+10-06 13:43:47.976   860   904 V WindowManagerShell: start default transition animation, info = {id=7 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@f3e35cb} m=OPEN f=MOVE_TO_TOP leash=Surface(name=Task=9)/@0x6776d89 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},{WCT{android.window.IWindowContainerToken$Stub$Proxy@7e2f1a8} m=CLOSE f=NONE leash=Surface(name=Task=8)/@0x52f918e sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0 taskParent=-1},{null m=TO_FRONT f=IS_WALLPAPER leash=Surface(name=WallpaperWindowToken{ea7af91 token=android.os.Binder@9305b8})/@0x56e6daf sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+10-06 13:43:47.976   860   904 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@2f863a7 animAttr=0xb type=CLOSE isEntrance=false
+10-06 13:43:47.982   860   904 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@819caf9 animAttr=0xa type=CLOSE isEntrance=true
+10-06 13:43:47.987   539  2070 W UserManagerService: Requested status bar icon for non-badged user 0
+10-06 13:43:47.991   860   904 V WindowManagerShell:  animated by com.android.wm.shell.transition.DefaultTransitionHandler@751439e
+10-06 13:43:48.011   860   904 V WindowManagerShell: Transition animation finished (aborted=false), notifying core (#7) android.os.BinderProxy@1fe2f48@0
+10-06 13:43:48.012   539   560 V WindowManager: Finish Transition (#7): created at 10-06 13:43:47.596 collect-started=0.079ms request-sent=0.136ms started=12.687ms ready=365.702ms sent=367.649ms finished=416.046ms
+10-06 13:43:48.131     0     0 I binder  : 1816:539 cannot find target node
+10-06 13:43:48.132     0     0 I binder  : 539:1816 transaction async to 0:0 failed 111064/29189/-22, size 64-0 line 3265
+10-06 13:43:48.021   539  1816 E IPCThreadState: Binder transaction failure. id: 111064, BR_*: 29189, error: -22 (Invalid argument)
+10-06 13:43:48.021   539  1816 W ActivityManager: pid 539 system sent binder code 7 with flags 1 to frozen apps and got error -32
+10-06 13:43:48.021   539  1816 W WindowManager: Exception thrown during dispatchAppVisibility Window{c3ae09 u0 kr.co.kjw.videodownloader/kr.co.kjw.videodownloader.MainActivity EXITING}
+10-06 13:43:48.021   539  1816 W WindowManager: android.os.DeadObjectException
+10-06 13:43:48.021   539  1816 W WindowManager: 	at android.os.BinderProxy.transactNative(Native Method)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at android.os.BinderProxy.transact(BinderProxy.java:586)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at android.view.IWindow$Stub$Proxy.dispatchAppVisibility(IWindow.java:553)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.WindowState.sendAppVisibilityToClients(WindowState.java:3253)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.WindowContainer.sendAppVisibilityToClients(WindowContainer.java:1289)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.WindowToken.setClientVisible(WindowToken.java:403)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.ActivityRecord.setClientVisible(ActivityRecord.java:7166)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.ActivityRecord.postApplyAnimation(ActivityRecord.java:5881)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.ActivityRecord.commitVisibility(ActivityRecord.java:5823)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.Transition.finishTransition(Transition.java:1286)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.TransitionController.finishTransition(TransitionController.java:937)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.WindowOrganizerController.finishTransition(WindowOrganizerController.java:494)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at android.window.IWindowOrganizerController$Stub.onTransact(IWindowOrganizerController.java:289)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at com.android.server.wm.WindowOrganizerController.onTransact(WindowOrganizerController.java:204)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at android.os.Binder.execTransactInternal(Binder.java:1505)
+10-06 13:43:48.021   539  1816 W WindowManager: 	at android.os.Binder.execTransact(Binder.java:1444)
+10-06 13:43:48.021   539  1816 W Process : Unable to open /proc/2147/status
+10-06 13:43:48.029   860   904 V WindowManagerShell: Track 0 became idle
+10-06 13:43:48.029   860   904 V WindowManagerShell: All active transition animations finished
+10-06 13:43:48.029  1273  1273 I TopTaskTracker: onTaskRemoved: taskId=8
+10-06 13:43:48.029  1273  1273 I TopTaskTracker: onTaskRemoved: taskId=8
+10-06 13:43:48.033   539  1816 W UserManagerService: Requested status bar icon for non-badged user 0
+10-06 13:43:48.034   539  1816 W UserManagerService: Requested status bar icon for non-badged user 0
+10-06 13:43:48.038   539  1816 W UserManagerService: Requested status bar icon for non-badged user 0
+10-06 13:43:48.056   416   416 E BpTransactionCompletedListener: Failed to transact (-32)
+10-06 13:43:48.095  2480  2480 I WebViewFactory: Loading com.android.webview version 124.0.6367.219 (code 636771907)
+10-06 13:43:48.096  2480  2480 V ResourcesManager: The following library key has been added: ResourcesKey{ mHash=7263dafd mResDir=null mSplitDirs=[] mOverlayDirs=[/data/resource-cache/com.android.systemui-neutral-0lH0.frro,/data/resource-cache/com.android.systemui-accent-sN4G.frro,/data/resource-cache/com.android.systemui-dynamic-cN7K.frro] mLibDirs=[/product/app/webview/webview.apk,/system_ext/framework/androidx.window.extensions.jar] mDisplayId=0 mOverrideConfig=v35 mCompatInfo={420dpi always-compat} mLoaders=[]}
+10-06 13:43:48.097  2480  2480 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+10-06 13:43:48.098  2480  2480 D nativeloader: InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libapexsupport.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-x86_64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvendorsupport.so:libvndksupport.so:libvulkan.so
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{8026491 com.android.cts.priv.ctsshim/10140} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ccf2ff6 com.android.uwb.resources/10138} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{3188ff7 com.android.internal.display.cutout.emulation.corner/10018} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{d5cbe64 com.android.internal.display.cutout.emulation.double/10017} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{7d7b8cd com.android.healthconnect.controller/10129} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{cb65582 com.android.health.connect.backuprestore/10130} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{c3c3493 com.android.virtualmachine.res/10142} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a595cd0 com.android.carrierconfig.auto_generated_rro_vendor__/10057} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{b3414c9 com.android.systemui.emulation.pixel_3_xl/10016} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ff847ce com.android.systemui.emulation.pixel_4_xl/10041} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9eb86ef com.android.systemui.emulation.pixel_fold/10032} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{83f75fc com.android.providers.telephony.auto_generated_characteristics_rro/10027} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{5e03485 com.android.htmlviewer/10082} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{45512da com.android.quicksearchbox/10104} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{293a30b com.android.networkstack.tethering.emulator/10054} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a0bf5e8 com.android.internal.emulation.pixel_3a_xl/10035} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{5749401 com.android.internal.emulation.pixel_6_pro/10012} BLOCKED
+10-06 13:43:48.098   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{18182a6 com.android.internal.emulation.pixel_7_pro/10048} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{c5764e7 com.android.internal.emulation.pixel_8_pro/10051} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{39e8894 com.android.internal.emulation.pixel_3a/10003} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{e956f3d com.android.internal.emulation.pixel_4a/10052} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{3b32332 com.android.internal.emulation.pixel_6a/10000} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2ab6883 com.android.internal.emulation.pixel_7a/10011} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{5259a00 com.android.internal.emulation.pixel_8a/10028} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{1eec239 com.android.safetycenter.resources/10136} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2ec407e com.android.simappdialog/10094} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9b209df com.android.connectivity.resources/10133} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{14a562c com.android.internal.display.cutout.emulation.hole/10023} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{4f048f5 com.android.internal.display.cutout.emulation.tall/10007} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{307e68a com.android.modulemetadata/10106} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{b5764fb com.android.internal.systemui.navbar.threebutton/10046} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a1ca918 com.android.wifi.dialog/10127} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a497f71 com.android.contacts/10102} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{885e156 com.android.camera2/10108} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a2d55d7 com.android.internal.ranchu.commonoverlay/10037} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{bf3ec4 com.android.launcher3/10121} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{625a1ad com.android.systemui.auto_generated_rro_vendor__/10055} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{e16bce2 com.android.internal.systemui.navbar.twobutton/10008} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{6077873 com.android.settings.intelligence/10099} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{3d38330 com.android.calendar/10109} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a27aba9 com.android.systemui.emulation.pixel_3/10025} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{6e7c52e com.android.systemui.emulation.pixel_4/10004} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{e5728cf com.android.systemui.emulation.pixel_5/10042} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{8a5a25c com.android.systemui.emulation.pixel_6/10047} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{5265965 com.android.systemui.emulation.pixel_7/10014} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9af063a com.android.systemui.emulation.pixel_8/10010} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{e4782eb com.android.printspooler/10083} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{b188848 com.android.dreams.basic/10086} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2a826e1 com.android.rkpdapp/10139} BLOCKED
+10-06 13:43:48.099  2480  2480 D nativeloader: Configuring product-clns-8 for unbundled product apk /product/app/webview/webview.apk. target_sdk_version=34, uses_libraries=, library_path=/product/app/webview/lib/x86_64:/product/app/webview/webview.apk!/lib/x86_64:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{774c06 com.android.internal.emulation.pixel_3/10049} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{e9962c7 com.android.internal.emulation.pixel_4/10013} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{51e0f4 com.android.internal.emulation.pixel_5/10044} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{61f501d com.android.internal.emulation.pixel_6/10002} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{92c2292 com.android.internal.emulation.pixel_7/10020} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{93f6463 com.android.internal.emulation.pixel_8/10019} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{8261860 android.auto_generated_characteristics_rro/10021} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{de5d119 com.android.musicfx/10060} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2e5d5de com.android.phone.auto_generated_characteristics_rro/10015} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ab9e3bf com.android.printservice.recommendation/10096} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9445a8c com.android.dialer/10101} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9f965d5 com.android.gallery3d/10107} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{3f571ea com.android.wifi.resources/10125} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{d32fcdb com.android.theme.font.notoserifsource/10036} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{4229378 com.android.internal.display.cutout.emulation.waterfall/10039} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2778a51 com.android.inputmethod.latin/10111} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{4b0c2b6 com.android.internal.systemui.navbar.transparent/10001} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{95a8bb7 org.chromium.webview_shell/10103} BLOCKED
+10-06 13:43:48.099  2480  2480 D nativeloader: InitVndkspLibrariesProduct: VNDK is deprecated with product
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{8a96f24 com.android.systemui.emulation.pixel_3a_xl/10043} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9d97a8d com.android.systemui.emulation.pixel_6_pro/10033} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{afe5442 com.android.systemui.emulation.pixel_7_pro/10026} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{9022c53 com.android.systemui.emulation.pixel_8_pro/10034} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{aa05990 com.android.dreams.phototable/10113} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{6f03289 com.android.providers.partnerbookmarks/10084} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2a1728e com.android.wallpaper.livepicker/10076} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{7793aaf com.android.cellbroadcastreceiver.module/10135} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{d97ebc com.android.phone.auto_generated_rro_vendor__/10056} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2a06e45 com.android.apps.tag/10075} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{e46299a com.android.imsserviceentitlement/10100} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ba8d2cb com.android.appsearch.apk/10145} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{b1dcaa8 com.android.internal.emulation.pixel_2_xl/10045} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{55ea9c1 com.android.internal.emulation.pixel_3_xl/10024} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{d4d4566 com.android.internal.emulation.pixel_4_xl/10040} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{7efd0a7 com.android.internal.emulation.pixel_fold/10053} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ad8e954 com.android.bookmarkprovider/10081} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{6b20fd com.android.systemui.emulation.pixel_3a/10022} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{25851f2 com.android.systemui.emulation.pixel_4a/10030} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{bbed043 com.android.systemui.emulation.pixel_6a/10005} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a8546c0 com.android.systemui.emulation.pixel_7a/10050} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ecdcff9 com.android.systemui.emulation.pixel_8a/10038} BLOCKED
+10-06 13:43:48.099   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a6db8ed com.android.cts.ctsshim/10141} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{6959b3e com.android.wallpaper/10117} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{2f42d9f com.android.connectivity.resources.goldfish.overlay/10059} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{fd80eec com.android.music/10105} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{a1272b5 com.android.hotspot2.osulogin/10126} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{5cc2d4a com.android.companiondevicemanager.auto_generated_characteristics_rro/10009} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ef804bb com.android.internal.systemui.navbar.gestural/10031} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{4ad2dd8 com.android.deskclock/10110} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{ec48531 com.android.bluetoothmidiservice/10087} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{f27d416 com.android.captiveportallogin/10089} BLOCKED
+10-06 13:43:48.100   539  1816 I AppsFilter: interaction: PackageSetting{2836eb8 kr.co.kjw.videodownloader/10148} -> PackageSetting{5983197 android.auto_generated_rro_vendor__/10058} BLOCKED
+10-06 13:43:48.125  2480  2480 I cr_WVCFactoryProvider: Loaded version=124.0.6367.219 minSdkVersion=1 isBundle=false multiprocess=true packageId=2
+10-06 13:43:48.145  2480  2480 D nativeloader: Load /product/app/webview/webview.apk!/lib/x86_64/libwebviewchromium.so using ns product-clns-8 from class loader (caller=/product/app/webview/webview.apk): ok
+10-06 13:43:48.146  2480  2480 D nativeloader: Load /system/lib64/libwebviewchromium_plat_support.so using ns product-clns-8 from class loader (caller=/product/app/webview/webview.apk): ok
+10-06 13:43:48.148   539  1816 I ActivityManager: Broadcasting: Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }
+10-06 13:43:48.149   539  1816 I ActivityManager: Enqueued broadcast Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x400000 }: 0
+10-06 13:43:48.149   539   988 W JobInfo : Job 'com.android.providers.media.module/com.android.providers.media.MediaService#-300' has a deadline with no functional constraints. The deadline won't improve job execution latency. Consider removing the deadline.
+10-06 13:43:48.151   539   560 I ActivityManager: Broadcast completed: result=0
+10-06 13:43:48.153  1390  1660 I MediaProvider: Begin Intent { act=android.intent.action.MEDIA_SCANNER_SCAN_FILE dat=file:///... flg=0x1400010 cmp=com.android.providers.media.module/com.android.providers.media.MediaService }
+10-06 13:43:48.162   539  2508 I EGL_emulation: Opening libGLESv1_CM_emulation.so
+10-06 13:43:48.167   539  2508 I EGL_emulation: Opening libGLESv2_emulation.so
+10-06 13:43:48.183  2480  2510 E chromium: [1006/134348.183612:ERROR:variations_seed_loader.cc(37)] Seed missing signature.
+10-06 13:43:48.183  2480  2510 I cr_VariationsUtils: Failed reading seed file "/data/user/0/kr.co.kjw.videodownloader/app_webview/variations_seed_new"
+10-06 13:43:48.183  2480  2510 I chromium: [1006/134348.183853:INFO:variations_seed_loader.cc(66)] Failed to open file for reading.: No such file or directory (2)
+10-06 13:43:48.183  2480  2510 I cr_VariationsUtils: Failed reading seed file "/data/user/0/kr.co.kjw.videodownloader/app_webview/variations_seed"
+10-06 13:43:48.188   539  2508 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
