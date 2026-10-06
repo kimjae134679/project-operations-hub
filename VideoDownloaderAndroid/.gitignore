@@ -1,0 +1,8 @@
+.gradle/
+**/build/
+local.properties
+*.jks
+*.keystore
+qa/node_modules/
+qa/test-results/
+qa/playwright-report/

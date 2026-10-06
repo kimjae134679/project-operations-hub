@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'"><title>영상다운로더</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="app">
+<header><div class="brand"><span class="logo" aria-hidden="true">↓</span><div><h1>영상다운로더</h1><p>보고 싶은 영상, 내 목록에</p></div></div><button id="addTop" class="primary" aria-label="링크 추가"><span>＋</span> 링크 추가</button></header>
+<main id="main"></main>
+<nav aria-label="주 메뉴"><button data-nav="lists" class="active"><span aria-hidden="true">▤</span>내 목록</button><button data-nav="downloads"><span aria-hidden="true">↓</span>다운로드 <b id="queueBadge" hidden></b></button><button data-nav="settings"><span aria-hidden="true">⚙</span>설정</button></nav>
+</div>
+<div id="selectBar" hidden></div>
+<dialog id="modal"><div id="dialogContent"></div></dialog><div id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script></body></html>

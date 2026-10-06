@@ -1,0 +1,85 @@
+name: Video Downloader APK and QA
+on:
+  push:
+    branches: [video-downloader-android-20261006]
+    paths: ['VideoDownloaderAndroid/app/**', 'VideoDownloaderAndroid/qa/**', 'VideoDownloaderAndroid/*.gradle', 'VideoDownloaderAndroid/gradle.properties', '.github/workflows/video-downloader-android.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: video-downloader-android
+  cancel-in-progress: true
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - name: Compile, unit tests and Android lint
+        run: gradle -p VideoDownloaderAndroid :app:assembleDebug :app:testDebugUnitTest :app:lintDebug --no-daemon
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Mobile and tablet UI QA
+        working-directory: VideoDownloaderAndroid/qa
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+          npm test
+      - name: Prepare real short MP4, HLS and DASH fixtures
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          mkdir -p /tmp/vd-fixtures/hls /tmp/vd-fixtures/dash
+          ffmpeg -y -f lavfi -i testsrc=size=320x180:rate=24 -f lavfi -i sine=frequency=440 -t 3 -c:v libx264 -pix_fmt yuv420p -c:a aac /tmp/vd-fixtures/sample.mp4
+          ffmpeg -y -i /tmp/vd-fixtures/sample.mp4 -c copy -hls_time 1 -hls_list_size 0 /tmp/vd-fixtures/hls/index.m3u8
+          ffmpeg -y -i /tmp/vd-fixtures/sample.mp4 -map 0 -c copy -f dash /tmp/vd-fixtures/dash/index.mpd
+          nohup python3 -m http.server 8765 --directory /tmp/vd-fixtures >/tmp/vd-fixtures/server.log 2>&1 &
+      - name: Android 35 real engine and file QA
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          working-directory: VideoDownloaderAndroid/qa
+          script: bash run-native.sh
+      - name: APK certificate and package verification
+        run: |
+          mkdir -p VideoDownloaderAndroid/dist/qa
+          BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          for ABI in arm64-v8a armeabi-v7a; do
+            cp "VideoDownloaderAndroid/app/build/outputs/apk/debug/app-$ABI-debug.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
+            "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
+            "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
+          done
+          cp VideoDownloaderAndroid/app/build/reports/lint-results-debug.html VideoDownloaderAndroid/dist/qa/
+          cp -r VideoDownloaderAndroid/qa/screenshots VideoDownloaderAndroid/dist/qa/screenshots
+          cd VideoDownloaderAndroid/dist
+          sha256sum *.apk > SHA256SUMS.txt
+          printf 'Build, JVM unit tests, Android lint, 6 responsive UI tests, Android 35 native MP4/HLS/DASH/short media/MediaStore/collision/recovery tests passed.\nSource commit: %s\n' "$GITHUB_SHA" > qa/RESULT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video-downloader-build-and-qa
+          path: |
+            VideoDownloaderAndroid/app/build/outputs/apk/debug/*.apk
+            VideoDownloaderAndroid/app/build/reports/
+            VideoDownloaderAndroid/qa/playwright-report/
+            VideoDownloaderAndroid/dist/
+          retention-days: 30
+      - name: Publish verified APK on this dedicated branch
+        run: |
+          git config user.name 'Video Downloader Build'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f VideoDownloaderAndroid/dist
+          git commit -m 'Publish tested video downloader APK and QA evidence'
+          git push origin HEAD:video-downloader-android-20261006
