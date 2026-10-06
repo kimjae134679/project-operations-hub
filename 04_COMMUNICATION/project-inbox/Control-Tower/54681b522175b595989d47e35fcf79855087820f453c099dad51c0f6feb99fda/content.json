@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "review-ui-tool-registration-20261006",
+  "revision": 1,
+  "title": "도구 목록 노출과 Aider·HyperFrames 설치 확인 구현",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "receivedAt": "2026-10-06T02:49:57.902Z",
+  "updatedAt": "2026-10-06T02:49:57.902Z",
+  "request": {
+    "summary": "ToolStatusViewModel과 설치 확인 provider를 맡아 도구가 보이게 구현",
+    "details": "부모 에이전트가 추가 담당 권한을 부여했다. 제품명 병기, 모든 기존 provider 숨김 해제, 미설치 정확한 표시, 필요한 Category 추가, Aider/HyperFrames 설치 파일 존재 확인 provider를 구현한다. MainViewModel/MainWindow/PROJECT_PRESENTATION_RULES는 부모 담당이므로 수정하지 않는다. 계정 비밀값/연결서비스를 변경하지 않고 실제 실행 성공을 주장하지 않는다. 핵심 labels 테스트만 추가 가능하다. receivedAt은 부모 메시지의 정확한 전달 시각이 제공되지 않아 첫 공식 작업 기록 작성 시각이다.",
+    "source": "parent_agent_message:/root"
+  },
+  "response": {
+    "summary": "담당 3개 파일 구현을 완료했고 부모에게 provider 통합과 최종 테스트를 요청했다.",
+    "details": "실제로 보낸 답변: 제품명과 쉬운 설명을 유지하며 모든 provider를 화면에 노출했다. Category/Id, 미설치와 설치 확인 상태 표시를 추가했다. InstalledToolStatusProvider는 aider/hyperframes 각 id로 인스턴스를 생성해 알려진 파일 위치만 확인하고 HyperFrames package.version을 읽는다. 인증·프로세스·렌더 성공을 주장하지 않는다. 핵심 회귀 테스트 3개를 추가했다. MainViewModel에 두 provider 통합은 부모 담당이며 동시 빌드 충돌을 피하려고 테스트 실행은 아직 하지 않았다고 전달했다.",
+    "source": "collaboration.send_message:/root"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "ToolStatusViewModel의 제품명 병기와 전 provider 표시, Category/Id 및 상태 라벨 구현",
+    "InstalledToolStatusProvider 신규 작성: Aider/HyperFrames 파일 존재만 확인, 버전 문자열 안전하게 표시",
+    "ToolStatusPresentationTests 3개 추가: 제품명/노출, 미설치와 오류 분리, 설치 확인과 실행 중 분리",
+    "MainViewModel/MainWindow는 수정하지 않았고 비밀값 출력·서비스 변경을 하지 않음"
+  ],
+  "verification": [
+    {
+      "name": "담당 코드 변경 확인",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs:44개 추가/10개 삭제",
+        "ai-control-tower/src/AIControlTower/Services/InstalledToolStatusProvider.cs:신규",
+        "ai-control-tower/tests/AIControlTower.Tests/ToolStatusPresentationTests.cs:신규"
+      ]
+    },
+    {
+      "name": "통합 빌드·핵심 테스트",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [
+    "부모가 provider 두 인스턴스를 통합하고 최종 빌드와 테스트를 실행",
+    "검증 결과를 받아 본인 기록의 revision을 올려 상태와 실제 답변을 갱신"
+  ],
+  "blockers": [],
+  "supersedes": []
+}
