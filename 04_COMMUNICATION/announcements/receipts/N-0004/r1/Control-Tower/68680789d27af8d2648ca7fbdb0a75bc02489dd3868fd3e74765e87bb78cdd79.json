@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0004",
+  "revision": 1,
+  "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "checkedAt": "2026-10-06T02:51:39.684258+00:00",
+  "applicationStatus": "applied",
+  "note": "기존 공유 Remote Desktop Commander 연결을 재사용했다. 외부 프로세스 종료와 연결 설정 변경을 하지 않았다.",
+  "evidence": [
+    "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs",
+    "_통합소통/보낼자료/task-40657a46af4d06b55a1c301b13ff2798ced500b7bcbf7d490b063f0df3b43522-r1.json"
+  ],
+  "appliedAt": "2026-10-06T02:51:40.421806+00:00"
+}
