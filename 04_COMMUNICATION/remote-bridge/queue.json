@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "jobs": [
+    {
+      "id": "20261006-qa-v1-before",
+      "target": "Mushoku-Audiobook",
+      "action": "status",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {}
+    },
+    {
+      "id": "20261006-qa-v1-inventory",
+      "target": "Mushoku-Audiobook",
+      "action": "locate_reference_inventory",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {}
+    },
+    {
+      "id": "20261006-qa-v1-apply",
+      "target": "Mushoku-Audiobook",
+      "action": "apply_reviewed_bundle",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {
+        "bundlePath": "04_COMMUNICATION/remote-bridge/bundles/20261006-listening-qa-97ae1490.json",
+        "bundleSha256": "97ae1490c6d483e97eb511ddcf7f088ad24db3b5a954fe85c8b449f5324dfd35"
+      }
+    },
+    {
+      "id": "20261006-qa-v1-qa",
+      "target": "Mushoku-Audiobook",
+      "action": "run_static_qa",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {},
+      "dependsOn": [
+        "20261006-qa-v1-apply"
+      ]
+    },
+    {
+      "id": "20261006-qa-v1-organize",
+      "target": "Mushoku-Audiobook",
+      "action": "organize_listening",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {},
+      "dependsOn": [
+        "20261006-qa-v1-qa"
+      ]
+    },
+    {
+      "id": "20261006-qa-v1-build",
+      "target": "Mushoku-Audiobook",
+      "action": "build_listener",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {},
+      "dependsOn": [
+        "20261006-qa-v1-qa"
+      ]
+    },
+    {
+      "id": "20261006-qa-v1-audit",
+      "target": "Mushoku-Audiobook",
+      "action": "audio_reference_audit",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {},
+      "dependsOn": [
+        "20261006-qa-v1-qa"
+      ]
+    },
+    {
+      "id": "20261006-qa-v1-refresh",
+      "target": "Mushoku-Audiobook",
+      "action": "refresh_listening_index",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {},
+      "dependsOn": [
+        "20261006-qa-v1-organize"
+      ]
+    },
+    {
+      "id": "20261006-qa-v1-after",
+      "target": "Mushoku-Audiobook",
+      "action": "status",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {}
+    },
+    {
+      "id": "20261006-qa-v1-previews",
+      "target": "Mushoku-Audiobook",
+      "action": "render_voice_repair_previews",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {},
+      "dependsOn": [
+        "20261006-qa-v1-audit",
+        "20261006-qa-v1-qa"
+      ]
+    },
+    {
+      "id": "20261006-qa-v1-final",
+      "target": "Mushoku-Audiobook",
+      "action": "status",
+      "createdAt": "2026-10-06T13:21:22+00:00",
+      "expiresAt": "2026-10-13T13:21:22.000Z",
+      "args": {}
+    }
+  ]
+}

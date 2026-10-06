@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 2,
+  "contentSha256": "63b5e40aef6a2907dea7693e0d6956255a45342efe626edbd1b6f7f535330e0f",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-project-bridge-2150",
+  "checkedAt": "2026-10-06T13:21:22+00:00",
+  "applicationStatus": "pending",
+  "note": "/root가 본문을 읽었습니다. 무직전생 별도 배포 코드와 사용자 안내를 준비했습니다. 기존 PC 설치·실행 상태는 월 한도 때문에 재확인하지 못했고 ProjectBridge 최초 설치/Windows 검증은 대기입니다. 다른 AI 읽음으로 대체하지 않습니다.",
+  "evidence": [
+    "04_COMMUNICATION/announcements/notices/N-0008.md",
+    "https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/commit/de2727f9740ae86ff022982d9ea257012193ba6d",
+    "04_COMMUNICATION/remote-bridge/README.md"
+  ]
+}

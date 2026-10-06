@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "mushoku-project-bridge-listening-qa-20261006",
+  "revision": 1,
+  "title": "새 연결·통합소통·전회차 인물 듣기와 음색 재검토",
+  "projectId": "Mushoku-Audiobook",
+  "actorId": "/root",
+  "sessionId": "20261006-project-bridge-2150",
+  "receivedAt": "2026-10-06T21:50:42+09:00",
+  "updatedAt": "2026-10-06T13:21:22+00:00",
+  "request": {
+    "summary": "새 PC 연결을 통합소통방에 연결하고 인물 듣기/QA/오디오를 개선",
+    "details": "나나호시 울먹임과 자노바 에코 거절, 페르기우스 선호 보존. 아리엘·엘리나리제 기존 표본 확인. 모든 정리 회차에서 인물 듣기 선택, 편한 QA와 다른 회차 진행을 요청.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "코드와 검증 완료, GitHub/통합소통 게시; PC 최초 설치와 새 음원은 대기",
+    "details": "프로젝트 전용 연결 프로그램, 전체 준비 회차 선택·인물별 이어 듣기·로컬 점수/태그/메모, 원본 참조 점검·다른 회차 비교 후보 생성을 준비했습니다. PC 제어 한도 차단으로 실제 적용·새 MP3·현재 완료 수를 확인하지 못했습니다. 설치 안내의 명령을 PC에서 한 번 실행하면 검토 코드 적용·QA·정리·점검·비교 작업을 이어가도록 큐에 등록했습니다.",
+    "source": "current_chat"
+  },
+  "status": "blocked",
+  "workDone": [
+    "전회차 인물 청취·파일 교체 감지·현재/이전 분리·로컬 평가와 미전송 복구 구현",
+    "D드라이브 네이티브 연결·창 없는 자식·로그인 시작·재연결·완료 작업 재실행 방지 구현",
+    "표준 통합소통 task_exchange 실행 응답 연결 구현",
+    "원본 화자·SHA 점검과 다른 회차 제한 비교 생성 구현; 본편 cast와 페르기우스 보존",
+    "기존 파일 SHA 보호·백업을 포함한 16파일 적용 묶음과 허브 작업 큐 게시"
+  ],
+  "verification": [
+    {
+      "name": "청취·참조·음색 비교 계획 검사",
+      "result": "pass",
+      "evidence": [
+        "18 tests passed; Linux Python unittest; JavaScript Node VM DOM adapter"
+      ]
+    },
+    {
+      "name": "연결·자료 보호·중복 방지·표준 소통 기록 검사",
+      "result": "pass",
+      "evidence": [
+        "18 bridge tests passed"
+      ]
+    },
+    {
+      "name": "16파일 적용 및 재적용",
+      "result": "pass",
+      "evidence": [
+        "Original GitHub commit fixture preflight/apply/replay verified; not actual PC"
+      ]
+    },
+    {
+      "name": "Windows 설치·컴파일·실제 브라우저·청취·새 음원",
+      "result": "not_run",
+      "evidence": [
+        "Remote Desktop Commander monthly quota blocked; no retry/reconnect",
+        "04_COMMUNICATION/remote-bridge/README.md"
+      ]
+    }
+  ],
+  "nextActions": [
+    "PC에서 최초 설치 안내 명령 1회 실행",
+    "기존 로컬 GitHub 로그인 없으면 PC에서 로그인",
+    "실행 결과의 실제 회차 수·원본 후보 수·검사·새 비교 MP3 확인",
+    "원본 상황·화자·잔향·연기를 듣고 선호 후보를 정한 후 본편 수정 검토"
+  ],
+  "blockers": [
+    "PC 제어 플러그인 월 한도 차단",
+    "새 연결의 실제 PC 최초 설치 미실행",
+    "실제 화자 확인과 청취 승인 없는 후보는 보류"
+  ],
+  "supersedes": []
+}
