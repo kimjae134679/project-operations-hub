@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "checkpoint-model-update-20261007",
+  "revision": 2,
+  "title": "사용자 실행 오류 재현·수정과 업데이트 재시도",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "checkpoint-model-update-20261007",
+  "receivedAt": "2026-10-07T02:03:26+09:00",
+  "updatedAt": "2026-10-06T17:24:06.251Z",
+  "request": {
+    "summary": "실행 오류가 반복되지 않도록 수정",
+    "details": "사용자가 앞서 전달한 복구·업데이트 명령 실행 후 오류를 보고함.",
+    "source": "user 2026-10-07T02:19:09+09:00"
+  },
+  "response": {
+    "summary": "Codex0.160.1 업데이트 성공과 이후 원격 설치 진입 오류를 확인하고, 내가 준비한 실행 경로 검증 부족을 인정했다.",
+    "details": "Windows PowerShell에서 실제 Commit validation 오류를 BOM 포함 installer header로 재현. 파일 다운로드→UTF8 BOM 제거→ParamBlock 검증으로 변경. 완료된 Codex 업데이트는 재실행하지 않도록 보완. 수정 명령 최종 전달 대기.",
+    "source": "actual_assistant_commentary"
+  },
+  "status": "blocked",
+  "workDone": [
+    "ProjectBridge 3.0 heartbeat와 현재 연결 확인",
+    "새 원격 read_file로 실행기 실패와 설정 상태 확인",
+    "단일 보호 폴더 배열의 PowerShell 직렬화 오류 수정 및 scalar 호환 방어",
+    "Windows 검사 83개 통과",
+    "숨김 Codex 0.160.1 업데이트·명시적 gpt-6.1-sol smoke helper 작성 및 PowerShell 파서 확인",
+    "N-0010 공지와 공통 정책 업데이트 준비",
+    "사용자PC actualVersion codex-cli0.160.1 확인",
+    "PS5의 동일 오류 재현 및 수정 후 Commit/manifest/login 인수 전달 PASS",
+    "이미 최신 Codex 설치 시 npm 재설치 생략",
+    "수정 helper와 회귀 검사 고정 커밋 6b513501af5b4d36fb40ce6a6653d33429375cde"
+  ],
+  "verification": [
+    {
+      "name": "Windows Python tests",
+      "result": "pass",
+      "evidence": [
+        "83 tests OK, 15.290s"
+      ]
+    },
+    {
+      "name": "Update helper PowerShell parser",
+      "result": "pass",
+      "evidence": [
+        "parserErrors=0"
+      ]
+    },
+    {
+      "name": "Actual Codex update/model roundtrip",
+      "result": "not_run",
+      "evidence": [
+        "현재 실행 환경 다운로드 EACCES; 기존 원격 월한도; 새 원격 설정 오류"
+      ]
+    },
+    {
+      "name": "Actual installed bridge repair",
+      "result": "not_run",
+      "evidence": [
+        "Source prepared; user one-time execution required"
+      ]
+    },
+    {
+      "name": "Windows PowerShell5 actual error reproduction and fixed entry",
+      "result": "pass",
+      "evidence": [
+        "Original BOM path reproduced exact Commit attribute error; UTF8 file read+TrimStart preserved param block and all arguments."
+      ]
+    }
+  ],
+  "nextActions": [
+    "고정 수정 helper 재실행 후 실제 report와 설치/6.1/원격 왕복 확인",
+    "보존된 연속 실행기 구현 요청 재개"
+  ],
+  "blockers": [
+    "수정 helper의 사용자PC 실제 설치·6.1 smoke 결과 대기",
+    "연속 작업 실행기 구현·배포 미완료"
+  ],
+  "supersedes": []
+}
