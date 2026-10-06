@@ -1,0 +1,28 @@
+{
+  "bridgeVersion": "2.0.0",
+  "data": {
+    "currentChapter": 149,
+    "lastProgressAt": 1791296619.3061974,
+    "listeningShelfReady": null,
+    "needsReviewChapters": 0,
+    "paused": false,
+    "readyChapterNumbers": [
+      144,
+      145,
+      146,
+      147,
+      148
+    ],
+    "readyChapters": 5,
+    "selectedChapters": 128,
+    "shelfVerificationIssueCount": 0,
+    "stage": "generating"
+  },
+  "device": "KJW-80ea388278fd",
+  "finishedAt": "2026-10-06T14:25:11.089917+00:00",
+  "jobId": "20261006-qa-v1-after",
+  "jobSha256": "2a80636199dc723dde3054c6513aacd983e85b119ebdc6fbd40bba23ead588b3",
+  "outcome": "completed",
+  "project": "Mushoku-Audiobook",
+  "schemaVersion": 1
+}
