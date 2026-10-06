@@ -12,6 +12,12 @@ public sealed class ProjectDiscoveryService
     private static readonly HashSet<string> Ignored = new(StringComparer.OrdinalIgnoreCase)
     { ".git", "node_modules", ".venv", "venv", "__pycache__", "bin", "obj", "backups", "cache", "Installers", "99_ARCHIVE", "Intermediate", "Saved", ".next", "ControlTowerData", "_통합소통", "Models" };
 
+    internal static bool IsTemporaryFolder(string name) =>
+        name.StartsWith("tower-test-", StringComparison.OrdinalIgnoreCase) ||
+        name.StartsWith("tower-scale-test-", StringComparison.OrdinalIgnoreCase) ||
+        name.StartsWith("ui-probe-", StringComparison.OrdinalIgnoreCase) ||
+        name.StartsWith("control-tower-probe-", StringComparison.OrdinalIgnoreCase);
+
     public DiscoveryResult Scan(string root, CancellationToken cancellationToken = default)
     {
         if (!Directory.Exists(root)) return new([], ["탐색 루트가 없습니다: " + root]);
@@ -24,6 +30,7 @@ public sealed class ProjectDiscoveryService
             try
             {
                 if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) return;
+                if (IsTemporaryFolder(System.IO.Path.GetFileName(directory))) return;
                 var manifest = System.IO.Path.Combine(directory, ManifestName);
                 var marker = DetectKind(directory);
                 var container = new[] { "Applications", "Projects", "Workspace", "External", "Programs" }.Contains(System.IO.Path.GetFileName(directory), StringComparer.OrdinalIgnoreCase);

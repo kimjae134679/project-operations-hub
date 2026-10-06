@@ -86,6 +86,7 @@ public partial class MainWindow : Window
         ContentShell.Margin = new Thickness(narrow ? 12 : 16);
         PageHeader.Margin = new Thickness(0, 0, 0, compact ? 8 : 14);
         WorkspaceContent.Margin = new Thickness(0, compact ? 16 : 20, 0, 0);
+        PostListColumn.Width = new GridLength(narrow ? 270 : 320);
         CatalogColumn.Width = new GridLength(narrow ? 230 : 264);
         InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
         ProjectHeader.Padding = compact ? new Thickness(18,10,18,6) : new Thickness(narrow ? 18 : 24);
@@ -169,7 +170,11 @@ public partial class MainWindow : Window
 
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
-    private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true); }
+    private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(manual: true); await _viewModel.RefreshServerAsync(true); }
+    private void ToolGuide_Click(object sender, RoutedEventArgs e) => _viewModel.OpenToolGuide();
+    private void ProjectGuide_Click(object sender, RoutedEventArgs e) { _viewModel.LoadProjectGuide(); WorkspaceTabs.SelectedItem = ProjectGuideTab; }
+    private void ReloadGuide_Click(object sender, RoutedEventArgs e) => _viewModel.LoadProjectGuide();
+    private void OpenGuide_Click(object sender, RoutedEventArgs e) => _viewModel.OpenProjectGuide();
     private void OpenServerFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerFolder();
     private void OpenServerMailbox_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerMailbox();
     private void OpenServerSource_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(false);

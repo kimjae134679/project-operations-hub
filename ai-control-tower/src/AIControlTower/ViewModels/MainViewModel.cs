@@ -44,7 +44,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
         var runner = new ProcessRunner();
         _providers = [new DesktopCommanderStatusProvider(runner), new JevStatusProvider(runner), new CodexStatusProvider(runner),
-            new GitHubCliStatusProvider(runner), new N8nStatusProvider(runner), new AiOpsRunnerStatusProvider(runner), new DeliveryChainProvider(runner)];
+            new GitHubCliStatusProvider(runner), new N8nStatusProvider(runner), new AiOpsRunnerStatusProvider(runner), new DeliveryChainProvider(runner),
+            new RegisteredToolStatusProvider("Aider", "aider"), new RegisteredToolStatusProvider("HyperFrames", "hyperframes"),
+            new RegisteredToolStatusProvider("MoneyPrinterTurbo", null, @"C:\KJ\Tools\AI\Applications\MoneyPrinterTurbo\1.3.7\requirements.txt"),
+            new RegisteredToolStatusProvider("VoiceStudio", null, @"D:\A_KJ\AI\Applications\VoiceStudio\pyproject.toml", @"D:\AI\VoiceStudio\pyproject.toml"),
+            new RegisteredToolStatusProvider("Zonos2", null, @"D:\A_KJ\AI\Applications\Zonos2\pyproject.toml", @"D:\AI\Zonos2\pyproject.toml")];
         _jobs.Log += OnJobLog;
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         _timer.Tick += async (_, _) =>
@@ -55,7 +59,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (_needsDiscovery || DateTime.UtcNow - _lastScan > TimeSpan.FromMinutes(1)) await DiscoverAsync();
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
-        _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(RosterRefreshSeconds) };
         _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
         if (enablePolling)
         {
@@ -121,6 +125,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (!SetProperty(ref _selectedProject, value)) return;
             SelectedProgram = value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
+            LoadProjectGuide();
             ProgramSearch = "";
             OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults));
         }
