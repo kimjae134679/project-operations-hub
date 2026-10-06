@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0008",
+  "revision": 2,
+  "contentSha256": "63b5e40aef6a2907dea7693e0d6956255a45342efe626edbd1b6f7f535330e0f",
+  "projectId": "Video-Downloader",
+  "actorId": "Codex-VideoDownloader",
+  "sessionId": "android-apk-20261006",
+  "checkedAt": "2026-10-06T13:34:51.506729+00:00",
+  "applicationStatus": "applied",
+  "note": "본인 명령·실제 진행 답변·남은일 기록과 Android 자료 안내를 작성했습니다. 기존 PC 소통함 수집/중앙 공유는 별도 확인 필요.",
+  "evidence": [
+    "VideoDownloaderAndroid/프로젝트_사용안내.md"
+  ],
+  "appliedAt": "2026-10-06T13:34:52.605744+00:00"
+}

@@ -24,7 +24,7 @@ jobs:
           gradle-version: '8.14.3'
           cache-read-only: false
       - name: Compile, unit tests and Android lint
-        run: gradle -p VideoDownloaderAndroid :app:assembleDebug :app:testDebugUnitTest :app:lintDebug --no-daemon
+        run: gradle -p VideoDownloaderAndroid :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --no-daemon
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -58,7 +58,7 @@ jobs:
           mkdir -p VideoDownloaderAndroid/dist/qa
           BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
           for ABI in arm64-v8a armeabi-v7a; do
-            cp "VideoDownloaderAndroid/app/build/outputs/apk/debug/app-$ABI-debug.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
+            cp "VideoDownloaderAndroid/app/build/outputs/apk/release/app-$ABI-release.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
             "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
             "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
           done
@@ -77,10 +77,13 @@ jobs:
             VideoDownloaderAndroid/qa/playwright-report/
             VideoDownloaderAndroid/dist/
           retention-days: 30
-      - name: Publish verified APK on this dedicated branch
+      - name: Publish verified APK and evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          gh release create video-downloader-android-v1.0.0 VideoDownloaderAndroid/dist/*.apk VideoDownloaderAndroid/dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title '영상다운로더 Android 1.0.0' --notes 'Standalone Android downloader. Native MP4/HLS/DASH and responsive UI QA passed. Galaxy S22: arm64-v8a. Files saved in Download/VideoDownloader. Personal testing certificate; not a Play Store release.' --latest=false
           git config user.name 'Video Downloader Build'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f VideoDownloaderAndroid/dist
+          git add -f VideoDownloaderAndroid/dist/qa VideoDownloaderAndroid/dist/SHA256SUMS.txt
           git commit -m 'Publish tested video downloader APK and QA evidence'
           git push origin HEAD:video-downloader-android-20261006

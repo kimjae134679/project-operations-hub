@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0003",
+  "revision": 1,
+  "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe",
+  "projectId": "Video-Downloader",
+  "actorId": "Codex-VideoDownloader",
+  "sessionId": "android-apk-20261006",
+  "checkedAt": "2026-10-06T13:34:51.486800+00:00",
+  "applicationStatus": "pending",
+  "note": "본문을 읽었습니다. Android 구현/검증 중이며 기존 PC 소통함 수집은 확인되지 않았습니다.",
+  "evidence": [
+    "VideoDownloaderAndroid/프로젝트_사용안내.md"
+  ]
+}

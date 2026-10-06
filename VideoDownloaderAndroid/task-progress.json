@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "video-downloader-android-20261006",
+  "revision": 1,
+  "title": "영상다운로더 Android 앱 제작과 QA",
+  "projectId": "Video-Downloader",
+  "actorId": "Codex-VideoDownloader",
+  "sessionId": "android-apk-20261006",
+  "receivedAt": "2026-10-06T22:04:26+09:00",
+  "updatedAt": "2026-10-06T22:33:00+09:00",
+  "request": {
+    "summary": "통합소통방을 읽고 영상다운로더를 APK로 제작. 앱 안 링크 입력·목록 관리·UI QA, 짧은 영상 관련 제한 제거, 포맷·사이트별 다운로드 보완.",
+    "details": "추가 지시: 10분 미만 관련 문구 삭제. 어떤 영상·포맷·구조도 가능한 범위에서 다운로드되게 보완. 기존 작업물을 보존하고 바탕화면에 새 작업물을 만들지 않음.",
+    "source": "현재 ChatGPT 작업 사용자 지시 2026-10-06"
+  },
+  "response": {
+    "summary": "링크·목록 UI와 휴대폰 독립 다운로드 엔진·앱 브라우저를 구현했으며 GitHub 빌드 환경에서 APK와 QA를 진행 중이라고 전달함.",
+    "details": "모든 사이트의 다운로드 보장은 불가능하다고 설명. DRM·로그인·차단은 구체적 오류/브라우저 재시도로 처리. 최종 답변 대기.",
+    "source": "현재 작업의 실제 진행 답변"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "기존 D:\\AI\\video-downloader의 README·AGENTS·프로젝트 안내와 N-0001~N-0009를 실제 읽음.",
+    "Android Store·ForegroundService·MediaStore 저장·yt-dlp/QuickJS/FFmpeg·브라우저 후보 탐지와 로그인 후 재시도 구현.",
+    "이름 있는 목록·검색·필터·다중선택·파일 공유·JSON/TXT 가져오기·테마 구현.",
+    "구버전 API 호환·취소/큐 race·진행률·재생목록 부분 성공·동명 파일 처리를 검토하고 보완.",
+    "전용 GitHub 브랜치와 APK 빌드·화면·실제 미디어 QA workflow 작성. Gradle packaging/ABI 충돌 수정 후 재빌드 진행."
+  ],
+  "verification": [
+    {"name": "JS 문법 및 URL 파서 Java 컴파일", "result": "pass", "evidence": ["로컬 node --check app.js/ui.spec.js 성공", "로컬 javac LinkParser.java 성공"]},
+    {"name": "APK·UI·Android 네이티브 실제 다운로드 QA", "result": "not_run", "evidence": ["GitHub Actions 실행 중. 이전 Gradle 구성 실패는 성공으로 기록하지 않음."]}
+  ],
+  "nextActions": ["APK 컴파일·UI QA·MP4/HLS/DASH·동명 파일·중단 복구 검증 완료", "검증 근거와 설치파일 공유", "최종 기록 갱신"],
+  "blockers": [],
+  "supersedes": []
+}

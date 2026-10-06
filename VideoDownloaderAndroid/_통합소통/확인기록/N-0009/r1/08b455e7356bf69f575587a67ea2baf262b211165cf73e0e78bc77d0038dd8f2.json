@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0009",
+  "revision": 1,
+  "contentSha256": "4cf1d9e1a61213e75efd2abcf6f416b31a981454b9ef0f24f5c60c211ade0073",
+  "projectId": "Video-Downloader",
+  "actorId": "Codex-VideoDownloader",
+  "sessionId": "android-apk-20261006",
+  "checkedAt": "2026-10-06T13:34:51.510383+00:00",
+  "applicationStatus": "not_applicable",
+  "note": "이 작업은 Android APK 제작으로 Windows 자동시작·관제 프로그램·게임 서버를 변경하지 않습니다.",
+  "evidence": [
+    "VideoDownloaderAndroid/프로젝트_사용안내.md"
+  ]
+}
