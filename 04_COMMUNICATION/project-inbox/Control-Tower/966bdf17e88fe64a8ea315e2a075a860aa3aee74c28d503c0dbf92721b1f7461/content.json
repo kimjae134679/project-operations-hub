@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-resume-reading-tools-151955",
+  "revision": 1,
+  "title": "남은 설치·공지 배포 재개: PC 원격 연결 대기",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-resume-23d97b523c7a",
+  "receivedAt": "2026-10-06T15:19:55+09:00",
+  "updatedAt": "2026-10-06T06:24:45.360Z",
+  "request": {
+    "summary": "중단된 통합소통방 개선 작업을 계속 진행하고 마무리하라는 재개 요청.",
+    "details": "사용자 최신 지시: 마저하라고. 기존 요구: 초록색·버튼 개선, 게시글 형태 소통방, 자동 갱신 주기와 수동 회전 속도 분리, 프로젝트 전체 이름, 원격 데스크톱/Jev 등 도구 노출, 프로젝트별 자료 위치·설명 안내. 설치·GitHub 반영·공지 권한 오류 해결·검증·임시 정리를 이어서 해야 함.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "실제 파일 조회에서 시간 초과가 발생한 뒤 PC가 오프라인임을 확인했고, GitHub의 마지막 기록과 미완료 항목을 확인한다고 사용자에게 전달했습니다.",
+    "details": "마지막 기록에는 게시글 본문 끝까지 읽는 수정과 native 검증이 끝났다고 남아 있으나 이번 세션에서는 재검증하지 않았습니다. 새 수정본은 GitHub의 main과 공개된 branch 목록에서 확인되지 않았고 설치·최종 검증에 PC 연결이 필요하다고 전달했습니다. 최종 답변 대기.",
+    "source": "current_chat"
+  },
+  "status": "blocked",
+  "workDone": [
+    "GitHub main 30af642cbf044f0980f15fc503a7254b35f6aa61의 AGENTS·운영 정책·프로젝트 표현 기준·공지 목록·마지막 소통 기록 확인",
+    "원격 list_directory가 MCP request timed out으로 실패; 이후 start_process가 No Desktop Commander device is currently online을 반환",
+    "list_devices 재확인에서 KJW Offline 확인",
+    "기존 최신 작업 기록과 이전 revision을 보존하며 재개 요청을 독립 recordId로 기록",
+    "이번 기록을 GitHub 연결 도구로 중앙에 직접 저장; PC 앱의 자동 수집이나 로컬 작업 완료로 표시하지 않음"
+  ],
+  "verification": [
+    {
+      "name": "원격 PC 연결",
+      "result": "fail",
+      "evidence": [
+        "KJW device f8113357-de2f-4e25-aae8-5a740c0d0ecb: 실제 파일 조회 timeout, start_process 오프라인 오류, 후속 list_devices Offline"
+      ]
+    },
+    {
+      "name": "GitHub 마지막 작업 상태",
+      "result": "pass",
+      "evidence": [
+        "main 30af642cbf044f0980f15fc503a7254b35f6aa61",
+        "PR #20은 0.6.1 병합 완료",
+        "20261006-control-tower-reading-tools revision2 in_progress",
+        "review-ui-article-height-native-20261006 revision1에는 마지막 줄 native 검증 완료가 기록됨; 이번 실행 결과는 아님",
+        "20261006-local-project-guides revision4에는 9개 안내·205개 링크 검증 완료가 기록됨; 이번 실행 결과는 아님"
+      ]
+    },
+    {
+      "name": "최신 로컬 수정본·공지 권한 오류·설치·Windows UI",
+      "result": "not_run",
+      "evidence": [
+        "PC 오프라인이며 현재 scratch에는 기존 작업본이 없음",
+        "소스 변경·새 설치·음원 청취·새 Windows QA를 수행하지 않음"
+      ]
+    }
+  ],
+  "nextActions": [
+    "사용자 PC에서 Desktop Commander Remote 연결을 복구",
+    "로컬 미커밋 작업과 기존 작업자/실행 프로세스를 확인하고 새 수정본을 보존",
+    "기존 native 검증 결과와 실제 게시글 마지막 단락·작은 창·11개 도구·9개 안내·갱신/회전 설정을 최종 EXE에서 확인",
+    "오디오북 _통합소통 N-0008 배포 Unauthorized 원인을 실제 ACL·프로세스·폴더에서 조사하고 수정",
+    "Known-Good 백업 후 최종 설치·실행·파일 해시 확인, GitHub 코드/공지/요약 반영, 중앙 기록 갱신·이번 임시파일 정리"
+  ],
+  "blockers": [
+    "사용자 PC KJW의 Desktop Commander Remote가 오프라인이라 최신 로컬 작업본·설치 위치·오디오북 공지 권한 오류에 접근할 수 없음"
+  ],
+  "supersedes": []
+}
