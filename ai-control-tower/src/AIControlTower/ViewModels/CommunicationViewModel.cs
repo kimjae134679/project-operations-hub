@@ -45,9 +45,12 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public IReadOnlyList<CommunicationEntry> ThreadEntries { get; init; } = [];
     public int EntryCount => ThreadEntries.Count;
     public int CommentCount => ThreadEntries.Count(e=>e.IsComment);
+    public int RecordCount => ThreadEntries.Count(e=>!e.IsComment && e.RecordKind is "record" or "unknown");
+    public int GuideCount => ThreadEntries.Count(e=>!e.IsComment && e.RecordKind=="guide");
+    public int PostCount => EntryCount-CommentCount-RecordCount-GuideCount;
     public int RevisionCount { get; init; } = 1;
     public string TimeDisplay => Time;
-    public string ConversationSummary => Exchange is not null ? $"게시글 1 · 수정 이력 {RevisionCount}" : $"게시글 {EntryCount - CommentCount} · 댓글 {CommentCount}";
+    public string ConversationSummary => Exchange is not null ? $"게시글 1 · 수정 이력 {RevisionCount}" : $"게시글 {PostCount} · 댓글 {CommentCount} · 답변·기록 {RecordCount} · 안내 {GuideCount}";
     public string StatusColorKey => Warning is not null || Exchange?.Status == "blocked" ? "Blocked" : Exchange?.Status == "completed" ? "Complete" : Exchange?.Status == "in_progress" ? "Running" : "Waiting";
     public string ProjectId { get; init; } = "";
     public TaskExchangeView? Exchange { get; init; }
@@ -67,6 +70,10 @@ public sealed class CommunicationEntryRow(CommunicationEntry entry, bool unread)
     public string TimeDisplay => Entry.TimeDisplay;
     public string Body => Entry.Body;
     public string KindLabel => Entry.KindLabel;
+    public string SourceName => Entry.SourceName;
+    public string SourcePath => Entry.SourcePath;
+    public string RecordKind => Entry.RecordKind;
+    public string SourceLabel => $"{KindLabel} · 원본 {SourceName} · {SourcePath}";
     public string AutomationLabel => $"{KindLabel} · {Title} · {Author} · {TimeDisplay}";
     private bool _isUnread = unread;
     public bool IsUnread { get => _isUnread; set { if (SetProperty(ref _isUnread,value)) { OnPropertyChanged(nameof(Unread)); OnPropertyChanged(nameof(UnreadLabel)); } } }
@@ -125,7 +132,8 @@ public sealed partial class MainViewModel
     private string _communicationSearch = "";
     private string _communicationStateFilter = "전체 상태";
     private bool _selectedProjectOnly, _showHistory, _rebuildingCommunication;
-    private bool _onlyUnread, _selectingInternally;
+    private bool _onlyUnread, _selectingInternally, _showCommunicationRaw;
+    public bool ShowCommunicationRaw { get => _showCommunicationRaw; set => SetProperty(ref _showCommunicationRaw,value); }
     private CommunicationReadStore _communicationReadStore = new();
     private CommunicationEntryRow? _selectedEntry;
     private string _receiptFilter = "전체", _receiptSearch = "";
@@ -135,6 +143,7 @@ public sealed partial class MainViewModel
     public CommunicationEntryRow? SelectedEntry { get => _selectedEntry; set { if(SetProperty(ref _selectedEntry,value)) { if(!_selectingInternally) MarkCommunicationViewed(); NotifyEntrySelection(); } } }
     public string SelectedBody => SelectedEntry?.Body ?? SelectedInbox?.ReadableBody ?? "";
     public string SelectedArticleBody => SelectedBody;
+    public string SelectedRawBody => SelectedInbox?.Exchange is not null ? SelectedInbox.Body : SelectedEntry?.Body ?? SelectedInbox?.Body ?? "";
     public string EntryPositionLabel => SelectedEntry is null ? "" : $"{Entries.IndexOf(SelectedEntry)+1} / {Entries.Count}";
     public bool HasEntries => Entries.Count > 1;
     public ICommand PrevEntryCommand { get; private set; } = null!;
@@ -248,7 +257,7 @@ public sealed partial class MainViewModel
     }
     private void NotifyEntrySelection()
     {
-        OnPropertyChanged(nameof(SelectedBody)); OnPropertyChanged(nameof(SelectedArticleBody));
+        OnPropertyChanged(nameof(SelectedBody)); OnPropertyChanged(nameof(SelectedArticleBody)); OnPropertyChanged(nameof(SelectedRawBody));
         OnPropertyChanged(nameof(EntryPositionLabel)); OnPropertyChanged(nameof(HasEntries));
         OnPropertyChanged(nameof(SelectedThreadHeader)); OnPropertyChanged(nameof(EntryReadPositionKey));
         foreach(var command in new[]{PrevEntryCommand,NextEntryCommand,PreviousPostCommand,NextPostCommand}) (command as CommunicationNavigationCommand)?.Changed();
@@ -273,7 +282,17 @@ public sealed partial class MainViewModel
         _settings.CommunicationFolders[id]=Path.GetFullPath(folder); SaveSettings(); _lastCommunication=DateTime.MinValue;
     }
     public void OpenCommunicationFolder() => OpenExisting(SelectedCommunicationProject?.Root is { Length:>0 } root ? Path.Combine(root,"_통합소통") : null);
-    public void OpenCollectedFile() => OpenExisting(SelectedInbox?.Path);
+    public void OpenCollectedFile()
+    {
+        var relative=SelectedEntry?.SourcePath;
+        if(string.IsNullOrWhiteSpace(relative)) { OpenExisting(SelectedInbox?.Path); return; }
+        var anchor=relative.IndexOf("#original=",StringComparison.Ordinal);
+        if(anchor>=0)relative=relative[..anchor];
+        var root=Path.GetFullPath(CommunicationHubPath);
+        var path=Path.GetFullPath(Path.Combine(root,relative));
+        // The displayed provenance is never a command or an arbitrary outside path.
+        if(path.StartsWith(root+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))OpenExisting(path);
+    }
     public async Task SyncCommunicationAsync(bool force=false)
     {
         if(IsReadOnlyView)
@@ -350,7 +369,7 @@ public sealed partial class MainViewModel
             snapshot.Notices,
             Receipts = snapshot.Receipts.Where(r=>r.IsCurrent).Select(r=>r.Receipt),
             Projects = snapshot.ProjectStates.Select(p=>new {p.ProjectId,p.RootPath,p.State,p.DeliveredCount}),
-            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath,i.SourceName,i.CollectedAt,i.Title,i.Preview}),
+            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath,i.SourceName,i.CollectedAt,i.Title,i.Preview,i.ThreadGroup,i.IsStandaloneThreadRecord}),
             snapshot.Errors, Names = _communicationNames, Actors = _communicationActorNames
         });
         OnPropertyChanged(nameof(CommunicationCheckedAt));
@@ -400,21 +419,35 @@ public sealed partial class MainViewModel
         });
         var revisionCounts=parsed.Values.Where(v=>v.Exchange is not null).Select(v=>v.Exchange!)
             .GroupBy(e=>(e.ProjectId,e.ActorId,e.RecordId)).ToDictionary(g=>g.Key,g=>g.Select(e=>e.Revision).Distinct().Count());
-        foreach(var item in snapshot.InboxItems.OrderByDescending(i=>i.CollectedAt))
+        var threadGroups=snapshot.InboxItems.Where(i=>i.ThreadGroup.Length>0)
+            .GroupBy(i=>i.ThreadGroup,StringComparer.Ordinal).ToDictionary(g=>g.Key,g=>g.OrderBy(i=>i.IsStandaloneThreadRecord).ThenBy(i=>i.SourceName,StringComparer.Ordinal).ToArray(),StringComparer.Ordinal);
+        var displayedThreads=new HashSet<string>(StringComparer.Ordinal);
+        foreach(var sourceItem in snapshot.InboxItems.OrderByDescending(i=>i.CollectedAt))
         {
+            var item=sourceItem;
+            CommunicationInboxItem[]? threadSources=null;
+            if(item.ThreadGroup.Length>0)
+            {
+                if(!displayedThreads.Add(item.ThreadGroup))continue;
+                threadSources=threadGroups[item.ThreadGroup]; item=threadSources[0];
+            }
             var body = item.Body ?? "";
             var (exchange,warning) = parsed[item.CentralPath];
-            var identity = exchange is not null ? item.ProjectId+"/task/"+exchange.ActorId+"/"+exchange.RecordId : item.ProjectId+"/file/"+item.SourceName;
+            var identity = exchange is not null ? item.ProjectId+"/task/"+exchange.ActorId+"/"+exchange.RecordId : threadSources is not null ? item.ProjectId+"/thread/"+item.ThreadGroup : item.ProjectId+"/file/"+item.SourceName;
             var author = exchange is null ? "" : _communicationActorNames.GetValueOrDefault(exchange.ActorId,exchange.ActorId);
             var time = (exchange?.UpdatedAt ?? item.CollectedAt).ToOffset(TimeSpan.FromHours(9)).ToString("MM/dd HH:mm") + " KST";
-            var entries = exchange is null ? CommunicationThreadParser.Parse(body,identity,item.Title,author,time) : new[]{ new CommunicationEntry(identity+"/post",exchange.Title,author,time,CommunicationArticle.Read(body,exchange),item.ContentSha256) };
+            IReadOnlyList<CommunicationEntry> entries = exchange is null
+                ? threadSources is null
+                    ? CommunicationThreadParser.Parse(body,identity,item.Title,author,time,item.SourceName,item.CentralPath,item.IsStandaloneThreadRecord)
+                    : threadSources.SelectMany(source=>CommunicationThreadParser.Parse(source.Body??"",identity+"/source/"+source.SourceName,source.Title,"","",source.SourceName,source.CentralPath,source.IsStandaloneThreadRecord)).ToArray()
+                : new[]{ new CommunicationEntry(identity+"/post",exchange.Title,author,time,CommunicationArticle.Read(body,exchange),item.ContentSha256) {SourceName=item.SourceName,SourcePath=item.CentralPath} };
             if(exchange is null) author = string.Join(", ",entries.Select(e=>e.Author).Distinct().Take(3));
-            if(item.IsThread && entries.Count>0) time=entries.Last().TimeDisplay;
+            if(item.IsThread)time="자료 수정 · "+time;
             var row = new InboxRow(NameFor(item.ProjectId), exchange?.Title ?? item.Title,
                 exchange?.RequestSummary ?? item.Preview, body, Path.Combine(CommunicationHubPath,item.CentralPath),
                 time)
                 { ProjectId = item.ProjectId, Exchange = exchange, Warning = warning, Author = author, Identity = identity, ThreadEntries = entries, IsUnread = entries.Any(e=>_communicationReadStore.IsUnread(e.Identity,e.ContentHash)), RevisionCount = exchange is null ? 1 : revisionCounts[(exchange.ProjectId,exchange.ActorId,exchange.RecordId)] };
-            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning && previous.Author == row.Author && previous.RevisionCount == row.RevisionCount)
+            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning && previous.Author == row.Author && previous.RevisionCount == row.RevisionCount && previous.ThreadEntries.SequenceEqual(entries))
                 row = previous;
             _allInboxRows.Add(row);
         }

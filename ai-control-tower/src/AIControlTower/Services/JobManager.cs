@@ -10,6 +10,9 @@ public sealed record JobResult(string Id, string ProjectId, string ProgramId, st
 /// <summary>Owns only processes started here. A project has one writer/runner at a time.</summary>
 public sealed class JobManager
 {
+    private readonly string _dataDirectory;
+    public JobManager() : this(ControlTowerSettings.DataDirectory) { }
+    public JobManager(string dataDirectory) => _dataDirectory = Path.GetFullPath(dataDirectory);
     private readonly ConcurrentDictionary<string, (Process Process, CancellationTokenSource Cancellation, WindowsProcessGroup Group)> _running = new();
     private readonly ConcurrentDictionary<string, byte> _projects = new();
     private readonly SemaphoreSlim _slots = new(3, 3);
@@ -18,16 +21,18 @@ public sealed class JobManager
     public int BusyProjectCount => _projects.Count;
     public bool IsProjectBusy(string projectId) => _projects.ContainsKey(projectId);
     public bool IsRunning(string programId) => _running.ContainsKey(programId);
-    public async Task<JobResult> RunAsync(ProgramItem program, ProgramCommand command, CancellationToken cancellationToken = default, string? standardInput = null)
+    public async Task<JobResult> RunAsync(ProgramItem program, ProgramCommand command, CancellationToken cancellationToken = default, string? standardInput = null, AiCompletionContract? aiContract = null)
     {
         if (command.TimeoutSeconds is < 0 or > 86400) throw new ArgumentOutOfRangeException(nameof(command.TimeoutSeconds), "timeoutSeconds는 0~86400입니다.");
         if (!_projects.TryAdd(program.ProjectId, 0)) throw new InvalidOperationException("이 프로젝트에는 실행 중인 작업이 있습니다.");
         var acquired = false;
         var id = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N")[..8];
         var started = DateTimeOffset.UtcNow;
-        var directory = Path.Combine(ControlTowerSettings.DataDirectory, "runs", id);
+        var directory = Path.Combine(_dataDirectory, "runs", id);
         var logPath = Path.Combine(directory, "output.log");
         var result = new JobResult(id, program.ProjectId, program.Id, command.Name, "queued", started, null, null, logPath);
+        AiCompletionEvaluator? ai = null;
+        AiCompletionReceipt? aiReceipt = null;
         using var manualCancellation = new CancellationTokenSource();
         using var timeoutCancellation = new CancellationTokenSource();
         if (command.TimeoutSeconds > 0) timeoutCancellation.CancelAfter(TimeSpan.FromSeconds(command.TimeoutSeconds));
@@ -42,6 +47,8 @@ public sealed class JobManager
             await _slots.WaitAsync(linked.Token).ConfigureAwait(false);
             acquired = true;
             if (!Directory.Exists(program.WorkingDirectory)) throw new DirectoryNotFoundException("실행 폴더가 없습니다: " + program.WorkingDirectory);
+            if (aiContract is not null) ai = new AiCompletionEvaluator(aiContract, program.WorkingDirectory, id, started);
+            if (ai?.PreflightFailure is not null) throw new InvalidOperationException("AI 완료 계약 사전 검사 실패 · " + ai.PreflightFailure);
             var executable = ResolveExecutable(command.FileName, program.WorkingDirectory);
             var info = new ProcessStartInfo(executable) { WorkingDirectory = program.WorkingDirectory, UseShellExecute = false,
                 CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden, RedirectStandardOutput = true, RedirectStandardError = true, RedirectStandardInput = true,
@@ -66,6 +73,32 @@ public sealed class JobManager
             var writeLock = new SemaphoreSlim(1, 1);
             async Task Pump(StreamReader reader, string prefix)
             {
+                if (ai is not null)
+                {
+                    // Bounded capture before sanitization; stderr can never supply AI completion.
+                    var buffer = new char[2048]; var pending = new System.Text.StringBuilder(); var truncated = false;
+                    while (true)
+                    {
+                        int count;
+                        try { count = await reader.ReadAsync(buffer.AsMemory(), drainCancellation.Token).ConfigureAwait(false); }
+                        catch (OperationCanceledException) { return; }
+                        if (count == 0) break;
+                        for (var index = 0; index < count; index++)
+                        {
+                            var character = buffer[index];
+                            if (character == '\n')
+                            {
+                                if (prefix.Length == 0) ai.ObserveStdout(truncated ? new string('x', AiCompletionEvaluator.MaxLineCharacters + 1) : pending.ToString().TrimEnd('\r'));
+                                pending.Clear(); truncated = false;
+                            }
+                            else if (pending.Length < AiCompletionEvaluator.MaxLineCharacters) pending.Append(character);
+                            else truncated = true;
+                        }
+                    }
+                    if (prefix.Length == 0 && (pending.Length > 0 || truncated))
+                        ai.ObserveStdout(truncated ? new string('x', AiCompletionEvaluator.MaxLineCharacters + 1) : pending.ToString().TrimEnd('\r'));
+                    return; // Never expose declared-AI raw lines/report bodies to log/UI.
+                }
                 while (true)
                 {
                     string? line;
@@ -111,6 +144,7 @@ public sealed class JobManager
             }
             result = result with { ExitCode = process.ExitCode, FinishedAt = DateTimeOffset.UtcNow,
                 State = result.State == "running" ? process.ExitCode == 0 ? "succeeded" : "failed" : result.State };
+            if (ai?.OutputLimitExceeded == true && result.State == "succeeded") result = result with { State = "output_limit" };
         }
         catch (OperationCanceledException)
         {
@@ -127,13 +161,25 @@ public sealed class JobManager
         }
         finally
         {
-            _running.TryRemove(program.Id, out _);
-            _projects.TryRemove(program.ProjectId, out _);
-            if (acquired) _slots.Release();
-            group?.Dispose();
-            process?.Dispose();
+            try
+            {
+                // Keep project ownership until semantic completion and its durable receipt are final.
+                if (ai is not null)
+                {
+                    aiReceipt = ai.Complete(result.ExitCode, result.State);
+                    if (aiReceipt.Status != "succeeded" && result.State == "succeeded") result = result with { State = "failed" };
+                }
+                Save(directory, result, aiReceipt);
+            }
+            finally
+            {
+                _running.TryRemove(program.Id, out _);
+                _projects.TryRemove(program.ProjectId, out _);
+                if (acquired) _slots.Release();
+                group?.Dispose();
+                process?.Dispose();
+            }
         }
-        Save(directory, result);
         Emit(program.Name + " · " + result.State + (result.ExitCode is not null ? " · exit " + result.ExitCode : ""));
         return result;
     }
@@ -188,11 +234,14 @@ public sealed class JobManager
         return ProcessRunner.Sanitize(value);
     }
     private void Emit(string message) => Log?.Invoke(DateTime.Now.ToString("HH:mm:ss") + "  " + message);
-    private static void Save(string directory, JobResult result)
+    private static void Save(string directory, JobResult result, AiCompletionReceipt? aiReceipt = null)
     {
         Directory.CreateDirectory(directory);
         var path = Path.Combine(directory, "result.json");
-        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        var json = JsonSerializer.SerializeToNode(result)!.AsObject();
+        if (aiReceipt is not null) json["aiReceipt"] = JsonSerializer.SerializeToNode(aiReceipt,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        File.WriteAllText(path + ".tmp", json.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
         File.Move(path + ".tmp", path, true);
     }
     public static void RecoverInterruptedRuns()

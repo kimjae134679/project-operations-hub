@@ -5,9 +5,25 @@ namespace AIControlTower.ViewModels;
 public sealed class ToolStatusViewModel : ObservableObject
 {
     private ToolStatus _status;
+    private string _usageEvidence="사용 근거 없음 · 설치/프로세스 존재만으로 사용·성공을 판단하지 않습니다.";
+    private bool _hasUsageEvidence;
     public ToolStatusViewModel(ToolStatus status) => _status = status;
     public string Id => _status.Id;
-    public string RawName => _status.DisplayName;
+    public string RawName => Id switch
+    {
+        "project-bridge"=>"ProjectBridge","desktop-commander"=>"Remote Desktop Commander","jev"=>"Jev Router",
+        "codex"=>"Codex","github-cli"=>"GitHub CLI","n8n"=>"n8n local bridge","ai-ops-runner"=>"GitHub Actions · MultiGod-PC",
+        "delivery-chain"=>"GPT → Jev 전달","aider"=>"Aider","hyperframes"=>"HyperFrames","voicestudio"=>"VoiceStudio","zonos2"=>"Zonos2",
+        _=>_status.DisplayName
+    };
+    public bool HasUsageEvidence=>_hasUsageEvidence;
+    public string UsageEvidence=>_usageEvidence;
+    public void SetUsageEvidence(string? evidence)
+    {
+        _hasUsageEvidence=!string.IsNullOrWhiteSpace(evidence);
+        _usageEvidence=_hasUsageEvidence?evidence!:"사용 근거 없음 · 설치/프로세스 존재만으로 사용·성공을 판단하지 않습니다.";
+        OnPropertyChanged(nameof(HasUsageEvidence));OnPropertyChanged(nameof(UsageEvidence));
+    }
     public string DisplayName => RawName switch
     {
         "ProjectBridge" => "ProjectBridge · 공용 PC 작업",

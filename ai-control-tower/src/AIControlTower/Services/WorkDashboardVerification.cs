@@ -14,10 +14,10 @@ public static class WorkDashboardVerification
     {
         var at = new DateTimeOffset(2026, 10, 7, 5, 0, 0, TimeSpan.FromHours(9));
         IReadOnlyList<WorkActivity> rows = [
-            new() { Id="fixture:manager", Project="컨트롤타워", Worker="연속 실행기", Source="검증용 가짜 자료", Title="두 단계 목록 · 기반 검증", Status="running", Stage="1/2단계 완료 · 두 번째 단계 기록", UpdatedAt=at, Evidence="가짜 체크포인트 · 현재 생존 미확인 · 실제 실행 아님", NextCheckpoint="검증 결과 확인 · 가짜 예시" },
+            new() { Id="fixture:manager", Project="컨트롤타워", ProjectId="project-operations-hub", ProjectDisplayName="컨트롤타워", Worker="연속 실행기", WorkerKind="연속 실행기", Source="검증용 가짜 자료", Title="두 단계 목록 · 기반 검증", Status="running", Stage="1/2단계 완료 · 두 번째 단계 기록", UpdatedAt=at, Evidence="가짜 체크포인트 · 현재 생존 미확인 · 실제 실행 아님", NextCheckpoint="검증 결과 확인 · 가짜 예시" },
             new() { Id="fixture:bridge", Project="공용 PC", Worker="ProjectBridge", Source="검증용 가짜 자료", Title="장기 작업 시작 접수", Status="accepted", Stage="접수만 확인 · 자식 완료 미확인", UpdatedAt=at, Evidence="연결 상태와 실제 작업 완료를 구분하는 가짜 예시" },
             new() { Id="fixture:jev", Project="콘텐츠 제작", Worker="Jev", Source="검증용 가짜 자료", Title="Jev 외부 작업 · 연결 미확인", Status="unknown", UpdatedAt=at, Evidence="설치/프로세스만으로 실제 진행을 추측하지 않음" },
-            new() { Id="fixture:process", Project="컨트롤타워", Worker="관리자 기록", Source="검증용 가짜 task_exchange", Title="현재 관제 과정 · 최신 기록", Status="in_progress", Stage="revision 2", IsManagementRecord=true, Revision=2, UpdatedAt=at, Evidence="가짜 명령·답변 기록 · 자동 채팅 감시 아님", RecentLog="상태 조회 UI 연결\n비밀값을 공개하지 않는 정제 표시", NextCheckpoint="조회 화면 검증 → 설치는 별도 승인·검증", Error="실제 Jev 작업 연결은 미확인" }
+            new() { Id="fixture:process", Project="컨트롤타워", ProjectId="Control-Tower", ProjectDisplayName="컨트롤타워", Worker="관리자 기록", Source="검증용 가짜 task_exchange", Title="통합관리 진행 · 최신 기록", Status="in_progress", Stage="revision 2", IsManagementRecord=true, Revision=2, UpdatedAt=at, Evidence="가짜 명령·답변 기록 · 자동 채팅 감시 아님", RecentLog="상태 조회 UI 연결\n비밀값을 공개하지 않는 정제 표시", NextCheckpoint="조회 화면 검증 → 설치는 별도 승인·검증", Error="실제 Jev 작업 연결은 미확인" }
         ];
         return new(_ => Task.FromResult(rows)) { IsFixture = true };
     }

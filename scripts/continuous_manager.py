@@ -17,6 +17,9 @@ import uuid
 
 
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$')
+AI_LINE_BYTES = 65536
+AI_OUTPUT_BYTES = 512 * 1024
+AI_ARTIFACT_BYTES = 1024 * 1024
 GUARD = ('Work only in the approved project workspace. Read its current project guide, '
          'AGENTS/README and new notices before acting; never acknowledge notices for other AIs. '
          'Do not touch the Desktop, other projects, accounts or permissions. '
@@ -75,6 +78,33 @@ def executable(value):
         raise ValueError('executable must be an existing absolute binary path (no shell wrapper)')
 
 
+def explicit_model(model):
+    return (isinstance(model, str) and re.fullmatch(r'gpt-[0-9][A-Za-z0-9._:-]{0,95}', model)
+            and 'astra' not in model.casefold() and 'router' not in model.casefold())
+
+
+def completion_contract(step, root):
+    declared = step.get('completion_contract')
+    if declared is None:
+        return {'adapter': 'codex-jsonl-v1', 'model': step['model']} if step['type'] == 'codex' else None
+    if not isinstance(declared, dict) or set(declared) - {'adapter', 'model', 'required_report_path'}:
+        raise ValueError('invalid explicit AI completion contract')
+    adapter, model = declared.get('adapter'), declared.get('model', step.get('model'))
+    if adapter not in ('codex-jsonl-v1', 'wrapper-json-v1') or not explicit_model(model):
+        raise ValueError('explicit supported AI adapter and concrete non-Astra model required')
+    if step['type'] == 'codex' and model != step['model']:
+        raise ValueError('completion contract model must match declared agent model')
+    result = dict(declared, adapter=adapter, model=model)
+    if 'required_report_path' in result:
+        value = result['required_report_path']
+        if not isinstance(value, str) or not value or len(value) > 4096 or '\x00' in value:
+            raise ValueError('invalid required report path')
+        path = safe_path(value, root)
+        if path == root or ':' in str(path)[len(path.anchor):]:
+            raise ValueError('required report must be a contained regular file')
+    return result
+
+
 def validate_plan(plan):
     if not isinstance(plan, dict):
         raise ValueError('plan must be an object')
@@ -104,7 +134,7 @@ def validate_plan(plan):
         kind = step.get('type')
         if kind not in fields or not base | fields[kind] <= set(step):
             raise ValueError('unsupported or incomplete step type')
-        allowed = base | fields[kind] | ({'prefix_argv'} if kind == 'codex' else set())
+        allowed = base | fields[kind] | {'completion_contract'} | ({'prefix_argv'} if kind == 'codex' else set())
         if set(step) - allowed:
             raise ValueError('unknown step field (no implicit permissions or retry policy)')
         name = step['id']
@@ -124,7 +154,7 @@ def validate_plan(plan):
         else:
             executable(step['executable'])
             model = step['model']
-            if not isinstance(model, str) or not re.fullmatch(r'[A-Za-z0-9._:-]{1,100}', model) or 'astra' in model.casefold():
+            if not explicit_model(model):
                 raise ValueError('an explicit non-Astra model is required')
             prompt = step['prompt']
             if not isinstance(prompt, str) or not prompt.strip() or len(prompt) > 12000 or '\x00' in prompt:
@@ -134,6 +164,7 @@ def validate_plan(plan):
                 # Prefix is only a reviewed local CLI script, never arbitrary CLI flags.
                 if len(step['prefix_argv']) != 1 or not Path(step['prefix_argv'][0]).is_absolute() or not Path(step['prefix_argv'][0]).is_file():
                     raise ValueError('prefix_argv supports one absolute local CLI script only')
+        completion_contract(step, root)
     visited = set()
     while len(visited) < len(steps):
         eligible = [s for s in steps if s['id'] not in visited and set(s['depends_on']) <= visited]
@@ -331,17 +362,121 @@ class OwnedJob:
 
 def read_usage(path):
     usage = None
-    for line in path.read_text(encoding='utf-8', errors='replace').splitlines():
-        try:
-            item = json.loads(line)
-            if isinstance(item, dict) and item.get('type') == 'turn.completed' and isinstance(item.get('usage'), dict):
-                usage = item['usage']
-        except (ValueError, TypeError):
-            continue
+    total = 0
+    with path.open('rb') as stream:
+        for line in iter(lambda: stream.readline(AI_LINE_BYTES + 1), b''):
+            total += len(line)
+            if len(line) > AI_LINE_BYTES or total > AI_OUTPUT_BYTES:
+                break
+            try:
+                item = json.loads(line.decode('utf-8'), object_pairs_hook=_unique_json_object)
+                if isinstance(item, dict) and item.get('type') == 'turn.completed' and isinstance(item.get('usage'), dict):
+                    usage = {key: value for key, value in item['usage'].items()
+                             if key in ('input_tokens', 'output_tokens', 'cached_input_tokens')
+                             and type(value) is int and 0 <= value <= 10**12}
+            except (ValueError, UnicodeError, TypeError, RecursionError):
+                continue
     return usage
 
 
-def execute_step(step, root, directory, digest, deadline, limit):
+def _unique_json_object(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError('duplicate JSON property')
+        value[key] = item
+    return value
+
+
+def ai_receipt(contract, stdout, result, root, started_ns, identity, preflight=None):
+    receipt = {'schemaVersion': 1, 'adapter': contract['adapter'], 'executionId': identity['planId'] + '/' + identity['stepId'],
+               'requestedModel': contract['model'], 'status': 'failed', 'processExitCode': result.get('returncode'),
+               'terminalObserved': False, 'reportObserved': False, 'reportRequired': 'required_report_path' in contract,
+               'artifactVerified': False if 'required_report_path' in contract else None, 'artifactSha256': None,
+               'failureCode': preflight, **identity}
+    failure, terminals, wrappers, total = preflight, 0, 0, 0
+    try:
+        with stdout.open('rb') as stream:
+            for line in iter(lambda: stream.readline(AI_LINE_BYTES + 1), b''):
+                total += len(line)
+                if len(line) > AI_LINE_BYTES or total > AI_OUTPUT_BYTES:
+                    failure = failure or 'output_limit'
+                    break
+                if not line.strip():
+                    continue
+                try:
+                    item = json.loads(line.decode('utf-8'), object_pairs_hook=_unique_json_object,
+                                      parse_constant=lambda _: (_ for _ in ()).throw(ValueError('nonfinite JSON')))
+                    if not isinstance(item, dict):
+                        raise ValueError('event must be object')
+                    if contract['adapter'] == 'wrapper-json-v1':
+                        wrappers += 1
+                        receipt['terminalObserved'] = item.get('state') in ('succeeded', 'completed', 'failed')
+                        receipt['reportObserved'] = item.get('reportPresent') is True
+                        if (wrappers != 1 or item.get('state') not in ('succeeded', 'completed')
+                                or type(item.get('exitCode')) is not int or item['exitCode'] != 0
+                                or item.get('reportPresent') is not True or item.get('model') != contract['model']):
+                            failure = failure or 'wrapper_failed'
+                    else:
+                        kind = item.get('type')
+                        if kind in ('error', 'turn.failed') or item.get('error') is not None:
+                            failure = failure or 'ai_failed'
+                        if kind == 'turn.completed':
+                            terminals += 1
+                            receipt['terminalObserved'] = True
+                            if terminals != 1:
+                                failure = failure or 'contradictory_terminal'
+                        child = item.get('item')
+                        if (kind == 'item.completed' and isinstance(child, dict) and child.get('type') == 'agent_message'
+                                and isinstance(child.get('text'), str) and child['text'].strip()):
+                            receipt['reportObserved'] = True
+                        if not isinstance(kind, str):
+                            failure = failure or 'invalid_event'
+                        if 'model' in item and item['model'] != contract['model']:
+                            failure = failure or 'model_mismatch'
+                except (ValueError, UnicodeError, RecursionError):
+                    failure = failure or 'invalid_json'
+    except OSError:
+        failure = failure or 'stdout_unavailable'
+    if result['status'] != 'succeeded' or result.get('returncode') != 0:
+        failure = 'process_' + result['status']
+    if not receipt['terminalObserved']:
+        failure = failure or 'terminal_missing'
+    if not receipt['reportObserved']:
+        failure = failure or 'report_missing'
+    if 'required_report_path' in contract and failure is None:
+        try:
+            path = safe_path(contract['required_report_path'], root)
+            before = path.stat()
+            if not stat.S_ISREG(before.st_mode) or not 0 < before.st_size <= AI_ARTIFACT_BYTES or before.st_mtime_ns < started_ns:
+                raise ValueError('artifact missing stale or oversized')
+            with path.open('rb') as artifact:
+                opened = os.fstat(artifact.fileno())
+                content = artifact.read(AI_ARTIFACT_BYTES + 1)
+                after = os.fstat(artifact.fileno())
+            final = safe_path(contract['required_report_path'], root).stat()
+            signature = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns)
+            if len(content) != before.st_size or not signature(before) == signature(opened) == signature(after) == signature(final):
+                raise ValueError('artifact changed')
+            receipt['artifactVerified'] = True
+            receipt['artifactSha256'] = hashlib.sha256(content).hexdigest()
+        except (OSError, ValueError):
+            failure = 'artifact_invalid'
+    receipt['failureCode'] = failure
+    receipt['status'] = 'failed' if failure else 'succeeded'
+    return receipt
+
+
+def execute_step(step, root, directory, digest, deadline, limit, plan_id=''):
+    contract = completion_contract(step, root)
+    started_ns = time.time_ns()
+    identity = {'planId': plan_id, 'stepId': step['id'], 'planSha256': digest}
+    preflight = None
+    if contract and 'required_report_path' in contract and safe_path(contract['required_report_path'], root).exists():
+        preflight = 'report_preexisting'
+        result = {'status': 'failed', 'returncode': None, 'finished_at': now()}
+        result['aiReceipt'] = ai_receipt(contract, directory / 'no-stdout', result, root, started_ns, identity, preflight)
+        return result
     argv, prompt = step_command(step, root)
     logs = safe_path(directory / 'logs', root)
     logs.mkdir(exist_ok=True)
@@ -436,6 +571,10 @@ def execute_step(step, root, directory, digest, deadline, limit):
         usage = read_usage(stdout)
         if usage is not None:
             result['usage'] = usage
+    if contract:
+        result['aiReceipt'] = ai_receipt(contract, stdout, result, root, started_ns, identity)
+        if result['status'] == 'succeeded' and result['aiReceipt']['status'] != 'succeeded':
+            result['status'] = 'output_limit' if result['aiReceipt']['failureCode'] == 'output_limit' else 'failed'
     return result
 
 
@@ -490,7 +629,7 @@ def run_plan(plan, directory, approved_digest):
                 state['updated_at'] = now()
                 atomic_json(state_path, state)  # Durable BEFORE spawn: unknown completion never auto-retries.
                 event(directory, 'step_started', step=step['id'])
-                value.update(execute_step(step, root, directory, digest, deadline, plan['max_output_bytes']))
+                value.update(execute_step(step, root, directory, digest, deadline, plan['max_output_bytes'], plan['id']))
                 state['updated_at'] = now()
                 atomic_json(state_path, state)
                 event(directory, 'step_finished', step=step['id'], status=value['status'], returncode=value.get('returncode'))

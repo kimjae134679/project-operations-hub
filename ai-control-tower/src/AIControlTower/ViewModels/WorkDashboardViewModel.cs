@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using AIControlTower.Models;
 using AIControlTower.Services;
 namespace AIControlTower.ViewModels;
@@ -14,17 +16,60 @@ public sealed class WorkDashboardViewModel : ObservableObject
     private WorkActivity? _selected;
     private bool _refreshing, _managementOnly;
     private int _selectionVersion;
+    private int _detailRequestVersion;
+    private string _projectFilterId = "", _workerFilterKey = "";
     public WorkDashboardViewModel(Func<CancellationToken, Task<IReadOnlyList<WorkActivity>>> read,
         Func<WorkActivity, Task<string>>? details = null, Func<string, bool>? owns = null, Func<string, bool>? stop = null)
     { _read = read; _details = details ?? (r => Task.FromResult(r.Evidence)); _owns = owns ?? (_ => false); _stop = stop ?? (_ => false); }
     public ObservableCollection<WorkActivity> Activities { get; } = [];
-    public IReadOnlyList<WorkActivity> FilteredActivities => Activities.Where(r => (!_managementOnly || r.IsManagementRecord)
-        && (string.IsNullOrWhiteSpace(Search) || new[] { r.Project, r.Worker, r.Title, r.StatusLabel, r.Stage, r.Source }.Any(x => x.Contains(Search.Trim(), StringComparison.OrdinalIgnoreCase)))).ToArray();
-    public string Search { get => _search; set { if (SetProperty(ref _search, value)) OnPropertyChanged(nameof(FilteredActivities)); } }
-    public bool ManagementOnly { get => _managementOnly; set { if (SetProperty(ref _managementOnly, value)) { OnPropertyChanged(nameof(FilteredActivities)); OnPropertyChanged(nameof(Heading)); OnPropertyChanged(nameof(ContextMessage)); } } }
+    private IEnumerable<WorkActivity> ScopedActivities => Activities.Where(r => r.IsManagementRecord == _managementOnly);
+    public IReadOnlyList<WorkActivity> FilteredActivities => ScopedActivities.Where(r => (ProjectFilterId.Length==0 || (r.ProjectGroupKey.Length==0?"__unassigned":r.ProjectGroupKey)==ProjectFilterId)
+        && (WorkerFilterKey.Length==0 || r.WorkerKind==WorkerFilterKey)
+        && (string.IsNullOrWhiteSpace(Search) || new[] { r.ProjectLabel, r.ProjectId, r.Worker, r.WorkerKind, r.ProgramId, r.Title, r.StatusLabel, r.Stage, r.Source }.Any(x => x.Contains(Search.Trim(), StringComparison.OrdinalIgnoreCase)))).ToArray();
+    public IReadOnlyList<WorkFilterOption> ProjectFilters
+    {
+        get
+        {
+            var options = ScopedActivities.GroupBy(r=>r.ProjectGroupKey,StringComparer.Ordinal)
+                .Select(g=>new WorkFilterOption(g.Key.Length==0?"__unassigned":g.Key,g.First().ProjectGroupLabel)).OrderBy(p=>p.Label).ToList();
+            if(ProjectFilterId.Length>0 && !options.Any(p=>p.Id==ProjectFilterId))options.Add(new(ProjectFilterId,ProjectFilterId+" · 현재 기록 없음"));
+            return new[] { new WorkFilterOption("","모든 프로젝트") }.Concat(options).ToArray();
+        }
+    }
+    public IReadOnlyList<WorkFilterOption> WorkerFilters
+    {
+        get
+        {
+            var options=ScopedActivities.Where(r=>ProjectFilterId.Length==0 || (r.ProjectGroupKey.Length==0?"__unassigned":r.ProjectGroupKey)==ProjectFilterId)
+                .Select(r=>r.WorkerKind).Distinct(StringComparer.Ordinal).OrderBy(s=>s).Select(s=>new WorkFilterOption(s,s)).ToList();
+            if(WorkerFilterKey.Length>0 && !options.Any(p=>p.Id==WorkerFilterKey))options.Add(new(WorkerFilterKey,WorkerFilterKey+" · 현재 기록 없음"));
+            return new[] { new WorkFilterOption("","모든 실행기") }.Concat(options).ToArray();
+        }
+    }
+    public IReadOnlyList<WorkProjectGroup> ProjectGroups => FilteredActivities.GroupBy(r=>r.ProjectGroupKey,StringComparer.Ordinal)
+        .Select(g=>new WorkProjectGroup(g.Key,g.First().ProjectLabel,g.GroupBy(r=>r.WorkerKind,StringComparer.Ordinal).Select(w=>new WorkWorkerGroup(w.Key,w.ToArray())).ToArray())).ToArray();
+    public ICollectionView GroupedActivities
+    {
+        get
+        {
+            var view=new ListCollectionView(FilteredActivities.ToArray());
+            view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(WorkActivity.ProjectGroupLabel)));
+            view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(WorkActivity.WorkerKind)));
+            return view;
+        }
+    }
+    private void NotifyFilters()
+    {
+        OnPropertyChanged(nameof(FilteredActivities));OnPropertyChanged(nameof(GroupedActivities));OnPropertyChanged(nameof(ProjectGroups));
+        OnPropertyChanged(nameof(ProjectFilters));OnPropertyChanged(nameof(WorkerFilters));
+    }
+    public string ProjectFilterId { get=>_projectFilterId;set { if(SetProperty(ref _projectFilterId,value??""))NotifyFilters(); } }
+    public string WorkerFilterKey { get=>_workerFilterKey;set { if(SetProperty(ref _workerFilterKey,value??""))NotifyFilters(); } }
+    public string Search { get => _search; set { if (SetProperty(ref _search, value)) NotifyFilters(); } }
+    public bool ManagementOnly { get => _managementOnly; set { if (SetProperty(ref _managementOnly, value)) { NotifyFilters(); OnPropertyChanged(nameof(Heading)); OnPropertyChanged(nameof(ContextMessage)); } } }
     public bool IsFixture { get; init; }
-    public string Heading => ManagementOnly ? "현재 관제 과정" : "전체 작업 현황";
-    public string ContextMessage => ManagementOnly ? "명령·답변 기록의 최신 수정본에서 진행·검증·남은 일을 봅니다. 자동 채팅 감시가 아닙니다." : "관제탑·PC 연결·등록된 연속 실행기의 실제 기록을 한곳에서 봅니다. 외부 콘솔을 임의로 감시하지 않습니다.";
+    public string Heading => ManagementOnly ? "통합관리 진행" : "프로젝트 작업";
+    public string ContextMessage => ManagementOnly ? "명시된 관리자 프로젝트 기록의 최신 수정본에서 진행·검증·남은 일을 봅니다. 자동 채팅 감시가 아닙니다." : "프로젝트 → 등록 실행기별 명령·진행·결과를 봅니다. 미등록 외부 콘솔은 연결 미확인으로 남습니다.";
     public bool CanRegisterSource => RegisterContinuousPath is not null;
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public string SelectedDetails { get => _detailsText; private set => SetProperty(ref _detailsText, value); }
@@ -64,14 +109,14 @@ public sealed class WorkDashboardViewModel : ObservableObject
         for (var i = 0; i < Activities.Count; i++) { Activities[i] = incoming[Activities[i].Id]; incoming.Remove(Activities[i].Id); }
         foreach (var row in incoming.Values) Activities.Add(row);
         Selected = id is null ? null : Activities.FirstOrDefault(r => r.Id == id);
-        OnPropertyChanged(nameof(FilteredActivities)); OnPropertyChanged(nameof(CanStopOwned));
+        NotifyFilters(); OnPropertyChanged(nameof(CanStopOwned));
         SnapshotApplied?.Invoke(this,EventArgs.Empty);
     }
     public async Task LoadSelectedDetailsAsync()
     {
-        if (Selected is not { } selected) return; var version = _selectionVersion;
-        try { var result = await _details(selected); if (version == _selectionVersion && Selected?.Id == selected.Id) SelectedDetails = WorkDashboardService.SafeText(result); }
-        catch (Exception ex) { if (version == _selectionVersion) SelectedDetails = "상세 조회 실패 · " + WorkDashboardService.SafeText(ex.Message); }
+        if (Selected is not { } selected) return; var version = _selectionVersion; var requestVersion=++_detailRequestVersion;
+        try { var result = await _details(selected); if (version == _selectionVersion && requestVersion==_detailRequestVersion && Selected?.Id == selected.Id) SelectedDetails = WorkDashboardService.SafeText(result); }
+        catch (Exception ex) { if (version == _selectionVersion && requestVersion==_detailRequestVersion) SelectedDetails = "상세 조회 실패 · " + WorkDashboardService.SafeText(ex.Message); }
     }
     public void StopSelectedOwned()
     {

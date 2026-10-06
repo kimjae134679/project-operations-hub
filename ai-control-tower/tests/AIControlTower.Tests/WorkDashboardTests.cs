@@ -23,7 +23,7 @@ public sealed class WorkDashboardTests
         var inbox = Path.Combine(project, "_통합소통", "보낼자료");
         Directory.CreateDirectory(inbox);
         object Record(int revision) => new { schemaVersion = 1, recordType = "task_exchange", recordId = "manager-test", revision, title = "bounded local fixture",
-            projectId = "control-tower", actorId = "manager-test", sessionId = "fixture", receivedAt = "2026-10-07T01:00:00+09:00", updatedAt = "2026-10-07T02:00:00+09:00",
+            projectId = "Control-Tower", actorId = "manager-test", sessionId = "fixture", receivedAt = "2026-10-07T01:00:00+09:00", updatedAt = "2026-10-07T02:00:00+09:00",
             request = new { summary = "private request", details = "PRIVATE_PROMPT", source = "fixture" }, response = new { summary = "private response", details = "PRIVATE_MODEL", source = "fixture" },
             status = "in_progress", workDone = new[] { "safe verified fixture" }, verification = new[] { new { name = "fixture", result = "pass", evidence = new[] { "test only" } } },
             nextActions = new[] { "remaining checkpoint" }, blockers = Array.Empty<string>(), supersedes = Array.Empty<string>() };
@@ -85,8 +85,8 @@ public sealed class WorkDashboardTests
     {
         var raw="{\"id\":\"one\",\"state\":\"completed\",\"result\":{\"data\":{\"processId\":\"p\",\"stage\":\"completed\",\"returnCode\":0,\"running\":false,\"done\":true,\"succeeded\":true},\"outcome\":\"completed\"},\"process\":{\"processId\":\"p\",\"stage\":\"completed\",\"returnCode\":0,\"running\":false,\"done\":true,\"succeeded\":true},\"acceptedResult\":{\"data\":{\"stage\":\"starting\",\"running\":true,\"done\":false,\"succeeded\":false},\"outcome\":\"completed\"}}";
         var detail=WorkDashboardService.BridgeDetail(raw);
-        Assert.Contains("자식 종료 확인",detail);Assert.Contains("종료 코드: 0",detail);
-        Assert.DoesNotContain("starting",detail);Assert.DoesNotContain("완료 미확인",detail);
+        Assert.Contains("프로세스 종료 확인",detail);Assert.Contains("종료 코드: 0",detail);
+        Assert.DoesNotContain("starting",detail);Assert.Contains("AI 업무 완료 미확인",detail);
     }
 
     [Fact]

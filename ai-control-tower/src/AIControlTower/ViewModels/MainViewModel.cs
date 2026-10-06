@@ -17,6 +17,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly CatalogDefinition _catalog = ProjectCatalogService.Load();
     private readonly JobManager _jobs = new();
     private readonly WorkDashboardService _workDashboardService;
+    // Explicit central registry IDs supplied by the user/project notice map, never guessed from names.
+    private static readonly IReadOnlyDictionary<string,string> DashboardProjectAliases=new Dictionary<string,string>(StringComparer.Ordinal)
+    {
+        ["PhoneLOL"]="phonelol-current",["Mushoku-Audiobook"]="audiobook",["Video-Downloader"]="video-downloader",["Control-Tower"]="project-operations-hub"
+    };
     public WorkDashboardViewModel WorkDashboard { get; }
     public WorkDashboardViewModel ManagementDashboard { get; }
     public DocumentReaderViewModel Documents { get; } = new();
@@ -109,9 +114,37 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<ProjectItem> Projects { get; } = [];
     public ObservableCollection<ToolStatusViewModel> Statuses { get; } = [];
     private string _toolSearch = "";
+    private bool _showOtherTools;
+    public bool ShowOtherTools {get=>_showOtherTools;set {if(SetProperty(ref _showOtherTools,value))OnPropertyChanged(nameof(FilteredToolStatuses));}}
+    public string ToolEvidenceSummary=>$"근거 연결 {Statuses.Count(s=>s.HasUsageEvidence)} / 등록 {Statuses.Count} · 설치 ≠ 실제 사용";
     public string ToolSearch { get => _toolSearch; set { if (SetProperty(ref _toolSearch,value)) OnPropertyChanged(nameof(FilteredToolStatuses)); } }
     public IReadOnlyList<ToolStatusViewModel> UserFacingStatuses => Statuses.Where(s => s.IsUserFacing).ToArray();
-    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => UserFacingStatuses.Where(s => Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel)).ToArray();
+    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => UserFacingStatuses.Where(s => (s.HasUsageEvidence || ShowOtherTools || !string.IsNullOrWhiteSpace(ToolSearch))
+        && Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel,s.UsageEvidence)).ToArray();
+    private void RefreshToolEvidence()
+    {
+        // Only explicit task/command identities, not installation probes or actor-name guesses.
+        foreach(var tool in Statuses)
+        {
+            var workerNames=tool.Id switch
+            {
+                "jev"=>new[]{"Jev","Jev · 관제탑 등록 실행","Jev Router"},"codex"=>new[]{"Codex"},
+                "project-bridge"=>new[]{"ProjectBridge"},"desktop-commander"=>new[]{"Remote Desktop Commander"},
+                "n8n"=>new[]{"n8n","n8n local bridge"},"aider"=>new[]{"Aider"},"hyperframes"=>new[]{"HyperFrames"},
+                "voicestudio"=>new[]{"VoiceStudio"},"zonos2"=>new[]{"Zonos2"},_=>Array.Empty<string>()
+            };
+            var record=WorkDashboard.Activities.FirstOrDefault(r=>r.Source!="작업 연결 없음" && workerNames.Contains(r.Worker,StringComparer.OrdinalIgnoreCase));
+            string? evidence=record is null?null:$"등록 작업 기록: {record.Project} · {record.Title} · {record.UpdatedLabel} · 현재 생존/실사용 성공은 별도 확인";
+            if(evidence is null)
+            {
+                var commands=tool.Id switch {"jev"=>new[]{"jev","jev.cmd","jev.exe"},"codex"=>new[]{"codex","codex.cmd","codex.exe"},"github-cli"=>new[]{"gh","gh.exe"},"aider"=>new[]{"aider","aider.exe"},_=>Array.Empty<string>()};
+                var project=Projects.FirstOrDefault(p=>p.Functions.SelectMany(f=>f.Programs).SelectMany(p=>p.Commands).Any(c=>commands.Contains(Path.GetFileName(c.FileName),StringComparer.OrdinalIgnoreCase)));
+                if(project is not null)evidence=$"프로젝트 실행도구 명시 등록: {project.DisplayName} · 실제 실행/성공 확인 아님";
+            }
+            tool.SetUsageEvidence(evidence is null?null:WorkDashboardService.SafeText(evidence));
+        }
+        OnPropertyChanged(nameof(ToolEvidenceSummary));OnPropertyChanged(nameof(FilteredToolStatuses));
+    }
     public ObservableCollection<string> JobLogs { get; } = [];
     public event EventHandler? CatalogRefreshing;
     public event EventHandler? CatalogRefreshed;
@@ -186,10 +219,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public async Task RefreshWorkDashboardAsync()
     {
         if(_disposed)return;
+        _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
             Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
         await WorkDashboard.RefreshAsync(_lifetime.Token);
         if(!_disposed) ManagementDashboard.ApplySnapshot(WorkDashboard.Activities.ToArray());
+        RefreshToolEvidence();
     }
 
     public async Task DiscoverAsync()
@@ -247,6 +282,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ProjectsCount)); OnPropertyChanged(nameof(ProgramsCount));
             OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
             CatalogRefreshed?.Invoke(this, EventArgs.Empty);
+            _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
+            RefreshToolEvidence();
             _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
                 Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
             Message = $"프로젝트 {ProjectsCount}개 · 프로그램/산출물 {ProgramsCount}개를 확인했습니다.";
@@ -264,7 +301,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             await PcConnection.PollAsync();
             if(Statuses.Count==0)foreach(var provider in _providers)
                 Statuses.Add(new ToolStatusViewModel(new(provider.Id,provider.Id switch {"project-bridge"=>"ProjectBridge","desktop-commander"=>"Remote Desktop Commander","jev"=>"Jev Router","codex"=>"Codex","github-cli"=>"GitHub CLI",_=>provider.Id},StatusKind.Unknown,"로컬 조회 · 외부/API 상태 확인 없음 · 현재 생존 미확인",DateTimeOffset.UtcNow)));
-            Message=_settings.ReadOnlyLoadIssue.Length>0?_settings.ReadOnlyLoadIssue:ViewModeLabel;OnPropertyChanged(nameof(UserFacingStatuses));OnPropertyChanged(nameof(FilteredToolStatuses));return;
+            RefreshToolEvidence();Message=_settings.ReadOnlyLoadIssue.Length>0?_settings.ReadOnlyLoadIssue:ViewModeLabel;OnPropertyChanged(nameof(UserFacingStatuses));OnPropertyChanged(nameof(FilteredToolStatuses));return;
         }
         if (_disposed || !await _refreshLock.WaitAsync(0)) return;
         try
@@ -279,6 +316,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 if (existing is null) Statuses.Add(new ToolStatusViewModel(result)); else existing.Update(result);
             }
             _lastStatus = DateTime.UtcNow;
+            RefreshToolEvidence();
             OnPropertyChanged(nameof(UserFacingStatuses)); OnPropertyChanged(nameof(FilteredToolStatuses));
             Message = "연결 상태 확인 · " + DateTime.Now.ToString("HH:mm:ss");
             UpdateRunningProperties();
@@ -366,14 +404,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (program is null || command is null) { Message = "실행할 프로그램과 등록된 명령을 선택하세요."; return; }
         await RunProgramAsync(program, command);
     }
-    private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null)
+    private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null,AiCompletionContract? aiContract=null)
     {
         if(BlockOperation())return;
         if (_jobs.IsProjectBusy(program.ProjectId)) { Message = "이 프로젝트에는 실행 중인 작업이 있습니다."; return; }
         try
         {
             UpdateProgramState(program, "실행 중 · " + command.Name);
-            var result = await _jobs.RunAsync(program, command, _lifetime.Token, input);
+            var result = await _jobs.RunAsync(program, command, _lifetime.Token, input,aiContract:aiContract);
             UpdateProgramState(program, result.State + (result.ExitCode is null ? "" : " · exit " + result.ExitCode));
             Message = program.DisplayName + " · " + program.StatusLabel + " · 작업 기록에서 결과를 확인하세요.";
         }
@@ -389,6 +427,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         if(BlockOperation())return;
         if (!EnableJev) { Message = LocalJevPolicyMessage; return; }
+        // No model/account-execution verification is configured in this UI yet. Installation/key existence is not proof.
+        if(!JevExecutionPolicy.TryCreate(null,false,out var contract,out var reason))
+        { Message="Jev 실행 보류 · " + reason + " · 명시 모델 및 현재 계정 실행 지원 검증이 필요합니다.";return; }
         if (string.IsNullOrWhiteSpace(TaskInput)) { Message = "작업 내용을 입력하세요."; return; }
         if (!Directory.Exists(ProjectPath)) { Message = "존재하는 프로젝트 경로를 선택하세요. 다른 폴더로 대체 실행하지 않습니다."; return; }
         var package = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "node_modules", "jev-router", "bin", "jev-codex.mjs");
@@ -397,8 +438,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (!EnvironmentProbe.HasAnyEnvironmentVariable("JEV_API_KEY", "TYPESAFE_API_KEY")) { Message = "Jev 키 설정을 확인하지 못했습니다. 비밀값은 화면에 표시하지 않습니다."; return; }
         var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
         var program = new ProgramItem { Id = projectId + "/jev", ProjectId = projectId, Name = "Jev · Codex 작업", Kind = "Jev", Path = ProjectPath, WorkingDirectory = ProjectPath };
-        var command = new ProgramCommand { Name = "Jev 작업", FileName = node, Arguments = [package, "exec", "--json", "--sandbox", "workspace-write", "-"], TimeoutSeconds = 1800 };
-        await RunProgramAsync(program, command, TaskInput);
+        var command = new ProgramCommand { Name = "Jev 작업", FileName = node, Arguments = JevExecutionPolicy.BuildArguments(package,contract!.RequestedModel).ToArray(), TimeoutSeconds = 1800 };
+        await RunProgramAsync(program, command, TaskInput,contract);
     }
     public Task CancelJevTaskAsync()
     {

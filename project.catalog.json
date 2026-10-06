@@ -358,6 +358,33 @@
           ]
         }
       ]
+    },
+    {
+      "id": "Threads",
+      "name": "인스타 수익화 · 콘텐츠 제작",
+      "path": "C:\\KJ\\Github\\Threads",
+      "description": "Threads 콘텐츠를 편집·평가하는 프로젝트입니다. 각 글의 실제 사용자 평가와 작성·검토 기록을 확인합니다. 외부 게시와 계정 연결은 승인되지 않았습니다.",
+      "category": "콘텐츠 제작",
+      "role": "current-development",
+      "roleLabel": "현재 개발",
+      "evidencePath": "실제 프로젝트 README·AGENTS·프로젝트_사용안내.md 및 본인 task_exchange projectId Threads",
+      "checkedAt": "2026-10-07",
+      "functions": [
+        {
+          "id": "workspace",
+          "name": "프로젝트 자료·기록",
+          "programs": [
+            {
+              "id": "user-guide",
+              "name": "콘텐츠 제작 사용 안내",
+              "path": "프로젝트_사용안내.md",
+              "description": "실제 프로젝트의 입력·편집·평가·기록 위치를 앱 안에서 읽습니다. 실행이나 게시를 대신하지 않습니다.",
+              "kindLabel": "사용 안내",
+              "openActionLabel": "사용 안내 읽기"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

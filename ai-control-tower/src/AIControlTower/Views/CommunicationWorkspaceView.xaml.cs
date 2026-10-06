@@ -10,6 +10,7 @@ public partial class CommunicationWorkspaceView : UserControl
 {
     private MainViewModel? _vm;
     private readonly Dictionary<string,double> _readPositions = new(StringComparer.Ordinal);
+    private readonly Dictionary<string,double> _rawPositions = new(StringComparer.Ordinal);
     private string _readingKey = "";
     private int _restoreVersion;
     public CommunicationWorkspaceView()
@@ -19,6 +20,7 @@ public partial class CommunicationWorkspaceView : UserControl
         Unloaded += (_,_) => Detach();
         DataContextChanged += (_,_) => { if(IsLoaded) Attach(); };
         ArticleReader.AddHandler(ScrollViewer.ScrollChangedEvent,new ScrollChangedEventHandler(ReaderScrolled));
+        RawReader.AddHandler(ScrollViewer.ScrollChangedEvent,new ScrollChangedEventHandler(RawScrolled));
     }
     private void Attach()
     {
@@ -42,18 +44,23 @@ public partial class CommunicationWorkspaceView : UserControl
     {
         var next = _vm?.EntryReadPositionKey ?? "";
         if(next == _readingKey) return;
-        if(_readingKey.Length > 0) _readPositions[_readingKey] = ArticleReader.VerticalOffset;
+        if(_readingKey.Length > 0) { _readPositions[_readingKey] = ArticleReader.VerticalOffset; _rawPositions[_readingKey] = RawReader.VerticalOffset; }
         _readingKey = next;
         var version = ++_restoreVersion;
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded,new Action(() =>
         {
-            if(version == _restoreVersion) ArticleReader.ScrollToVerticalOffset(_readPositions.GetValueOrDefault(next,0));
+            if(version == _restoreVersion) { ArticleReader.ScrollToVerticalOffset(_readPositions.GetValueOrDefault(next,0)); RawReader.ScrollToVerticalOffset(_rawPositions.GetValueOrDefault(next,0)); }
         }));
     }
     private void ReaderScrolled(object sender,ScrollChangedEventArgs e)
     {
         if(_readingKey.Length > 0 && e.VerticalChange != 0 && e.ExtentHeightChange == 0)
             _readPositions[_readingKey] = ArticleReader.VerticalOffset;
+    }
+    private void RawScrolled(object sender,ScrollChangedEventArgs e)
+    {
+        if(_readingKey.Length > 0 && e.VerticalChange != 0 && e.ExtentHeightChange == 0)
+            _rawPositions[_readingKey] = RawReader.VerticalOffset;
     }
     private void OpenCollectedFile_Click(object sender,RoutedEventArgs e) => _vm?.OpenCollectedFile();
     private void OpenCommunicationFolder_Click(object sender,RoutedEventArgs e) => _vm?.OpenCommunicationFolder();

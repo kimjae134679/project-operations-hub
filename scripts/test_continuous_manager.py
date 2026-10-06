@@ -230,6 +230,125 @@ class ContinuousManagerTests(unittest.TestCase):
         self.assertEqual(1, proc.returncode, (out, err))
         self.assertEqual('timed_out', self.snapshot()['steps']['a']['status'])
 
+    def ai_step(self, code, contract=None):
+        cli = self.root / 'fake_ai.py'
+        cli.write_text(code, encoding='utf-8')
+        step = {'id': 'a', 'type': 'codex', 'executable': sys.executable,
+                'prefix_argv': [str(cli)], 'model': 'gpt-6.1-sol', 'prompt': 'fixture only',
+                'depends_on': [], 'timeout_seconds': 5, 'cwd': '.'}
+        if contract is not None:
+            step['completion_contract'] = contract
+        return step
+
+    def ai_success_code(self):
+        lines = [{'type': 'item.completed', 'item': {'type': 'agent_message', 'text': 'private fixture report'}},
+                 {'type': 'turn.completed', 'usage': {'input_tokens': 1, 'output_tokens': 1}}]
+        return '\n'.join('print(' + repr(json.dumps(line)) + ')' for line in lines)
+
+    def test_ai_exit_zero_turn_failed_blocks_successor_and_resume(self):
+        failure = json.dumps({'type': 'turn.failed', 'error': {'message': 'unsupported account'}})
+        p = self.plan([self.ai_step('print(' + repr(failure) + ')'),
+                       self.step('next', "from pathlib import Path; Path('must_not_run').touch()", ['a'])])
+        self.assertEqual(1, self.run_plan(p))
+        self.assertEqual('failed', self.snapshot()['steps']['a']['status'])
+        self.assertEqual('blocked', self.snapshot()['steps']['next']['status'])
+        self.assertFalse((self.root / 'must_not_run').exists())
+        self.assertEqual(1, self.run_plan(p))
+        self.assertEqual(1, self.snapshot()['steps']['a']['attempts'])
+
+    def test_ai_terminal_without_report_and_stderr_success_do_not_complete(self):
+        for code in ('print(\'{"type":"turn.completed"}\')',
+                     'import sys; print(\'{"type":"turn.completed"}\',file=sys.stderr)',
+                     'print("not json")', 'print("{}")', 'print("x"*70000)'):
+            with self.subTest(code=code):
+                self.state = self.root / ('state-' + str(abs(hash(code))))
+                self.assertEqual(1, self.run_plan(self.plan([self.ai_step(code)])))
+                self.assertEqual('output_limit' if '70000' in code else 'failed', self.snapshot()['steps']['a']['status'])
+
+    def test_ai_failure_wins_over_valid_terminal_and_report(self):
+        code = self.ai_success_code() + '\nprint(\'{"type":"error","message":"failed"}\')'
+        self.assertEqual(1, self.run_plan(self.plan([self.ai_step(code)])))
+        self.assertEqual('failed', self.snapshot()['steps']['a']['status'])
+
+    def test_ai_success_receipt_binds_immutable_plan_and_never_publishes_report(self):
+        p = self.plan([self.ai_step(self.ai_success_code())])
+        self.assertEqual(0, self.run_plan(p))
+        receipt = self.snapshot()['steps']['a'].get('aiReceipt')
+        self.assertIsInstance(receipt, dict, 'declared AI requires a typed completion receipt')
+        self.assertEqual(1, receipt['schemaVersion'])
+        self.assertEqual('harmless/a', receipt['executionId'])
+        self.assertEqual(self.cm.plan_hash(p), receipt['planSha256'])
+        self.assertEqual('harmless', receipt['planId'])
+        self.assertEqual('a', receipt['stepId'])
+        self.assertEqual('succeeded', receipt['status'])
+        self.assertTrue(receipt['terminalObserved'])
+        self.assertTrue(receipt['reportObserved'])
+        self.assertNotIn('private fixture report', json.dumps(receipt))
+
+    def test_explicit_wrapper_failed_receipt_cannot_override_physical_exit_zero(self):
+        wrapper = {'state': 'failed', 'exitCode': 1, 'reportPresent': False, 'model': 'gpt-6.1-sol'}
+        step = self.step('a', 'print(' + repr(json.dumps(wrapper)) + ')')
+        step['completion_contract'] = {'adapter': 'wrapper-json-v1', 'model': 'gpt-6.1-sol'}
+        self.assertEqual(1, self.run_plan(self.plan([step])))
+        self.assertEqual('failed', self.snapshot()['steps']['a']['status'])
+
+    def test_generic_command_json_stdout_stays_opaque(self):
+        p = self.plan([self.step('a', 'print(\'{"state":"failed","exitCode":1,"reportPresent":false}\')')])
+        self.assertEqual(0, self.run_plan(p))
+        self.assertNotIn('aiReceipt', self.snapshot()['steps']['a'])
+
+    def test_required_report_must_be_new_nonempty_bounded_and_inside_root(self):
+        report = self.root / 'report.txt'
+        report.write_text('old report', encoding='utf-8')
+        contract = {'adapter': 'codex-jsonl-v1', 'required_report_path': 'report.txt'}
+        code = "from pathlib import Path; Path('spawned').touch()\n" + self.ai_success_code()
+        p = self.plan([self.ai_step(code, contract)])
+        self.assertEqual(1, self.run_plan(p))
+        self.assertFalse((self.root / 'spawned').exists(), 'stale report must block before spawn')
+        for path in ('../escape', str(self.root.parent / 'escape.txt'), 'Desktop/report.txt'):
+            with self.subTest(path=path):
+                p['steps'][0]['completion_contract']['required_report_path'] = path
+                with self.assertRaises(ValueError):
+                    self.cm.validate_plan(p)
+
+    def test_required_report_new_artifact_is_hashed_not_replaced_by_stdout_claim(self):
+        contract = {'adapter': 'codex-jsonl-v1', 'required_report_path': 'report.txt'}
+        code = "from pathlib import Path; Path('report.txt').write_text('new private report')\n" + self.ai_success_code()
+        self.assertEqual(0, self.run_plan(self.plan([self.ai_step(code, contract)])))
+        receipt = self.snapshot()['steps']['a']['aiReceipt']
+        self.assertTrue(receipt['artifactVerified'])
+        self.assertEqual(64, len(receipt['artifactSha256']))
+        self.assertNotIn('new private report', json.dumps(receipt))
+
+    def test_ai_router_auto_and_astra_models_rejected_before_execution(self):
+        p = self.plan([self.ai_step(self.ai_success_code())])
+        for model in ('jev-router', 'auto', 'router', 'gpt-6-astra'):
+            with self.subTest(model=model):
+                p['steps'][0]['model'] = model
+                with self.assertRaises(ValueError):
+                    self.cm.validate_plan(p)
+
+    def test_usage_metadata_only_allows_bounded_integer_counters(self):
+        path = self.root / 'usage.log'
+        path.write_text(json.dumps({'type': 'turn.completed', 'usage': {'input_tokens': 3,
+                        'output_tokens': 'SECRET_PROMPT', 'raw_report': 'PRIVATE_BODY',
+                        'cached_input_tokens': True}}), encoding='utf-8')
+        self.assertEqual({'input_tokens': 3}, self.cm.read_usage(path))
+
+    def test_required_report_stale_empty_and_stdout_only_claim_fail(self):
+        import os
+        for artifact_code in ('', "from pathlib import Path; Path('report.txt').touch()",
+                              "from pathlib import Path; import os; Path('report.txt').write_text('new'); os.utime('report.txt',(1,1))"):
+            with self.subTest(artifact=artifact_code):
+                self.state = self.root / ('artifact-state-' + str(abs(hash(artifact_code))))
+                report = self.root / 'report.txt'
+                if report.exists():
+                    report.unlink()
+                code = artifact_code + '\n' + self.ai_success_code()
+                contract = {'adapter': 'codex-jsonl-v1', 'required_report_path': 'report.txt'}
+                self.assertEqual(1, self.run_plan(self.plan([self.ai_step(code, contract)])))
+                self.assertFalse(self.snapshot()['steps']['a']['aiReceipt']['artifactVerified'])
+
 
 if __name__ == '__main__':
     unittest.main()

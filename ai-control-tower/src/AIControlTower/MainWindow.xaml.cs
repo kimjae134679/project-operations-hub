@@ -21,6 +21,11 @@ public partial class MainWindow : Window
     private Task? _initializeTask;
     private double _catalogOffset;
     private readonly Dictionary<string, bool> _expandedFunctions = new();
+    private bool _paneWidthsInitialized,_restoringReaderOrigin;
+    private double _expandedLogHeight=140;
+    private ReaderOrigin? _readerOrigin;
+    private sealed record ReaderOrigin(TabItem Tab,WorkspaceReaderSelection Selection,
+        (ScrollViewer View,double Vertical,double Horizontal)[] Scrolls,(Expander View,bool Expanded)[] Groups);
 
     public MainWindow(ControlTowerSettings? settings = null)
     {
@@ -28,8 +33,10 @@ public partial class MainWindow : Window
         ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
-        if(_viewModel.IsReadOnlyView)Title="통합 관제탑 0.9.1 · 로컬 조회 (외부 실행/공유 보류)";
+        if(_viewModel.IsReadOnlyView)Title=$"통합 관제탑 · {_viewModel.ApplicationVersionLabel} · 로컬 조회 (외부 실행/공유 보류)";
         _viewModel.Documents.Opened+=(_,_)=>WorkspaceTabs.SelectedItem=DocumentReaderTab;
+        _viewModel.Documents.Opening+=(_,_)=>CaptureReaderOrigin();
+        _viewModel.Documents.ReturnRequested+=(_,_)=>RestoreReaderOrigin();
         _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
         PcJobsHost.Content = _pcJobsPanel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
@@ -83,6 +90,37 @@ public partial class MainWindow : Window
             async()=>{await _viewModel.RefreshAsync();await _viewModel.RefreshWorkDashboardAsync();await _viewModel.SyncCommunicationAsync(true);},
             InitializeOperationalAsync);
     }
+    private void CaptureReaderOrigin()
+    {
+        if(_restoringReaderOrigin || WorkspaceTabs.SelectedItem is not TabItem tab || tab==DocumentReaderTab)return;
+        var root=tab.Content as DependencyObject;
+        var children=root is null?Array.Empty<DependencyObject>():Descendants(root).ToArray();
+        _readerOrigin=new(tab,WorkspaceReaderSelection.Capture(_viewModel),
+            children.OfType<ScrollViewer>().Select(s=>(s,s.VerticalOffset,s.HorizontalOffset)).ToArray(),
+            children.OfType<Expander>().Select(e=>(e,e.IsExpanded)).ToArray());
+        _viewModel.Documents.CanReturnToOrigin=true;
+    }
+    private void RestoreReaderOrigin()
+    {
+        if(_readerOrigin is not { } state)return;
+        _restoringReaderOrigin=true;
+        try
+        {
+            state.Selection.Restore(_viewModel);
+            WorkspaceTabs.SelectedItem=state.Tab;
+            Dispatcher.BeginInvoke(()=>
+            {
+                foreach(var group in state.Groups)group.View.SetCurrentValue(Expander.IsExpandedProperty,group.Expanded);
+                foreach(var scroll in state.Scrolls){scroll.View.ScrollToVerticalOffset(scroll.Vertical);scroll.View.ScrollToHorizontalOffset(scroll.Horizontal);}
+                SynchronizeProgramSelections();
+            },System.Windows.Threading.DispatcherPriority.Loaded);
+        }
+        finally {_restoringReaderOrigin=false;}
+    }
+    private void Log_Expanded(object sender,RoutedEventArgs e)
+    { if(JobLogRow is null)return;JobLogRow.MinHeight=65;JobLogRow.Height=new GridLength(_expandedLogHeight); }
+    private void Log_Collapsed(object sender,RoutedEventArgs e)
+    { if(JobLogRow is null)return;if(JobLogRow.Height.IsAbsolute)_expandedLogHeight=JobLogRow.Height.Value;JobLogRow.MinHeight=0;JobLogRow.Height=GridLength.Auto; }
     private async Task InitializeOperationalAsync()
     {
         await _viewModel.DiscoverAsync();
@@ -100,8 +138,12 @@ public partial class MainWindow : Window
         ContentShell.Margin = new Thickness(narrow ? 12 : 16);
         PageHeader.Margin = new Thickness(0, 0, 0, compact ? 8 : 14);
         WorkspaceContent.Margin = new Thickness(0, compact ? 16 : 20, 0, 0);
-        CatalogColumn.Width = new GridLength(narrow ? 230 : 264);
-        InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
+        if(!_paneWidthsInitialized)
+        {
+            CatalogColumn.Width = new GridLength(narrow ? 230 : 264);
+            InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
+            _paneWidthsInitialized=true;
+        }
         ProjectHeader.Padding = compact ? new Thickness(18,10,18,6) : new Thickness(narrow ? 18 : 24);
         ProjectCategory.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
         ProjectHeaderBody.Margin = new Thickness(0,0,7,compact ? 2 : 18);
@@ -109,7 +151,6 @@ public partial class MainWindow : Window
         ProjectTitle.FontSize = narrow ? 27 : 32;
         ProjectDescription.MaxHeight = compact ? 44 : 60;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
-        JobLogList.Height = compact ? 65 : 100;
 
         LogPanel.Margin = new Thickness(0, compact ? 8 : 14, 0, 0);
         var hideMetadata = compact && _viewModel.HasSelectedCommands;
@@ -177,7 +218,7 @@ public partial class MainWindow : Window
 
     private void WorkspaceTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.OriginalSource != sender || WorkspaceContent is null) return;
+        if (e.OriginalSource != sender || WorkspaceContent is null || _restoringReaderOrigin) return;
         FadeIn(WorkspaceContent);
         if (CommunicationTab.IsSelected) _viewModel.MarkCommunicationViewed();
         if (WorkDashboardTab.IsSelected || ManagementProcessTab.IsSelected) _ = _viewModel.RefreshWorkDashboardAsync();

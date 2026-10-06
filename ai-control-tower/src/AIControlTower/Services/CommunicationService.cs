@@ -276,7 +276,7 @@ public sealed class CommunicationService
         // These documents remain untouched and are not manufactured as comments/receipts.
         foreach(var path in EnumerateSafe(Inside(root,"04_COMMUNICATION/threads"),errors,null,10000))
         {
-            if(!Path.GetFileName(path).Equals("THREAD.md",StringComparison.OrdinalIgnoreCase)) continue;
+            if(!Path.GetExtension(path).Equals(".md",StringComparison.OrdinalIgnoreCase)) continue;
             try
             {
                 var body=await ReadText(path,ct).ConfigureAwait(false);
@@ -284,7 +284,9 @@ public sealed class CommunicationService
                 var relative=Path.GetRelativePath(root,path).Replace('\\','/');
                 var title=body.Split('\n').FirstOrDefault(l=>l.StartsWith("# "))?.TrimStart('#',' ') ?? Path.GetFileName(Path.GetDirectoryName(path))!;
                 items.Add(new("Shared-Communication",ContentHash(body),relative,relative,new DateTimeOffset(File.GetLastWriteTimeUtc(path),TimeSpan.Zero))
-                    { Body=body,Title=title,Preview="공용 소통방의 게시글",IsThread=true });
+                    { Body=body,Title=title,Preview="공용 소통방의 원본 기록",IsThread=true,
+                        ThreadGroup=Path.GetRelativePath(root,Path.GetDirectoryName(path)!).Replace('\\','/'),
+                        IsStandaloneThreadRecord=!Path.GetFileName(path).Equals("THREAD.md",StringComparison.OrdinalIgnoreCase) });
             }
             catch(Exception ex) when(IsFileError(ex)) { Hold(errors,null,"thread_retry"); }
         }

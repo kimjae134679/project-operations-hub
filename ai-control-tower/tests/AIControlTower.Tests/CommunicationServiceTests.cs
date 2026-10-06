@@ -25,15 +25,31 @@ public sealed class CommunicationServiceTests : IDisposable
         var path=Path.Combine(room,"THREAD.md");
         var raw=Encoding.UTF8.GetBytes("# Room\r\n## 2026-10-06 KST — Post\r\n작성자: Sol\r\nBody\r\n");
         File.WriteAllBytes(path,raw);
-        File.WriteAllText(Path.Combine(room,"README.md"),"Not a post");
+        var guidePath=Path.Combine(room,"README.md");
+        File.WriteAllText(guidePath,"Not a post");
+        var guideRaw=File.ReadAllBytes(guidePath);
         var result=await Service().Sync(Hub,[]);
-        var thread=Assert.Single(result.InboxItems);
+        Assert.Equal(2,result.InboxItems.Count);
+        var thread=Assert.Single(result.InboxItems.Where(i=>i.SourceName.EndsWith("/THREAD.md",StringComparison.Ordinal)));
+        var guide=Assert.Single(result.InboxItems.Where(i=>i.SourceName.EndsWith("/README.md",StringComparison.Ordinal)));
         Assert.True(thread.IsThread);
+        Assert.False(thread.IsStandaloneThreadRecord);
+        Assert.True(guide.IsStandaloneThreadRecord);
+        Assert.Equal(thread.ThreadGroup,guide.ThreadGroup);
         Assert.Equal("Room",thread.Title);
         Assert.Equal("Shared-Communication",thread.ProjectId);
         Assert.Equal(raw,File.ReadAllBytes(path));
+        Assert.Equal(guideRaw,File.ReadAllBytes(guidePath));
+        var readStore=new CommunicationReadStore();
+        foreach(var source in result.InboxItems)
+        {
+            var entries=CommunicationThreadParser.Parse(source.Body!,source.SourceName,source.Title,
+                sourceName:source.SourceName,sourcePath:source.CentralPath,standaloneRecord:source.IsStandaloneThreadRecord);
+            Assert.All(entries,e=>Assert.True(readStore.IsUnread(e.Identity,e.ContentHash)));
+            if(source==guide)Assert.Equal("주제 안내",Assert.Single(entries).KindLabel);
+            Assert.DoesNotContain(source.CentralPath,result.PublishablePaths);
+        }
         Assert.Empty(result.Receipts);
-        Assert.DoesNotContain(thread.CentralPath,result.PublishablePaths);
     }
 
     [Fact]
