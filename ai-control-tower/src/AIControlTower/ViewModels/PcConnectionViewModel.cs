@@ -39,7 +39,7 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     public PcConnectionViewModel(ProjectBridgeService? service = null)
     {
         _service = service ?? new(); ConnectCommand = new PcCommand(() => OperateAsync("resume")); PauseCommand = new PcCommand(() => OperateAsync("pause")); StopCommand = new PcCommand(StopAsync);
-        InstallCommand = new PcCommand(InstallAsync); OpenJobsCommand = new PcCommand(() => { new PcJobsWindow(this) { Owner = Application.Current?.MainWindow }.Show(); return Task.CompletedTask; }, ShowError);
+        InstallCommand = new PcCommand(InstallAsync); OpenJobsCommand = new PcCommand(() => { (Application.Current?.MainWindow as MainWindow)?.ShowPcJobs(); return Task.CompletedTask; }, ShowError);
         OpenGuideCommand = new PcCommand(() => { new ProjectGuideWindow("공용 PC 연결", _service.Home) { Owner = Application.Current?.MainWindow }.Show(); return Task.CompletedTask; }, ShowError);
     }
     public ObservableCollection<PcJobViewModel> Jobs { get; } = [];

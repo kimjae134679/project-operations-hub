@@ -1,0 +1,22 @@
+{
+  "version": "3.0.0",
+  "date": "2026-10-06",
+  "developmentWindowsTests": {
+    "passed": 73,
+    "failures": 0
+  },
+  "nativeFrameworkBuilds": [
+    "BridgeLauncher.cs WinExe",
+    "DesktopAutomation.cs WinExe x86 and x64"
+  ],
+  "desktopPipeRegression": "CREATE_NO_WINDOW with redirected UTF8 stdin/stdout; native window_list structured response verified",
+  "actualUserPCv3Installed": false,
+  "actualUserPCFullRoundtripVerified": false,
+  "notes": [
+    "Inherited Windows JSON DELETE-sharing failures and false liveness after process exit were corrected with bounded atomic replacement retries, unique temporary names, and kernel wait-state liveness checks. Deterministic regressions pass.",
+    "Native background launcher never shows its own window and accepts shutdown query without stopping a cancelled session. Tests use installation-home mutex scope and wait for owned worker exit.",
+    "Project and issuer workspaces, logs and per-job journals are separate; legacy published jobs and legacy detached tickets retain compatibility without replay.",
+    "User PC v3 installation and full remote roundtrip remain separate verification steps."
+  ],
+  "validatedAt": "2026-10-06T15:10:08.676246+00:00"
+}

@@ -51,7 +51,7 @@ internal static class ThemeVerification
                 var jev = new JevControlWindow(vm) { Owner = window };
                 try
                 {
-                    jev.Show();
+                    VerificationDisplay.Show(jev);
                     await jev.Dispatcher.InvokeAsync(jev.UpdateLayout,DispatcherPriority.Render);
                     var colors=CheckRenderedText(jev);
                     results.Add(new { Theme=mode, Window="AI 작업 전달", TextCount=colors.Count, MinimumContrast=colors.DefaultIfEmpty(21).Min() });
@@ -61,7 +61,7 @@ internal static class ThemeVerification
                 var receipts = new NoticeReceiptsWindow(vm) { Owner = window };
                 try
                 {
-                    receipts.Show();
+                    VerificationDisplay.Show(receipts);
                     await receipts.Dispatcher.InvokeAsync(receipts.UpdateLayout,DispatcherPriority.Render);
                     var colors=CheckRenderedText(receipts);
                     results.Add(new { Theme=mode, Window="공지 확인 현황",TextCount=colors.Count,MinimumContrast=colors.DefaultIfEmpty(21).Min() });

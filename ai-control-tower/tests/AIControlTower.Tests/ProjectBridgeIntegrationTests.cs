@@ -69,5 +69,14 @@ public sealed class ProjectBridgeIntegrationTests : IDisposable
             Assert.Equal(file.GetProperty("sha256").GetString(),hash);
         }
     }
+    [Theory]
+    [InlineData("project-operations-hub","Control-Tower")]
+    [InlineData("audiobook","Mushoku-Audiobook")]
+    [InlineData("phonelol-current","PhoneLOL")]
+    [InlineData("stock-planned","Investment-Lab")]
+    [InlineData("housing-planned","ChungYack")]
+    [InlineData("custom-project","custom-project")]
+    public void CatalogAliasSharesTheCanonicalProjectWorkspace(string id,string expected)
+        => Assert.Equal(expected,ProjectBridgeService.CanonicalProjectId(id));
     public void Dispose(){if(Directory.Exists(_home))Directory.Delete(_home,true);}
 }

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 3,
+  "version": "3.0.0",
+  "files": [
+    {
+      "path": "bridge_worker.py",
+      "sha256": "227a9dc07a4a157e28ba01ff4d85a0ac9c051b5ff3960361dbba98ad434e5b05"
+    },
+    {
+      "path": "BridgeLauncher.cs",
+      "sha256": "a9fb588fcab44d2e7d7171e4e46d1dc428225cbaddd5e90779c2ec80f9791181"
+    },
+    {
+      "path": "DesktopAutomation.cs",
+      "sha256": "825abdfcef01ffd7e5f163c91a999892d08bc2d0e67342be7afe4255ca6e914b"
+    },
+    {
+      "path": "universal_worker.py",
+      "sha256": "1dfcecb9a9d845cbcac89ee0f5f85e17e602b44904a41f167b3c3aa24fb0f3f8"
+    },
+    {
+      "path": "universal_actions.py",
+      "sha256": "205983e6b11a21cc2f5a9cf1f1a037db76bf0fc96f4a22c4a70a718d0b9da7a9"
+    },
+    {
+      "path": "process_runner.py",
+      "sha256": "d83fb59b1ad4ece9f0d33f9a8948b6c6184c6dddbe886a4d0b5b2a5e83a33604"
+    },
+    {
+      "path": "local_api.py",
+      "sha256": "cee1b82d5afa3c8743e567b492e50b3c9291fdd8ec44d3ed3c2a4bfb450b32b8"
+    },
+    {
+      "path": "bridge_mcp.py",
+      "sha256": "f2e5c7557cedfee4da7683e2bf4dd23779b0c33b4fc3cbfdbc2333188e9aa2c8"
+    },
+    {
+      "path": "README.md",
+      "sha256": "04e0ba2fe45c30f8e29e4f622598b1975207c9fee30a6bd7e40a43612fff21bf"
+    },
+    {
+      "path": "UNIVERSAL_PROTOCOL.md",
+      "sha256": "33f0361be4f6e84efd5f643b14b2af5ce1376763a7df367d32c255888839aafb"
+    },
+    {
+      "path": "프로젝트_사용안내.md",
+      "sha256": "356fa5f27c1b320dc884bbc6d834ac6d81ab9d759dc9bd9bcf18c61b667c6c3c"
+    },
+    {
+      "path": "tests/test_bridge.py",
+      "sha256": "70361fb3fc14ce869056a6a0416aa46d34d9f083ab6f9048e85f96320ad5ce4c"
+    },
+    {
+      "path": "tests/test_universal_worker.py",
+      "sha256": "4c76b26ab732d8076763b64baa27c8a2036e49acbdc50f6d9222782263ae50a5"
+    },
+    {
+      "path": "tests/test_universal_actions.py",
+      "sha256": "0cc16886f09a0a8d5133b2e09ad054bcba6a2302228bdd05a6c67c4e48006c93"
+    },
+    {
+      "path": "tests/test_desktop_helper_source.py",
+      "sha256": "7b86f93f6e581c441e98606f7959e5cc8fbe61d48495c514db18305d2eb1c94f"
+    },
+    {
+      "path": "tests/test_shared_scheduler.py",
+      "sha256": "0beab1e4c2b309a060c1de9eb160ec43456a38a01694069c3ca63a719e838338"
+    },
+    {
+      "path": "tests/test_github_client.py",
+      "sha256": "33039048d313fff501a9c4dbc226d6372ecce6d683aaca4b5c5478384f1bacb6"
+    },
+    {
+      "path": "tests/test_local_api.py",
+      "sha256": "8ba984903f90bad7a3c99226002c1aa2f0996604d1dd72c848f432d27fbb444d"
+    }
+  ]
+}

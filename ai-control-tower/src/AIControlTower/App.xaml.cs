@@ -99,7 +99,11 @@ public partial class App : Application
             if (MainWindow.WindowState == WindowState.Minimized) MainWindow.WindowState = WindowState.Normal;
             MainWindow.Show(); MainWindow.Activate();
         }), null, Timeout.Infinite, false);
-        MainWindow.Show();
+        Services.VerificationDisplay.Quiet = e.Args.Contains("--verify-ui-hidden");
+        if (e.Args.Contains("--background") && !e.Args.Contains("--verify-ui"))
+            _ = ((MainWindow)MainWindow).InitializeAsync();
+        else
+            Services.VerificationDisplay.Show(MainWindow);
         var capture = Array.IndexOf(e.Args, "--verify-ui");
         if (capture >= 0 && capture + 1 < e.Args.Length)
         {

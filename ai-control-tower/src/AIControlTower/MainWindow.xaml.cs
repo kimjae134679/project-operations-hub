@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     private readonly InstallationService _installationService = new();
     private JevControlWindow? _jevWindow;
     private NoticeReceiptsWindow? _receiptWindow;
+    private readonly PcJobsPanel _pcJobsPanel;
     private ListBox? _activeProgramList;
     private Task? _initializeTask;
     private double _catalogOffset;
@@ -27,6 +28,8 @@ public partial class MainWindow : Window
         ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
+        _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
+        PcJobsHost.Content = _pcJobsPanel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
         SourceInitialized += (_, _) => ApplyTitlebarTheme();
         Loaded += async (_, _) => await InitializeAsync();
@@ -170,6 +173,11 @@ public partial class MainWindow : Window
     }
 
     private bool _articleExpanded;
+    public void ShowPcJobs()
+    {
+        WorkspaceTabs.SelectedItem = PcConnectionTab;
+        if (!VerificationDisplay.Quiet) _pcJobsPanel.FocusJobs();
+    }
     private void ToggleArticleWidth_Click(object sender, RoutedEventArgs e)
     {
         _articleExpanded = !_articleExpanded;

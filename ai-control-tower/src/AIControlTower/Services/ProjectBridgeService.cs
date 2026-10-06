@@ -27,6 +27,15 @@ public sealed class ProjectBridgeService : IDisposable
             throw new InvalidDataException("로컬 연결 주소를 확인하세요.");
         return uri;
     }
+    public static string CanonicalProjectId(string id) => id switch
+    {
+        "project-operations-hub" => "Control-Tower",
+        "audiobook" => "Mushoku-Audiobook",
+        "phonelol-current" => "PhoneLOL",
+        "stock-planned" => "Investment-Lab",
+        "housing-planned" => "ChungYack",
+        _ => id
+    };
     private (Uri Address, string Token) Endpoint()
     {
         using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Home, "state", "local_endpoint.json")));
@@ -96,7 +105,7 @@ public sealed class ProjectBridgeService : IDisposable
     {
         var state = await CheckAsync(ct); if (!state.Connected) throw new InvalidOperationException("PC 연결이 준비되지 않았습니다.");
         var id = "tower-" + Guid.NewGuid().ToString("N"); var now = DateTimeOffset.UtcNow;
-        using var doc = await RequestAsync(HttpMethod.Post, "v1/jobs", new { id, target = "PC", deviceId = state.Device, projectId = project,
+        using var doc = await RequestAsync(HttpMethod.Post, "v1/jobs", new { id, target = "PC", deviceId = state.Device, projectId = CanonicalProjectId(project),
             toolId = tool, action, createdAt = now.ToString("o"), expiresAt = now.AddDays(1).ToString("o"), args }, ct);
         return id;
     }

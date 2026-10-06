@@ -53,6 +53,16 @@ public static class UiVerification
         vm.ProjectSearch = ""; vm.ProgramSearch = "";
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         var tabs = Walk(window).OfType<TabControl>().First();
+        var beforePcWindows=Application.Current.Windows.Count;
+        vm.PcConnection.OpenJobsCommand.Execute(null);
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        if(tabs.SelectedItem!=window.FindName("PcConnectionTab") || Application.Current.Windows.Count!=beforePcWindows)
+            throw new InvalidOperationException("Shared PC jobs opened a separate window instead of the inline workspace.");
+        window.Width=1060;window.Height=720;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        CheckVisibleControl(window,"PcJobsHost");
+        Capture(window,Path.Combine(outputDirectory,"pc-jobs-inline-compact.png"));
+        window.Width=1460;window.Height=920;
         tabs.SelectedItem = window.FindName("ToolsTab");
         if (consolidateRemote) { await vm.ConsolidateRemoteStartupAsync(); await vm.EnsureRemoteRunningAsync(); }
         await vm.RefreshAsync();
@@ -73,7 +83,7 @@ public static class UiVerification
         var receiptWindow = new NoticeReceiptsWindow(vm) { Owner = window };
         try
         {
-            receiptWindow.Show(); await receiptWindow.Dispatcher.InvokeAsync(receiptWindow.UpdateLayout, DispatcherPriority.Render);
+            VerificationDisplay.Show(receiptWindow); await receiptWindow.Dispatcher.InvokeAsync(receiptWindow.UpdateLayout, DispatcherPriority.Render);
             Capture(receiptWindow, Path.Combine(outputDirectory, "notice-receipts.png"));
             vm.NoticeReceiptFilter = "대기";
             await receiptWindow.Dispatcher.InvokeAsync(receiptWindow.UpdateLayout, DispatcherPriority.Render);
@@ -180,7 +190,7 @@ public static class UiVerification
             var guide=new ProjectGuideWindow(entry.DisplayName,entry.Path) { Owner=window };
             try
             {
-                guide.Show(); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
+                VerificationDisplay.Show(guide); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
                 if(!guide.GuideLoaded) throw new InvalidOperationException("Project guide missing: "+entry.DisplayName);
                 guideChecks.Add(new { entry.DisplayName,guide.GuideLoaded,guide.GuideFilePath });
                 if(entry.Id=="audiobook") Capture(guide,Path.Combine(outputDirectory,"audiobook-guide.png"));
@@ -190,7 +200,7 @@ public static class UiVerification
         var serverGuide=new ProjectGuideWindow("멀티의 신 서버",vm.ServerRootPath) { Owner=window };
         try
         {
-            serverGuide.Show(); await serverGuide.Dispatcher.InvokeAsync(serverGuide.UpdateLayout,DispatcherPriority.Render);
+            VerificationDisplay.Show(serverGuide); await serverGuide.Dispatcher.InvokeAsync(serverGuide.UpdateLayout,DispatcherPriority.Render);
             if(!serverGuide.GuideLoaded) throw new InvalidOperationException("Operational server guide missing.");
             guideChecks.Add(new { DisplayName="멀티의 신 서버",serverGuide.GuideLoaded,serverGuide.GuideFilePath });
         }
@@ -200,7 +210,7 @@ public static class UiVerification
             var guide=new ProjectGuideWindow(toolName,Path.Combine(@"D:\A_KJ\AI\Applications",toolName)) { Owner=window };
             try
             {
-                guide.Show(); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
+                VerificationDisplay.Show(guide); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
                 if(!guide.GuideLoaded) throw new InvalidOperationException("Tool guide missing: "+toolName);
                 guideChecks.Add(new { DisplayName=toolName,guide.GuideLoaded,guide.GuideFilePath });
             }
@@ -224,6 +234,7 @@ public static class UiVerification
             ArticleReadingChecks = articleReadingChecks,
             EntryNavigationChecks = entryNavigationChecks,
             ManualRefreshControlsRemoved = VerifyNoManualRefresh(window),
+            SharedPcJobsInline = true,
             CatalogRefresh = catalogRefresh,
             KeyColors = new { Text = ThemeColor(window, "TextBrush"), Canvas = ThemeColor(window, "CanvasBrush"), Surface = ThemeColor(window, "SurfaceBrush") },
             ValidationState = program?.Status,
