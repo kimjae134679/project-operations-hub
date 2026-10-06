@@ -10,9 +10,10 @@
 |---|---|---|
 | GitHub | ACTIVE | 저장소·문서·commit·PR·Actions |
 | Remote Desktop Commander / Desktop Remote | ACTIVE | 실제 PC 파일·명령·빌드·실행·기기 검증 |
+| ProjectBridge / 프로젝트 연결 | PROJECT — 2.0 실제 연결 / 3.0 적용 중 | 여러 프로젝트·도구의 공용 PC 작업. 기존 404 주소 오류 수정과 실제 장치·파일·명령·창 목록 왕복 확인. 3.0 로컬 API·MCP·병렬 처리 및 관리 앱 통합 소스 검사 완료, 실제 새 버전 배포 검증 진행 중 |
 | ChatGPT Files / Library | ACTIVE | 현재/과거 첨부와 저장자료 회수 |
 | n8n | ACTIVE — local | 로컬 자동화/워크플로. `AI Ops Hub - Local Task Bridge`로 localhost task receipt 검증 완료 |
-| AI Control Tower | PROJECT — 0.2 workbench | 프로젝트·기능·프로그램 발견/등록·명령 실행·중지·실제 로그와 종료 코드·공유 리모트 시작 등록 관리. 2026-10-05 Windows 검증은 ai-control-tower/docs/VERIFICATION-20261005.md 참고. Jev는 선택 사용 설정이며 옛 텍스트 큐는 자동 실행하지 않음 |
+| AI Control Tower | PROJECT — 0.7.0 / 0.8.0 적용 중 | 프로젝트·기능·프로그램·공용 연결과 소통 관리. 0.8.0 소스는 새로고침 조작 없이 자동 확인, 글 작성자·안 읽음·게시글 이동과 공지 명단 검색. 실제 설치 버전과 새 소스 검증을 구분. Jev는 선택 사용, 옛 텍스트 큐는 자동 실행하지 않음 |
 | Supabase | PROJECT — chunkyack | DB/인증/프로젝트 연결. 비밀값은 문서화 금지 |
 | Google Drive / OAuth / Android SDK / Blender 연동 등 | PROJECT when verified | 실제 프로젝트에서 확인된 경우만 등록 |
 
@@ -43,6 +44,8 @@ n8n bridge는 현재 `127.0.0.1:5678`에만 연결하며 외부 공개 endpoint�
 - [VoiceStudio 사용 안내](D:/A_KJ/AI/Applications/VoiceStudio/프로젝트_사용안내.md): D실행기, 기존 음원·배역·더빙작업·공유모델·환경 위치.
 - [Zonos2 사용 안내](D:/A_KJ/AI/Applications/Zonos2/프로젝트_사용안내.md): 앱/CLI/server와 외부Q8 모델 위치. 기본 BAT의 q6 신규다운로드 가능성 때문에 자동 실행하지 않습니다.
 
-## 공용 PC 연결 — 설치 대기
+## 공용 PC 연결 — 기존 연결 복구 / 새 통합 버전 적용 중
 
-ProjectBridge 2.0은 사용자 요청으로 오디오북과 여러 프로젝트에 사용할 공용 연결로 확장했습니다. 파일·명령·설치·빌드·장기 작업·화면·마우스·키보드를 지원하는 코드를 게시했습니다. 실제 요청·명령·출력·화면은 전용 비공개 branch에서만 교환하고 통합소통에는 요약을 남깁니다. Remote Desktop Commander의 월 한도와 별개입니다. 목표 D:/A_KJ/AI/Applications/ProjectBridge, 기존 안정 프로젝트 위치는 유지합니다. Windows 최초 설치·실제 연결은 대기입니다. [설치·동작·검증](../04_COMMUNICATION/remote-bridge/README.md).
+ProjectBridge 2.0은 실제 PC에 설치되어 있고, 저장소 API 주소 오류를 수정한 뒤 `KJW-80ea388278fd` 장치의 파일·명령·창 목록 왕복을 확인했습니다. 공용 연결 3.0과 관리 앱 0.8.0 소스는 개발 검사를 통과했으며 실제 새 버전 적용·자동 시작·화면 검증을 진행합니다. 설치된 상태와 실제 연결·동작은 따로 기록합니다.
+
+3.0의 PC 안 도구는 같은 로컬 API 또는 MCP 어댑터에 연결하며 파일 작업마다 GitHub를 거치지 않습니다. 외부 GPT는 지원되는 인증된 비공개 GitHub 중계를 사용합니다. 독립 작업은 병렬로, 같은 파일·프로젝트 수정·프로세스와 화면은 자원별로 순서대로 처리합니다. 상세 요청·출력·화면은 PC 또는 비공개 통로에만 보관하고 통합소통에는 공개 가능한 요약을 남깁니다. 기존 안정 프로젝트와 제작 큐는 보존합니다. [설치·동작·검증](../04_COMMUNICATION/remote-bridge/README.md).

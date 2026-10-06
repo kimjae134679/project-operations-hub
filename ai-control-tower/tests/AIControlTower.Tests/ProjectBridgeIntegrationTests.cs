@@ -54,5 +54,20 @@ public sealed class ProjectBridgeIntegrationTests : IDisposable
     }
     [Fact] public void FailureAndInterruptedHaveDistinctStatus()
     {Assert.Equal("오류",new PcJobViewModel(new("x","작업","P","T","failed")).StatusText);Assert.True(new PcJobViewModel(new("y","작업","P","T","interrupted")).HasError);}
+    [Fact] public void BundledInstallerContainsEveryManifestFileWithExactBytes()
+    {
+        var assembly=typeof(ProjectBridgeService).Assembly;
+        using var manifest=assembly.GetManifestResourceStream("ProjectBridge/release_manifest.json");
+        Assert.NotNull(manifest);
+        using var document=JsonDocument.Parse(manifest);
+        foreach(var file in document.RootElement.GetProperty("files").EnumerateArray())
+        {
+            var path=file.GetProperty("path").GetString()!;
+            using var resource=assembly.GetManifestResourceStream("ProjectBridge/"+path);
+            Assert.NotNull(resource);
+            var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(resource)).ToLowerInvariant();
+            Assert.Equal(file.GetProperty("sha256").GetString(),hash);
+        }
+    }
     public void Dispose(){if(Directory.Exists(_home))Directory.Delete(_home,true);}
 }

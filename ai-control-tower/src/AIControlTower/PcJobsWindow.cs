@@ -19,7 +19,7 @@ public sealed class PcJobsWindow : Window
     public PcJobsWindow(PcConnectionViewModel vm)
     {
         _vm = vm; DataContext = vm; Title = "공용 PC 작업"; Width = 1000; Height = 730; MinWidth = 820; MinHeight = 580;
-        SetResourceReference(BackgroundProperty,"WindowBackgroundBrush"); SetResourceReference(ForegroundProperty,"TextPrimaryBrush"); FontFamily = new System.Windows.Media.FontFamily("Malgun Gothic");
+        SetResourceReference(BackgroundProperty,"CanvasBrush"); SetResourceReference(ForegroundProperty,"TextBrush"); FontFamily = new System.Windows.Media.FontFamily("Malgun Gothic");
         var grid = new Grid { Margin = new Thickness(22) }; grid.RowDefinitions.Add(new() { Height = GridLength.Auto }); grid.RowDefinitions.Add(new() { Height = GridLength.Auto }); grid.RowDefinitions.Add(new());
         var title = new TextBlock { Text = "같은 PC에서 여러 도구의 작업을 함께 처리합니다", FontSize = 21, FontWeight = FontWeights.SemiBold, Margin = new(0,0,0,16) }; grid.Children.Add(title);
         var form = new StackPanel { Margin = new(0,0,0,18) }; Grid.SetRow(form,1); grid.Children.Add(form);
