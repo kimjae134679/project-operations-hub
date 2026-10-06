@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "version": "2.0.0",
+  "files": [
+    {
+      "path": "bridge_worker.py",
+      "sha256": "c2c87fdeb1a5ef0c13baa20ed176247e47e826928ee556be15bc8ef31ab5cbec"
+    },
+    {
+      "path": "BridgeLauncher.cs",
+      "sha256": "535bb89b6c2b8861ce9b92d007bf25c23daf9c51026db17e6bf1c0c1744c1b91"
+    },
+    {
+      "path": "DesktopAutomation.cs",
+      "sha256": "4b8dd583eef433a4a387e4ea756f9b53a1cd9167c81621ebb68cc88904e46c08"
+    },
+    {
+      "path": "universal_worker.py",
+      "sha256": "fc6146616aacdea1ad7d3615c1a1a1ff5f428bc9dfde352725e074c0e16bd5ea"
+    },
+    {
+      "path": "universal_actions.py",
+      "sha256": "8aaf6ce34c0d4003df59ee8a6f155f5dac990c0278ad3359e7d2bdda9b67b7bf"
+    },
+    {
+      "path": "process_runner.py",
+      "sha256": "9306abdee8989c27a894b2f5d5a9b50fb8e494495281ad8a5aa1077f74dd1e1d"
+    },
+    {
+      "path": "README.md",
+      "sha256": "b8d4b3851ff95102c3e3b27848af0f81a189a7e77da8a430b4b533dd6eb926c8"
+    },
+    {
+      "path": "UNIVERSAL_PROTOCOL.md",
+      "sha256": "c44ab670de0ec14d60b848d4c49c73bbfb2c2627c327b11a190a97394ea85979"
+    },
+    {
+      "path": "프로젝트_사용안내.md",
+      "sha256": "cf6d58e2e41c489ca3790f982fb9a490807c55c65684950725e96e40f5350734"
+    },
+    {
+      "path": "tests/test_bridge.py",
+      "sha256": "0f61dce6109e576d1daca09fa72a97272a0c8ccf6ff6833f5885b1a5746d2f4d"
+    },
+    {
+      "path": "tests/test_universal_worker.py",
+      "sha256": "dd49039e89671d10cb36c94f203205ab220cab911daa3fb971ef2637d882b463"
+    },
+    {
+      "path": "tests/test_universal_actions.py",
+      "sha256": "cc2e053259b720d11d832bfe7f5448340620af9d266a0d17d362614cec1247f1"
+    },
+    {
+      "path": "tests/test_desktop_helper_source.py",
+      "sha256": "d92a0cb02d6b09ca13c5e5cd53e264970f2d2d2485a9d5141ada7d65517a2836"
+    }
+  ]
+}
