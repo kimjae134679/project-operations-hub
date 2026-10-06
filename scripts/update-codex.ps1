@@ -38,9 +38,6 @@ try {
  if(!(Test-Path -LiteralPath $exe)){throw 'Updated native Codex executable missing'}
  $report.actualVersion=(Invoke-Quiet $exe @('--version') 'codex-version' 30).Trim()
  $report.state='updated';Save-Report
- $smoke=Invoke-Quiet $exe @('exec','--ignore-user-config','--ephemeral','--json','--model','gpt-6.1-sol','--sandbox','workspace-write','--skip-git-repo-check','-C',$root,'Return exactly CODEX_6_1_OK. Do not use tools or change files.') 'model-smoke' 120
- if($smoke -notmatch 'CODEX_6_1_OK' -or $smoke -match '"type"\s*:\s*"turn.failed"'){throw '6.1 model smoke did not complete'}
- $report.modelSmoke='pass';Save-Report
  if($BridgeCommit){
   if(!$ManifestSha256){throw 'Manifest SHA required for bridge repair'}
   $url='https://raw.githubusercontent.com/kimjae134679/project-operations-hub/'+$BridgeCommit+'/04_COMMUNICATION/remote-bridge/releases/20261006-v3/install.ps1'
@@ -48,6 +45,9 @@ try {
   & ([scriptblock]::Create($installer)) -Commit $BridgeCommit -ManifestSha256 $ManifestSha256 -StartAtLogin
   $report.bridgeRepair='installer_completed_check_local_and_relay_separately'
  }
+ $smoke=Invoke-Quiet $exe @('exec','--ignore-user-config','--ephemeral','--json','--model','gpt-6.1-sol','--sandbox','workspace-write','--skip-git-repo-check','-C',$root,'Return exactly CODEX_6_1_OK. Do not use tools or change files.') 'model-smoke' 120
+ if($smoke -notmatch 'CODEX_6_1_OK' -or $smoke -match '"type"\s*:\s*"turn.failed"'){throw '6.1 model smoke did not complete'}
+ $report.modelSmoke='pass';Save-Report
  $report.state='completed';$report.finishedAt=[DateTimeOffset]::UtcNow.ToString('o');Save-Report
  Write-Output 'Codex updated and 6.1 model smoke passed. Detailed results are saved in the existing work folder.'
 } catch {
