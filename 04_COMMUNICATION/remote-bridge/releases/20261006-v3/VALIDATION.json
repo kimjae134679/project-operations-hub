@@ -2,8 +2,9 @@
   "version": "3.0.0",
   "date": "2026-10-06",
   "developmentWindowsTests": {
-    "passed": 73,
-    "failures": 0
+    "passed": 78,
+    "failures": 0,
+    "seconds": 12.301
   },
   "nativeFrameworkBuilds": [
     "BridgeLauncher.cs WinExe",
@@ -16,7 +17,10 @@
     "Inherited Windows JSON DELETE-sharing failures and false liveness after process exit were corrected with bounded atomic replacement retries, unique temporary names, and kernel wait-state liveness checks. Deterministic regressions pass.",
     "Native background launcher never shows its own window and accepts shutdown query without stopping a cancelled session. Tests use installation-home mutex scope and wait for owned worker exit.",
     "Project and issuer workspaces, logs and per-job journals are separate; legacy published jobs and legacy detached tickets retain compatibility without replay.",
+    "Installed Runtime layout is verified by the isolated hidden-native launcher test. Root config/state and legacy active ticket paths remain unchanged; checked legacy source files are removed only by known release hash, and unknown changes are preserved.",
+    "Detached start_process acceptance is immutable; local status and get_job project actual owned process phases and outcomes, count detached live jobs without double-counting scheduler threads, and refuse cross-issuer ticket access. Real success/exit7 failure and terminal phase regressions pass. Runner children use Windows SW_HIDE plus CREATE_NO_WINDOW.",
+    "Historical active detached owners remain counted and prioritized after150 newer records. Read-only phase caching and rotating polls are capped at100 owned ticket probes per status, with unknown owners marked starting until checked. A130-owner budget/rotation regression passes.",
     "User PC v3 installation and full remote roundtrip remain separate verification steps."
   ],
-  "validatedAt": "2026-10-06T15:10:08.676246+00:00"
+  "validatedAt": "2026-10-06T15:41:20.594571+00:00"
 }

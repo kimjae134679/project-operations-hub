@@ -80,8 +80,10 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         if (StartRemoteSupervisor(e)) return;
-        _instance = new Mutex(false, @"Local\AIControlTower.Application");
-        _activate = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\AIControlTower.Activate");
+        var verification = e.Args.Contains("--verify-ui");
+        var identity = verification ? "Verification." + Environment.ProcessId : "Application";
+        _instance = new Mutex(false, @"Local\AIControlTower." + identity);
+        _activate = new EventWaitHandle(false, EventResetMode.AutoReset, verification ? @"Local\AIControlTower.Verification.Activate." + Environment.ProcessId : @"Local\AIControlTower.Activate");
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
         if (!_owns) { _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);

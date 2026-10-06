@@ -28,10 +28,13 @@ function Invoke-HiddenTool([string]$File,[string[]]$Arguments,[string]$WorkingDi
   return $result
  }finally{$process.Dispose()}
 }
+$exeName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0xc5f0,0xacb0,0x2e,0x65,0x78,0x65) -join '')
+$guideName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0x5f,0xc0ac,0xc6a9,0xc548,0xb0b4,0x2e,0x6d,0x64) -join '')
 $target='D:\A_KJ\AI\Applications\ProjectBridge'
+$runtimePath=Join-Path $target 'Runtime'
 $statePath=Join-Path $target 'state'
-$exePath=Join-Path $target '프로젝트연결.exe'
-$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md','프로젝트_사용안내.md','tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py')
+$exePath=Join-Path $target $exeName
+$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py')
 foreach($hash in $ApprovedBundleSha256){if($hash -notmatch '^[a-f0-9]{64}$'){throw 'Invalid approved bundle hash'}}
 $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $stage=Join-Path $tempRoot ('ProjectBridge3_'+[Guid]::NewGuid().ToString('N'))
@@ -61,8 +64,46 @@ try {
   if((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -ne $row.sha256){throw 'Release file hash mismatch'}
  }
  if(@($manifest.files).Count -ne $allowed.Count){throw 'Incomplete release manifest'}
+ # The user sees one entry program and its guide. Implementation files live
+ # together in Runtime; config/state keep legacy absolute paths for live jobs.
+ $destinations=@{}
+ foreach($name in $allowed){$destinations[$name]=if($name -eq $guideName){$name}else{Join-Path 'Runtime' $name}}
+ $destinations['release_manifest.json']='Runtime\release_manifest.json'
+ $destinations[$exeName]=$exeName
+ $destinations['DesktopAutomation.exe']='Runtime\DesktopAutomation.exe'
+ $legacyHashes=@{}
+ foreach($row in $manifest.files){$legacyHashes[$row.path]=@([string]$row.sha256)}
+ # Original immutable v2 manifest hashes plus the narrow metadata URL hotfix.
+ $v2Hashes=@{
+  'bridge_worker.py'=@('c2c87fdeb1a5ef0c13baa20ed176247e47e826928ee556be15bc8ef31ab5cbec','b832694ec80a847962d07552b014cae1580242e1ead6f02344754c21e6603373');
+  'BridgeLauncher.cs'=@('535bb89b6c2b8861ce9b92d007bf25c23daf9c51026db17e6bf1c0c1744c1b91');
+  'DesktopAutomation.cs'=@('4b8dd583eef433a4a387e4ea756f9b53a1cd9167c81621ebb68cc88904e46c08');
+  'universal_worker.py'=@('fc6146616aacdea1ad7d3615c1a1a1ff5f428bc9dfde352725e074c0e16bd5ea');
+  'universal_actions.py'=@('8aaf6ce34c0d4003df59ee8a6f155f5dac990c0278ad3359e7d2bdda9b67b7bf');
+  'process_runner.py'=@('9306abdee8989c27a894b2f5d5a9b50fb8e494495281ad8a5aa1077f74dd1e1d');
+  'README.md'=@('b8d4b3851ff95102c3e3b27848af0f81a189a7e77da8a430b4b533dd6eb926c8');
+  'UNIVERSAL_PROTOCOL.md'=@('c44ab670de0ec14d60b848d4c49c73bbfb2c2627c327b11a190a97394ea85979');
+  'tests/test_bridge.py'=@('0f61dce6109e576d1daca09fa72a97272a0c8ccf6ff6833f5885b1a5746d2f4d');
+  'tests/test_universal_worker.py'=@('dd49039e89671d10cb36c94f203205ab220cab911daa3fb971ef2637d882b463');
+  'tests/test_universal_actions.py'=@('cc2e053259b720d11d832bfe7f5448340620af9d266a0d17d362614cec1247f1');
+  'tests/test_desktop_helper_source.py'=@('d92a0cb02d6b09ca13c5e5cd53e264970f2d2d2485a9d5141ada7d65517a2836')
+ }
+ foreach($name in $v2Hashes.Keys){$legacyHashes[$name]=@($legacyHashes[$name])+@($v2Hashes[$name])}
+ $priorManifest=Join-Path $target 'release_manifest.json'
+ if(Test-Path -LiteralPath $priorManifest){
+  try {
+   $prior=Get-Content -LiteralPath $priorManifest -Raw -Encoding UTF8|ConvertFrom-Json
+   if($prior.schemaVersion -in @(2,3)){
+    foreach($row in $prior.files){if($row.path -in $allowed -and $row.sha256 -match '^[a-f0-9]{64}$'){$legacyHashes[$row.path]=@($legacyHashes[$row.path])+@([string]$row.sha256)}}
+   }
+  }catch{}
+ }
  # Validate startup ownership before stopping anything or touching install files.
  # A conflicting task/shortcut cannot leave a half-updated, stopped bridge.
+ if(Test-Path -LiteralPath $runtimePath){
+  $runtimeInfo=Get-Item -LiteralPath $runtimePath -Force
+  if(!$runtimeInfo.PSIsContainer -or ($runtimeInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Runtime path is not a normal owned installation directory'}
+ }
  $taskName='ProjectBridge_Login';$shortcutPath=Join-Path ([Environment]::GetFolderPath('Startup')) 'ProjectBridge_Login.lnk'
  if($StartAtLogin){
   $task=Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
@@ -88,7 +129,8 @@ try {
  if(!$cfg.privateRepository){$cfg.privateRepository='kimjae134679/Mushoku-Tensei-AI-Audiobook'}
  if(!$cfg.privateBranch){$cfg.privateBranch='remote/pc-bridge'}
  if(!$cfg.maxWorkers){$cfg.maxWorkers=4}
- $cfg.uiHelper=Join-Path $target 'DesktopAutomation.exe'
+ $priorUiHelper=[string]$cfg.uiHelper
+ $cfg.uiHelper=Join-Path $runtimePath 'DesktopAutomation.exe'
  $cfg.protectedRoots=@($cfg.protectedRoots)+@([Environment]::GetFolderPath('Desktop'))|Sort-Object -Unique
  if(!$cfg.pollSeconds){$cfg.pollSeconds=90}
  $cfg.approvedBundleSha256=@(@($cfg.approvedBundleSha256)+@($ApprovedBundleSha256)|Where-Object{$_}|Sort-Object -Unique)
@@ -96,7 +138,7 @@ try {
  $csc=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
  if(!(Test-Path -LiteralPath $csc)){$csc=Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe'}
  if(!(Test-Path -LiteralPath $csc)){throw '.NET Framework compiler missing'}
- foreach($pair in @(@('BridgeLauncher.cs','프로젝트연결.exe'),@('DesktopAutomation.cs','DesktopAutomation.exe'))){
+ foreach($pair in @(@('BridgeLauncher.cs',$exeName),@('DesktopAutomation.cs','DesktopAutomation.exe'))){
   $compiled=Invoke-HiddenTool $csc @('/nologo','/target:winexe','/reference:System.Windows.Forms.dll','/reference:System.Drawing.dll','/reference:System.Web.Extensions.dll',(('/out:')+(Join-Path $stage $pair[1])),(Join-Path $stage $pair[0])) $stage
   if($compiled.ExitCode -ne 0 -or !(Test-Path -LiteralPath (Join-Path $stage $pair[1]))){throw 'Native bridge compile failed'}
  }
@@ -108,10 +150,11 @@ try {
   if($tested.ExitCode -ne 0){throw 'Bridge release tests failed; existing installation remains untouched'}
  }finally{Set-Location -LiteralPath $priorLocation.Path}
  # All downloads, hashes, compilation and tests have passed before stopping v2.
- New-Item -ItemType Directory -Force -Path $target,$statePath|Out-Null
+ New-Item -ItemType Directory -Force -Path $target,$statePath,$runtimePath|Out-Null
  $backup=Join-Path $statePath ('install-backups\'+[DateTime]::UtcNow.ToString('yyyyMMdd_HHmmss_ffff'))
  New-Item -ItemType Directory -Path $backup -Force|Out-Null
- foreach($name in @($allowed)+@('release_manifest.json','config.json','프로젝트연결.exe','DesktopAutomation.exe')){
+ $backupNames=@($destinations.Values)+@($allowed)+@('release_manifest.json','config.json','DesktopAutomation.exe')|Sort-Object -Unique
+ foreach($name in $backupNames){
   $existing=Join-Path $target $name
   if(Test-Path -LiteralPath $existing){$saved=Join-Path $backup $name;New-Item -ItemType Directory -Force -Path (Split-Path -Parent $saved)|Out-Null;Copy-Item -LiteralPath $existing -Destination $saved}
  }
@@ -126,11 +169,12 @@ try {
   $candidate=Get-Process -Id ([int]$ticket.pid) -ErrorAction SilentlyContinue
   $info=Get-CimInstance Win32_Process -Filter ('ProcessId='+[int]$ticket.pid) -ErrorAction SilentlyContinue
   $pythonPaths=@($python,(Join-Path (Split-Path -Parent $python) 'pythonw.exe'))
-  if($candidate -and $candidate.StartTime.ToUniversalTime().ToString('o') -eq [string]$ticket.startedAt -and $candidate.Path -in $pythonPaths -and $info.CommandLine -and $info.CommandLine.Contains((Join-Path $target 'bridge_worker.py'))){$child=$candidate}
+  $ownedWorkerCommand=$info.CommandLine -and ($info.CommandLine.Contains((Join-Path $target 'bridge_worker.py')) -or $info.CommandLine.Contains((Join-Path $runtimePath 'bridge_worker.py')))
+  if($candidate -and $candidate.StartTime.ToUniversalTime().ToString('o') -eq [string]$ticket.startedAt -and $candidate.Path -in $pythonPaths -and $ownedWorkerCommand){$child=$candidate}
  }
  # The recorded bridge child is separate from audiobook production; only this
  # exact child and the native launcher at this installation path may be stopped.
- foreach($info in @(Get-CimInstance Win32_Process -Filter "Name='프로젝트연결.exe'" -ErrorAction SilentlyContinue)){
+ foreach($info in @(Get-CimInstance Win32_Process -Filter "Name=$exeName" -ErrorAction SilentlyContinue)){
   if($info.ExecutablePath -eq $exePath){
    $candidate=Get-Process -Id $info.ProcessId -ErrorAction SilentlyContinue
    if($candidate){$birth=$candidate.StartTime.ToUniversalTime().ToString('o');$live=Get-Process -Id $candidate.Id -ErrorAction SilentlyContinue;if($live -and $live.Path -eq $exePath -and $live.StartTime.ToUniversalTime().ToString('o') -eq $birth){Stop-Process -Id $live.Id -Force}}
@@ -141,8 +185,8 @@ try {
   if($live -and $live.StartTime.ToUniversalTime().ToString('o') -eq [string]$ticket.startedAt -and $live.Path -in $pythonPaths){Stop-Process -Id $live.Id -Force}
  }
  try {
-  foreach($name in @($allowed)+@('release_manifest.json','프로젝트연결.exe','DesktopAutomation.exe')){
-   $destination=Join-Path $target $name;New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)|Out-Null;Copy-Item -LiteralPath (Join-Path $stage $name) -Destination $destination -Force
+  foreach($name in $destinations.Keys){
+   $destination=Join-Path $target $destinations[$name];New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)|Out-Null;Copy-Item -LiteralPath (Join-Path $stage $name) -Destination $destination -Force
   }
   [IO.File]::WriteAllText($configPath,($cfg|ConvertTo-Json -Depth 12),(New-Object Text.UTF8Encoding($false)))
  }catch{
@@ -163,6 +207,36 @@ try {
  }
  Start-Process -FilePath $exePath -ArgumentList '--resume' -WorkingDirectory $target -WindowStyle Hidden
  $installationCommitted=$true
+ # Only remove checked copies from the old flat layout after the new worker
+ # can be started. Unknown/user-edited files are preserved in place.
+ foreach($name in $legacyHashes.Keys){
+  if($name -eq $guideName){continue}
+  $oldFile=[IO.Path]::GetFullPath((Join-Path $target $name))
+  if(!$oldFile.StartsWith(($target+'\'),[StringComparison]::OrdinalIgnoreCase)){throw 'Legacy path outside install root'}
+  if(Test-Path -LiteralPath $oldFile -PathType Leaf){
+   $oldInfo=Get-Item -LiteralPath $oldFile -Force
+   if(($oldInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0 -and (Get-FileHash -LiteralPath $oldFile -Algorithm SHA256).Hash.ToLowerInvariant() -in $legacyHashes[$name]){
+    Remove-Item -LiteralPath $oldFile -Force -ErrorAction SilentlyContinue
+   }
+  }
+ }
+ # Remaining owned metadata is hidden, with its path unchanged. Do not delete
+ # a compiled legacy helper without a verified executable hash.
+ $hide=@($runtimePath,$statePath,$configPath)
+ if(Test-Path -LiteralPath $priorManifest){$hide+=@($priorManifest)}
+ if($priorUiHelper -eq (Join-Path $target 'DesktopAutomation.exe') -and (Test-Path -LiteralPath $priorUiHelper)){$hide+=@($priorUiHelper)}
+ $legacyTests=Join-Path $target 'tests'
+ if(Test-Path -LiteralPath $legacyTests){$hide+=@($legacyTests)}
+ $legacyCache=Join-Path $target '__pycache__'
+ if(Test-Path -LiteralPath $legacyCache -PathType Container){
+  $cacheEntries=@(Get-ChildItem -LiteralPath $legacyCache -Force)
+  $ownedStems=@($allowed|Where-Object{$_ -like '*.py' -and $_ -notlike 'tests/*'}|ForEach-Object{[IO.Path]::GetFileNameWithoutExtension($_)})
+  $unknownCache=@($cacheEntries|Where-Object{$_.PSIsContainer -or $_.Extension -ne '.pyc' -or ($_.BaseName.Split('.')[0] -notin $ownedStems)})
+  if($unknownCache.Count -eq 0){$hide+=@($legacyCache)}
+ }
+ foreach($path in $hide){
+  try{$info=Get-Item -LiteralPath $path -Force;$info.Attributes=$info.Attributes -bor [IO.FileAttributes]::Hidden}catch{}
+ }
  Write-Output 'Installed ProjectBridge 3.0. Check local connection and remote relay separately.'
  Write-Output 'Existing device ID, config, production work and journals were preserved; no desktop files were created.'
 }finally{
@@ -170,7 +244,7 @@ try {
  # backups and the previous user's pause/stop choices. Hard OS termination is
  # inherently not catchable; retained backups permit an explicit repair.
  if($installTouched -and !$installationCommitted -and $backup){
-  foreach($saved in @(Get-ChildItem -LiteralPath $backup -File -Recurse)){
+  foreach($saved in @(Get-ChildItem -LiteralPath $backup -File -Recurse -Force)){
    $relative=$saved.FullName.Substring($backup.Length).TrimStart('\');$restore=[IO.Path]::GetFullPath((Join-Path $target $relative))
    if(!$restore.StartsWith(($target+'\'),[StringComparison]::OrdinalIgnoreCase)){throw 'Backup path outside install root'}
    Copy-Item -LiteralPath $saved.FullName -Destination $restore -Force -ErrorAction SilentlyContinue
@@ -179,7 +253,7 @@ try {
    $flag=Join-Path $statePath $name
    if($null -eq $priorFlags[$name]){Remove-Item -LiteralPath $flag -ErrorAction SilentlyContinue}else{[IO.File]::WriteAllText($flag,[string]$priorFlags[$name])}
   }
-  if((Test-Path -LiteralPath (Join-Path $backup '프로젝트연결.exe')) -and (Test-Path -LiteralPath $exePath)){Start-Process -FilePath $exePath -ArgumentList '--background' -WorkingDirectory $target -WindowStyle Hidden -ErrorAction SilentlyContinue}
+  if((Test-Path -LiteralPath (Join-Path $backup $exeName)) -and (Test-Path -LiteralPath $exePath)){Start-Process -FilePath $exePath -ArgumentList '--background' -WorkingDirectory $target -WindowStyle Hidden -ErrorAction SilentlyContinue}
  }
  $resolved=[IO.Path]::GetFullPath($stage)
  if($resolved.StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -like 'ProjectBridge3_*'){Remove-Item -LiteralPath $resolved -Recurse -Force -ErrorAction SilentlyContinue}

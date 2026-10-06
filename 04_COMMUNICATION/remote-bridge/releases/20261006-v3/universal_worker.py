@@ -63,6 +63,7 @@ class UniversalWorker:
   if not ID.fullmatch(self.device):raise UniversalError('invalid_device_id')
   self.journal_path=self.state/'universal_journal.json';self.journal=read(self.journal_path,{})
   self.lock=threading.RLock();self.active={};self.held=set();self.stop_event=threading.Event();self.thread=None
+  self.detached_states={};self.detached_cursor=0
   self.last_hello=0;self.relay_code=None;self.relay_available=False
   self.worker_count=max(1,min(16,int(self.config.get('maxWorkers',4))))
   self.pool=futures.ThreadPoolExecutor(max_workers=self.worker_count,thread_name_prefix='project-bridge')
@@ -98,15 +99,52 @@ class UniversalWorker:
  def save_record(self,jid,record):
   job=record.get('job')
   if job:atomic(self.scope(job)[0]/'journal'/(jid+'.json'),record)
+ def live_process(self,record,maximum=0):
+  accepted=record.get('result',{})
+  if record.get('action')!='start_process' or accepted.get('outcome')!='completed':return None
+  pid=accepted.get('data',{}).get('processId')
+  if not isinstance(pid,str) or not re.fullmatch(r'[a-f0-9]{32}',pid):return None
+  job=record.get('job') or {'projectId':record.get('projectId','Control-Tower'),'toolId':'ProjectBridge'}
+  status_job={**job,'action':'process_status','args':{'processId':pid}}
+  _,state=self.scoped_job(status_job)
+  try:
+   from universal_actions import process_status
+   return process_status(pid,state,maximum=maximum)
+  except Exception as exc:
+   code=str(exc)
+   if not re.fullmatch(r'[a-zA-Z0-9_]{1,100}',code):code='process_status_unavailable'
+   return {'processId':pid,'stage':'interrupted','running':False,'done':True,'succeeded':False,'error':code}
+ def effective_state(self,record,process=None):
+  if process is None:return record.get('result',{}).get('outcome',record.get('state'))
+  stage=process.get('stage','interrupted')
+  if stage=='completed':return 'completed' if process.get('succeeded') is True else 'failed'
+  return stage if stage in ('starting','running','failed','timed_out','stopped','interrupted') else 'failed'
  def status(self):
   with self.lock:
    paused=(self.state/'disconnected.flag').exists()
-   return {'bridgeVersion':'3.0.0','version':'3.0.0','stage':'stopped' if self.stop_event.is_set() else 'disconnected' if paused else 'running' if self.active else 'connected',
-    'deviceId':self.device,'localReady':not self.stop_event.is_set(),'relayConnected':self.relay_available,'parallelLimit':self.worker_count,'activeJobCount':len(self.active),
+   rows=list(self.journal.items());candidates=[];active=set(self.active);jobs=[]
+   for jid,r in rows:
+    result=r.get('result',{});pid=result.get('data',{}).get('processId')
+    if r.get('action')=='start_process' and result.get('outcome')=='completed' and isinstance(pid,str) and re.fullmatch(r'[a-f0-9]{32}',pid):
+     if self.detached_states.get(jid) not in ('completed','failed','timed_out','stopped'):candidates.append((jid,r))
+   pending_ids={jid for jid,r in candidates}
+   if candidates:
+    offset=self.detached_cursor%len(candidates);batch=(candidates[offset:]+candidates[:offset])[:100]
+    self.detached_cursor=(offset+len(batch))%len(candidates)
+    for jid,r in batch:self.detached_states[jid]=self.effective_state(r,self.live_process(r))
+   for jid,r in rows:
+    state=self.detached_states.get(jid,self.effective_state(r))
+    if jid not in self.detached_states and jid in pending_ids:state='starting'
+    if state in ('starting','running') and r.get('action')=='start_process':active.add(jid)
+    jobs.append({'id':jid,'title':NAMES.get(r.get('action'),'PC 작업'),'projectId':r.get('projectId','Control-Tower'),'toolId':r.get('job',{}).get('toolId','ProjectBridge'),'action':r.get('action'),'state':state,'startedAt':r.get('startedAt'),'outcome':state if r.get('result') else None})
+   # Keep an old long-running owner visible even after many newer requests.
+   live_rows=[r for r in jobs if r['id'] in active][-100:]
+   jobs=live_rows+([r for r in jobs if r['id'] not in active][-(100-len(live_rows)):] if len(live_rows)<100 else [])
+   return {'bridgeVersion':'3.0.0','version':'3.0.0','stage':'stopped' if self.stop_event.is_set() else 'disconnected' if paused else 'running' if active else 'connected',
+    'deviceId':self.device,'localReady':not self.stop_event.is_set(),'relayConnected':self.relay_available,'parallelLimit':self.worker_count,'activeJobCount':len(active),
     'device':self.device,'workerPid':os.getpid(),'updatedAt':now(),'localChannelAvailable':not self.stop_event.is_set(),
     'privateChannelAvailable':self.relay_available,'relayCode':self.relay_code,'maxWorkers':self.worker_count,
-    'runningJobs':len(self.active),'pendingJobs':sum(r.get('state')=='queued' for r in self.journal.values()),
-    'jobs':[{'id':jid,'title':NAMES.get(r.get('action'),'PC 작업'),'projectId':r.get('projectId','Control-Tower'),'toolId':r.get('job',{}).get('toolId','ProjectBridge'),'action':r.get('action'),'state':r.get('result',{}).get('outcome',r.get('state')),'startedAt':r.get('startedAt'),'outcome':r.get('result',{}).get('outcome')} for jid,r in list(self.journal.items())[-100:]]}
+    'runningJobs':len(active),'pendingJobs':sum(r.get('state')=='queued' for r in self.journal.values()),'jobs':jobs}
  def ui(self,*unused,**ignored):atomic(self.state/'universal_status.json',self.status())
  def verify_private(self):
   if self.private is None:raise UniversalError('private_relay_not_configured')
@@ -140,7 +178,16 @@ class UniversalWorker:
   with self.lock:
    row=self.journal.get(jid)
    if row is None:raise UniversalError('job_not_found')
-   return json.loads(json.dumps({'id':jid,'state':row['state'],'result':row.get('result')}))
+   output=json.loads(json.dumps({'id':jid,'state':row['state'],'result':row.get('result')}))
+   process=self.live_process(row,maximum=65536)
+   if process is not None:
+    state=self.effective_state(row,process);self.detached_states[jid]=state;output['state']=state;output['process']=process
+    output['acceptedResult']=json.loads(json.dumps(row['result']))
+    output['result'].update(outcome=state,data=process,acceptedAt=row['result'].get('finishedAt'))
+    output['result'].pop('finishedAt',None)
+    if isinstance(process.get('finishedAt'),(int,float)):
+     output['result']['finishedAt']=dt.datetime.fromtimestamp(process['finishedAt'],dt.timezone.utc).isoformat()
+   return output
  def execute(self,jid,record,prerequisite_failed=False):
   job=record['job']
   try:

@@ -18,10 +18,12 @@
 MCP 설정은 다음 항목을 각 도구의 지원되는 설정에 등록합니다. Python과 경로는 설치된 config를 사용합니다. stdio 프로그램은 GitHub를 거치지 않고 같은 로컬 API에 접속합니다.
 
 ```json
-{"mcpServers":{"projectbridge":{"command":"D:\\AI\\envs\\cosyvoice\\python.exe","args":["D:\\A_KJ\\AI\\Applications\\ProjectBridge\\bridge_mcp.py","--home","D:\\A_KJ\\AI\\Applications\\ProjectBridge","--issuer","Codex-audiobook"]}}}
+{"mcpServers":{"projectbridge":{"command":"D:\\AI\\envs\\cosyvoice\\python.exe","args":["D:\\A_KJ\\AI\\Applications\\ProjectBridge\\Runtime\\bridge_mcp.py","--home","D:\\A_KJ\\AI\\Applications\\ProjectBridge","--issuer","Codex-audiobook"]}}}
 ```
 
 도구는 `pc_status`, `pc_submit`, `pc_result`입니다. submit은 작업 ID를 즉시 돌려줍니다. 긴 작업은 `start_process`로 시작하고 실제 `processId`로 `process_status`를 확인합니다. 임의 프로세스 번호나 이름으로 종료하지 않고 `stop_process`로 등록된 작업만 중지합니다.
+
+`start_process`의 최초 비공개 결과는 시작 요청을 접수한 기록입니다. 실제 작업 완료를 뜻하지 않습니다. 로컬 status와 결과 조회는 담당자에게 속한 process ticket의 현재 상태를 확인하여 시작 중·실행 중·완료·실패·시간 초과·중지·중단을 표시합니다. 결과 조회의 `result`는 현재 상태, `process`는 상세 상태이며, `acceptedResult`는 변경하지 않은 최초 접수 결과입니다. 실행 중인 detached 작업도 활성 작업 수에 포함합니다. 상태 목록에는 파일·명령·출력 내용이 들어가지 않습니다.
 
 `--issuer`와 `--tool-id`는 같은 옵션입니다. 제품명 하나로 모든 GPT 담당자를 묶지 않고 `Codex-audiobook`, `Codex-manager`, `Jev-assets`처럼 담당자 인스턴스별 ID를 지정합니다. 생략하면 MCP 연결마다 `mcp-<uuid>`를 발급합니다. `pc_submit`의 `toolId`로 명시할 수도 있습니다. 직접 HTTP 제출은 toolId를 생략할 수 없습니다. 기존 v2 비공개 큐의 생략된 ID는 호환용 `ProjectBridge`로 취급합니다.
 

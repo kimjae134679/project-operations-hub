@@ -187,6 +187,12 @@ class UniversalTests(unittest.TestCase):
         self.assertEqual(invoke.call_args.kwargs['timeout'],30)
         for malformed in ({'action':'screen_capture'},{'action':'screenshot','args':{}},{'action':'screen_capture','args':{},'extra':1}):
             with self.assertRaises(u.ActionError):self.call('ui_control',malformed)
+    @unittest.skipUnless(sys.platform=='win32','Windows GUI launch flags')
+    def test_child_startup_requests_hidden_window_in_addition_to_no_console(self):
+        import subprocess
+        startup=p.hidden_startup_info()
+        self.assertTrue(startup.dwFlags & subprocess.STARTF_USESHOWWINDOW)
+        self.assertEqual(startup.wShowWindow,subprocess.SW_HIDE)
     def test_windows_job_clears_only_kill_on_close_on_success(self):
         import ctypes
         from unittest.mock import Mock

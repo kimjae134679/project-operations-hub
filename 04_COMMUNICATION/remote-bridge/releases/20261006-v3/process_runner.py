@@ -146,6 +146,13 @@ def stop_owned(child, child_birth, job):
         child.wait(timeout=5)
     return True
 
+def hidden_startup_info():
+    if os.name!='nt':return None
+    startup=subprocess.STARTUPINFO()
+    startup.dwFlags|=subprocess.STARTF_USESHOWWINDOW
+    startup.wShowWindow=subprocess.SW_HIDE
+    return startup
+
 def run(folder):
     folder=Path(folder);ticket=load(folder/'ticket.json')
     if not isinstance(ticket,dict):return 2
@@ -158,7 +165,7 @@ def run(folder):
         with (folder/'stdout.log').open('wb') as stdout,(folder/'stderr.log').open('wb') as stderr:
             child=subprocess.Popen(ticket['argv'],cwd=ticket['cwd'],env=environment,
                 stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr,shell=False,
-                creationflags=0x08000000 if os.name=='nt' else 0,start_new_session=os.name!='nt')
+                creationflags=0x08000000 if os.name=='nt' else 0,start_new_session=os.name!='nt',startupinfo=hidden_startup_info())
             child_birth=birth(child.pid);job=WindowsJob(child)
             identity.update(childPid=child.pid,childBirth=child_birth,
                 ownedDescendantStop=job.attached if os.name=='nt' else child_birth is not None)

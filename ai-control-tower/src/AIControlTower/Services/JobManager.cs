@@ -44,7 +44,7 @@ public sealed class JobManager
             if (!Directory.Exists(program.WorkingDirectory)) throw new DirectoryNotFoundException("실행 폴더가 없습니다: " + program.WorkingDirectory);
             var executable = ResolveExecutable(command.FileName, program.WorkingDirectory);
             var info = new ProcessStartInfo(executable) { WorkingDirectory = program.WorkingDirectory, UseShellExecute = false,
-                CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true, RedirectStandardInput = true,
+                CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden, RedirectStandardOutput = true, RedirectStandardError = true, RedirectStandardInput = true,
                 StandardOutputEncoding = System.Text.Encoding.UTF8, StandardErrorEncoding = System.Text.Encoding.UTF8 };
             foreach (var argument in command.Arguments) info.ArgumentList.Add(argument);
             if (program.Kind == "Jev")

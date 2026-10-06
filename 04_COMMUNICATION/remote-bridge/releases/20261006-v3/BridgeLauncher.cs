@@ -74,6 +74,7 @@ class BridgeLauncher : Form {
         base.WndProc(ref m);
     }
     Dictionary<string,object> Config(){return json.Deserialize<Dictionary<string,object>>(File.ReadAllText(Path.Combine(home,"config.json")));}
+    string WorkerPath(){string p=Path.Combine(home,"Runtime","bridge_worker.py");return File.Exists(p)?p:Path.Combine(home,"bridge_worker.py");}
     void AddButton(FlowLayoutPanel p,string text,Action action){var b=new Button {Text=text,AutoSize=true,Height=38,FlatStyle=FlatStyle.Flat,BackColor=Color.White,Margin=new Padding(4)};b.Click+=delegate {try{action();}catch{status.Text="연결 작업 확인 필요";status.ForeColor=Color.Firebrick;}};p.Controls.Add(b);}
     void Delete(string name){string p=Path.Combine(state,name);if(File.Exists(p))File.Delete(p);}
     bool Stopped(){string p=Path.Combine(state,"stopped_logon.txt");return File.Exists(p)&&File.ReadAllText(p)==logon;}
@@ -90,7 +91,7 @@ class BridgeLauncher : Form {
             if(!child.HasExited&&child.StartTime.ToUniversalTime().ToString("o")==Convert.ToString(old["startedAt"])&&Convert.ToString(old["logonId"])==logon&&(String.Equals(executable,python,StringComparison.OrdinalIgnoreCase)||String.Equals(executable,pyw,StringComparison.OrdinalIgnoreCase))){worker=child;return;}
         }catch{}
         var config=Config();string exe=(string)config["python"],windowless=Path.Combine(Path.GetDirectoryName(exe),"pythonw.exe");if(File.Exists(windowless))exe=windowless;
-        worker=Process.Start(new ProcessStartInfo {FileName=exe,Arguments="\""+Path.Combine(home,"bridge_worker.py")+"\" --home \""+home+"\"",WorkingDirectory=home,UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden});
+        worker=Process.Start(new ProcessStartInfo {FileName=exe,Arguments="\""+WorkerPath()+"\" --home \""+home+"\"",WorkingDirectory=home,UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden});
         File.WriteAllText(Path.Combine(state,"launcher_child.json"),json.Serialize(new {pid=worker.Id,startedAt=worker.StartTime.ToUniversalTime().ToString("o"),logonId=logon}));
     }
     static object Value(Dictionary<string,object> row,string key,object fallback){object v;return row.TryGetValue(key,out v)?v:fallback;}

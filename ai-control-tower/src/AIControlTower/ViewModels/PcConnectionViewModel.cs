@@ -27,9 +27,9 @@ public sealed class PcJobViewModel : ObservableObject
         if (_value == value) return; _value = value;
         foreach (var p in new[]{nameof(Title),nameof(Project),nameof(Tool),nameof(State),nameof(StatusText),nameof(HasError),nameof(IsRunning)}) OnPropertyChanged(p);
     }
-    public bool HasError => State is "failed" or "interrupted" or "blocked";
-    public bool IsRunning => State is "started" or "running";
-    public string StatusText => State switch { "queued" or "pending" => "대기", "started" or "running" => "실행 중", "finished" or "published" or "completed" => "완료", "failed" => "오류", "interrupted" => "중단 확인 필요", "blocked" => "선행 작업 대기", _ => "미확인" };
+    public bool HasError => State is "failed" or "interrupted" or "blocked" or "timed_out";
+    public bool IsRunning => State is "starting" or "started" or "running";
+    public string StatusText => State switch { "queued" or "pending" => "대기", "starting" or "started" or "running" => "실행 중", "finished" or "published" or "completed" => "완료", "failed" => "오류", "interrupted" => "중단 확인 필요", "timed_out" => "시간 초과", "stopped" => "중지", "blocked" => "선행 작업 대기", _ => "미확인" };
 }
 public sealed class PcConnectionViewModel : ObservableObject, IDisposable
 {

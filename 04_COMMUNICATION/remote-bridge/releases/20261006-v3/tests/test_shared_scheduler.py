@@ -95,4 +95,70 @@ class SchedulerTests(unittest.TestCase):
   self.assertEqual(w.scoped_job(legacy)[1],w.state/'general')
   other=dict(legacy,toolId='Codex-other');self.assertNotEqual(w.scoped_job(other)[1],w.state/'general')
   other=dict(legacy,projectId='Other');self.assertNotEqual(w.scoped_job(other)[1],w.state/'general')
+ def test_detached_live_status_tracks_real_success_and_failure_without_mutating_acceptance(self):
+  import universal_actions as actions
+  w=self.worker(actions.perform);gates=[];handles=[]
+  try:
+   for code in (0,7):
+    jid='detached'+str(code);j=job(jid,'start_process',{'python':"from pathlib import Path\nimport time,sys\np=Path('release"+str(code)+"')\nwhile not p.exists():time.sleep(.03)\nsys.exit("+str(code)+")",'timeoutSeconds':30},projectId='Live',toolId='Codex-owner')
+    gate=w.scope(j)[1]/('release'+str(code));gates.append(gate);w.submit(j);self.drain(w,timeout=30)
+    accepted=json.loads(json.dumps(w.journal[jid]['result']));pid=accepted['data']['processId'];handles.append(actions.OWNED_RUNNERS.get(pid))
+    until=time.monotonic()+30
+    while time.monotonic()<until:
+     detail=w.get_job(jid)
+     if detail['state']=='running':break
+     self.assertIn(detail['state'],('starting','running'));time.sleep(.03)
+    self.assertEqual(detail['state'],'running');self.assertEqual(detail['result']['outcome'],'running')
+    self.assertEqual(detail['acceptedResult'],accepted);self.assertNotIn('finishedAt',detail['result']);self.assertEqual(w.status()['activeJobCount'],1)
+    # A different issuer cannot read the running owner's ticket/output.
+    other=job('foreign'+str(code),'start_process',{},projectId='Live',toolId='Codex-other')
+    w.journal[other['id']]={'state':'finished','job':other,'action':'start_process','projectId':'Live','result':accepted}
+    foreign=w.get_job(other['id']);self.assertEqual(foreign['state'],'interrupted');self.assertEqual(foreign['process']['error'],'process_not_owned');self.assertNotIn('stdoutPath',foreign['process'])
+    self.assertEqual(w.status()['activeJobCount'],1)
+    gate.touch();until=time.monotonic()+30
+    while time.monotonic()<until:
+     detail=w.get_job(jid)
+     if detail['state'] not in ('starting','running'):break
+     time.sleep(.03)
+    self.assertEqual(detail['state'],'completed' if code==0 else 'failed');self.assertEqual(detail['result']['outcome'],detail['state'])
+    self.assertEqual(w.status()['activeJobCount'],0);self.assertEqual(w.journal[jid]['result'],accepted)
+    self.assertEqual(w.status()['jobs'][-2]['state'],detail['state'])
+  finally:
+   for gate in gates:
+    if gate.parent.exists():gate.touch()
+   for handle in handles:
+    if handle is not None:handle.wait(timeout=35)
+ def test_detached_terminal_phases_and_active_count_do_not_double_count(self):
+  from concurrent.futures import Future
+  pid='c'*32;w=self.worker(lambda *args:{'processId':pid});j=job('phases','start_process');w.submit(j);self.drain(w)
+  folder=w.scope(j)[0]/'processes'/pid;u.atomic(folder/'ticket.json',{'processId':pid,'ownerNonce':'test-nonce'})
+  accepted=json.loads(json.dumps(w.journal[j['id']]['result']))
+  for stage in ('starting','running','timed_out','stopped','interrupted','failed'):
+   u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':stage})
+   self.assertEqual(w.get_job(j['id'])['state'],stage)
+   self.assertEqual(w.status()['activeJobCount'],int(stage in ('starting','running')))
+  u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':'running'})
+  w.active[j['id']]=(Future(),set())
+  try:self.assertEqual(w.status()['activeJobCount'],1)
+  finally:del w.active[j['id']]
+  self.assertEqual(w.journal[j['id']]['result'],accepted)
+ def test_old_detached_owner_remains_counted_and_visible_after_newer_history(self):
+  pid='d'*32;w=self.worker(lambda *args:{'processId':pid});j=job('old-live','start_process');w.submit(j);self.drain(w)
+  folder=w.scope(j)[0]/'processes'/pid;u.atomic(folder/'ticket.json',{'processId':pid,'ownerNonce':'test-nonce'})
+  u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':'running'})
+  for n in range(150):w.journal['new'+str(n)]={'state':'finished','action':'capabilities','result':{'outcome':'completed'}}
+  status=w.status();self.assertEqual(status['activeJobCount'],1);self.assertEqual(len(status['jobs']),100)
+  self.assertEqual(status['jobs'][0]['id'],'old-live');self.assertEqual(status['jobs'][0]['state'],'running')
+  u.atomic(folder/'status.json',{'ownerNonce':'test-nonce','stage':'completed','returnCode':0})
+  self.assertEqual(w.status()['activeJobCount'],0)
+ def test_detached_status_probes_are_bounded_and_rotate_across_all_owners(self):
+  from unittest.mock import patch
+  w=self.worker(lambda *args:{})
+  for n in range(130):
+   j=job('owner'+str(n),'start_process');w.journal[j['id']]={'state':'finished','action':'start_process','job':j,'result':{'outcome':'completed','data':{'processId':format(n,'032x'),'running':True}}}
+  visited=set()
+  def probe(record):visited.add(record['job']['id']);return {'stage':'running','running':True}
+  with patch.object(w,'live_process',side_effect=probe) as live:
+   self.assertEqual(w.status()['activeJobCount'],130);self.assertEqual(live.call_count,100)
+   w.status();self.assertEqual(live.call_count,200);self.assertEqual(len(visited),130)
 if __name__=='__main__':unittest.main()

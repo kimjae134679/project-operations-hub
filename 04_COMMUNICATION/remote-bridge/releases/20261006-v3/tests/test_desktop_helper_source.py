@@ -22,7 +22,8 @@ class DesktopHelperContract(unittest.TestCase):
             source=SOURCE.with_name('BridgeLauncher.cs')
             compiled=subprocess.run([str(compiler),'/nologo','/target:winexe','/out:'+str(exe),'/r:System.Windows.Forms.dll','/r:System.Drawing.dll','/r:System.Web.Extensions.dll',str(source)],capture_output=True,text=True,timeout=40,creationflags=subprocess.CREATE_NO_WINDOW)
             self.assertEqual(compiled.returncode,0,compiled.stdout+compiled.stderr)
-            for name in ('bridge_worker.py','universal_worker.py','universal_actions.py','process_runner.py','local_api.py'):shutil.copy2(SOURCE.with_name(name),home/name)
+            runtime=home/'Runtime';runtime.mkdir()
+            for name in ('bridge_worker.py','universal_worker.py','universal_actions.py','process_runner.py','local_api.py'):shutil.copy2(SOURCE.with_name(name),runtime/name)
             (home/'config.json').write_text(json.dumps({'deviceId':'test-device','hubRepository':'kimjae134679/project-operations-hub','python':sys.executable,'projectRoot':str(home/'missing-audio'),'audioEnabled':False,'maxWorkers':4}),encoding='utf-8')
             process=subprocess.Popen([str(exe),'--background'],creationflags=subprocess.CREATE_NO_WINDOW)
             user=ctypes.WinDLL('user32');kernel=ctypes.WinDLL('kernel32');windows=[];visible=[]
