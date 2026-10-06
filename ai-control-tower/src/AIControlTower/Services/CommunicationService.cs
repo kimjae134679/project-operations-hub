@@ -38,6 +38,21 @@ public sealed class CommunicationService
     public Task<CommunicationSnapshot> SyncAsync(string hubRoot, IEnumerable<CommunicationTarget> targets,
         CancellationToken ct = default) => Sync(hubRoot, targets, ct);
 
+    /// <summary>Only existing central board, receipts, inbox and threads. No delivery, collection or status writes.</summary>
+    public async Task<CommunicationSnapshot> ReadOnlyAsync(string hubRoot,CancellationToken ct=default)
+    {
+        var errors=new List<CommunicationIssue>();var receipts=new List<CommunicationReceiptItem>();var items=new List<CommunicationInboxItem>();
+        try
+        {
+            var root=ExistingRoot(hubRoot);var board=await LoadBoard(root,ct).ConfigureAwait(false);
+            await ReadCentral(root,board,receipts,items,new HashSet<string>(StringComparer.Ordinal),errors,ct).ConfigureAwait(false);
+            var states=board.Projects.Select(id=>new CommunicationProjectState(id,"","",0,0,"로컬 자료만 조회 · 전달/공유 미확인")).ToArray();
+            return new(board.Notices.Values.Where(n=>n.Active).Select(n=>n.Notice).ToArray(),receipts,states,items,errors,DateTimeOffset.UtcNow,[]);
+        }
+        catch(Exception ex) when(IsFileError(ex))
+        { Hold(errors,null,"manifest_invalid");return new([],receipts,[],items,errors,DateTimeOffset.UtcNow,[]); }
+    }
+
     public async Task<CommunicationSnapshot> Sync(string hubRoot, IEnumerable<CommunicationTarget> targets,
         CancellationToken ct = default)
     {

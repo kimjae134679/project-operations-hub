@@ -36,6 +36,6 @@
     <DockPanel Grid.Row="2" Margin="0,8,0,0"><Button DockPanel.Dock="Right" Content="수집 파일 위치" Click="OpenCollectedFile_Click" Style="{StaticResource QuietButton}"/><TextBlock Text="{Binding UserReadExplanation}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,0,8,0"/></DockPanel>
    </Grid>
   </Grid>
-  <Expander Grid.Row="4" Header="전달 / 폴더 연결 설정 (기존 기능)" IsExpanded="False" Margin="0,8,0,0"><WrapPanel><Button Content="선택 프로젝트 폴더 연결" Click="LinkCommunicationProject_Click" Style="{StaticResource QuietButton}"/><Button Content="소통 폴더 열기" Click="OpenCommunicationFolder_Click" Style="{StaticResource QuietButton}" Margin="8,0"/><CheckBox Content="수집 자료를 GitHub에 자동 공유" IsChecked="{Binding AutoPublishCommunication}"/></WrapPanel></Expander>
+  <Expander Grid.Row="4" Header="전달 / 폴더 연결 설정 (기존 기능)" IsExpanded="False" Margin="0,8,0,0"><WrapPanel><Button Content="선택 프로젝트 폴더 연결" Click="LinkCommunicationProject_Click" IsEnabled="{Binding CanMutate}" Style="{StaticResource QuietButton}"/><Button Content="소통 폴더 열기" Click="OpenCommunicationFolder_Click" Style="{StaticResource QuietButton}" Margin="8,0"/><CheckBox IsEnabled="{Binding CanMutate}" Content="수집 자료를 GitHub에 자동 공유" IsChecked="{Binding AutoPublishCommunication}"/></WrapPanel></Expander>
  </Grid>
 </UserControl>

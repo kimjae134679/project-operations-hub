@@ -104,7 +104,7 @@ public sealed partial class MainViewModel
     public bool NoReceiptRows => SelectedNoticeReceipts.Count == 0;
     public string ReceiptEmptyLabel => SelectedNotice is null ? "공지를 선택하세요" : _allNoticeReceipts.Count == 0 ? "현재 버전의 실제 확인 기록과 등록 대상이 없습니다" : "검색·상태 조건에 맞는 기록이 없습니다";
     public string SelectedThreadHeader => SelectedInbox is null ? "주제 / 전달 자료를 선택하세요" : $"{SelectedInbox.Project} · {SelectedInbox.Title}";
-    public string UserReadExplanation => "이 화면의 읽음 표시는 사용자 읽기 위치입니다. AI 공지 확인을 대신 기록하지 않습니다.";
+    public string UserReadExplanation => IsReadOnlyView ? "로컬 조회의 읽음 표시는 이번 창의 임시 위치입니다. 저장하거나 AI 확인 기록을 변경하지 않습니다." : "이 화면의 읽음 표시는 사용자 읽기 위치입니다. AI 공지 확인을 대신 기록하지 않습니다.";
     public string EntryReadPositionKey => SelectedEntry is null ? "" : SelectedEntry.Entry.Identity + "/" + SelectedEntry.Entry.ContentHash;
     private readonly CommunicationService _communication = new();
     private readonly CommunicationGitService _communicationGit = new();
@@ -199,7 +199,7 @@ public sealed partial class MainViewModel
     private void InitializeCommunication()
     {
         _communication.Diagnostic += line => OnJobLog("소통 진단 · " + line);
-        _communicationReadStore = new(_settings.IsTemporary ? null : Path.Combine(ControlTowerSettings.DataDirectory,"communication-user-read.json"));
+        _communicationReadStore = new(_settings.IsTemporary || IsReadOnlyView ? null : Path.Combine(ControlTowerSettings.DataDirectory,"communication-user-read.json"));
         PrevEntryCommand = new CommunicationNavigationCommand(()=>MoveEntry(-1),()=>Entries.IndexOf(SelectedEntry!)>0);
         NextEntryCommand = new CommunicationNavigationCommand(()=>MoveEntry(1),()=>SelectedEntry is not null && Entries.IndexOf(SelectedEntry)<Entries.Count-1);
         PreviousPostCommand = new CommunicationNavigationCommand(()=>MovePost(-1),()=>InboxItems.IndexOf(SelectedInbox!)>0);
@@ -268,6 +268,7 @@ public sealed partial class MainViewModel
     }
     public void LinkCommunicationProject(string id,string folder)
     {
+        if(BlockOperation())return;
         if(!_communicationNames.ContainsKey(id) || !Directory.Exists(folder)) { CommunicationMessage="연결할 프로젝트와 실제 폴더를 선택하세요."; return; }
         _settings.CommunicationFolders[id]=Path.GetFullPath(folder); SaveSettings(); _lastCommunication=DateTime.MinValue;
     }
@@ -275,6 +276,22 @@ public sealed partial class MainViewModel
     public void OpenCollectedFile() => OpenExisting(SelectedInbox?.Path);
     public async Task SyncCommunicationAsync(bool force=false)
     {
+        if(IsReadOnlyView)
+        {
+            if(_disposed || !await _communicationLock.WaitAsync(0))return;
+            try
+            {
+                var local=await _communication.ReadOnlyAsync(CommunicationHubPath,_lifetime.Token);
+                if(!local.Errors.Any(e=>e.Code=="manifest_invalid"))ReadCommunicationNames(Path.Combine(CommunicationHubPath,"04_COMMUNICATION","announcements","manifest.json"));
+                ApplyCommunicationSnapshot(local);
+                CentralSyncMessage=local.Errors.Any(e=>e.Code=="manifest_invalid")?"로컬 조회 보류 · 기존 공지 자료를 읽지 못했습니다. GitHub 연결/공유 없음":"로컬 조회 · 기존 자료만 표시 · GitHub 연결/공유 없음";
+                CommunicationMessage=CentralSyncMessage;
+            }
+            catch(OperationCanceledException){}
+            catch(Exception){CentralSyncMessage=CommunicationMessage="로컬 조회 보류 · 기존 자료는 변경하지 않았습니다.";}
+            finally{_communicationLock.Release();}
+            return;
+        }
         if(_disposed || !force && DateTime.UtcNow-_lastCommunication<TimeSpan.FromSeconds(15)) return;
         try
         {

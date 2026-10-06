@@ -3,7 +3,7 @@ namespace AIControlTower;
 public partial class App : Application
 {
     public static bool ShouldActivateExistingInstance(IEnumerable<string> arguments)
-        => !arguments.Contains("--background", StringComparer.Ordinal);
+        => !arguments.Contains("--background", StringComparer.Ordinal) && !Services.StartupPolicy.RequestsLocalView(arguments);
     private Mutex? _instance;
     private EventWaitHandle? _activate;
     private RegisteredWaitHandle? _listener;
@@ -81,6 +81,7 @@ public partial class App : Application
     }
     protected override void OnStartup(StartupEventArgs e)
     {
+        if(!Services.StartupPolicy.TryCreate(e.Args,out var policy)){Shutdown(2);return;}
         var workFixture = Array.IndexOf(e.Args,"--verify-work-dashboard");
         if(workFixture>=0)
         {
@@ -103,13 +104,14 @@ public partial class App : Application
         }
         if (StartRemoteSupervisor(e)) return;
         var verification = e.Args.Contains("--verify-ui");
-        var identity = verification ? "Verification." + Environment.ProcessId : "Application";
+        var identity = verification ? "Verification." + Environment.ProcessId : policy.InstanceIdentity;
+        // LocalView has a separate identity and never signals/listens to the operating GUI.
         _instance = new Mutex(false, @"Local\AIControlTower." + identity);
-        _activate = new EventWaitHandle(false, EventResetMode.AutoReset, verification ? @"Local\AIControlTower.Verification.Activate." + Environment.ProcessId : @"Local\AIControlTower.Activate");
+        _activate = new EventWaitHandle(false, EventResetMode.AutoReset, verification ? @"Local\AIControlTower.Verification.Activate." + Environment.ProcessId : policy.ActivationEvent);
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
         if (!_owns) { if (ShouldActivateExistingInstance(e.Args)) _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);
-        var settings = Services.ControlTowerSettings.Load();
+        var settings = policy.IsLocalView ? Services.ControlTowerSettings.LoadReadOnly() : Services.ControlTowerSettings.Load();
         if (e.Args.Contains("--verify-ui")) settings.IsTemporary = true;
         var communicationRoot = Array.IndexOf(e.Args, "--communication-hub");
         if (communicationRoot >= 0 && communicationRoot + 1 < e.Args.Length)
@@ -118,6 +120,7 @@ public partial class App : Application
             if (e.Args.Contains("--verify-ui")) settings.AutoPublishCommunication = false;
         }
         MainWindow = new MainWindow(settings);
+        if (!policy.IsLocalView)
         _listener = ThreadPool.RegisterWaitForSingleObject(_activate, (_, _) => Dispatcher.InvokeAsync(() =>
         {
             if (MainWindow.WindowState == WindowState.Minimized) MainWindow.WindowState = WindowState.Normal;

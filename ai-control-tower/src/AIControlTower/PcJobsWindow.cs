@@ -46,9 +46,10 @@ public sealed class PcJobsPanel : UserControl
   _target.Text="";
   var workspaceHint=new TextBlock { Text="명령 실행의 작업 폴더를 비우면 프로젝트와 요청 주체별 공간을 자동으로 사용합니다.",TextWrapping=TextWrapping.Wrap,FontSize=12,Margin=new(0,0,0,8) };
   workspaceHint.SetResourceReference(TextBlock.ForegroundProperty,"MutedBrush");form.Children.Add(workspaceHint);
-  var submit=new Button { Content="작업 요청",HorizontalAlignment=HorizontalAlignment.Left,MinWidth=130,Margin=new(0,8,0,8) };
+  var submit=new Button { IsEnabled=!vm.IsReadOnly, Content=vm.IsReadOnly?"로컬 조회 · 요청 보류":"작업 요청",HorizontalAlignment=HorizontalAlignment.Left,MinWidth=130,Margin=new(0,8,0,8) };
   submit.Click+=async(_,_)=>
   {
+   if(vm.IsReadOnly){_message.Text="로컬 조회 · PC/API 작업 요청은 실행하지 않습니다.";return;}
    submit.IsEnabled=false;
    try
    {
@@ -61,7 +62,7 @@ public sealed class PcJobsPanel : UserControl
     _projectFilter.SelectedItem=_projectFilters.FirstOrDefault(x=>x.Action==projectId);_toolFilter.SelectedItem=_toolFilter.Items.OfType<Choice>().FirstOrDefault(x=>x.Action==issuer);_stateFilter.SelectedIndex=0;
     _pendingJobId=id; await vm.PollAsync(); SelectPendingJob(); _formExpander.IsExpanded=false;
    }
-   catch(Exception e){_message.SetResourceReference(TextBlock.ForegroundProperty,"StatusErrorInk");_message.Text=ProcessRunner.Sanitize(e.Message);}finally{submit.IsEnabled=true;}
+   catch(Exception e){_message.SetResourceReference(TextBlock.ForegroundProperty,"StatusErrorInk");_message.Text=ProcessRunner.Sanitize(e.Message);}finally{submit.IsEnabled=!vm.IsReadOnly;}
   };
   form.Children.Add(submit); _message.TextWrapping=TextWrapping.Wrap; form.Children.Add(_message);
   var body=new Grid(); body.ColumnDefinitions.Add(new(){Width=new GridLength(320)}); body.ColumnDefinitions.Add(new(){Width=new GridLength(14)}); body.ColumnDefinitions.Add(new()); Grid.SetRow(body,2); grid.Children.Add(body);
@@ -80,7 +81,7 @@ public sealed class PcJobsPanel : UserControl
   foreach(var field in new[]{"Project","Tool"}){var line=new FrameworkElementFactory(typeof(TextBlock));line.SetBinding(TextBlock.TextProperty,new Binding(field){Converter=new FriendlyJobLabel(main),ConverterParameter=field});line.SetResourceReference(TextBlock.ForegroundProperty,"MutedBrush");line.SetValue(TextBlock.FontSizeProperty,12d);line.SetValue(TextBlock.TextWrappingProperty,TextWrapping.Wrap);panel.AppendChild(line);}row.AppendChild(panel);template.VisualTree=row;_jobs.ItemTemplate=template;
   _jobs.SelectionChanged+=async(_,_)=>{_lastResult="";_result.Text="결과 확인 중…";await UpdateResultAsync();};Content=grid;
   _timer=new DispatcherTimer{Interval=TimeSpan.FromSeconds(2)};_timer.Tick+=async(_,_)=>{SelectPendingJob();await UpdateResultAsync();};
-  Loaded+=(_,_)=>{_active=true;if(IsVisible)_timer.Start();};Unloaded+=(_,_)=>{_active=false;_timer.Stop();};IsVisibleChanged+=async(_,_)=>{if(IsVisible&&_active){_timer.Start();await UpdateResultAsync();}else _timer.Stop();};
+  Loaded+=(_,_)=>{_active=true;if(IsVisible&&!vm.IsReadOnly)_timer.Start();};Unloaded+=(_,_)=>{_active=false;_timer.Stop();};IsVisibleChanged+=async(_,_)=>{if(IsVisible&&_active&&!vm.IsReadOnly){_timer.Start();await UpdateResultAsync();}else _timer.Stop();};
  }
  private void UpdateProjectFilters()
  {

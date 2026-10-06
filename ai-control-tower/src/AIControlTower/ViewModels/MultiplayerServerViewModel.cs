@@ -61,6 +61,7 @@ public sealed partial class MainViewModel
     public string ServerSummaryMessage { get => _serverSummaryMessage; private set => SetProperty(ref _serverSummaryMessage,value); }
     public async Task RefreshServerAsync(bool force = false)
     {
+        if(IsReadOnlyView){ServerSummaryMessage="로컬 조회 · 서버/API 확인 없음 · 현재 생존 미확인";return;}
         if (_disposed || !force && DateTime.UtcNow-_lastServerCheck<TimeSpan.FromSeconds(15) || !await _serverLock.WaitAsync(0)) return;
         try
         {
@@ -92,6 +93,7 @@ public sealed partial class MainViewModel
     public string RosterCheckedAt => _rosterCheckedAt is { } time ? "마지막 확인 " + time.LocalDateTime.ToString("HH:mm:ss") : "";
     public async Task RefreshRosterAsync(bool manual = false)
     {
+        if(IsReadOnlyView){_rosterHealth="로컬 조회 · 접속자/API 확인 없음";OnPropertyChanged(nameof(RosterStatus));return;}
         if (_disposed) return;
         try
         {
@@ -130,6 +132,7 @@ public sealed partial class MainViewModel
     public void OpenServerMailbox() => OpenExisting(Path.Combine(ServerRootPath,"_통합소통"));
     public void OpenServerRepository(bool release)
     {
+        if(BlockOperation())return;
         try { Process.Start(new ProcessStartInfo("https://github.com/kimjae134679/" + (release ? "PhoneLoL_02" : "PhoneLoL_02-Source")) { UseShellExecute=true }); }
         catch(Exception ex) { Message = "저장소 열기 실패 · " + ProcessRunner.Sanitize(ex.Message); }
     }

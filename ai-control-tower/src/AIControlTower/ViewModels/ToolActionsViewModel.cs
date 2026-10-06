@@ -16,11 +16,13 @@ public sealed partial class MainViewModel
         }
         if(name is "desktop-commander" or "n8n")
         {
+            if(BlockOperation())return;
             var url=name=="n8n" ? "http://localhost:5678/" : "https://mcp.desktopcommander.app/";
             try { Process.Start(new ProcessStartInfo(url) { UseShellExecute=true })?.Dispose(); }
             catch(Exception ex) { Message="화면 열기 실패 · "+ProcessRunner.Sanitize(ex.Message); }
             return;
         }
+        if(BlockOperation())return;
         string? path=name switch
         {
             "codex"=>EnvironmentProbe.FindCommand("codex.cmd")??EnvironmentProbe.FindCommand("codex.exe"),

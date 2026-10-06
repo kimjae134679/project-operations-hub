@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Threading;
 using AIControlTower.Models;
@@ -23,6 +23,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string ApplicationVersionLabel => "실행 버전 " + (typeof(MainViewModel).Assembly.GetName().Version?.ToString() ?? "미확인");
     public string ApplicationSourceLabel => "실행 파일: " + (Environment.ProcessPath ?? "미확인");
     private readonly ControlTowerSettings _settings;
+    private readonly StartupPolicy _startupPolicy;
+    public bool IsReadOnlyView => _settings.TransientReadOnly;
+    public bool CanMutate => !IsReadOnlyView;
+    public string ViewModeLabel => IsReadOnlyView ? "로컬 조회 · 외부 연결/실행/공유는 중지 · 표시 시각 ≠ 생존" : "자동으로 최신 상태 유지";
+    public bool BlockOperation()
+    { if(!IsReadOnlyView)return false; Message="로컬 조회 · 외부 연결/실행/공유 보류 · 기존 파일과 작업은 변경하지 않습니다."; return true; }
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
     private readonly DispatcherTimer _timer;
     private readonly DispatcherTimer _serverLiveTimer;
@@ -45,21 +51,24 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private string _projectSearch = "";
     private string _programSearch = "";
 
-    public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true)
+    public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true) : this(settings,enablePolling,JobManager.RecoverInterruptedRuns) { }
+    public MainViewModel(ControlTowerSettings? settings, bool enablePolling, Action recoverRuns)
     {
         _settings = settings ?? ControlTowerSettings.Load();
-        _workDashboardService = new WorkDashboardService(Path.Combine(ControlTowerSettings.DataDirectory,"runs"),_jobs.IsRunning,
+        _startupPolicy = new(IsReadOnlyView);
+        _workDashboardService = IsReadOnlyView ? new WorkDashboardService(Path.Combine(_settings.ViewDataDirectory,"runs")) : new WorkDashboardService(Path.Combine(ControlTowerSettings.DataDirectory,"runs"),_jobs.IsRunning,
             async ct => { using var bridge=new ProjectBridgeService(); return await bridge.CheckAsync(ct); },
             async (id,ct) => { using var bridge=new ProjectBridgeService(); return await bridge.ResultAsync(id,ct); });
         foreach(var path in (_settings.ContinuousStatePaths ?? []).Take(40)) _workDashboardService.ContinuousPaths.Add(path);
-        if(File.Exists(WorkDashboardService.FoundationState) && !_workDashboardService.ContinuousPaths.Contains(WorkDashboardService.FoundationState,StringComparer.OrdinalIgnoreCase))
+        if(!IsReadOnlyView && File.Exists(WorkDashboardService.FoundationState) && !_workDashboardService.ContinuousPaths.Contains(WorkDashboardService.FoundationState,StringComparer.OrdinalIgnoreCase))
             _workDashboardService.ContinuousPaths.Add(WorkDashboardService.FoundationState);
-        PcConnection = new(openDocument: (root,path,title) => Documents.OpenAsync(root,path,title));
+        PcConnection = new(null,(root,path,title) => Documents.OpenAsync(root,path,title),IsReadOnlyView);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath, [], _settings.CommunicationFolders.Values);
         WorkDashboard = new(_workDashboardService.ReadAsync,_workDashboardService.DetailsAsync,_jobs.IsRunning,_jobs.Stop)
         {
             RegisterContinuousPath = path =>
             {
+                if(BlockOperation())return;
                 var full=WorkDashboardService.SafePath(path); _=WorkDashboardService.ReadContinuous(full);
                 if(_workDashboardService.ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return;
                 if(_workDashboardService.ContinuousPaths.Count>=40) throw new InvalidDataException("상태 파일 연결은 최대 40개입니다.");
@@ -67,7 +76,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             }
         };
         ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),_workDashboardService.DetailsAsync) { ManagementOnly=true };
-        _settings.AutoCommunication = true;
+        if(!IsReadOnlyView)_settings.AutoCommunication = true;
         InitializeCommunication();
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
         var runner = new ProcessRunner();
@@ -89,9 +98,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
         _pcLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
         _pcLiveTimer.Tick += async (_, _) => await PcConnection.PollAsync();
-        if (enablePolling)
+        if (enablePolling && !IsReadOnlyView)
         {
-            JobManager.RecoverInterruptedRuns();
+            _startupPolicy.RecoverRuns(recoverRuns);
             if (!_settings.IsTemporary) _timer.Start();
             _serverLiveTimer.Start();
             _pcLiveTimer.Start();
@@ -127,8 +136,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public int ProgramsCount => Projects.Sum(p => p.Functions.Sum(f => f.Programs.Count));
     public int RunningCount => _jobs.RunningCount;
     public bool IsBusy => _jobs.BusyProjectCount > 0;
-    public bool CanStopSelectedProgram => SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
-    public bool CanLaunchSelectedProgram => SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
+    public bool CanStopSelectedProgram => CanMutate && SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
+    public bool CanLaunchSelectedProgram => CanMutate && SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
     public bool CanOpenSelectedProgram => SelectedProgram is not null && (File.Exists(SelectedProgram.Path) || Directory.Exists(SelectedProgram.Path));
     public bool HasSelectedCommands => SelectedProgram?.CanLaunch == true;
     public bool ShowSeparateOpenButton => HasSelectedCommands || SelectedProgram?.HasEditorLauncher == true;
@@ -171,9 +180,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string TaskInput { get => _taskInput; set => SetProperty(ref _taskInput, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public bool IsRefreshing { get => _isRefreshing; private set => SetProperty(ref _isRefreshing, value); }
-    public bool IsLocalJevExecutionAllowed => EnableJev;
-    public string LocalJevPolicyMessage => EnableJev ? "Jev를 이 관제탑에서 선택해 사용할 수 있습니다. 설치·키 존재는 인증이나 실행 성공을 뜻하지 않습니다." : LocalExecutionPolicy.LocalJevDisabledMessage;
-    public string ActivitySummary => IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
+    public bool IsLocalJevExecutionAllowed => CanMutate && EnableJev;
+    public string LocalJevPolicyMessage => IsReadOnlyView ? "로컬 조회 · Jev 실행/중지 보류 · 저장된 기록만 표시합니다." : EnableJev ? "Jev를 이 관제탑에서 선택해 사용할 수 있습니다. 설치·키 존재는 인증이나 실행 성공을 뜻하지 않습니다." : LocalExecutionPolicy.LocalJevDisabledMessage;
+    public string ActivitySummary => IsReadOnlyView ? "로컬 저장 기록 조회 · 실제 작업/프로세스 생존 미확인" : IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
     public async Task RefreshWorkDashboardAsync()
     {
         if(_disposed)return;
@@ -250,6 +259,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task RefreshAsync()
     {
+        if(IsReadOnlyView)
+        {
+            await PcConnection.PollAsync();
+            if(Statuses.Count==0)foreach(var provider in _providers)
+                Statuses.Add(new ToolStatusViewModel(new(provider.Id,provider.Id switch {"project-bridge"=>"ProjectBridge","desktop-commander"=>"Remote Desktop Commander","jev"=>"Jev Router","codex"=>"Codex","github-cli"=>"GitHub CLI",_=>provider.Id},StatusKind.Unknown,"로컬 조회 · 외부/API 상태 확인 없음 · 현재 생존 미확인",DateTimeOffset.UtcNow)));
+            Message=_settings.ReadOnlyLoadIssue.Length>0?_settings.ReadOnlyLoadIssue:ViewModeLabel;OnPropertyChanged(nameof(UserFacingStatuses));OnPropertyChanged(nameof(FilteredToolStatuses));return;
+        }
         if (_disposed || !await _refreshLock.WaitAsync(0)) return;
         try
         {
@@ -275,6 +291,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void OpenProject() => OpenExisting(SelectedProject?.Path);
     public void OpenProgram()
     {
+        if(IsReadOnlyView) { OpenExisting(SelectedProgram?.Path);return; }
         if (SelectedProgram is not null && Uri.TryCreate(SelectedProgram.ServiceUrl, UriKind.Absolute, out var url)
             && url.IsLoopback && url.Scheme is "http" or "https")
         {
@@ -286,6 +303,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task ActivateSelectedProgramAsync()
     {
+        if(BlockOperation())return;
         if (SelectedProgram is { HasEditorLauncher: true } editor)
         {
             if (!File.Exists(editor.EditorOpenScript)) { Message = "편집기 열기 파일을 찾지 못했습니다."; return; }
@@ -332,6 +350,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 return;
             }
             // Opening an artifact reveals it; it does not silently execute an installer/script.
+            if(BlockOperation())return;
             var info = new ProcessStartInfo("explorer.exe") { UseShellExecute = false };
             if (File.Exists(path)) info.Arguments = "/select,\"" + path + "\""; else info.ArgumentList.Add(path);
             Process.Start(info)?.Dispose();
@@ -341,6 +360,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task LaunchProgramAsync()
     {
+        if(BlockOperation())return;
         var program = SelectedProgram;
         var command = SelectedCommand;
         if (program is null || command is null) { Message = "실행할 프로그램과 등록된 명령을 선택하세요."; return; }
@@ -348,6 +368,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null)
     {
+        if(BlockOperation())return;
         if (_jobs.IsProjectBusy(program.ProjectId)) { Message = "이 프로젝트에는 실행 중인 작업이 있습니다."; return; }
         try
         {
@@ -361,10 +382,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public void StopProgram()
     {
+        if(BlockOperation())return;
         Message = SelectedProgram is not null && _jobs.Stop(SelectedProgram.Id) ? "선택한 관제탑 작업의 취소를 요청했습니다." : "관제탑이 소유한 해당 실행 작업이 없습니다.";
     }
     public async void RunJevTask()
     {
+        if(BlockOperation())return;
         if (!EnableJev) { Message = LocalJevPolicyMessage; return; }
         if (string.IsNullOrWhiteSpace(TaskInput)) { Message = "작업 내용을 입력하세요."; return; }
         if (!Directory.Exists(ProjectPath)) { Message = "존재하는 프로젝트 경로를 선택하세요. 다른 폴더로 대체 실행하지 않습니다."; return; }
@@ -379,22 +402,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public Task CancelJevTaskAsync()
     {
+        if(BlockOperation())return Task.CompletedTask;
         var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
         Message = _jobs.Stop(projectId + "/jev") ? "이 프로젝트 Jev 작업의 취소를 요청했습니다." : "이 프로젝트에서 관제탑이 시작한 Jev 작업이 없습니다.";
         return Task.CompletedTask;
     }
     public async Task ConsolidateRemoteStartupAsync()
     {
+        if(BlockOperation())return;
         try { Message = _remote.ConsolidateStartup(Environment.GetFolderPath(Environment.SpecialFolder.Startup), ControlTowerSettings.DataDirectory); Message += " " + await _remote.ConfigureNativeStartupAsync(Environment.ProcessPath!, _lifetime.Token); AddLog(Message); await RefreshAsync(); }
         catch (Exception ex) { Message = "시작 경로 통합 실패 · " + ProcessRunner.Sanitize(ex.Message); AddLog(Message); }
     }
     public async Task EnsureRemoteRunningAsync()
     {
+        if(BlockOperation())return;
         try { Message = await _remote.EnsureRunningAsync(_lifetime.Token); AddLog(Message); }
         catch (Exception ex) { Message = "공유 연결 요청 실패 · " + ProcessRunner.Sanitize(ex.Message); }
     }
     public async Task StopRemoteRunningAsync()
     {
+        if(BlockOperation())return;
         try { Message = await new RemoteSupervisor(_remote).StopAsync(_lifetime.Token); AddLog(Message); await RefreshAsync(); }
         catch (Exception ex) { Message = "원격 연결 중지 실패 · " + ProcessRunner.Sanitize(ex.Message); }
     }
@@ -410,11 +437,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (!_disposed) _dispatcher.InvokeAsync(() => { if (_disposed) return; AddLog(line); UpdateRunningProperties(); });
     }
     private void AddLog(string line) { JobLogs.Add(line); while (JobLogs.Count > 500) JobLogs.RemoveAt(0); }
-    private void SaveSettings() { try { _settings.Save(); } catch (Exception ex) { AddLog("설정 저장 실패 · " + ProcessRunner.Sanitize(ex.Message)); } }
+    private void SaveSettings() { if(IsReadOnlyView){Message="로컬 조회 · 화면 선택은 임시이며 설정/읽기 위치는 저장하지 않습니다.";return;} try { _settings.Save(); } catch (Exception ex) { AddLog("설정 저장 실패 · " + ProcessRunner.Sanitize(ex.Message)); } }
     public void Dispose()
     {
         if (_disposed) return;
-        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _pcLiveTimer.Stop(); _watcher?.Dispose(); _jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog; PcConnection.Dispose();
+        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _pcLiveTimer.Stop(); _watcher?.Dispose(); if(CanMutate)_jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog; PcConnection.Dispose();
         // Semaphores remain available for in-flight finally blocks during shutdown.
     }
 }

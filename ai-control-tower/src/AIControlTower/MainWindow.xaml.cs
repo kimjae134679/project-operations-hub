@@ -28,6 +28,7 @@ public partial class MainWindow : Window
         ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
+        if(_viewModel.IsReadOnlyView)Title="통합 관제탑 0.9.1 · 로컬 조회 (외부 실행/공유 보류)";
         _viewModel.Documents.Opened+=(_,_)=>WorkspaceTabs.SelectedItem=DocumentReaderTab;
         _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
         PcJobsHost.Content = _pcJobsPanel;
@@ -77,6 +78,13 @@ public partial class MainWindow : Window
         ApplyResponsiveLayout();
         if (!SystemParameters.ClientAreaAnimation) _viewModel.ReduceMotion = true;
         FadeIn(WorkspaceContent);
+        await new StartupPolicy(_viewModel.IsReadOnlyView).InitializeAsync(
+            _viewModel.DiscoverAsync,
+            async()=>{await _viewModel.RefreshAsync();await _viewModel.RefreshWorkDashboardAsync();await _viewModel.SyncCommunicationAsync(true);},
+            InitializeOperationalAsync);
+    }
+    private async Task InitializeOperationalAsync()
+    {
         await _viewModel.DiscoverAsync();
         await _viewModel.RefreshAsync();
         await _viewModel.RefreshWorkDashboardAsync();
@@ -210,6 +218,7 @@ public partial class MainWindow : Window
     private void OpenServerRelease_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(true);
     private async void LinkServerFolder_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var dialog = new OpenFolderDialog { Title = "실제로 실행하는 멀티의 신 서버 폴더 선택" };
         if (dialog.ShowDialog(this) != true) return;
         _viewModel.ServerRootPath = dialog.FolderName;
@@ -220,6 +229,7 @@ public partial class MainWindow : Window
     private void OpenCollectedFile_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCollectedFile();
     private async void LinkCommunicationProject_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var project = _viewModel.SelectedCommunicationProject;
         if (project is null) return;
         var dialog = new OpenFolderDialog { Title = project.Name + "의 주 작업 폴더 선택", Multiselect = false };
@@ -233,6 +243,7 @@ public partial class MainWindow : Window
     private async void EnsureRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.EnsureRemoteRunningAsync();
     private async void StopRemote_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         if (MessageBox.Show(this, "원격 연결을 끄면 연결된 AI의 PC 작업도 끊깁니다. 이번 로그인 동안은 자동 복구를 멈추고, 다음 로그인에는 다시 켭니다.", "원격 연결 중지", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
             await _viewModel.StopRemoteRunningAsync();
     }
@@ -263,6 +274,7 @@ public partial class MainWindow : Window
 
     private void Jev_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         if (_jevWindow is { IsLoaded: true }) { _jevWindow.Activate(); return; }
         _jevWindow = new JevControlWindow(_viewModel) { Owner = this };
         _jevWindow.Closed += (_, _) => _jevWindow = null;
@@ -271,6 +283,7 @@ public partial class MainWindow : Window
 
     private async void Install_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var result = await _installationService.InstallAsync(Environment.ProcessPath ?? string.Empty, CancellationToken.None);
         MessageBox.Show(this, result.Detail + Environment.NewLine + result.InstallPath, "관제탑 설치", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }
@@ -291,6 +304,7 @@ public partial class MainWindow : Window
 
     private async void Uninstall_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var path = ResolveInstallPath();
         if (MessageBox.Show(this, "관리 화면의 자동 시작을 제거합니다.\n원격 연결·자동 복구·프로젝트 자료와 실행 파일은 유지합니다.\n\n" + path, "관제탑 제거", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK) return;
         var result = await _installationService.UninstallAsync(path, CancellationToken.None);
@@ -299,6 +313,7 @@ public partial class MainWindow : Window
 
     private async void Restore_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var result = await _installationService.RestoreDesktopCommanderStartupAsync(ResolveInstallPath(), CancellationToken.None);
         MessageBox.Show(this, result.Detail, "공유 연결 복구", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }
