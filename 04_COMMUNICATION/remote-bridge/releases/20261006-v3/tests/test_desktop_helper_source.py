@@ -13,6 +13,38 @@ SOURCE = Path(__file__).resolve().parents[1] / 'DesktopAutomation.cs'
 
 
 class DesktopHelperContract(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows staged installer regression')
+    def test_installer_function_contract_runs_from_isolated_payload_stage(self):
+        import base64
+        release=SOURCE.parent
+        with tempfile.TemporaryDirectory() as temp:
+            stage=Path(temp)/'stage';stage.mkdir()
+            manifest=json.loads((release/'release_manifest.json').read_text(encoding='utf-8'))
+            for row in manifest['files']:
+                target=stage/row['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(release/row['path'],target)
+            # Exercise the actual staging function before running the leaf test
+            # from its payload directory, just as the real installer does.
+            script=r'''
+$ErrorActionPreference='Stop';$errors=$null;$tokens=$null
+Import-Module (Join-Path $env:WINDIR 'System32/WindowsPowerShell/v1.0/Modules/Microsoft.PowerShell.Utility/Microsoft.PowerShell.Utility.psd1') -Force
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('INSTALL_PATH',[ref]$tokens,[ref]$errors)
+if($errors){throw 'Installer parse failed'}
+$function=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Stage-InstallerSource'},$true)
+Invoke-Expression $function.Extent.Text
+Stage-InstallerSource 'RELEASE_PATH' 'INSTALL_PATH' '' 'DESTINATION_PATH'
+$bad='BAD_PATH';[IO.File]::WriteAllText($bad,'different installer')
+$rejected=$false
+try{Stage-InstallerSource 'RELEASE_PATH' $bad '' 'DESTINATION_PATH'}catch{if($_.Exception.Message -eq 'Installer source binding mismatch'){$rejected=$true}else{throw}}
+if(!$rejected){throw 'Unbound installer source accepted'}
+'''
+            for key,value in [('INSTALL_PATH',release/'install.ps1'),('RELEASE_PATH',release),('DESTINATION_PATH',stage/'install.ps1'),('BAD_PATH',Path(temp)/'different.ps1')]:script=script.replace(key,str(value).replace("'","''"))
+            command=base64.b64encode(script.encode('utf-16le')).decode('ascii')
+            result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-EncodedCommand',command],capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=20,creationflags=subprocess.CREATE_NO_WINDOW)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            self.assertEqual((stage/'install.ps1').read_bytes(),(release/'install.ps1').read_bytes())
+            code="import sys,unittest;sys.path.insert(0,'tests');import test_desktop_helper_source as t;s=unittest.defaultTestLoader.loadTestsFromName('test_installer_starts_registered_task_after_resume_flags_and_hidden_fallback',t.DesktopHelperContract);r=unittest.TextTestRunner().run(s);sys.exit(not r.wasSuccessful())"
+            tested=subprocess.run([sys.executable,'-c',code],cwd=stage,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=30,creationflags=subprocess.CREATE_NO_WINDOW)
+            self.assertEqual(tested.returncode,0,tested.stdout+tested.stderr)
     @unittest.skipUnless(os.name=='nt','Windows installer task supervision')
     def test_installer_starts_registered_task_after_resume_flags_and_hidden_fallback(self):
         import base64

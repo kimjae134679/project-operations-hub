@@ -6,6 +6,8 @@ param(
  [switch]$StartAtLogin
 )
 $ErrorActionPreference='Stop'
+$runningInstaller=$null
+if($MyInvocation.MyCommand -is [System.Management.Automation.ExternalScriptInfo]){$runningInstaller=$PSCommandPath}
 $installMutex=New-Object -TypeName System.Threading.Mutex -ArgumentList @($false,'Local\ProjectBridge_Install')
 try{$hasInstallLock=$installMutex.WaitOne(0)}catch [System.Threading.AbandonedMutexException]{$hasInstallLock=$true}
 if(!$hasInstallLock){ $installMutex.Dispose();throw 'Another ProjectBridge install is running' }
@@ -41,6 +43,19 @@ function Start-InstalledBridge([bool]$Registered){
  }
  Start-Process -FilePath $exePath -ArgumentList '--resume' -WorkingDirectory $target -WindowStyle Hidden
 }
+function Stage-InstallerSource([string]$EmbeddedSource,[string]$RunningInstaller,[string]$PinnedBase,[string]$Destination){
+ if($EmbeddedSource){
+  $candidate=Join-Path $EmbeddedSource 'install.ps1'
+  if(!(Test-Path -LiteralPath $candidate -PathType Leaf)){throw 'Embedded installer source missing'}
+  if($RunningInstaller -and (Test-Path -LiteralPath $RunningInstaller -PathType Leaf) -and (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $RunningInstaller -Algorithm SHA256).Hash){throw 'Installer source binding mismatch'}
+  Copy-Item -LiteralPath $candidate -Destination $Destination
+ }elseif($RunningInstaller -and (Test-Path -LiteralPath $RunningInstaller -PathType Leaf)){
+  Copy-Item -LiteralPath $RunningInstaller -Destination $Destination
+ }else{
+  if(!$PinnedBase){throw 'Pinned installer source required for inline invocation'}
+  Invoke-WebRequest -UseBasicParsing -Uri ($PinnedBase+'install.ps1') -OutFile $Destination
+ }
+}
 $exeName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0xc5f0,0xacb0,0x2e,0x65,0x78,0x65) -join '')
 $guideName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0x5f,0xc0ac,0xc6a9,0xc548,0xb0b4,0x2e,0x6d,0x64) -join '')
 $target='D:\A_KJ\AI\Applications\ProjectBridge'
@@ -53,6 +68,7 @@ $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $stage=Join-Path $tempRoot ('ProjectBridge3_'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $stage|Out-Null
 try {
+ $base=$null
  if($SourceDirectory){
   $source=[IO.Path]::GetFullPath($SourceDirectory)
   $manifestFile=Join-Path $source 'release_manifest.json'
@@ -77,6 +93,9 @@ try {
   if((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -ne $row.sha256){throw 'Release file hash mismatch'}
  }
  if(@($manifest.files).Count -ne $allowed.Count){throw 'Incomplete release manifest'}
+ # The installer is the trusted entry script, outside the payload manifest.
+ # Its tests need the exact same source in the otherwise isolated stage.
+ Stage-InstallerSource $SourceDirectory $runningInstaller $base (Join-Path $stage 'install.ps1')
  # The user sees one entry program and its guide. Implementation files live
  # together in Runtime; config/state keep legacy absolute paths for live jobs.
  $destinations=@{}

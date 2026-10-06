@@ -60,7 +60,7 @@
     },
     {
       "path": "tests/test_desktop_helper_source.py",
-      "sha256": "0543035a9f80ed1ed66da22240325bba4743b47be7674897665495ee9927ccf3"
+      "sha256": "49fe14f103daf86617c02606ff7cbc0febaac2e32c56974368a8a99d8f3d5ba1"
     },
     {
       "path": "tests/test_shared_scheduler.py",
