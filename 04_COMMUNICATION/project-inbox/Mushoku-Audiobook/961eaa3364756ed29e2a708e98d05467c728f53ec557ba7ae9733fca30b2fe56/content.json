@@ -1,0 +1,38 @@
+{
+  "actorId": "ProjectBridge/KJW-80ea388278fd",
+  "blockers": [],
+  "nextActions": [],
+  "projectId": "Mushoku-Audiobook",
+  "receivedAt": "2026-10-06T13:21:22+00:00",
+  "recordId": "bridge-20261006-qa-v1-before",
+  "recordType": "task_exchange",
+  "request": {
+    "details": "사용자가 요청한 프로젝트 전용 작업 큐",
+    "source": "04_COMMUNICATION/remote-bridge/queue.json",
+    "summary": "제작 상태 확인"
+  },
+  "response": {
+    "details": "{\"currentChapter\": 149, \"lastProgressAt\": 1791296619.3061974, \"listeningShelfReady\": null, \"needsReviewChapters\": 0, \"paused\": false, \"readyChapterNumbers\": [144, 145, 146, 147, 148], \"readyChapters\": 5, \"selectedChapters\": 128, \"shelfVerificationIssueCount\": 0, \"stage\": \"generating\"}",
+    "source": "project_bridge_operational_result",
+    "summary": "제작 상태 확인 완료"
+  },
+  "revision": 1,
+  "schemaVersion": 1,
+  "sessionId": "KJW-80ea388278fd",
+  "status": "completed",
+  "supersedes": [],
+  "title": "제작 상태 확인",
+  "updatedAt": "2026-10-06T14:24:32.438207+00:00",
+  "verification": [
+    {
+      "evidence": [
+        "04_COMMUNICATION/remote-bridge/results/KJW-80ea388278fd/20261006-qa-v1-before.json"
+      ],
+      "name": "로컬 작업 결과",
+      "result": "pass"
+    }
+  ],
+  "workDone": [
+    "제작 상태 확인"
+  ]
+}
