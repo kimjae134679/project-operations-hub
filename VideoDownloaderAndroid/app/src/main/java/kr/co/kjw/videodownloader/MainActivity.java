@@ -20,8 +20,11 @@ public class MainActivity extends Activity {
         if(BuildConfig.DEBUG)WebView.setWebContentsDebuggingEnabled(true);
         web.addJavascriptInterface(new Bridge(),"Android");
         web.setWebViewClient(new WebViewClient(){@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){if(r.getUrl().toString().equals("file:///android_asset/index.html"))return false;return true;}});
-        web.setOnApplyWindowInsetsListener((v,insets)->{if(Build.VERSION.SDK_INT>=30){android.graphics.Insets bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());android.graphics.Insets ime=insets.getInsets(WindowInsets.Type.ime());v.setPadding(bars.left,bars.top,bars.right,Math.max(bars.bottom,ime.bottom));}else v.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());return insets;});
-        setContentView(web);web.loadUrl("file:///android_asset/index.html");
+        android.widget.FrameLayout root=new android.widget.FrameLayout(this);
+        root.setBackgroundColor(0xfff7f8fc);
+        root.addView(web,new android.widget.FrameLayout.LayoutParams(-1,-1));
+        root.setOnApplyWindowInsetsListener((v,insets)->{if(Build.VERSION.SDK_INT>=30){android.graphics.Insets bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());android.graphics.Insets ime=insets.getInsets(WindowInsets.Type.ime());v.setPadding(bars.left,bars.top,bars.right,Math.max(bars.bottom,ime.bottom));return WindowInsets.CONSUMED;}v.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());return insets.consumeSystemWindowInsets();});
+        setContentView(root);root.requestApplyInsets();web.loadUrl("file:///android_asset/index.html");
     }
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);receive(intent);if(web!=null)web.evaluateJavascript("window.checkShared&&checkShared()",null);}
     private void receive(Intent i){if(i!=null&&(Intent.ACTION_SEND.equals(i.getAction())||Intent.ACTION_SEND_MULTIPLE.equals(i.getAction())))shared=i.getStringExtra(Intent.EXTRA_TEXT)==null?"":i.getStringExtra(Intent.EXTRA_TEXT);}

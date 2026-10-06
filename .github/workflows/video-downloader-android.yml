@@ -61,9 +61,9 @@ jobs:
           mkdir -p VideoDownloaderAndroid/dist/qa
           BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
           for ABI in arm64-v8a armeabi-v7a; do
-            cp "VideoDownloaderAndroid/app/build/outputs/apk/release/app-$ABI-release.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
-            "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
-            "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.0.0-$ABI.apk"
+            cp "VideoDownloaderAndroid/app/build/outputs/apk/release/app-$ABI-release.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.0.1-$ABI.apk"
+            "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.0.1-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
+            "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.0.1-$ABI.apk"
           done
           cp VideoDownloaderAndroid/app/build/reports/lint-results-debug.html VideoDownloaderAndroid/dist/qa/
           cp -r VideoDownloaderAndroid/qa/screenshots VideoDownloaderAndroid/dist/qa/screenshots
@@ -84,7 +84,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create video-downloader-android-v1.0.0 VideoDownloaderAndroid/dist/*.apk VideoDownloaderAndroid/dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title '영상다운로더 Android 1.0.0' --notes 'Standalone Android downloader. Native MP4/HLS/DASH and responsive UI QA passed. Galaxy S22: arm64-v8a. Files saved in Download/VideoDownloader. Personal testing certificate; not a Play Store release.' --latest=false
+          gh release create video-downloader-android-v1.0.1 VideoDownloaderAndroid/dist/*.apk VideoDownloaderAndroid/dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title '영상다운로더 Android 1.0.1' --notes 'Standalone Android downloader. Native MP4/HLS/DASH and responsive UI QA passed. Galaxy S22: arm64-v8a. Files saved in Download/VideoDownloader. Personal testing certificate; not a Play Store release.' --latest=false
           git config user.name 'Video Downloader Build'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f VideoDownloaderAndroid/dist/qa VideoDownloaderAndroid/dist/SHA256SUMS.txt
