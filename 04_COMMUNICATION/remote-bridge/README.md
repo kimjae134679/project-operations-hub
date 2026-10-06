@@ -1,22 +1,38 @@
-# 프로젝트 연결 — 최초 설치 대기
+# 프로젝트 연결 2.0 — 공용 PC 연결 / 최초 설치 대기
 
-새 프로젝트 연결 프로그램과 전회차 청취 QA 코드가 준비됐습니다. PC 제어 플러그인의 월 한도로 실제 PC 설치·음원 생성은 미확인입니다. 이 기록을 연결 완료로 보지 않습니다.
+오디오북과 다른 프로젝트의 파일 수정·설치·빌드·프로그램 실행·장기 작업·화면 확인·마우스·키보드 입력을 하나의 연결에서 요청합니다. 통합소통에는 공개 가능한 실행 요약을 남깁니다. PC 제어 플러그인의 월 한도로 실제 PC 설치·연결·화면 입력은 아직 미확인입니다.
 
 ## 한 번 설치하기
 
-PC의 PowerShell에 아래 명령을 한 번 붙여넣고 실행합니다. 바탕화면에는 만들지 않습니다.
+PC의 PowerShell에 아래 명령을 한 번 붙여넣고 실행합니다. 이전 설치 명령의 404는 비공개 저장소를 익명 다운로드한 오류였습니다. 설치 코드를 공개 허브의 고정 배포본으로 바꿨습니다. 이전 실패를 설치 완료로 보지 않습니다.
 
 ```powershell
 irm 'https://raw.githubusercontent.com/kimjae134679/project-operations-hub/main/04_COMMUNICATION/remote-bridge/install.ps1' | iex
 ```
 
-설치 프로그램과 코드의 정확한 SHA를 검사하고 Windows에서 실행 프로그램을 만듭니다. 프로그램은 D:/A_KJ/AI/Applications/ProjectBridge/프로젝트연결.exe, 관리 대상은 기존 D:/AI/VoiceAudiobook입니다. 창 없는 작업 자식·로그인 시작·현재 로그인 중 명시적 종료 보존을 제공합니다. 로그인 작업 권한이 없으면 현재 사용자 Startup 폴더의 전용 바로가기를 사용합니다. 다른 앱·작업은 수정하지 않습니다.
+설치기 SHA와 manifest 및 13개 코드·안내·검사 파일의 SHA를 확인합니다. Windows에서 네이티브 EXE를 만들고 순수 x86/x64 입력 ABI 검사를 실행합니다. 프로그램 위치는 D:/A_KJ/AI/Applications/ProjectBridge/프로젝트연결.exe입니다. 바탕화면에 파일을 만들지 않습니다. Windows 로그인 때 창 없는 작업 자식·트레이로 시작합니다. 현재 로그인에서 명시적으로 연결 종료했다면 다음 로그인까지 종료를 유지합니다. 관리자 로그인 작업 등록이 안 되면 현재 사용자 Startup 전용 바로가기를 사용합니다.
 
-GitHub는 PC에 기존 로그인한 gh 또는 Git Credential Manager를 사용합니다. 인증이 없으면 PC의 GitHub 로그인을 한 번 완료해야 합니다. 토큰을 채팅에 붙이지 않습니다. OpenAI API 키와 추가 결제는 필요하지 않습니다. Windows 실제 컴파일·연결·브라우저 청취는 설치 후 확인합니다.
+GitHub는 PC의 기존 gh 또는 Git Credential Manager 로그인을 사용합니다. 인증이 없으면 PC에서 로그인을 한 번 완료합니다. 토큰을 채팅에 보내지 않습니다. 이 연결 자체에는 OpenAI API 키와 모델 API 결제가 필요하지 않습니다.
 
-검토 소스: [오디오북 PR](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/1). 고정 release commit: de2727f9740ae86ff022982d9ea257012193ba6d. 최초 코드 bundle SHA: 97ae1490c6d483e97eb511ddcf7f088ad24db3b5a954fe85c8b449f5324dfd35.
+## 다른 GPT와 다른 프로젝트에서 사용
 
-## 설치 뒤 진행할 일
+- [사람용 사용 안내](releases/20261006-v2/프로젝트_사용안내.md)
+- [공통 PC 작업 규약](releases/20261006-v2/UNIVERSAL_PROTOCOL.md)
+- [프로그램 동작·복구](releases/20261006-v2/README.md)
+
+GitHub 연결로 비공개 저장소를 읽고 쓸 수 있는 대화에서 사용합니다. 실제 PC 요청·명령·파일 내용·상세 출력·화면은 비공개 kimjae134679/Mushoku-Tensei-AI-Audiobook의 remote/pc-bridge branch를 사용합니다. 저장소 이름과 작업 범위는 별개이며 여러 프로젝트를 처리할 수 있습니다. 큐는 _pc_bridge/queue.json, 장치는 _pc_bridge/devices, 결과는 _pc_bridge/results입니다.
+
+처음 연결된 PC의 실제 deviceId와 마지막 연결 시각을 확인한 뒤 요청합니다. 비공개 통로가 준비됐다고 장치가 접속했다고 기록하지 않습니다. 일반 PC 요청은 기존 오디오북 제작 큐와 별도 스레드에서 처리합니다. 긴 작업은 소유 UUID ticket으로 상태를 확인하고 자신의 작업만 중지합니다. 파일 수정은 기존 SHA·백업·중복 실행 방지를 적용합니다.
+
+이미 실행한 장기 작업은 대화가 끝나도 PC가 켜져 있으면 진행할 수 있습니다. GPT가 새 판단을 계속하는 프로그램은 아니며, GPT와 GitHub 도구가 없는 대화에서 자동으로 사용할 수 있는 연결도 아닙니다. 잠긴 화면·UAC 보안 화면·사용자 권한의 실제 제약을 따릅니다.
+
+검토 소스: [PR](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/1). 공개 asset release commit: e057a73092f152637f7406c74a7f5c2855e76c63. manifest SHA: f7c40fa0a5a6eb3f80f7a44d0bdbec754b6294981acd44707033e97bea03eb5c. 최초 오디오북 코드 bundle SHA: 97ae1490c6d483e97eb511ddcf7f088ad24db3b5a954fe85c8b449f5324dfd35.
+
+## 검증 범위
+
+연결 관련 46개 검사 중 44개 통과, 2개는 Linux의 Windows 컴파일/ABI 및 실제 PID 시각 제약으로 건너뛰었습니다. 오디오북 청취 QA 18개는 통과했습니다. Windows 최초 설치·자동 시작·파일 작업 왕복·실제 화면 입력·새 MP3·사용자 청취 승인은 별도로 확인해야 합니다.
+
+## 오디오북 설치 뒤 진행할 일
 
 1. 현재 회차 상태와 표본 자료 개수를 확인합니다.
 2. 검토한 16개 코드/UI/테스트/안내를 기존 파일 SHA 검사·백업 후 적용합니다. 다른 로컬 수정이 있으면 덮어쓰지 않고 막힘으로 기록합니다.
@@ -35,9 +51,9 @@ GitHub는 PC에 기존 로그인한 gh 또는 Git Credential Manager를 사용�
 ## 통합소통과 결과
 
 - [대기 중 실행 요청](queue.json): 허용 작업만 있는 별도 운영 큐. 기존 task_exchange를 임의 실행하지 않습니다.
-- 실행 후 결과: results/<기기>/<작업>.json. 설치 전에는 결과 폴더가 없을 수 있습니다.
+- 오디오북 전용 실행 후 결과: results/<기기>/<작업>.json. 설치 전에는 결과 폴더가 없을 수 있습니다.
 - 같은 실행 응답을 표준 task_exchange로 04_COMMUNICATION/project-inbox/Mushoku-Audiobook에 등록해 관리 앱의 통합소통에서 읽게 합니다. 프로그램 응답은 AI 읽음·연기 승인과 구분합니다.
-- [프로그램 동작·복구·자료 보호](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/de2727f9740ae86ff022982d9ea257012193ba6d/bridge/README.md)
+- [프로그램 동작·복구·자료 보호](releases/20261006-v2/README.md)
 - [청취 QA 기준](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/de2727f9740ae86ff022982d9ea257012193ba6d/docs/AUDIO_QA_20261006.md)
 
 현재 상태: 코드 게시·정적 검증 완료 / Windows 최초 설치·실제 연결·새 MP3·청취 검증 대기. 2026-10-06.

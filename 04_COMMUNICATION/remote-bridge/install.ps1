@@ -1,10 +1,10 @@
 $ErrorActionPreference='Stop'
 [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
-$commit='de2727f9740ae86ff022982d9ea257012193ba6d'
-$url='https://raw.githubusercontent.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/'+$commit+'/bridge/install.ps1'
-$setup=Join-Path ([IO.Path]::GetTempPath()) ('ProjectBridgeSetup_'+[Guid]::NewGuid().ToString('N')+'.ps1')
+$taskSetupPath=Join-Path ([IO.Path]::GetTempPath()) ('ProjectBridge_setup_'+[Guid]::NewGuid().ToString('N')+'.ps1')
 try {
- Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $setup
- if((Get-FileHash -LiteralPath $setup -Algorithm SHA256).Hash.ToLowerInvariant() -ne '6e0f020ec156bc5ca76d94da516968982483819fe393978c5db4728d70ba4cf3'){throw 'Installer hash mismatch'}
- & ([scriptblock]::Create([IO.File]::ReadAllText($setup,[Text.Encoding]::UTF8))) -Commit $commit -ManifestSha256 '799c9b9fbd0e5f5fd74d8ad886a6be09cfcab9f9477af1727affdfba7cecfc75' -ApprovedBundleSha256 '97ae1490c6d483e97eb511ddcf7f088ad24db3b5a954fe85c8b449f5324dfd35' -StartAtLogin
-} finally {if(Test-Path -LiteralPath $setup){Remove-Item -LiteralPath $setup -Force}}
+ $url='https://raw.githubusercontent.com/kimjae134679/project-operations-hub/e057a73092f152637f7406c74a7f5c2855e76c63/04_COMMUNICATION/remote-bridge/releases/20261006-v2/install.ps1'
+ Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $taskSetupPath
+ if((Get-FileHash -LiteralPath $taskSetupPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne '34cbd7c62a1fe09d673704dc5a83a8badd7138cb1a31e9350a80562dcdc12e0e'){throw 'ProjectBridge installer hash mismatch'}
+ $taskInstaller=[ScriptBlock]::Create([IO.File]::ReadAllText($taskSetupPath,[Text.Encoding]::UTF8))
+ & $taskInstaller -Commit 'e057a73092f152637f7406c74a7f5c2855e76c63' -ManifestSha256 'f7c40fa0a5a6eb3f80f7a44d0bdbec754b6294981acd44707033e97bea03eb5c' -ApprovedBundleSha256 '97ae1490c6d483e97eb511ddcf7f088ad24db3b5a954fe85c8b449f5324dfd35' -StartAtLogin
+} finally {Remove-Item -LiteralPath $taskSetupPath -Force -ErrorAction SilentlyContinue}

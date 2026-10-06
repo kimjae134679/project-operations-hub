@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "pc-bridge-general-20261006",
+  "revision": 1,
+  "title": "ProjectBridge를 모든 프로젝트의 공용 PC 연결로 확장",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-universal-pc-bridge",
+  "receivedAt": "2026-10-06T22:29:49+09:00",
+  "updatedAt": "2026-10-06T22:56:00+09:00",
+  "request": {
+    "summary": "오디오북뿐 아니라 GPT가 다른 작업을 할 때도 사용할 공용 PC 연결을 요청",
+    "details": "사용자 지시: 해당 오디오 뿐만이 아닌 GPT 너가 뭘 하든 무얼하든 다 대응되는걸로 해줘. 앞선 요청의 통합소통 연계·Windows 로그인 자동 실행·바탕화면 변경 금지도 유지.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "여러 프로젝트의 파일·명령·설치·빌드·장기 실행과 Windows 화면·입력 연결을 구현하고 공개 배포 경로를 수정",
+    "details": "공개 소스와 비공개 PC 작업 통로를 분리했다. GitHub에 접근 가능한 다른 GPT 대화에서 작업 규약과 실제 deviceId를 확인해 요청할 수 있다. 실제 PC 설치·인증·연결·화면 입력은 설치 이후 확인해야 한다. 이 연결은 GPT 모델을 자동 호출하지 않는다.",
+    "source": "current_chat"
+  },
+  "status": "blocked",
+  "workDone": [
+    "공용 요청·결과를 위한 전용 비공개 branch remote/pc-bridge 구성",
+    "장치 선택·만료·의존 작업·중복 실행 방지·실패한 전송 재시도 구현",
+    "파일 읽기/수정/목록과 소유 ticket을 이용한 명령·비동기 실행·상태/중지 구현",
+    "Windows 화면 캡처·창 목록·클릭·스크롤·문자·키·창 선택 helper 구현",
+    "창 없는 사용자 로그인 시작·자신의 worker 복구·통합소통 진입점 유지",
+    "비공개 저장소 익명 다운로드로 발생한 404 경로를 공개 허브의 commit/SHA 고정 배포본으로 수정",
+    "공용 사용 안내·작업 규약·도구 등록·통합소통 인수인계 게시"
+  ],
+  "verification": [
+    {
+      "name": "공용 연결 자동 검사",
+      "result": "pass",
+      "evidence": [
+        "46개 실행 중 44개 통과·2개 건너뜀. 장치 오선택·공개 상태 실행 차단·비공개 결과·중복/재시도·파일 보호·명령 종료 코드·화면 요청 형식을 확인"
+      ]
+    },
+    {
+      "name": "Windows 환경 검사",
+      "result": "not_run",
+      "evidence": [
+        "Linux에서 Windows helper 컴파일/x86·x64 ABI와 외부 실제 PID 생성 시각 검사는 건너뜀. 실제 Windows 설치·자동 시작·화면 입력 완료를 뜻하지 않음"
+      ]
+    },
+    {
+      "name": "기존 청취 QA",
+      "result": "pass",
+      "evidence": [
+        "기존 오디오북 청취 QA 18개 검사 통과. 기존 제작 큐와 비교 bundle 승인 SHA 보존"
+      ]
+    },
+    {
+      "name": "공개 배포",
+      "result": "partial",
+      "evidence": [
+        "공개 asset release e057a73092f152637f7406c74a7f5c2855e76c63",
+        "원본 검토 source commit 7e54a1b06ab7694559aa1b2bfd6bb5ba546beb94",
+        "Manifest SHA f7c40fa0a5a6eb3f80f7a44d0bdbec754b6294981acd44707033e97bea03eb5c",
+        "PC 최초 설치와 외부 요청 왕복은 미실행"
+      ]
+    }
+  ],
+  "nextActions": [
+    "PC에서 수정한 공개 설치 명령을 한 번 실행하고 기존 GitHub 인증 확인",
+    "실제 장치 ID/연결 시각을 확인한 뒤 capabilities·파일·화면 왕복 검사",
+    "기존 오디오북 상태를 먼저 확인하고 등록된 QA/비교 작업을 중복 없이 진행"
+  ],
+  "blockers": [
+    "PC 제어 플러그인의 월 사용량 한도로 이 세션에서 PC 최초 설치·인증·Windows 실행을 직접 확인할 수 없음"
+  ],
+  "supersedes": []
+}

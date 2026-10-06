@@ -25,7 +25,7 @@
 | AI Control Tower | 0.2.0 | `D:\A_KJ\AI\Applications\AIControlTower\AIControlTower.exe`; 소스 `D:\A_KJ\AI\Projects\project-operations-hub\ai-control-tower` | 새 프로젝트 작업실·owned Windows job·공유 리모트 중계. 설정/작업 기록/백업은 `%LocalAppData%\AIControlTower` 유지. 옛 LocalAppData EXE는 복구용 보존. 실제 최종 검증/해시는 ai-control-tower/docs/VERIFICATION-20261005.md |
 | Unity iOS Build Support | 6000.3.14f1 | C:/Program Files_My/A_3D/Unity_Hub/Unity_Editor/6000.3.14f1/Editor/Data/PlaybackEngines/iOSSupport | 2026-09-25 공식 Unity CLI 설치 성공. 기존 Unity Editor 종속 모듈이므로 공식 설치 위치 유지. Windows에서 Xcode 프로젝트 내보내기용이며 Mac/Xcode는 별도 필요. 원격 에디터 실행은 PhoneLoL_02/Automation/OpenUnity.ps1 사용 |
 
-| 무직전생 AI 오디오북 | VoxCPM2 원본참조 / 록시 CosyVoice3 선호 유지 | D:/AI/VoiceAudiobook; 환경 D:/AI/envs; 추가 모델 D:/A_KJ/AI/Models, 검토 환경 Workspace/VoiceBench | 현재 실행기 무직전생.exe / 오디오북제작.exe. 본편15~24 준비128회차, 완성 수는 실제 로컬 상태 확인 필요. 원본참조 새 판과 이전 판 분리. 원격 월 한도 이후 실제 PC 변경 미확인. [전용 연결 설치 대기](../04_COMMUNICATION/remote-bridge/README.md) |
+| 무직전생 AI 오디오북 | VoxCPM2 원본참조 / 록시 CosyVoice3 선호 유지 | D:/AI/VoiceAudiobook; 환경 D:/AI/envs; 추가 모델 D:/A_KJ/AI/Models, 검토 환경 Workspace/VoiceBench | 현재 실행기 무직전생.exe / 오디오북제작.exe. 본편15~24 준비128회차, 완성 수는 실제 로컬 상태 확인 필요. 원본참조 새 판과 이전 판 분리. 원격 월 한도 이후 실제 PC 변경 미확인. [공용 연결 설치 대기](../04_COMMUNICATION/remote-bridge/README.md) |
 
 ## 인수인계 필수 항목
 모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.
@@ -42,6 +42,6 @@
 - 보안: localhost 전용. 외부 tunnel/public webhook은 별도 승인·인증 설계 전에는 열지 않습니다.
 
 
-## ProjectBridge — 새 도구 준비, 설치 미확인
+## ProjectBridge 2.0 — 공용 PC 도구 준비, 설치 미확인
 
-사용자 요청으로 프로젝트 전용 연결 코드를 준비했습니다. 목표 D:/A_KJ/AI/Applications/ProjectBridge/프로젝트연결.exe; 관리 대상 D:/AI/VoiceAudiobook. Windows 컴파일/실행과 실제 연결은 최초 설치 후 확인하며 설치됨으로 등록하지 않습니다. [설치 및 검증](../04_COMMUNICATION/remote-bridge/README.md).
+목표 D:/A_KJ/AI/Applications/ProjectBridge/프로젝트연결.exe. 기존 D:/AI/VoiceAudiobook과 다른 프로젝트의 파일·명령·설치·빌드·실행·화면 입력을 요청합니다. 새 비공개 PC branch와 공개 소스 배포를 구성했습니다. 바탕화면 파일 없이 사용자 로그인 때 트레이·창 없는 worker로 시작하도록 준비했습니다. 기존 인증·자료·안정 설치는 기존 위치를 유지합니다. 실제 Windows 컴파일·로그인 자동 실행·왕복은 최초 설치 후 확인하며 설치됨으로 등록하지 않습니다. [설치 및 검증](../04_COMMUNICATION/remote-bridge/README.md).

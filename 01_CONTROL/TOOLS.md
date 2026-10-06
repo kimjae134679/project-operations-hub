@@ -43,6 +43,6 @@ n8n bridge는 현재 `127.0.0.1:5678`에만 연결하며 외부 공개 endpoint�
 - [VoiceStudio 사용 안내](D:/A_KJ/AI/Applications/VoiceStudio/프로젝트_사용안내.md): D실행기, 기존 음원·배역·더빙작업·공유모델·환경 위치.
 - [Zonos2 사용 안내](D:/A_KJ/AI/Applications/Zonos2/프로젝트_사용안내.md): 앱/CLI/server와 외부Q8 모델 위치. 기본 BAT의 q6 신규다운로드 가능성 때문에 자동 실행하지 않습니다.
 
-## 프로젝트 전용 연결 — 설치 대기
+## 공용 PC 연결 — 설치 대기
 
-ProjectBridge는 사용자 요청으로 준비한 무직전생 전용 연결입니다. 월 한도가 차단된 Remote Desktop Commander와 별개이며 임의 PC 제어를 제공하지 않습니다. 코드·허용 작업·로컬 QA 저장·표준 통합소통 기록을 준비했고 실제 Windows 설치/연결은 대기입니다. [최초 설치·실행 상태](../04_COMMUNICATION/remote-bridge/README.md). 대상 D:/AI/VoiceAudiobook, 새 프로그램 D:/A_KJ/AI/Applications/ProjectBridge. 임의 shell이나 공개 원문/오디오 전송은 없습니다.
+ProjectBridge 2.0은 사용자 요청으로 오디오북과 여러 프로젝트에 사용할 공용 연결로 확장했습니다. 파일·명령·설치·빌드·장기 작업·화면·마우스·키보드를 지원하는 코드를 게시했습니다. 실제 요청·명령·출력·화면은 전용 비공개 branch에서만 교환하고 통합소통에는 요약을 남깁니다. Remote Desktop Commander의 월 한도와 별개입니다. 목표 D:/A_KJ/AI/Applications/ProjectBridge, 기존 안정 프로젝트 위치는 유지합니다. Windows 최초 설치·실제 연결은 대기입니다. [설치·동작·검증](../04_COMMUNICATION/remote-bridge/README.md).
