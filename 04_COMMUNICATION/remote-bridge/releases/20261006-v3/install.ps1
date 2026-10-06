@@ -1,4 +1,4 @@
-﻿param(
+param(
  [ValidatePattern('^[a-f0-9]{40}$')][string]$Commit,
  [ValidatePattern('^[a-f0-9]{64}$')][string]$ManifestSha256,
  [string]$SourceDirectory,
@@ -13,6 +13,41 @@ $installMutex=New-Object -TypeName System.Threading.Mutex -ArgumentList @($false
 try{$hasInstallLock=$installMutex.WaitOne(0)}catch [System.Threading.AbandonedMutexException]{$hasInstallLock=$true}
 if(!$hasInstallLock){ $installMutex.Dispose();throw 'Another ProjectBridge install is running' }
 $installTouched=$false;$installationCommitted=$false;$backup=$null;$priorFlags=@{}
+function Assert-OwnedFileWritable([string]$Path){
+ if([IO.File]::Exists($Path)){
+  $info=Get-Item -LiteralPath $Path -Force
+  if($info.PSIsContainer -or ($info.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw ('Install file is not a regular file: '+$Path)}
+  if(($info.Attributes -band [IO.FileAttributes]::ReadOnly) -ne 0){throw ('Install file is read-only; installation was not changed: '+$Path)}
+  $stream=$null
+  try{$stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Write,[IO.FileShare]::Read)}
+  finally{if($stream){$stream.Dispose()}}
+ }elseif([IO.Directory]::Exists($Path)){throw ('Install file path is a directory: '+$Path)}
+}
+function Write-OwnedUtf8([string]$Path,[string]$Text){
+ # FileMode.Create (WriteAllText) rejects existing Hidden files on Windows.
+ # Open preserves the owned file's ACL/attributes; truncate after writing.
+ Assert-OwnedFileWritable $Path
+ $mode=if([IO.File]::Exists($Path)){[IO.FileMode]::Open}else{[IO.FileMode]::CreateNew}
+ $bytes=(New-Object Text.UTF8Encoding($false)).GetBytes($Text);$stream=$null
+ try{
+  $stream=[IO.File]::Open($Path,$mode,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+  $stream.Write($bytes,0,$bytes.Length);$stream.SetLength($bytes.Length);$stream.Flush($true)
+ }finally{if($stream){$stream.Dispose()}}
+}
+function Assert-InstallWritable([string]$Root,[string[]]$RelativeFiles){
+ # Check real upgrade destinations before the running bridge is stopped.
+ foreach($name in $RelativeFiles){Assert-OwnedFileWritable (Join-Path $Root $name)}
+ $ancestor=$Root
+ while(![IO.Directory]::Exists($ancestor)){
+  $parent=Split-Path -Parent $ancestor
+  if(!$parent -or $parent -eq $ancestor){throw 'No existing installation ancestor'}
+  $ancestor=$parent
+ }
+ $probe=Join-Path $ancestor ('.ProjectBridge-write-probe-'+[guid]::NewGuid().ToString('N'))
+ $stream=$null;$created=$false
+ try{$stream=[IO.File]::Open($probe,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None);$created=$true}
+ finally{if($stream){$stream.Dispose()};if($created){Remove-Item -LiteralPath $probe -Force}}
+}
 function Invoke-HiddenTool([string]$File,[string[]]$Arguments,[string]$WorkingDirectory){
  $info=New-Object Diagnostics.ProcessStartInfo
  $info.FileName=$File;$info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.WindowStyle='Hidden'
@@ -184,7 +219,8 @@ try {
   if($tested.Output){Write-Output $tested.Output};if($tested.Error){Write-Output $tested.Error}
   if($tested.ExitCode -ne 0){throw 'Bridge release tests failed; existing installation remains untouched'}
  }finally{Set-Location -LiteralPath $priorLocation.Path}
- if($ValidateOnly){Write-Output 'Preflight passed: all release hashes, native compilation and staged tests; existing installation untouched.';return}
+ Assert-InstallWritable $target (@($destinations.Values)+@('config.json'))
+ if($ValidateOnly){Write-Output 'Preflight passed: all release hashes, native compilation, staged tests and destination write access; existing installation untouched.';return}
  # All downloads, hashes, compilation and tests have passed before stopping v2.
  New-Item -ItemType Directory -Force -Path $target,$statePath,$runtimePath|Out-Null
  $backup=Join-Path $statePath ('install-backups\'+[DateTime]::UtcNow.ToString('yyyyMMdd_HHmmss_ffff'))
@@ -224,7 +260,7 @@ try {
   foreach($name in $destinations.Keys){
    $destination=Join-Path $target $destinations[$name];New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)|Out-Null;Copy-Item -LiteralPath (Join-Path $stage $name) -Destination $destination -Force
   }
-  [IO.File]::WriteAllText($configPath,($cfg|ConvertTo-Json -Depth 12),(New-Object Text.UTF8Encoding($false)))
+  Write-OwnedUtf8 $configPath ($cfg|ConvertTo-Json -Depth 12)
  }catch{
   throw
  }
