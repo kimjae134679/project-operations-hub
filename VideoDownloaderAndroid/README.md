@@ -1,10 +1,13 @@
 # 영상다운로더 Android
 
+설치파일: [Galaxy S22·64비트 Android용 APK 1.0.2](https://github.com/kimjae134679/project-operations-hub/releases/download/video-downloader-android-v1.0.2/VideoDownloader-1.0.2-arm64-v8a.apk). [전체 배포 파일](https://github.com/kimjae134679/project-operations-hub/releases/tag/video-downloader-android-v1.0.2)에서 32비트 APK와 SHA256 체크섬도 확인할 수 있습니다.
+
 휴대폰에서 링크를 입력하고 이름 있는 목록으로 관리한 뒤 영상·음원을 직접 저장하는 앱입니다. PC 서버가 필요 없습니다. Android 10 이상이며 Galaxy S22는 arm64-v8a 설치파일을 사용합니다.
 
 - [설치·자료·사용 안내](프로젝트_사용안내.md)
 - [Android 소스](app/src/main/)
 - [화면 QA](qa/)
+- [실제 검증 범위와 남은 한계](검증결과.md)
 - 검증 후 생성되는 설치파일·화면·검증 근거: `dist/`
 
 ## 기능

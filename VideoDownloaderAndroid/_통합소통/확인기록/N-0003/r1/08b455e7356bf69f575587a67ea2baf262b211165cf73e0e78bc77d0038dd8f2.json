@@ -7,9 +7,10 @@
   "actorId": "Codex-VideoDownloader",
   "sessionId": "android-apk-20261006",
   "checkedAt": "2026-10-06T13:34:51.486800+00:00",
-  "applicationStatus": "pending",
-  "note": "본문을 읽었습니다. Android 구현/검증 중이며 기존 PC 소통함 수집은 확인되지 않았습니다.",
+  "applicationStatus": "applied",
+  "note": "공식 엔진 API 조사·독립 코드 검토·네이티브 엔진/화면 QA를 사용. 로컬 SDK 권한과 네트워크 제한은 GitHub 빌드로 대체. 실기기·모든 외부 사이트는 미검증으로 구분. 성능 절감률 주장 없음.",
   "evidence": [
-    "VideoDownloaderAndroid/프로젝트_사용안내.md"
-  ]
+    "https://github.com/kimjae134679/project-operations-hub/actions/runs/37476104820"
+  ],
+  "appliedAt": "2026-10-06T14:11:59.840940+00:00"
 }

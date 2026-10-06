@@ -7,9 +7,10 @@
   "actorId": "Codex-VideoDownloader",
   "sessionId": "android-apk-20261006",
   "checkedAt": "2026-10-06T13:34:51.481935+00:00",
-  "applicationStatus": "pending",
-  "note": "본문을 읽었습니다. Android 구현/검증 중이며 기존 PC 소통함 수집은 확인되지 않았습니다.",
+  "applicationStatus": "applied",
+  "note": "한국어 목록 중심 UI, 작은 화면·긴 제목·테마·모든 표시 버튼·실제 Android 시스템바 영역과 렌더링 캡처 확인. APK 1.0.2 설치 안내와 검증 범위 갱신.",
   "evidence": [
-    "VideoDownloaderAndroid/프로젝트_사용안내.md"
-  ]
+    "https://github.com/kimjae134679/project-operations-hub/actions/runs/37476104820"
+  ],
+  "appliedAt": "2026-10-06T14:11:59.672994+00:00"
 }
