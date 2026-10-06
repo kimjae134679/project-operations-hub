@@ -20,8 +20,15 @@ function Assert-ExistingConfigWritable([string]$Path){
  try{
   $item=Get-Item -LiteralPath $Path -Force
   if($item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Existing config is not a regular file'}
+  # Open access alone does not prove the later WriteAllText create/truncate
+  # operation will succeed. Refuse Hidden/System without changing attributes.
+  $blockingAttributes=$item.Attributes -band ([IO.FileAttributes]::Hidden -bor [IO.FileAttributes]::System)
+  if($blockingAttributes -ne 0){throw ('config_writealltext_attribute_conflict_before_install: '+$blockingAttributes.ToString())}
   $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read)
- }catch{throw 'config_not_writable_before_install'}
+ }catch{
+  if($_.Exception.Message.StartsWith('config_writealltext_attribute_conflict_before_install:',[StringComparison]::Ordinal)){throw}
+  throw 'config_not_writable_before_install'
+ }
  finally{if($stream){$stream.Dispose()}}
 }
 function Invoke-HiddenTool([string]$File,[string[]]$Arguments,[string]$WorkingDirectory){
@@ -75,7 +82,7 @@ $runtimePath=Join-Path $target 'Runtime'
 $statePath=Join-Path $target 'state'
 $configPath=Join-Path $target 'config.json'
 $exePath=Join-Path $target $exeName
-$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py','tests/test_file_crud.py','tests/test_mcp_control.py')
+$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py','tests/test_file_crud.py','tests/test_mcp_control.py','tests/test_installer_preflight.py')
 foreach($hash in $ApprovedBundleSha256){if($hash -notmatch '^[a-f0-9]{64}$'){throw 'Invalid approved bundle hash'}}
 $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $stage=Join-Path $tempRoot ('ProjectBridge3_'+[Guid]::NewGuid().ToString('N'))

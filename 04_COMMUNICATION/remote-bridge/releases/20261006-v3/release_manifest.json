@@ -36,7 +36,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "a00f44732d9c99f07d78b513c98ab06f9c0a1dd91e32d7225e2f30c90f7b9daf"
+      "sha256": "1b2e09ff89bdbac7dfc5689b9b4d27e0ec97ee8fef55fd1de07c2210979f2688"
     },
     {
       "path": "UNIVERSAL_PROTOCOL.md",
@@ -44,7 +44,7 @@
     },
     {
       "path": "프로젝트_사용안내.md",
-      "sha256": "9708447a98b63b6f44228127eb9738a96b972c222fb400d5dbd55e5567b32a55"
+      "sha256": "f1083f542483aa8b142aa3aa42bf3a6e05cf5ff57ba97e952367990cfee4aaad"
     },
     {
       "path": "tests/test_bridge.py",
@@ -81,6 +81,10 @@
     {
       "path": "tests/test_mcp_control.py",
       "sha256": "ae5ed617e29cff038aceb0b25299365f0b8c065cbc892fd1c75cbbe4876613cf"
+    },
+    {
+      "path": "tests/test_installer_preflight.py",
+      "sha256": "a4eb677990d0199a9ccb5e0e06dbc9c44f84598b5ff70371199aab182a2348aa"
     }
   ]
 }

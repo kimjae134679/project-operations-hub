@@ -28,4 +28,6 @@ powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File inst
 
 개발 환경에서 검사와 빌드가 완료된 것과 사용자 PC에서 설치·자동 시작·원격 왕복이 검증된 것은 구분해서 기록해야 합니다. 설치 성공만으로 원격 연결 성공이라고 표시하지 않습니다.
 
+설치 사전 검사는 기존 `config.json`에 Hidden 또는 System 속성이 있으면 `config_writealltext_attribute_conflict_before_install`과 해당 속성을 표시하고 브리지 중지·설치 파일 교체 전에 중단합니다. 읽기·쓰기 접근 검사가 통과해도 이후 `WriteAllText`의 생성·잘라쓰기 동작은 이 속성 때문에 거부될 수 있습니다. 설정 내용·속성·ACL을 변경하거나 자동으로 권한을 우회하지 않습니다. 이 소스 방어와 검사 통과는 운영 설치 완료 또는 과거 실패 원인 확정을 뜻하지 않습니다.
+
 장기 작업 저널의 `monitoring`은 별도 실행 중인 등록 작업의 확인을 이어가는 상태입니다. 최초 시작 접수는 `acceptedResult`에 보존하며 `result`와 로컬 결과 파일은 현재 상태·실제 종료 결과를 기록합니다. 시작 접수만으로 비공개 중계 결과나 공개 성공 기록을 게시하지 않습니다. 상세 동작과 유지보수 제한은 [공통 규약](UNIVERSAL_PROTOCOL.md)을 따릅니다.
