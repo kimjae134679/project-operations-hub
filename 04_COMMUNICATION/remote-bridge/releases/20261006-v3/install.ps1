@@ -28,6 +28,19 @@ function Invoke-HiddenTool([string]$File,[string[]]$Arguments,[string]$WorkingDi
   return $result
  }finally{$process.Dispose()}
 }
+function Start-InstalledBridge([bool]$Registered){
+ # Installation is an authorized resume. Clear the same flags as --resume
+ # before the task's --background action checks the current login stop state.
+ foreach($name in @('stop.flag','disconnected.flag','stopped_logon.txt')){
+  $flag=Join-Path $statePath $name
+  if(Test-Path -LiteralPath $flag){Remove-Item -LiteralPath $flag -Force}
+ }
+ if($Registered){
+  try{Start-ScheduledTask -TaskName $taskName -ErrorAction Stop;return}
+  catch{Write-Output 'Login task could not start now; using hidden native resume.'}
+ }
+ Start-Process -FilePath $exePath -ArgumentList '--resume' -WorkingDirectory $target -WindowStyle Hidden
+}
 $exeName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0xc5f0,0xacb0,0x2e,0x65,0x78,0x65) -join '')
 $guideName=([char[]]@(0xd504,0xb85c,0xc81d,0xd2b8,0x5f,0xc0ac,0xc6a9,0xc548,0xb0b4,0x2e,0x6d,0x64) -join '')
 $target='D:\A_KJ\AI\Applications\ProjectBridge'
@@ -105,6 +118,7 @@ try {
   if(!$runtimeInfo.PSIsContainer -or ($runtimeInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Runtime path is not a normal owned installation directory'}
  }
  $taskName='ProjectBridge_Login';$shortcutPath=Join-Path ([Environment]::GetFolderPath('Startup')) 'ProjectBridge_Login.lnk'
+ $taskRegistered=$false
  if($StartAtLogin){
   $task=Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
   if($task -and (@($task.Actions).Count -ne 1 -or $task.Actions[0].Execute -ne $exePath -or $task.Actions[0].Arguments -ne '--background')){throw 'Existing login task is not owned by this bridge'}
@@ -174,7 +188,7 @@ try {
  }
  # The recorded bridge child is separate from audiobook production; only this
  # exact child and the native launcher at this installation path may be stopped.
- foreach($info in @(Get-CimInstance Win32_Process -Filter "Name=$exeName" -ErrorAction SilentlyContinue)){
+ foreach($info in @(Get-CimInstance Win32_Process -Filter ("Name='"+$exeName+"'") -ErrorAction SilentlyContinue)){
   if($info.ExecutablePath -eq $exePath){
    $candidate=Get-Process -Id $info.ProcessId -ErrorAction SilentlyContinue
    if($candidate){$birth=$candidate.StartTime.ToUniversalTime().ToString('o');$live=Get-Process -Id $candidate.Id -ErrorAction SilentlyContinue;if($live -and $live.Path -eq $exePath -and $live.StartTime.ToUniversalTime().ToString('o') -eq $birth){Stop-Process -Id $live.Id -Force}}
@@ -198,14 +212,14 @@ try {
   $trigger=New-ScheduledTaskTrigger -AtLogOn -User $identity
   $principal=New-ScheduledTaskPrincipal -UserId $identity -LogonType Interactive -RunLevel Limited
   $settings=New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -StartWhenAvailable
-  try{Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description 'ProjectBridge 3.0 hidden shared executor; local jobs do not require GitHub' -Force|Out-Null}
+  try{Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description 'ProjectBridge 3.0 hidden shared executor; local jobs do not require GitHub' -Force|Out-Null;$taskRegistered=$true}
   catch{
    $shell=New-Object -ComObject WScript.Shell;$shortcut=$shell.CreateShortcut($shortcutPath)
    if((Test-Path -LiteralPath $shortcutPath) -and ($shortcut.TargetPath -ne $exePath -or $shortcut.Arguments -ne '--background')){throw 'Unowned startup shortcut preserved'}
    $shortcut.TargetPath=$exePath;$shortcut.Arguments='--background';$shortcut.WorkingDirectory=$target;$shortcut.Save()
   }
  }
- Start-Process -FilePath $exePath -ArgumentList '--resume' -WorkingDirectory $target -WindowStyle Hidden
+ Start-InstalledBridge $taskRegistered
  $installationCommitted=$true
  # Only remove checked copies from the old flat layout after the new worker
  # can be started. Unknown/user-edited files are preserved in place.

@@ -115,22 +115,33 @@ class BridgeLauncher : Form {
             jobs.BeginUpdate();jobs.Items.Clear();object raw=Value(row,"jobs",null);var list=raw as System.Collections.IEnumerable;
             if(list!=null)foreach(object element in list){var j=element as Dictionary<string,object>;if(j==null)continue;string s=Convert.ToString(Value(j,"state",""));string outcome=Convert.ToString(Value(j,"outcome",""));
                 var item=new ListViewItem(Convert.ToString(Value(j,"title",Value(j,"action","PC 작업"))));item.SubItems.Add(Convert.ToString(Value(j,"projectId","")));item.SubItems.Add(Convert.ToString(Value(j,"toolId","")));
-                item.SubItems.Add(s=="started"?"실행 중":s=="queued"?"대기":outcome=="completed"?"완료":outcome=="interrupted"?"중단 · 확인 필요":"실패 · 확인 필요");item.SubItems.Add(Convert.ToString(Value(j,"id","")));
-                item.ForeColor=s=="started"?Color.RoyalBlue:s=="queued"?Color.DarkGoldenrod:outcome=="completed"?Color.SeaGreen:Color.Firebrick;jobs.Items.Add(item);
+                string phase=s=="finished"||s=="published"||s==""?outcome:s;string phaseLabel;Color phaseColor;
+                switch(phase){
+                    case "started":case "running":phaseLabel="실행 중";phaseColor=Color.RoyalBlue;break;
+                    case "starting":phaseLabel="시작 중";phaseColor=Color.RoyalBlue;break;
+                    case "queued":phaseLabel="대기";phaseColor=Color.DarkGoldenrod;break;
+                    case "completed":phaseLabel="완료";phaseColor=Color.SeaGreen;break;
+                    case "timed_out":phaseLabel="시간 초과";phaseColor=Color.Firebrick;break;
+                    case "interrupted":phaseLabel="중단 · 확인 필요";phaseColor=Color.Firebrick;break;
+                    case "failed":phaseLabel="실패 · 확인 필요";phaseColor=Color.Firebrick;break;
+                    case "stopped":phaseLabel="중지";phaseColor=Color.DimGray;break;
+                    default:phaseLabel="상태 확인 필요";phaseColor=Color.DimGray;break;
+                }
+                item.SubItems.Add(phaseLabel);item.SubItems.Add(Convert.ToString(Value(j,"id","")));item.ForeColor=phaseColor;jobs.Items.Add(item);
             }jobs.EndUpdate();
         }catch{status.Text=stopped?"● 연결 꺼짐":"● 연결 준비 중 · 자동 확인";}
     }
     [STAThread]static void Main(string[] args){
         string stateDir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"state");Directory.CreateDirectory(stateDir);
-        bool resume=Array.IndexOf(args,"--resume")>=0;
+        bool resume=Array.IndexOf(args,"--resume")>=0, background=Array.IndexOf(args,"--background")>=0;
         if(Array.IndexOf(args,"--pause")>=0){File.WriteAllText(Path.Combine(stateDir,"disconnected.flag"),"paused by management program");return;}
         if(Array.IndexOf(args,"--stop")>=0){File.WriteAllText(Path.Combine(stateDir,"stopped_logon.txt"),LogonId());File.WriteAllText(Path.Combine(stateDir,"stop.flag"),"stopped by management program");return;}
         if(resume)foreach(string n in new[]{"stopped_logon.txt","stop.flag","disconnected.flag"}){string p=Path.Combine(stateDir,n);if(File.Exists(p))File.Delete(p);}
         bool created;using(var mutex=new Mutex(true,"Local\\ProjectBridge_"+InstanceKey(),out created)){
             string eventName="Local\\ProjectBridge_Show_"+InstanceKey();
-            if(!created){if(!resume)try{using(var existing=EventWaitHandle.OpenExisting(eventName))existing.Set();}catch{}return;}
+            if(!created){if(!resume&&!background)try{using(var existing=EventWaitHandle.OpenExisting(eventName))existing.Set();}catch{}return;}
             using(showSignal=new EventWaitHandle(false,EventResetMode.AutoReset,eventName)){
-                Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);Application.Run(new BridgeLauncher(resume||Array.IndexOf(args,"--background")>=0));
+                Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);Application.Run(new BridgeLauncher(resume||background));
             }
         }
     }

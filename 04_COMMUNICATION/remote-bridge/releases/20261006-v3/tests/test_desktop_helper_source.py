@@ -13,6 +13,42 @@ SOURCE = Path(__file__).resolve().parents[1] / 'DesktopAutomation.cs'
 
 
 class DesktopHelperContract(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows installer task supervision')
+    def test_installer_starts_registered_task_after_resume_flags_and_hidden_fallback(self):
+        import base64
+        with tempfile.TemporaryDirectory() as temp:
+            script=r'''
+$ErrorActionPreference='Stop'
+$errors=$null;$tokens=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('INSTALL_PATH',[ref]$tokens,[ref]$errors)
+if($errors){throw 'Installer parse failed'}
+$function=$ast.Find({param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Start-InstalledBridge'},$true)
+if(!$function){throw 'Startup function missing'}
+Invoke-Expression $function.Extent.Text
+$statePath='STATE_PATH';New-Item -ItemType Directory -Path $statePath|Out-Null
+$target='fixture';$exePath='fixture.exe';$taskName='fixture'
+$script:taskCalls=0;$script:nativeCalls=0;$script:failTask=$false
+function Start-ScheduledTask($TaskName,$ErrorAction){
+ foreach($name in @('stop.flag','disconnected.flag','stopped_logon.txt')){if(Test-Path (Join-Path $statePath $name)){throw 'Stop flag remained before task launch'}}
+ $script:taskCalls++
+ if($script:failTask){throw 'Simulated task start unavailable'}
+}
+function Start-Process($FilePath,$ArgumentList,$WorkingDirectory,$WindowStyle){
+ if($WindowStyle -ne 'Hidden' -or $ArgumentList -ne '--resume'){throw 'Visible fallback'}
+ $script:nativeCalls++
+}
+foreach($name in @('stop.flag','disconnected.flag','stopped_logon.txt')){[IO.File]::WriteAllText((Join-Path $statePath $name),'stopped')}
+Start-InstalledBridge $true
+if($script:taskCalls -ne 1 -or $script:nativeCalls -ne 0){throw 'Task did not own initial launcher'}
+$script:failTask=$true
+Start-InstalledBridge $true
+if($script:taskCalls -ne 2 -or $script:nativeCalls -ne 1){throw 'Task failure did not use hidden native resume'}
+Start-InstalledBridge $false
+if($script:taskCalls -ne 2 -or $script:nativeCalls -ne 2){throw 'No-task startup failed'}
+'''.replace('INSTALL_PATH',str(SOURCE.with_name('install.ps1')).replace("'","''")).replace('STATE_PATH',str(Path(temp)/'state').replace("'","''"))
+            command=base64.b64encode(script.encode('utf-16le')).decode('ascii')
+            result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-EncodedCommand',command],capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=20,creationflags=subprocess.CREATE_NO_WINDOW)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
     def test_background_launcher_never_shows_window_and_accepts_shutdown_query(self):
         if os.name!='nt':self.skipTest('Windows native launcher required')
         compiler=Path(os.environ.get('WINDIR',r'C:\Windows'))/'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
@@ -35,7 +71,7 @@ class DesktopHelperContract(unittest.TestCase):
                     windows.append(hwnd)
                     if user.IsWindowVisible(hwnd):visible.append(hwnd)
                 return 1
-            callback=callback_type(each);endpoint=None
+            callback=callback_type(each);endpoint=None;duplicate_started=False
             try:
                 deadline=time.monotonic()+3
                 while time.monotonic()<deadline:
@@ -44,9 +80,14 @@ class DesktopHelperContract(unittest.TestCase):
                     if path.exists():
                         try:endpoint=json.loads(path.read_text(encoding='utf-8'))
                         except ValueError:pass
+                    if endpoint is not None and not duplicate_started:
+                        duplicate_started=True
+                        for flag in ('--background','--resume'):
+                            subprocess.run([str(exe),flag],timeout=3,creationflags=subprocess.CREATE_NO_WINDOW)
                     time.sleep(.02)
                 self.assertEqual(visible,[],'Background launcher displayed a window')
                 self.assertIsNotNone(endpoint,'Hidden launcher did not start local endpoint')
+                self.assertTrue(duplicate_started,'Duplicate hidden invocation was not exercised')
                 headers={'X-ProjectBridge-Token':endpoint['token']}
                 with urllib.request.urlopen(urllib.request.Request(endpoint['baseUrl']+'/v1/status',headers=headers),timeout=3) as response:status=json.load(response)
                 self.assertTrue(status['localReady']);self.assertEqual(status['deviceId'],'test-device')

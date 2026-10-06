@@ -8,7 +8,7 @@
     },
     {
       "path": "BridgeLauncher.cs",
-      "sha256": "22d404844f0d22bc32f587b040a4fc07e3198386515dfd86cbe9dbb439fa4d31"
+      "sha256": "3911d459b7d0347d6c4afabfed445828e26fd7ada6e014c54d33c303945e0c12"
     },
     {
       "path": "DesktopAutomation.cs",
@@ -60,7 +60,7 @@
     },
     {
       "path": "tests/test_desktop_helper_source.py",
-      "sha256": "8617db7671da839fdff36ea988d87a3f28c44cb4653bbeb4e79aa76fa1e36688"
+      "sha256": "0543035a9f80ed1ed66da22240325bba4743b47be7674897665495ee9927ccf3"
     },
     {
       "path": "tests/test_shared_scheduler.py",
