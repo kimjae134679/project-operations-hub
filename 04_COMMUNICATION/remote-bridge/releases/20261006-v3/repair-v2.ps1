@@ -7,7 +7,7 @@ $homePath='D:\A_KJ\AI\Applications\ProjectBridge'
 $statePath=Join-Path $homePath 'state'
 $workerPath=Join-Path $homePath 'bridge_worker.py'
 $exePath=Join-Path $homePath '프로젝트연결.exe'
-$expectedOld='04c5b1fa3086299d9696a172bfeaf885e239d885455a9b51ea3a6c1654322738'
+$expectedOld='c2c87fdeb1a5ef0c13baa20ed176247e47e826928ee556be15bc8ef31ab5cbec'
 if(!(Test-Path -LiteralPath $workerPath -PathType Leaf)){throw 'ProjectBridge 2.0 worker missing'}
 $current=(Get-FileHash -LiteralPath $workerPath -Algorithm SHA256).Hash.ToLowerInvariant()
 if($current -ne $expectedOld -and $current -ne $WorkerSha256){throw 'Local worker changed; refusing overwrite'}
