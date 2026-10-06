@@ -8,7 +8,7 @@ namespace AIControlTower.ViewModels;
 
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
-    public PcConnectionViewModel PcConnection { get; } = new();
+    public PcConnectionViewModel PcConnection { get; }
     private readonly IReadOnlyList<IStatusProvider> _providers;
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private readonly SemaphoreSlim _discoveryLock = new(1, 1);
@@ -16,6 +16,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly ProjectCatalogService _catalogService = new();
     private readonly CatalogDefinition _catalog = ProjectCatalogService.Load();
     private readonly JobManager _jobs = new();
+    private readonly WorkDashboardService _workDashboardService;
+    public WorkDashboardViewModel WorkDashboard { get; }
+    public WorkDashboardViewModel ManagementDashboard { get; }
+    public DocumentReaderViewModel Documents { get; } = new();
+    public string ApplicationVersionLabel => "실행 버전 " + (typeof(MainViewModel).Assembly.GetName().Version?.ToString() ?? "미확인");
+    public string ApplicationSourceLabel => "실행 파일: " + (Environment.ProcessPath ?? "미확인");
     private readonly ControlTowerSettings _settings;
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
     private readonly DispatcherTimer _timer;
@@ -42,6 +48,25 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true)
     {
         _settings = settings ?? ControlTowerSettings.Load();
+        _workDashboardService = new WorkDashboardService(Path.Combine(ControlTowerSettings.DataDirectory,"runs"),_jobs.IsRunning,
+            async ct => { using var bridge=new ProjectBridgeService(); return await bridge.CheckAsync(ct); },
+            async (id,ct) => { using var bridge=new ProjectBridgeService(); return await bridge.ResultAsync(id,ct); });
+        foreach(var path in (_settings.ContinuousStatePaths ?? []).Take(40)) _workDashboardService.ContinuousPaths.Add(path);
+        if(File.Exists(WorkDashboardService.FoundationState) && !_workDashboardService.ContinuousPaths.Contains(WorkDashboardService.FoundationState,StringComparer.OrdinalIgnoreCase))
+            _workDashboardService.ContinuousPaths.Add(WorkDashboardService.FoundationState);
+        PcConnection = new(openDocument: (root,path,title) => Documents.OpenAsync(root,path,title));
+        _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath, [], _settings.CommunicationFolders.Values);
+        WorkDashboard = new(_workDashboardService.ReadAsync,_workDashboardService.DetailsAsync,_jobs.IsRunning,_jobs.Stop)
+        {
+            RegisterContinuousPath = path =>
+            {
+                var full=WorkDashboardService.SafePath(path); _=WorkDashboardService.ReadContinuous(full);
+                if(_workDashboardService.ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return;
+                if(_workDashboardService.ContinuousPaths.Count>=40) throw new InvalidDataException("상태 파일 연결은 최대 40개입니다.");
+                _workDashboardService.ContinuousPaths.Add(full); _settings.ContinuousStatePaths=_workDashboardService.ContinuousPaths.ToList(); SaveSettings();
+            }
+        };
+        ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),_workDashboardService.DetailsAsync) { ManagementOnly=true };
         _settings.AutoCommunication = true;
         InitializeCommunication();
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
@@ -53,6 +78,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _timer.Tick += async (_, _) =>
         {
             UpdateRunningProperties();
+            await RefreshWorkDashboardAsync();
             await PcConnection.PollAsync();
             await RefreshServerAsync();
             if (AutoCommunication) await SyncCommunicationAsync();
@@ -148,6 +174,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public bool IsLocalJevExecutionAllowed => EnableJev;
     public string LocalJevPolicyMessage => EnableJev ? "Jev를 이 관제탑에서 선택해 사용할 수 있습니다. 설치·키 존재는 인증이나 실행 성공을 뜻하지 않습니다." : LocalExecutionPolicy.LocalJevDisabledMessage;
     public string ActivitySummary => IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
+    public async Task RefreshWorkDashboardAsync()
+    {
+        if(_disposed)return;
+        _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
+            Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
+        await WorkDashboard.RefreshAsync(_lifetime.Token);
+        if(!_disposed) ManagementDashboard.ApplySnapshot(WorkDashboard.Activities.ToArray());
+    }
 
     public async Task DiscoverAsync()
     {
@@ -204,6 +238,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ProjectsCount)); OnPropertyChanged(nameof(ProgramsCount));
             OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
             CatalogRefreshed?.Invoke(this, EventArgs.Empty);
+            _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
+                Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
             Message = $"프로젝트 {ProjectsCount}개 · 프로그램/산출물 {ProgramsCount}개를 확인했습니다.";
             foreach (var warning in results.Warnings) AddLog("탐색 참고 · " + warning);
             if (results.Warnings.Count > 0) Message += $" 참고 {results.Warnings.Count}건은 로그에서 확인하세요.";
@@ -279,21 +315,27 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
         await LaunchProgramAsync();
     }
-    private void OpenExisting(string? path)
+    private async void OpenExisting(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || (!Directory.Exists(path) && !File.Exists(path))) { Message = "실제 경로를 찾지 못했습니다."; return; }
         try
         {
+            if(File.Exists(path) && Path.GetExtension(path).ToLowerInvariant() is ".md" or ".txt" or ".json" or ".log")
+            {
+                var roots=new[] { SelectedProject?.Path, SelectedProgram?.WorkingDirectory, _settings.CommunicationHubPath, ControlTowerSettings.DataDirectory }
+                    .Concat(_settings.CommunicationFolders.Values).Where(r=>!string.IsNullOrWhiteSpace(r));
+                var full=Path.GetFullPath(path);
+                var root=roots.FirstOrDefault(r=>full.StartsWith(Path.GetFullPath(r!).TrimEnd(Path.DirectorySeparatorChar)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase));
+                if(root is null){Message="문서의 확인된 프로젝트/연결 루트가 없습니다. 외부 프로그램으로 자동 열지 않습니다.";return;}
+                await Documents.OpenAsync(root,full,SelectedProgram?.DisplayName??Path.GetFileName(full));
+                Message="통합 프로그램 내부 읽기로 안내·기록을 열었습니다.";
+                return;
+            }
             // Opening an artifact reveals it; it does not silently execute an installer/script.
             var info = new ProcessStartInfo("explorer.exe") { UseShellExecute = false };
-            if (File.Exists(path) && System.IO.Path.GetExtension(path).ToLowerInvariant() is ".md" or ".txt")
-            {
-                info = new ProcessStartInfo("notepad.exe") { UseShellExecute = false };
-                info.ArgumentList.Add(path);
-            }
-            else if (File.Exists(path)) info.Arguments = "/select,\"" + path + "\""; else info.ArgumentList.Add(path);
+            if (File.Exists(path)) info.Arguments = "/select,\"" + path + "\""; else info.ArgumentList.Add(path);
             Process.Start(info)?.Dispose();
-            Message = File.Exists(path) && System.IO.Path.GetExtension(path).ToLowerInvariant() is ".md" or ".txt" ? "안내 파일을 열었습니다." : "파일·폴더 위치를 열었습니다.";
+            Message = "파일·폴더 위치를 열었습니다.";
         }
         catch (Exception ex) { Message = "열기 실패 · " + ProcessRunner.Sanitize(ex.Message); }
     }

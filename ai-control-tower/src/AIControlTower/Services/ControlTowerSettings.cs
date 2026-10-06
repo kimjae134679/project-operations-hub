@@ -14,6 +14,7 @@ public sealed class ControlTowerSettings
     public bool AutoPublishCommunication { get; set; } = true;
     public string CommunicationHubPath { get; set; } = @"D:\A_KJ\AI\ControlTowerData\communication-hub";
     public Dictionary<string, string> CommunicationFolders { get; set; } = new();
+    public List<string> ContinuousStatePaths { get; set; } = new();
     public string MultiplayerServerRoot { get; set; } = @"C:\Users\user\Documents\MultiGod\PhoneLOL_LocalRuntime";
     [System.Text.Json.Serialization.JsonIgnore]
     public bool IsTemporary { get; set; }

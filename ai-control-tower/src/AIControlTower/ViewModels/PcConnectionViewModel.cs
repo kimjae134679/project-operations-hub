@@ -36,11 +36,13 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     private readonly ProjectBridgeService _service; private readonly SemaphoreSlim _gate = new(1,1), _operations = new(1,1); private readonly CancellationTokenSource _lifetime = new();
     private PcConnectionSnapshot _snapshot = new(false,false,false,"기기 확인 대기","unknown","연결 상태를 확인하고 있습니다.","",0,4,[]);
     private bool _working; private string _error = "";
-    public PcConnectionViewModel(ProjectBridgeService? service = null)
+    public PcConnectionViewModel(ProjectBridgeService? service = null, Func<string,string,string,Task>? openDocument = null)
     {
         _service = service ?? new(); ConnectCommand = new PcCommand(() => OperateAsync("resume")); PauseCommand = new PcCommand(() => OperateAsync("pause")); StopCommand = new PcCommand(StopAsync);
         InstallCommand = new PcCommand(InstallAsync); OpenJobsCommand = new PcCommand(() => { (Application.Current?.MainWindow as MainWindow)?.ShowPcJobs(); return Task.CompletedTask; }, ShowError);
-        OpenGuideCommand = new PcCommand(() => { new ProjectGuideWindow("공용 PC 연결", _service.Home) { Owner = Application.Current?.MainWindow }.Show(); return Task.CompletedTask; }, ShowError);
+        OpenGuideCommand = new PcCommand(() => openDocument is not null
+            ? openDocument(_service.Home,Path.Combine(_service.Home,"프로젝트_사용안내.md"),"공용 PC 연결")
+            : Task.FromException(new InvalidOperationException("내부 문서 읽기 연결이 필요합니다. 파일을 외부 창에서 대신 열지 않습니다.")), ShowError);
     }
     public ObservableCollection<PcJobViewModel> Jobs { get; } = [];
     public ICommand ConnectCommand { get; } public ICommand PauseCommand { get; } public ICommand StopCommand { get; } public ICommand InstallCommand { get; } public ICommand OpenJobsCommand { get; } public ICommand OpenGuideCommand { get; }

@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace AIControlTower.Services;
 
@@ -60,7 +62,9 @@ public static class ThemeService
         ["DisabledBrush"]="#252A35",
         ["DisabledInkBrush"]="#AAB4C8",
         ["ButtonFootBrush"]="#1D2028",
-        ["HighlightBrush"]="#00FFFFFF"
+        ["HighlightBrush"]="#00FFFFFF",
+        ["ButtonHoverBrush"]="#2B3040", ["ButtonPressedBrush"]="#313954",
+        ["PrimaryHoverBrush"]="#4957B4", ["PrimaryPressedBrush"]="#404CA0"
     } : new()
     {
         ["StatusRunningFace"]="#E0F3EB", ["StatusRunningInk"]="#16644E",
@@ -98,7 +102,9 @@ public static class ThemeService
         ["DisabledBrush"]="#E6E9EF",
         ["DisabledInkBrush"]="#596378",
         ["ButtonFootBrush"]="#FFFFFF",
-        ["HighlightBrush"]="#00FFFFFF"
+        ["HighlightBrush"]="#00FFFFFF",
+        ["ButtonHoverBrush"]="#EEF1F8", ["ButtonPressedBrush"]="#E2E7FA",
+        ["PrimaryHoverBrush"]="#3E4DAA", ["PrimaryPressedBrush"]="#34418F"
     };
 
     // Keep the existing brush keys, with identical stops for flat surfaces.
@@ -121,5 +127,16 @@ public static class ThemeService
         ["RailMaterial"]=["#F7F8FB","#F7F8FB"],
         ["HeroFace"]=["#F4F5FB","#F4F5FB"]
     };
+}
+
+/// <summary>Only replace WPF's built-in unwrapped string selection; preserve caller presentation.</summary>
+public sealed class ComboStringTemplateConverter : IMultiValueConverter
+{
+    public DataTemplate WrappedTemplate { get; set; } = null!;
+    public object? Convert(object[] values, Type targetType, object parameter, CultureInfo culture) =>
+        values.Length == 5 && values[1] is null && values[2] is null && values[3] is string &&
+        (values[4] is null || values[4] is string { Length: 0 }) ? WrappedTemplate : values[0];
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException("Selection presentation is one-way.");
 }
 

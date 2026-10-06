@@ -28,6 +28,7 @@ public partial class MainWindow : Window
         ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
+        _viewModel.Documents.Opened+=(_,_)=>WorkspaceTabs.SelectedItem=DocumentReaderTab;
         _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
         PcJobsHost.Content = _pcJobsPanel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
@@ -78,6 +79,7 @@ public partial class MainWindow : Window
         FadeIn(WorkspaceContent);
         await _viewModel.DiscoverAsync();
         await _viewModel.RefreshAsync();
+        await _viewModel.RefreshWorkDashboardAsync();
         await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true);
         if (_viewModel.AutoCommunication) await _viewModel.SyncCommunicationAsync(true);
     }
@@ -170,21 +172,13 @@ public partial class MainWindow : Window
         if (e.OriginalSource != sender || WorkspaceContent is null) return;
         FadeIn(WorkspaceContent);
         if (CommunicationTab.IsSelected) _viewModel.MarkCommunicationViewed();
+        if (WorkDashboardTab.IsSelected || ManagementProcessTab.IsSelected) _ = _viewModel.RefreshWorkDashboardAsync();
     }
 
-    private bool _articleExpanded;
     public void ShowPcJobs()
     {
         WorkspaceTabs.SelectedItem = PcConnectionTab;
         if (!VerificationDisplay.Quiet) _pcJobsPanel.FocusJobs();
-    }
-    private void ToggleArticleWidth_Click(object sender, RoutedEventArgs e)
-    {
-        _articleExpanded = !_articleExpanded;
-        ArticleListPanel.Visibility = _articleExpanded ? Visibility.Collapsed : Visibility.Visible;
-        ArticleListColumn.Width = new GridLength(_articleExpanded ? 0 : 320);
-        ArticleGapColumn.Width = new GridLength(_articleExpanded ? 0 : 18);
-        ArticleExpandButton.Content = _articleExpanded ? "목록 함께 보기" : "본문 넓게";
     }
     private void OpenNoticeReceipts_Click(object sender, RoutedEventArgs e)
     {
@@ -194,10 +188,10 @@ public partial class MainWindow : Window
         _receiptWindow.Closed += (_,_) => _receiptWindow = null;
         _receiptWindow.Show();
     }
-    private void OpenProjectGuide_Click(object sender, RoutedEventArgs e)
+    private async void OpenProjectGuide_Click(object sender, RoutedEventArgs e)
     {
         if (_viewModel.SelectedProject is { } project)
-            new ProjectGuideWindow(project.DisplayName, project.Path) { Owner = this }.Show();
+            await _viewModel.Documents.OpenAsync(project.Path,Path.Combine(project.Path,"프로젝트_사용안내.md"),project.DisplayName);
     }
     private void OpenTool_Click(object sender, RoutedEventArgs e)
     {
@@ -209,7 +203,7 @@ public partial class MainWindow : Window
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
     private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(true); await _viewModel.RefreshServerAsync(true); }
-    private void OpenServerGuide_Click(object sender,RoutedEventArgs e) => new ProjectGuideWindow("멀티의 신 서버",_viewModel.ServerRootPath) { Owner=this }.Show();
+    private async void OpenServerGuide_Click(object sender,RoutedEventArgs e) => await _viewModel.Documents.OpenAsync(_viewModel.ServerRootPath,Path.Combine(_viewModel.ServerRootPath,"프로젝트_사용안내.md"),"멀티의 신 서버");
     private void OpenServerFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerFolder();
     private void OpenServerMailbox_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerMailbox();
     private void OpenServerSource_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(false);

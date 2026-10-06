@@ -2,6 +2,8 @@
 namespace AIControlTower;
 public partial class App : Application
 {
+    public static bool ShouldActivateExistingInstance(IEnumerable<string> arguments)
+        => !arguments.Contains("--background", StringComparer.Ordinal);
     private Mutex? _instance;
     private EventWaitHandle? _activate;
     private RegisteredWaitHandle? _listener;
@@ -79,13 +81,33 @@ public partial class App : Application
     }
     protected override void OnStartup(StartupEventArgs e)
     {
+        var workFixture = Array.IndexOf(e.Args,"--verify-work-dashboard");
+        if(workFixture>=0)
+        {
+            // Standalone in-memory control rendering: no settings, mutex activation,
+            // MainWindow, process execution, communication or remote initialization.
+            ShutdownMode=ShutdownMode.OnExplicitShutdown;
+            base.OnStartup(e);
+            _=Dispatcher.InvokeAsync(async () =>
+            {
+                var code=0;
+                try
+                {
+                    if(workFixture+1>=e.Args.Length)throw new ArgumentException("검증 출력 경로가 필요합니다.");
+                    await Services.WorkDashboardVerification.RunAsync(e.Args[workFixture+1]);
+                }
+                catch(Exception ex) { code=1; Console.Error.WriteLine(Services.ProcessRunner.Sanitize(ex.ToString())); }
+                finally { Shutdown(code); }
+            });
+            return;
+        }
         if (StartRemoteSupervisor(e)) return;
         var verification = e.Args.Contains("--verify-ui");
         var identity = verification ? "Verification." + Environment.ProcessId : "Application";
         _instance = new Mutex(false, @"Local\AIControlTower." + identity);
         _activate = new EventWaitHandle(false, EventResetMode.AutoReset, verification ? @"Local\AIControlTower.Verification.Activate." + Environment.ProcessId : @"Local\AIControlTower.Activate");
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
-        if (!_owns) { _activate.Set(); Shutdown(); return; }
+        if (!_owns) { if (ShouldActivateExistingInstance(e.Args)) _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);
         var settings = Services.ControlTowerSettings.Load();
         if (e.Args.Contains("--verify-ui")) settings.IsTemporary = true;

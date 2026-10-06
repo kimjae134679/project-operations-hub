@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace AIControlTower.Services;
 
-public sealed record PcJobSnapshot(string Id, string Title, string Project, string Tool, string State);
+public sealed record PcJobSnapshot(string Id, string Title, string Project, string Tool, string State, string Action = "");
 public sealed record PcConnectionSnapshot(bool Installed, bool Connected, bool RelayConnected, string Device,
     string Stage, string Detail, string RelayCode, int ActiveJobs, int ParallelLimit, IReadOnlyList<PcJobSnapshot> Jobs);
 
@@ -72,7 +72,7 @@ public sealed class ProjectBridgeService : IDisposable
             var connected = fresh && Flag(j, "localReady") && stage is not ("stopped" or "disconnected" or "paused");
             var jobs = new List<PcJobSnapshot>();
             if (j.ValueKind == JsonValueKind.Object && j.TryGetProperty("jobs", out var rows) && rows.ValueKind == JsonValueKind.Array)
-                foreach (var r in rows.EnumerateArray().Take(200)) jobs.Add(new(Text(r, "id"), Text(r, "title", ActionName(Text(r, "action"))), Text(r, "projectId"), Text(r, "toolId", "ProjectBridge"), Text(r, "state", "unknown")));
+                foreach (var r in rows.EnumerateArray().Take(200)) jobs.Add(new(Text(r, "id"), Text(r, "title", ActionName(Text(r, "action"))), Text(r, "projectId"), Text(r, "toolId", "ProjectBridge"), Text(r, "state", "unknown"), Text(r,"action")));
             return new(true, connected, fresh && Flag(j, "relayConnected"), Text(j, "deviceId", device), fresh ? stage : "stale",
                 fresh ? "파일·명령은 병렬 처리하고 화면 조작과 같은 파일 수정은 순서대로 처리합니다." : "최근 응답이 없습니다. 연결을 다시 시작하세요.",
                 Text(j, "relayCode"), Number(j, "activeJobCount", 0), Math.Clamp(Number(j, "parallelLimit", 4), 1, 8), jobs);
