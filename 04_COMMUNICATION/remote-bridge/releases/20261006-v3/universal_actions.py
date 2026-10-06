@@ -16,13 +16,15 @@ import subprocess
 import sys
 import time
 import uuid
+import stat
+from contextlib import ExitStack
 import process_runner as runner
 
 MAX_BYTES=512*1024
 OWNED_RUNNERS={}
 HASH=re.compile(r'^[a-f0-9]{64}$')
 ACTIONS=frozenset(('read_file','write_file','list_dir','run_command','start_process',
-    'process_status','stop_process','capabilities','ui_control'))
+    'process_status','stop_process','capabilities','ui_control','make_dir','move_file','delete_file','restore_file'))
 
 class ActionError(Exception):pass
 
@@ -51,6 +53,7 @@ def protected(path,config):
     # Resolve junctions/symlinks before comparison. Also protect this user's
     # actual known Desktop even if caller forgot to add it to configuration.
     roots=list(protected_roots(config))
+    roots.append(str(Path(__file__).resolve().parents[2]/'sources'))
     if os.name=='nt':
         roots.extend(str(Path(os.environ.get('USERPROFILE',str(Path.home()))) / name) for name in ('Desktop','OneDrive/Desktop'))
         try:
@@ -63,6 +66,106 @@ def protected(path,config):
         root=absolute_path(value)
         if path==root or path.is_relative_to(root):return True
     return False
+
+def mutation_path(value,config):
+    """Reject links/junctions in the lexical path before resolving it."""
+    if not isinstance(value,str) or '\x00' in value or not Path(value).is_absolute():raise ActionError('absolute_path_required')
+    lexical=Path(value)
+    for part in (lexical,*lexical.parents):
+        try:info=part.lstat()
+        except FileNotFoundError:continue
+        if stat.S_ISLNK(info.st_mode) or getattr(info,'st_file_attributes',0)&0x400:raise ActionError('reparse_path_not_allowed')
+    path=lexical.resolve()
+    if protected(path,config):raise ActionError('protected_write_path')
+    return path
+
+def expected_file(path,expected):
+    if not isinstance(expected,str) or not HASH.fullmatch(expected):raise ActionError('invalid_expected_hash')
+    if not path.is_file():raise ActionError('file_not_found')
+    if file_sha(path)!=expected:raise ActionError('file_sha_conflict')
+
+def durable_json(path,value):
+    temporary=path.with_name(path.name+'.'+uuid.uuid4().hex+'.tmp')
+    try:
+        with temporary.open('x',encoding='utf-8') as out:
+            json.dump(value,out);out.flush();os.fsync(out.fileno())
+        os.replace(temporary,path)
+    finally:
+        if temporary.exists():temporary.unlink()
+
+def transfer_file(source,target,expected,config):
+    """Exclusive copy then verified unlink; never replace an existing target."""
+    mutation_path(str(source),config);mutation_path(str(target),config)
+    expected_file(source,expected)
+    if not target.parent.is_dir():raise ActionError('destination_parent_not_found')
+    if target.exists():raise ActionError('destination_exists')
+    created=False
+    try:
+        with source.open('rb') as inp,target.open('xb') as out:
+            created=True;shutil.copyfileobj(inp,out);out.flush();os.fsync(out.fileno())
+        if file_sha(target)!=expected:raise ActionError('file_changed_during_transfer')
+        mutation_path(str(source),config);mutation_path(str(target),config)
+        expected_file(source,expected)
+        source.unlink()
+    except BaseException:
+        if created and target.exists():target.unlink()
+        raise
+
+def file_operation(action,args,config,state_root):
+    fields={'make_dir':{'path'},'move_file':{'path','destination','expectedSha256'},
+        'delete_file':{'path','expectedSha256'},'restore_file':{'trashId','expectedSha256'}}
+    if set(args)!=fields[action]:raise ActionError('invalid_file_operation_args')
+    state=mutation_path(str(Path(state_root).absolute()),config)
+    mutation_path(str(state/'file_locks'),config)
+    if action=='make_dir':
+        path=mutation_path(args['path'],config)
+        with file_lock(state/'file_locks'/(sha(str(path).encode())+'.lock')):
+            mutation_path(str(path),config);path.mkdir(parents=False,exist_ok=False)
+        return {'path':str(path),'created':True}
+    if action=='restore_file':
+        identity=args['trashId']
+        if not isinstance(identity,str) or not re.fullmatch('[a-f0-9]{32}',identity):raise ActionError('invalid_trash_id')
+        folder=mutation_path(str(state/'file_trash'/identity),config)
+        mutation_path(str(folder/'metadata.json'),config)
+        mutation_path(str(state/'file_trash'/'owner.json'),config)
+        mutation_path(str(folder/'content'),config)
+        record=runner.load(folder/'metadata.json')
+        owner=runner.load(state/'file_trash'/'owner.json')
+        if not isinstance(record,dict) or not isinstance(owner,dict) or record.get('trashId')!=identity or record.get('ownerNonce')!=owner.get('ownerNonce') or not owner.get('ownerNonce'):raise ActionError('trash_not_owned')
+        if record.get('stage') not in ('deleted','prepared'):raise ActionError('trash_not_restorable')
+        if record.get('sha256')!=args['expectedSha256']:raise ActionError('file_sha_conflict')
+        source=folder/'content';target=mutation_path(record.get('originalPath'),config)
+        # A crash after source unlink but before final metadata publication
+        # leaves a prepared ticket. Exclusive restore still verifies content.
+        if record.get('stage')=='prepared' and target.exists():raise ActionError('trash_not_restorable')
+    else:
+        source=mutation_path(args['path'],config)
+        target=mutation_path(args['destination'],config) if action=='move_file' else None
+    with ExitStack() as stack:
+        paths=[source]+([target] if target else [])
+        if action in ('delete_file','restore_file'):paths.append(state/'file_trash')
+        for key in sorted({sha(str(p).encode()) for p in paths}):stack.enter_context(file_lock(state/'file_locks'/(key+'.lock')))
+        if action=='restore_file':
+            latest=runner.load(folder/'metadata.json')
+            if latest!=record:raise ActionError('trash_changed')
+        if action=='delete_file':
+            expected_file(source,args['expectedSha256'])
+            trash=mutation_path(str(state/'file_trash'),config);trash.mkdir(exist_ok=True)
+            mutation_path(str(trash/'owner.json'),config)
+            owner=runner.load(trash/'owner.json')
+            if owner is None:
+                owner={'ownerNonce':secrets.token_hex(32)};durable_json(trash/'owner.json',owner)
+            if not isinstance(owner,dict) or not owner.get('ownerNonce'):raise ActionError('trash_owner_invalid')
+            identity=uuid.uuid4().hex;folder=trash/identity;folder.mkdir()
+            target=folder/'content'
+            record={'trashId':identity,'ownerNonce':owner['ownerNonce'],'originalPath':str(source),
+                'sha256':args['expectedSha256'],'createdAt':time.time(),'stage':'prepared'}
+            durable_json(folder/'metadata.json',record)
+        transfer_file(source,target,args['expectedSha256'],config)
+        if action in ('delete_file','restore_file'):
+            record['stage']='deleted' if action=='delete_file' else 'restored'
+            durable_json(folder/'metadata.json',record)
+        return {'path':str(target),'sha256':args['expectedSha256'],**({'trashId':identity} if action in ('delete_file','restore_file') else {})}
 
 def file_lock(path):
     """Per-file lock; no unsafe stale lock deletion or global file locks."""
@@ -219,6 +322,7 @@ def perform(job,config,state_root):
     action=job.get('action');args=job.get('args',{})
     if action not in ACTIONS or not isinstance(args,dict):raise ActionError('unsupported_action')
     state_root=Path(state_root)
+    if action in ('make_dir','move_file','delete_file','restore_file'):return file_operation(action,args,config,state_root)
     if action=='capabilities':
         if args:raise ActionError('unexpected_args')
         return {'actions':sorted(ACTIONS),'channelRequired':'authenticated_private','maxFileBytes':MAX_BYTES,
@@ -234,7 +338,7 @@ def perform(job,config,state_root):
         return result
     if action=='write_file':
         if set(args)-{'path','expectedSha256','contentUtf8','contentBase64'} or 'expectedSha256' not in args:raise ActionError('write_precondition_required')
-        path=absolute_path(args.get('path'))
+        path=mutation_path(args.get('path'),config)
         if protected(path,config):raise ActionError('protected_write_path')
         expected=args['expectedSha256']
         if expected is not None and (not isinstance(expected,str) or not HASH.fullmatch(expected)):raise ActionError('invalid_expected_hash')
@@ -257,7 +361,7 @@ def perform(job,config,state_root):
             temporary=path.with_name(path.name+'.bridge-'+secrets.token_hex(8)+'.tmp')
             try:
                 with temporary.open('xb') as out:out.write(data);out.flush();os.fsync(out.fileno())
-                if protected(path.resolve(),config):raise ActionError('protected_write_path')
+                mutation_path(str(path),config)
                 if file_sha(path)!=current:raise ActionError('file_changed_during_write')
                 os.replace(temporary,path)
             finally:

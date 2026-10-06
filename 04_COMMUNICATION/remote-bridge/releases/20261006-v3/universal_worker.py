@@ -9,7 +9,7 @@ QUEUE='_pc_bridge/queue.json'
 RESULTS='_pc_bridge/results'
 ID=re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$')
 PROJECT=re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}$')
-ACTIONS=frozenset(('capabilities','read_file','write_file','list_dir','run_command','start_process','process_status','stop_process','ui_control'))
+ACTIONS=frozenset(('capabilities','read_file','write_file','list_dir','make_dir','move_file','delete_file','restore_file','run_command','start_process','process_status','stop_process','ui_control'))
 NAMES={'capabilities':'PC 기능 확인','read_file':'파일 읽기','write_file':'파일 수정','list_dir':'폴더 확인','run_command':'명령 실행','start_process':'장기 작업 시작','process_status':'작업 상태 확인','stop_process':'등록 작업 중지','ui_control':'화면 확인·조작'}
 class UniversalError(Exception):pass
 def now():return dt.datetime.now(dt.timezone.utc).isoformat()
@@ -51,7 +51,9 @@ def validate_job(job,device,at=None):
 def resource_keys(job):
  args=job['args'];action=job['action'];keys=set('explicit:'+x for x in job.get('resourceKeys',[]))
  if action=='ui_control':keys.add('desktop-input')
- if action in ('read_file','write_file') and isinstance(args.get('path'),str):keys.add('file:'+os.path.normcase(str(Path(args['path']).resolve())))
+ if action in ('read_file','write_file','make_dir','move_file','delete_file') and isinstance(args.get('path'),str):keys.add('file:'+os.path.normcase(str(Path(args['path']).resolve())))
+ if action=='move_file' and isinstance(args.get('destination'),str):keys.add('file:'+os.path.normcase(str(Path(args['destination']).resolve())))
+ if action=='restore_file':keys.add('trash:'+str(args.get('trashId')))
  if action in ('run_command','start_process') and isinstance(args.get('cwd'),str):keys.add('cwd:'+os.path.normcase(str(Path(args['cwd']).resolve())))
  if action in ('process_status','stop_process'):keys.add('process:'+str(args.get('processId')))
  return keys

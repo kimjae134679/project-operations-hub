@@ -1,0 +1,10 @@
+{
+ "mcpServers":{
+  "projectbridge":{
+   "command":"D:\\AI\\envs\\cosyvoice\\python.exe",
+   "args":["D:\\A_KJ\\AI\\Applications\\ProjectBridge\\Runtime\\bridge_mcp.py","--home","D:\\A_KJ\\AI\\Applications\\ProjectBridge","--issuer","ChatGPT-ProjectBridge"],
+   "env":{"PYTHONIOENCODING":"utf-8"},
+   "startup_timeout_sec":30
+  }
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "name":"projectbridge-local",
+ "version":"3.0.1",
+ "description":"Authenticated Windows file and command control through the independently running ProjectBridge worker.",
+ "author":{"name":"kimjae134679"},
+ "mcpServers":"./.mcp.json",
+ "interface":{"displayName":"ProjectBridge PC Control","shortDescription":"Read, create, edit, move, delete, restore and execute on your Windows PC","capabilities":["Read","Write","Interactive"]}
+}

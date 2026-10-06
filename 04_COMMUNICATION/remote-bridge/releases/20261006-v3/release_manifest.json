@@ -16,11 +16,11 @@
     },
     {
       "path": "universal_worker.py",
-      "sha256": "771336d7981cf63036f63917400ccba06017581df0662a2ddceb9898915cdcb7"
+      "sha256": "d43077c1216046b0bf6d05f6f8f93717726d33dedcd80b1739dd0bedfb743c9b"
     },
     {
       "path": "universal_actions.py",
-      "sha256": "2bee9b66efcc4f1a3f3f0a9de79d0d3f220dec1dbe37221a3f78391b15261eea"
+      "sha256": "0de078f53d0194be03fb39b746055cfc11187e9870adf63d42c3edfe63d8d4f5"
     },
     {
       "path": "process_runner.py",
@@ -32,7 +32,7 @@
     },
     {
       "path": "bridge_mcp.py",
-      "sha256": "f2e5c7557cedfee4da7683e2bf4dd23779b0c33b4fc3cbfdbc2333188e9aa2c8"
+      "sha256": "aa8f61ee73fa9e177f25e79f85f2503b99efeb8095784bd3777faf1ccd6f181b"
     },
     {
       "path": "README.md",
@@ -73,6 +73,14 @@
     {
       "path": "tests/test_local_api.py",
       "sha256": "8ba984903f90bad7a3c99226002c1aa2f0996604d1dd72c848f432d27fbb444d"
+    },
+    {
+      "path": "tests/test_file_crud.py",
+      "sha256": "1aaf49d064fd49b3930e5692f7f3f3c3645450bf5c8864490c0ac38b60812757"
+    },
+    {
+      "path": "tests/test_mcp_control.py",
+      "sha256": "1790cc6a378ee2225366406668a78d6e9eaa58baa9f723f68ddade4739669405"
     }
   ]
 }

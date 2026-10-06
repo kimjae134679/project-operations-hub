@@ -1,0 +1,5 @@
+{
+ "name":"projectbridge-personal",
+ "owner":{"name":"kimjae134679"},
+ "plugins":[{"name":"projectbridge-local","source":"./plugins/projectbridge-local","description":"Authenticated local Windows PC control"}]
+}
