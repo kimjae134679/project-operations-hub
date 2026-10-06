@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "projectId": "Control-Tower",
+  "toolId": "codex-continuity-20261007",
+  "at": "2026-10-06T18:39:04.128Z",
+  "status": "bridge_installed_plugin_zip_ready",
+  "sourceCommit": "da5a0628c5ae18b60ce00966d199ffebeab831fa",
+  "actualUserResult": "c443 bridge installation94PASS completed; registration failed unsupported root .codex-plugin marketplace path",
+  "cause": "Correct Codex marketplace manifest path is .agents/plugins/marketplace.json; plugin .codex-plugin/plugin.json remains valid",
+  "validation": "Actual installed codex-cli0.160.1 marketplace add/plugin add/plugin list in disposable child config succeeded installed/enabled true; extracted final ZIP INSTALL.cmd actual execution passed",
+  "actual": {
+    "bridgeInstall": "COMPLETED_BY_USER",
+    "heartbeat": "localReady and relayConnected, workerPid1292",
+    "mainUserPluginRegistration": "NOT_RUN",
+    "hostPermissionsChanged": false
+  },
+  "artifact": "04_COMMUNICATION/remote-bridge/downloads/ProjectBridge_PC_Control_3.0.1.zip",
+  "artifactSha256": "a9b8ee9512b9270e762a7298080abbaa2db8a89a8cdb55a22395ebc9d4632ff1",
+  "next": "User downloads ZIP, extracts permanent folder, runs INSTALL.cmd, starts new Codex session. No bridge reinstall. ChatGPT web customMCP URL/tunnel is separate."
+}
