@@ -44,6 +44,8 @@ jobs:
           ffmpeg -y -i /tmp/vd-fixtures/sample.mp4 -map 0 -c copy -f dash /tmp/vd-fixtures/dash/index.mpd
           ffmpeg -y -f lavfi -i testsrc2=size=640x360:rate=30 -f lavfi -i sine=frequency=440 -t 12 -c:v libx264 -b:v 2M -minrate 2M -maxrate 2M -bufsize 4M -x264-params nal-hrd=cbr -pix_fmt yuv420p -c:a aac -movflags +faststart /tmp/vd-fixtures/slow.mp4
           nohup python3 VideoDownloaderAndroid/qa/fixture-server.py /tmp/vd-fixtures >/tmp/vd-fixtures/server.log 2>&1 &
+      - name: Enable emulator hardware acceleration
+        run: sudo chmod 666 /dev/kvm
       - name: Android 35 real engine and file QA
         uses: reactivecircus/android-emulator-runner@v2
         with:
