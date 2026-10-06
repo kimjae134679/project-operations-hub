@@ -1,2 +1,2 @@
 Build, JVM unit tests, Android lint, 6 responsive UI tests, Android 35 native MP4/HLS/DASH/short media/MediaStore/collision/recovery tests passed.
-Source commit: bde574c7eebdbc9150eeebc98389d897e511a112
+Source commit: da44620aa8bc2ba4f8bd980c17c53a1dc6116d13
