@@ -21,6 +21,7 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public string? Warning { get; init; }
     public string StateLabel => Warning ?? Exchange?.StateLabel ?? "전달 자료";
     public string RevisionLabel => Exchange is { } record ? $"기록 {record.Revision} · {record.ActorId}" : "";
+    public string ArticleBody => "# " + Title.Replace("\r", " ").Replace("\n", " ") + "\n\n" + Project + " · " + StateLabel + " · " + Time + "\n" + RevisionLabel + "\n\n" + ReadableBody;
     public string ReadableBody => Exchange?.Markdown ?? (Body.TrimStart().StartsWith('{') || Body.TrimStart().StartsWith('[') ? "```json\n" + Body + "\n```" : Body);
 }
 

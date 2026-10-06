@@ -7,6 +7,8 @@ public sealed class ControlTowerSettings
     public string RootPath { get; set; } = @"D:\A_KJ\AI";
     public bool EnableJev { get; set; } = false;
     public bool ReduceMotion { get; set; } = false;
+    public int RosterRefreshSeconds { get; set; } = 5;
+    public int RefreshTurnMilliseconds { get; set; } = 1200;
     public bool DarkMode { get; set; } = false;
     public bool AutoCommunication { get; set; } = true;
     public bool AutoPublishCommunication { get; set; } = true;

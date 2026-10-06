@@ -66,17 +66,18 @@ public sealed partial class MainViewModel
     public bool IsUpdatingRoster { get => _isUpdatingRoster; private set { SetProperty(ref _isUpdatingRoster, value); OnPropertyChanged(nameof(RosterStatus)); } }
     public bool RosterHealthy => _rosterHealthy;
     public bool RosterEmpty => _rosterHealthy && ServerPlayers.Count == 0;
-    public string RosterStatus => IsUpdatingRoster ? "접속자 갱신 중…" : _rosterHealth;
+    public string RosterStatus => IsManualRosterRefresh ? "접속자 갱신 중…" : _rosterHealth;
     public string RosterCheckedAt => _rosterCheckedAt is { } time ? "마지막 확인 " + time.LocalDateTime.ToString("HH:mm:ss") : "";
-    public async Task RefreshRosterAsync()
+    public async Task RefreshRosterAsync(bool manual = false)
     {
         if (_disposed || !await _rosterLock.WaitAsync(0)) return;
         try
         {
             IsUpdatingRoster = true;
+            if (manual) IsManualRosterRefresh = true;
             var result = await _rosterMonitor.FetchAsync(_lifetime.Token);
             _rosterHealthy = result.IsHealthy;
-            _rosterHealth = result.IsHealthy ? "1초마다 자동 갱신" : result.Health + (ServerPlayers.Count > 0 ? " · 이전 목록" : "");
+            _rosterHealth = result.IsHealthy ? $"{RosterRefreshSeconds}초마다 자동 갱신" : result.Health + (ServerPlayers.Count > 0 ? " · 이전 목록" : "");
             if (result.IsHealthy)
             {
                 _rosterCheckedAt = result.FetchedAt;
@@ -96,7 +97,7 @@ public sealed partial class MainViewModel
             foreach (var property in new[] { nameof(RosterHealthy), nameof(RosterEmpty), nameof(RosterStatus), nameof(RosterCheckedAt) }) OnPropertyChanged(property);
         }
         catch (OperationCanceledException) { }
-        finally { IsUpdatingRoster = false; _rosterLock.Release(); }
+        finally { IsManualRosterRefresh = false; IsUpdatingRoster = false; _rosterLock.Release(); }
     }
     public void OpenServerFolder() => OpenExisting(ServerRootPath);
     public void OpenServerMailbox() => OpenExisting(Path.Combine(ServerRootPath,"_통합소통"));

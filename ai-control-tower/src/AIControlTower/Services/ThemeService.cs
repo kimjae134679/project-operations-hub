@@ -24,43 +24,43 @@ public static class ThemeService
 
     internal static Dictionary<string, string> Palette(bool dark) => dark ? new()
     {
-        ["CanvasBrush"]="#171C1B", ["SurfaceBrush"]="#252D2A", ["RaisedBrush"]="#303B36",
-        ["LineBrush"]="#48534D", ["TextBrush"]="#F5F4EC", ["MutedBrush"]="#C0C9C0",
-        ["AccentBrush"]="#C7E59A", ["AccentInkBrush"]="#FFFFFF", ["DangerBrush"]="#FFA7AD",
-        ["RailBrush"]="#202923", ["RailTextBrush"]="#F1F3E9", ["RailMutedBrush"]="#B8C8B3",
-        ["RailHoverBrush"]="#354137", ["RailSelectedBrush"]="#43513D", ["RailEdgeBrush"]="#526246",
-        ["SelectionBrush"]="#384335", ["HoverBrush"]="#303A33", ["FocusBrush"]="#D7EEAD",
-        ["ShadowBrush"]="#0C110E", ["SheetBackBrush"]="#39483A", ["SheetMiddleBrush"]="#45563D",
-        ["HeroBrush"]="#303B31", ["ChipBrush"]="#394433", ["ChipInkBrush"]="#E4EDD7",
-        ["BadgeBrush"]="#DDE9BE", ["BadgeInkBrush"]="#25301D", ["ScrollThumbBrush"]="#7F9185",
-        ["DisabledBrush"]="#323B36", ["DisabledInkBrush"]="#AFB8AD", ["ButtonFootBrush"]="#111810",
+        ["CanvasBrush"]="#181A1E", ["SurfaceBrush"]="#23262B", ["RaisedBrush"]="#2D3036",
+        ["LineBrush"]="#50545D", ["TextBrush"]="#F5F6F8", ["MutedBrush"]="#C6CBD4",
+        ["AccentBrush"]="#BDD1FF", ["AccentInkBrush"]="#FFFFFF", ["DangerBrush"]="#FFA7AD",
+        ["RailBrush"]="#202329", ["RailTextBrush"]="#F5F6F8", ["RailMutedBrush"]="#C6CBD4",
+        ["RailHoverBrush"]="#2D3036", ["RailSelectedBrush"]="#353942", ["RailEdgeBrush"]="#666C79",
+        ["SelectionBrush"]="#353942", ["HoverBrush"]="#2D3036", ["FocusBrush"]="#BDD1FF",
+        ["ShadowBrush"]="#0E1013", ["SheetBackBrush"]="#363A42", ["SheetMiddleBrush"]="#414650",
+        ["HeroBrush"]="#2B2E34", ["ChipBrush"]="#353942", ["ChipInkBrush"]="#F5F6F8",
+        ["BadgeBrush"]="#D6DCE8", ["BadgeInkBrush"]="#23262B", ["ScrollThumbBrush"]="#818895",
+        ["DisabledBrush"]="#30343B", ["DisabledInkBrush"]="#BFC5D0", ["ButtonFootBrush"]="#17191D",
         ["HighlightBrush"]="#21FFFFFF"
     } : new()
     {
-        ["CanvasBrush"]="#EDEDE6", ["SurfaceBrush"]="#FFFDF7", ["RaisedBrush"]="#E8EADD",
-        ["LineBrush"]="#CDD1C2", ["TextBrush"]="#222B24", ["MutedBrush"]="#545F51",
-        ["AccentBrush"]="#3E5726", ["AccentInkBrush"]="#FFFFFF", ["DangerBrush"]="#A1273C",
-        ["RailBrush"]="#263126", ["RailTextBrush"]="#FCFCF1", ["RailMutedBrush"]="#C4D0BC",
-        ["RailHoverBrush"]="#354535", ["RailSelectedBrush"]="#46583C", ["RailEdgeBrush"]="#769163",
-        ["SelectionBrush"]="#E1E8D2", ["HoverBrush"]="#EFF0E5", ["FocusBrush"]="#425F25",
-        ["ShadowBrush"]="#C2C8B8", ["SheetBackBrush"]="#BBC6A6", ["SheetMiddleBrush"]="#CCD5B9",
-        ["HeroBrush"]="#F6F5E9", ["ChipBrush"]="#E2E8D3", ["ChipInkBrush"]="#3D4D30",
-        ["BadgeBrush"]="#DDE9BE", ["BadgeInkBrush"]="#25301D", ["ScrollThumbBrush"]="#8A9680",
-        ["DisabledBrush"]="#E1E4D9", ["DisabledInkBrush"]="#55614F", ["ButtonFootBrush"]="#AFB7A1",
+        ["CanvasBrush"]="#F0F1F4", ["SurfaceBrush"]="#FFFFFF", ["RaisedBrush"]="#E9ECF1",
+        ["LineBrush"]="#CBD0D9", ["TextBrush"]="#23262B", ["MutedBrush"]="#505866",
+        ["AccentBrush"]="#284E91", ["AccentInkBrush"]="#FFFFFF", ["DangerBrush"]="#A1273C",
+        ["RailBrush"]="#FFFFFF", ["RailTextBrush"]="#23262B", ["RailMutedBrush"]="#505866",
+        ["RailHoverBrush"]="#EEF0F4", ["RailSelectedBrush"]="#E3E8F1", ["RailEdgeBrush"]="#AEB9CD",
+        ["SelectionBrush"]="#E3E8F1", ["HoverBrush"]="#EEF0F4", ["FocusBrush"]="#284E91",
+        ["ShadowBrush"]="#D0D5DF", ["SheetBackBrush"]="#D2D7E0", ["SheetMiddleBrush"]="#E1E5ED",
+        ["HeroBrush"]="#F7F8FA", ["ChipBrush"]="#E3E8F1", ["ChipInkBrush"]="#343E50",
+        ["BadgeBrush"]="#E3E8F1", ["BadgeInkBrush"]="#23262B", ["ScrollThumbBrush"]="#919AA9",
+        ["DisabledBrush"]="#E2E5EB", ["DisabledInkBrush"]="#505866", ["ButtonFootBrush"]="#C9CED8",
         ["HighlightBrush"]="#72FFFFFF"
     };
 
     internal static Dictionary<string, string[]> Gradients(bool dark) => dark ? new()
     {
-        ["ButtonFace"]=["#3B463D","#303B33"], ["ActionFace"]=["#53733B","#3B5529"],
-        ["CardFace"]=["#2D362F","#252D28"], ["SelectionFace"]=["#3D4937","#333F31"],
-        ["RimBrush"]=["#61715B","#43503E"], ["RailMaterial"]=["#2D382C","#202920"],
-        ["HeroFace"]=["#35422F","#2B352D"]
+        ["ButtonFace"]=["#33373F","#2D3036"], ["ActionFace"]=["#345EA1","#284E91"],
+        ["CardFace"]=["#2B2E34","#23262B"], ["SelectionFace"]=["#353942","#30343B"],
+        ["RimBrush"]=["#686F7C","#454B56"], ["RailMaterial"]=["#25282E","#202329"],
+        ["HeroFace"]=["#2D3036","#25282E"]
     } : new()
     {
-        ["ButtonFace"]=["#FFFDF7","#E4E7DA"], ["ActionFace"]=["#48662F","#304921"],
-        ["CardFace"]=["#FFFDF7","#F0F0E5"], ["SelectionFace"]=["#EAF0DC","#DDE5CD"],
-        ["RimBrush"]=["#E9ECDF","#BBC5AF"], ["RailMaterial"]=["#344331","#253025"],
-        ["HeroFace"]=["#FCFBEF","#EAEDD9"]
+        ["ButtonFace"]=["#FFFFFF","#F3F4F7"], ["ActionFace"]=["#345EA1","#284E91"],
+        ["CardFace"]=["#FFFFFF","#F5F6F9"], ["SelectionFace"]=["#E9EDF5","#E3E8F1"],
+        ["RimBrush"]=["#E9ECF1","#BEC6D3"], ["RailMaterial"]=["#FFFFFF","#F5F6F9"],
+        ["HeroFace"]=["#FFFFFF","#F1F3F7"]
     };
 }
