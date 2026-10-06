@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0007",
+  "revision": 1,
+  "contentSha256": "3f0edd4e30dbb06fb14d4d1e29c5edd3cb2c8146ec589787bb7afe904250a9f8",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "work-20261006-reader-followup",
+  "checkedAt": "2026-10-06T06:40:33.193624+00:00",
+  "applicationStatus": "applied",
+  "note": "이번 회차 지시 우선·검증 구분·원본 보존·본인 기록·독립 검토에 적용. 실제 PC 실행 성공은 주장하지 않음.",
+  "evidence": [
+    "ai-control-tower/docs/READER-FOLLOWUP-20261006.md"
+  ],
+  "appliedAt": "2026-10-06T06:41:07.014256+00:00"
+}

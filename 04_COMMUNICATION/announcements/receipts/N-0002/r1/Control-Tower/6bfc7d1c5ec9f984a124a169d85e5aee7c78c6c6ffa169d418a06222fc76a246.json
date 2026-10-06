@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0002",
+  "revision": 1,
+  "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "work-20261006-reader-followup",
+  "checkedAt": "2026-10-06T06:40:33.190242+00:00",
+  "applicationStatus": "pending",
+  "note": "소스·기록·공통 지침에 반영. PC 오프라인으로 현지 실행·공지 전달·안내 확인은 대기.",
+  "evidence": [
+    "ai-control-tower/docs/READER-FOLLOWUP-20261006.md"
+  ]
+}
