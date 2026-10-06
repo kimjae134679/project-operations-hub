@@ -1,4 +1,4 @@
-param(
+﻿param(
  [ValidatePattern('^[a-f0-9]{40}$')][string]$Commit,
  [ValidatePattern('^[a-f0-9]{64}$')][string]$ManifestSha256,
  [string]$SourceDirectory,
@@ -164,7 +164,7 @@ try {
  if(!$cfg.maxWorkers){$cfg.maxWorkers=4}
  $priorUiHelper=[string]$cfg.uiHelper
  $cfg.uiHelper=Join-Path $runtimePath 'DesktopAutomation.exe'
- $cfg.protectedRoots=@($cfg.protectedRoots)+@([Environment]::GetFolderPath('Desktop'))|Sort-Object -Unique
+ $cfg.protectedRoots=@(@($cfg.protectedRoots)+@([Environment]::GetFolderPath('Desktop'))|Where-Object{$_}|Sort-Object -Unique)
  if(!$cfg.pollSeconds){$cfg.pollSeconds=90}
  $cfg.approvedBundleSha256=@(@($cfg.approvedBundleSha256)+@($ApprovedBundleSha256)|Where-Object{$_}|Sort-Object -Unique)
  $python=[string]$cfg.python

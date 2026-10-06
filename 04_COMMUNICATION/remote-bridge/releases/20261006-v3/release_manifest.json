@@ -20,7 +20,7 @@
     },
     {
       "path": "universal_actions.py",
-      "sha256": "205983e6b11a21cc2f5a9cf1f1a037db76bf0fc96f4a22c4a70a718d0b9da7a9"
+      "sha256": "2bee9b66efcc4f1a3f3f0a9de79d0d3f220dec1dbe37221a3f78391b15261eea"
     },
     {
       "path": "process_runner.py",
@@ -44,7 +44,7 @@
     },
     {
       "path": "프로젝트_사용안내.md",
-      "sha256": "d0982650bf560597ad19ff1bc9619ed3fc553949e861aed25fcf48632ea3c270"
+      "sha256": "8b1acea50442bffada1e53af70e56f3cf607ed64f28acbff49515c6d6a982ede"
     },
     {
       "path": "tests/test_bridge.py",
@@ -56,7 +56,7 @@
     },
     {
       "path": "tests/test_universal_actions.py",
-      "sha256": "ce03c9b4dc7adf3a53e0859287e51a036c4c28805071cff014233fccb45ffe52"
+      "sha256": "2a301d6ce5d07c6f345cd75cdacd977090d61a9cfdd7b95821dcc28301257b66"
     },
     {
       "path": "tests/test_desktop_helper_source.py",

@@ -39,10 +39,18 @@ def absolute_path(value):
     if not isinstance(value,str) or '\x00' in value or not Path(value).is_absolute():raise ActionError('absolute_path_required')
     return Path(value).resolve()
 
+def protected_roots(config):
+    roots=config.get('protectedRoots',[])
+    # PS pipelines serialize a one-item array as a scalar. Preserve protection.
+    if isinstance(roots,str):roots=[roots]
+    if not isinstance(roots,list):raise ActionError('invalid_protected_roots')
+    for root in roots:absolute_path(root)
+    return roots
+
 def protected(path,config):
     # Resolve junctions/symlinks before comparison. Also protect this user's
     # actual known Desktop even if caller forgot to add it to configuration.
-    roots=list(config.get('protectedRoots',[]))
+    roots=list(protected_roots(config))
     if os.name=='nt':
         roots.extend(str(Path(os.environ.get('USERPROFILE',str(Path.home()))) / name) for name in ('Desktop','OneDrive/Desktop'))
         try:
@@ -133,7 +141,7 @@ def command(args,config):
     # These operations have a separate exact-owned-process API. Do not accept
     # broad name/all-process kill commands through the generic command action.
     if re.search(r'\b(?:taskkill|killall|pkill|stop-process|terminateprocess|wmic\s+process)\b',text):raise ActionError('use_owned_stop_process')
-    for root in config.get('protectedRoots',[]):
+    for root in protected_roots(config):
         normalized=str(absolute_path(root)).lower()
         if normalized in text or normalized.replace('\\','/') in text:raise ActionError('protected_path_in_command')
     timeout=args.get('timeoutSeconds',300)

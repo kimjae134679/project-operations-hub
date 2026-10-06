@@ -17,6 +17,29 @@ import universal_actions as u
 import process_runner as p
 
 class UniversalTests(unittest.TestCase):
+    def test_scalar_protected_root_keeps_protection_without_blocking_other_work(self):
+        protected=self.work/'protected';protected.mkdir()
+        self.config['protectedRoots']=str(protected)
+        self.assertTrue(u.protected(protected/'file.txt',self.config))
+        self.assertFalse(u.protected(self.work/'allowed.txt',self.config))
+        with self.assertRaises(u.ActionError):
+            self.call('write_file',{'path':str(protected/'file.txt'),'expectedSha256':None,'contentUtf8':'refused'})
+        self.call('write_file',{'path':str(self.work/'allowed.txt'),'expectedSha256':None,'contentUtf8':'allowed'})
+        self.assertEqual((self.work/'allowed.txt').read_text(),'allowed')
+        self.assertTrue(self.call('run_command',{'cwd':str(self.work),'python':'print("allowed")','timeoutSeconds':10})['succeeded'])
+        with self.assertRaises(u.ActionError):
+            self.call('run_command',{'cwd':str(self.work),'python':repr(protected.as_posix()),'timeoutSeconds':10})
+    def test_invalid_protected_root_configuration_fails_closed(self):
+        for roots in (None,5,{},['relative'],['']):
+            with self.assertRaises(u.ActionError):u.protected(self.work,{'protectedRoots':roots})
+    @unittest.skipUnless(sys.platform=='win32','PowerShell installer serialization')
+    def test_installer_one_root_remains_json_array(self):
+        installer=Path(__file__).parents[1]/'install.ps1'
+        line=next(line.strip() for line in installer.read_text(encoding='utf-8-sig').splitlines() if line.strip().startswith('$cfg.protectedRoots='))
+        script="$cfg=@{protectedRoots=@()};"+line+";$cfg|ConvertTo-Json -Compress"
+        result=u.subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-Command',script],capture_output=True,text=True,timeout=15,creationflags=u.subprocess.CREATE_NO_WINDOW)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIsInstance(json.loads(result.stdout)['protectedRoots'],list)
     def test_windows_exited_process_with_retained_handle_is_not_alive(self):
         if os.name!='nt':self.skipTest('Windows retained kernel handle behavior')
         process=u.subprocess.Popen([sys.executable,'-c','import time;time.sleep(.1)'],stdout=u.subprocess.DEVNULL,stderr=u.subprocess.DEVNULL,creationflags=u.subprocess.CREATE_NO_WINDOW)
