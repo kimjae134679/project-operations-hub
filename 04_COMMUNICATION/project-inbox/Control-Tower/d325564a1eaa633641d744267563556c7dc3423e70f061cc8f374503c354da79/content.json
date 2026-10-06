@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "task20261006-silent-startup-remote-recovery",
+  "revision": 3,
+  "title": "부팅 콘솔·종료 방해 조사와 원격 자동 복구",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "20261006-startup-recovery",
+  "receivedAt": "2026-10-06T18:06:54+09:00",
+  "updatedAt": "2026-10-06T18:52:27.702514+09:00",
+  "request": {
+    "summary": "부팅 CMD·PowerShell과 종료 방해를 조사·정리하고 원격 연결 자동 시작·복구·관리 앱 종료를 구현. 남은 작업 마무리.",
+    "details": "원격 연결은 컴퓨터 로그인 직후 시작하고 비정상 종료는 복구, 관리 앱에서 의도적으로 끄면 이번 로그인 동안 유지. 소통 게시글·중립 디자인·도구·프로젝트 안내 개편도 완료.",
+    "source": "current_chat"
+  },
+  "response": {
+    "summary": "원격 강제 종료 자동 복구·관리 앱 끄기 유지 확인. 부팅 창 실행기를 숨김으로 교체. Logitech Options+ 반복 충돌도 발견했으나 종료 방해 원인 전부 확정되지는 않음.",
+    "details": "현재 채팅에서 실제 전달한 진행 답변을 기록. 변경은 PR23 병합. 검증용 예약 작업·임시 파일 정리 후 완료 기록 자동 수집 확인 중. 실제 재부팅은 하지 않음.",
+    "source": "current_chat"
+  },
+  "status": "completed",
+  "workDone": [
+    "현재 시작 파일·예약 작업·프로세스와 이벤트 기록 조사",
+    "기존 UI119테스트·33테마 검사·11도구·9안내 확인",
+    "오디오북 공지 전달 오류 재시도 해결 확인",
+    "주식 CMD·멀티의신 터널 시작 바로가기 숨김 교체 및 원본 백업",
+    "네이티브 원격 감시기·로그인 예약 작업·관리 앱 켜기/끄기·종료 대기 제거 설치",
+    "실제9개 복구·중지·종료 허용·숨김 검사 통과",
+    "N0009 공지·정책·사용자 안내 작성",
+    "0.7.0 설치본 최종 33 UI검사·11도구·9안내·9공지 통과",
+    "PR23 병합 37f6a53971bc330fc54b07dbd8ac64b5ed504f22 및 N8r2/N9r1 본인 적용 확인 공유",
+    "검증용 예약 작업3개와 생성한 임시 파일·배포 staging 정리"
+  ],
+  "verification": [
+    {
+      "name": "코드",
+      "result": "pass",
+      "evidence": [
+        "dotnet test138 + python unittest29 =167 pass"
+      ]
+    },
+    {
+      "name": "설치본 화면",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/docs/READING-TOOLS-UI-20261006.json 33 pass"
+      ]
+    },
+    {
+      "name": "실제 원격 복구·관리 중지·종료 메시지",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/docs/REMOTE-RECOVERY-20261006.json 9/9 pass; actual reboot not run"
+      ]
+    },
+    {
+      "name": "부팅·종료 조사",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/docs/STARTUP-AUDIT-20261006.json; Logitech Options+ repeated crash; shutdown blocker attribution unresolved"
+      ]
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}
