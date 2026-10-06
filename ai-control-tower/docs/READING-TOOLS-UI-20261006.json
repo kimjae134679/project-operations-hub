@@ -1,5 +1,5 @@
 {
-  "CheckedAt": "2026-10-06T18:20:25.8890223+09:00",
+  "CheckedAt": "2026-10-06T18:35:43.8181673+09:00",
   "ProjectsCount": 6,
   "ProgramsCount": 27,
   "RunningCount": 0,
@@ -455,29 +455,29 @@
     "CompactEnd": {
       "Layout": "compact",
       "Title": "\uBD80\uD305 \uCF58\uC194\u00B7\uC885\uB8CC \uBC29\uD574 \uC870\uC0AC\uC640 \uC6D0\uACA9 \uC790\uB3D9 \uBCF5\uAD6C",
-      "ExpectedFinalText": "\u2014 \uC124\uCE58\u00B7GitHub\u00B7\uC18C\uD1B5 \uAE30\uB85D \uC644\uB8CC",
-      "NativeTextLength": 492,
-      "Blocks": 16,
-      "ReaderHeight": 788,
-      "ContentEnd": "216,726,0,21",
-      "VisibleEnd": "216,172,0,21",
+      "ExpectedFinalText": "\u2014 \uC124\uCE58\uBCF8 \uCD5C\uC885 \uD654\uBA74 \uAC80\uC0AC\u00B7GitHub\u00B7\uC644\uB8CC \uAE30\uB85D \uC218\uC9D1 \uD655\uC778",
+      "NativeTextLength": 658,
+      "Blocks": 20,
+      "ReaderHeight": 956,
+      "ContentEnd": "376,894,0,21",
+      "VisibleEnd": "376,172,0,21",
       "ViewportHeight": 248,
-      "ScrollableHeight": 693,
-      "BottomOffset": 693,
+      "ScrollableHeight": 861,
+      "BottomOffset": 861,
       "BottomReached": true
     },
     "ExpandedEnd": {
       "Layout": "wide-compact",
       "Title": "\uBD80\uD305 \uCF58\uC194\u00B7\uC885\uB8CC \uBC29\uD574 \uC870\uC0AC\uC640 \uC6D0\uACA9 \uC790\uB3D9 \uBCF5\uAD6C",
-      "ExpectedFinalText": "\u2014 \uC124\uCE58\u00B7GitHub\u00B7\uC18C\uD1B5 \uAE30\uB85D \uC644\uB8CC",
-      "NativeTextLength": 492,
-      "Blocks": 16,
-      "ReaderHeight": 704,
-      "ContentEnd": "216,642,0,21",
-      "VisibleEnd": "216,172,0,21",
+      "ExpectedFinalText": "\u2014 \uC124\uCE58\uBCF8 \uCD5C\uC885 \uD654\uBA74 \uAC80\uC0AC\u00B7GitHub\u00B7\uC644\uB8CC \uAE30\uB85D \uC218\uC9D1 \uD655\uC778",
+      "NativeTextLength": 658,
+      "Blocks": 20,
+      "ReaderHeight": 872,
+      "ContentEnd": "376,810,0,21",
+      "VisibleEnd": "376,172,0,21",
       "ViewportHeight": 248,
-      "ScrollableHeight": 609,
-      "BottomOffset": 609,
+      "ScrollableHeight": 777,
+      "BottomOffset": 777,
       "BottomReached": true
     }
   },
@@ -771,7 +771,7 @@
     {
       "DisplayName": "Remote Desktop Commander \u00B7 PC \uC6D0\uACA9 \uC5F0\uACB0",
       "State": "Running",
-      "Detail": "\uC5F0\uACB0 \uD504\uB85C\uC138\uC2A4 \uD2B8\uB9AC 1\uAC1C \u00B7 \uC790\uC2DD \uD3EC\uD568 3\uAC1C \u00B7 \uC2DC\uC791 \uB4F1\uB85D 1\uAC1C. \uC628\uB77C\uC778/\uC778\uC99D\uC740 \uC6D0\uACA9 \uC11C\uBE44\uC2A4\uC5D0\uC11C \uBCC4\uB3C4 \uD655\uC778\uD569\uB2C8\uB2E4."
+      "Detail": "\uC5F0\uACB0 \uD504\uB85C\uC138\uC2A4 \uD2B8\uB9AC 1\uAC1C \u00B7 \uC790\uC2DD \uD3EC\uD568 2\uAC1C \u00B7 \uC2DC\uC791 \uB4F1\uB85D 1\uAC1C. \uC628\uB77C\uC778/\uC778\uC99D\uC740 \uC6D0\uACA9 \uC11C\uBE44\uC2A4\uC5D0\uC11C \uBCC4\uB3C4 \uD655\uC778\uD569\uB2C8\uB2E4."
     },
     {
       "DisplayName": "Jev Router \u00B7 AI \uC791\uC5C5 \uBD84\uBC30",
@@ -859,12 +859,17 @@
     {
       "Title": "\uBC1B\uC740 \uBA85\uB839\uACFC AI \uB2F5\uBCC0 \uAE30\uB85D",
       "VersionLabel": "\uBC84\uC804 1",
-      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 4\uBA85"
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 5\uBA85"
     },
     {
       "Title": "\uD504\uB85C\uC81D\uD2B8 \uC790\uB8CC \uC704\uCE58\uC640 \uC0AC\uC6A9 \uC548\uB0B4 \uBA3C\uC800 \uC77D\uAE30",
       "VersionLabel": "\uBC84\uC804 1",
-      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 3\uBA85"
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D 4\uBA85"
+    },
+    {
+      "Title": "\uBD80\uD305 \uCC3D\uACFC \uC885\uB8CC \uBC29\uD574 \uC5C6\uB294 \uBC31\uADF8\uB77C\uC6B4\uB4DC \uC2E4\uD589",
+      "VersionLabel": "\uBC84\uC804 1",
+      "ReadSummary": "\uD655\uC778 \uAE30\uB85D \uC5C6\uC74C"
     }
   ],
   "CommunicationProjects": [
@@ -897,7 +902,7 @@
       "Name": "\uBA40\uD2F0\uC758 \uC2E0",
       "Root": "D:\\A_KJ\\AI\\PhoneLoL_02",
       "Delivery": "\uC5F0\uACB0\uB428",
-      "Read": "6/8\uAC1C \uACF5\uC9C0 \u00B7 2\uBA85",
+      "Read": "6/9\uAC1C \uACF5\uC9C0 \u00B7 2\uBA85",
       "Applied": "\uC801\uC6A9 \uAE30\uB85D 47\uAC74"
     },
     {
@@ -905,7 +910,7 @@
       "Name": "\uBA40\uD2F0\uC758 \uC2E0 \uC11C\uBC84",
       "Root": "C:\\Users\\user\\Documents\\MultiGod\\PhoneLOL_LocalRuntime",
       "Delivery": "\uC5F0\uACB0\uB428",
-      "Read": "6/8\uAC1C \uACF5\uC9C0 \u00B7 2\uBA85",
+      "Read": "6/9\uAC1C \uACF5\uC9C0 \u00B7 2\uBA85",
       "Applied": "\uC801\uC6A9 \uAE30\uB85D 52\uAC74"
     },
     {
@@ -945,8 +950,8 @@
       "Name": "\uBB34\uC9C1\uC804\uC0DD \uC624\uB514\uC624\uBD81",
       "Root": "D:\\AI\\VoiceAudiobook",
       "Delivery": "\uC5F0\uACB0\uB428",
-      "Read": "6/8\uAC1C \uACF5\uC9C0 \u00B7 6\uBA85",
-      "Applied": "\uC801\uC6A9 \uAE30\uB85D 35\uAC74"
+      "Read": "8/9\uAC1C \uACF5\uC9C0 \u00B7 6\uBA85",
+      "Applied": "\uC801\uC6A9 \uAE30\uB85D 37\uAC74"
     },
     {
       "Id": "Burgundy",
@@ -969,7 +974,7 @@
       "Name": "\uD1B5\uD569\uC18C\uD1B5\uBC29\u00B7\uCEE8\uD2B8\uB864\uD0C0\uC6CC",
       "Root": "D:\\A_KJ\\AI\\Projects\\project-operations-hub",
       "Delivery": "\uC5F0\uACB0\uB428",
-      "Read": "8/8\uAC1C \uACF5\uC9C0 \u00B7 7\uBA85",
+      "Read": "8/9\uAC1C \uACF5\uC9C0 \u00B7 7\uBA85",
       "Applied": "\uC801\uC6A9 \uAE30\uB85D 48\uAC74"
     },
     {
@@ -1003,8 +1008,8 @@
   "Server": {
     "IsHealthy": true,
     "Health": "\uC11C\uBC84 \uC751\uB2F5 \uD655\uC778\uB428",
-    "ObservedAt": "2026-10-06T09:20:18+00:00",
-    "FetchedAt": "2026-10-06T09:20:18.2504329+00:00",
+    "ObservedAt": "2026-10-06T09:35:35+00:00",
+    "FetchedAt": "2026-10-06T09:35:35.5683517+00:00",
     "Total": {
       "Online": 0,
       "Preparing": 0,
@@ -1067,20 +1072,20 @@
     "RosterHealthy": true,
     "PlayerCount": 0,
     "RosterStatus": "3\uCD08\uB9C8\uB2E4 \uC790\uB3D9 \uAC31\uC2E0",
-    "RosterCheckedAt": "\uB9C8\uC9C0\uB9C9 \uD655\uC778 18:20:25"
+    "RosterCheckedAt": "\uB9C8\uC9C0\uB9C9 \uD655\uC778 18:35:43"
   },
   "RosterLiveChecks": {
     "AutomaticMotionQuiet": true,
     "ManualRequestObserved": true,
-    "ManualAngle": 38.496137142857144,
+    "ManualAngle": 40.44520285714286,
     "PollIntervalSeconds": 3,
     "TurnMilliseconds": 1400
   },
   "RefreshMotionChecks": {
     "MotionDisabledByWindows": false,
     "OneTurnVerified": true,
-    "AngleBeforeRequestEnd": 38.50035428571428,
-    "AngleAfterRequestEnd": 76.22562857142857,
+    "AngleBeforeRequestEnd": 37.77516,
+    "AngleAfterRequestEnd": 78.93339428571429,
     "IdleAngle": 0,
     "ReducedMotionAngle": 0
   },
