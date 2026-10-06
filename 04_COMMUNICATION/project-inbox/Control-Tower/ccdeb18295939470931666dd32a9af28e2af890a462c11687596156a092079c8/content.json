@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "review-ui-tools-discovery-20261006",
+  "revision": 1,
+  "title": "도구가 보이지 않는 원인과 프로젝트 축약 표시 조사",
+  "projectId": "Control-Tower",
+  "actorId": "/root/review_ui",
+  "sessionId": "review-ui-20261006-tools",
+  "receivedAt": "2026-10-06T11:44:56.1277244+09:00",
+  "updatedAt": "2026-10-06T11:46:07.4506330+09:00",
+  "request": {
+    "summary": "최신 사용자 불만을 바탕으로 도구 발견 경로와 갱신 구조를 읽기 전용 조사",
+    "details": "부모 에이전트가 Remote Desktop Commander/Jev 등 도구 누락, 한 글자 프로젝트 축약, 1초 갱신 구조를 조사하도록 지시했다. 관련 AGENTS와 현재 공지/PROJECT_PRESENTATION_RULES를 재확인한다. 소스 수정과 외부 프로그램 종료/설정 변경을 하지 않으며 비밀값을 출력하지 않는다. 정확한 지시 수신 시각이 제공되지 않아 receivedAt에는 첫 실제 환경 확인 시각을 사용했다.",
+    "source": "parent_agent_message:/root"
+  },
+  "response": {
+    "summary": "도구는 연결·관리 탭에 숨겨져 있고 제품명도 바뀌어 찾기 어렵다. 설치 파일은 확인했지만 실제 인증과 원격 연결은 별도 확인이 필요하다.",
+    "details": "실제로 부모에게 전달: Remote/Jev는 프로젝트 카탈로그에 없고 연결·관리 카드에만 있으며 각각 PC 원격 연결/AI 작업 분배로 제품명이 사라졌다. 제품명과 쉬운 설명을 병기하고 도구·연결 탐색에서 검색 가능하게 하는 방식을 제안했다. n8n은 provider가 있으나 화면 whitelist에서 제외됐고 HyperFrames/Aider는 등록 자체가 없다. 한 글자 Monogram 배지를 제거하거나 의미있는 glyph로 교체하고 전체 이름을 유지하도록 제안했다. KJW에서 설치 파일과 패키지 버전을 확인했으며 Jev 키 존재는 process=true/user=false로만 반환했다. Remote 프로세스 조회는 액세스 거부여서 0개 결과를 무효로 분류했다. NotInstalled가 오류로 표시되는 라벨 결함도 전달했다.",
+    "source": "collaboration.send_message:/root"
+  },
+  "status": "completed",
+  "workDone": [
+    "최신 AGENTS, 공지 N-0002/N-0003/N-0007, 프로젝트 표현 기준과 카탈로그 확인",
+    "MainViewModel provider 목록과 ToolStatusViewModel whitelist 및 MainWindow 도구 진입 버튼 조사",
+    "Jev/Remote/n8n/HyperFrames/Aider 설치 파일 및 CLI 존재를 읽기 전용 확인",
+    "1초 접속자 갱신과 5초 일반 폴링 구조 확인",
+    "원격 연결 프로세스 조회 실패를 실제 연결 수 미확인으로 구분하여 전달"
+  ],
+  "verification": [
+    {
+      "name": "도구 표시와 축약 코드 경로",
+      "result": "pass",
+      "evidence": [
+        "ai-control-tower/src/AIControlTower/MainWindow.xaml",
+        "ai-control-tower/src/AIControlTower/ViewModels/ToolStatusViewModel.cs",
+        "ai-control-tower/src/AIControlTower/ViewModels/MainViewModel.cs",
+        "ai-control-tower/src/AIControlTower/Models/ProjectItem.cs"
+      ]
+    },
+    {
+      "name": "KJW 실제 설치 파일",
+      "result": "pass",
+      "evidence": [
+        "jev-router package.json 0.2.0와 bin/jev-codex.mjs 파일 존재",
+        "n8n package.json 2.38.7, hyperframes package.json 0.8.40, aider.exe 파일 존재",
+        "RemoteBridge.ps1 파일과 시작 등록 1개 존재"
+      ]
+    },
+    {
+      "name": "원격 프로세스 조회",
+      "result": "fail",
+      "evidence": [
+        "Get-CimInstance Win32_Process: 액세스가 거부되었습니다. 반환된 0개는 연결 없음의 근거가 아님"
+      ]
+    },
+    {
+      "name": "도구 실제 인증과 작업 왕복 및 수정 화면 검증",
+      "result": "not_run",
+      "evidence": []
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}

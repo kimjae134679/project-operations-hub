@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "20261006-neutral-flat-theme",
+  "revision": 1,
+  "title": "초록 테마와 입체 버튼을 중립 색·평면 버튼으로 교체",
+  "projectId": "Control-Tower",
+  "actorId": "/root/record_protocol",
+  "sessionId": "20261006-neutral-flat-theme",
+  "receivedAt": "2026-10-06T11:43:11+09:00",
+  "updatedAt": "2026-10-06T02:48:56.614Z",
+  "request": {
+    "summary": "사용자가 초록색 테마와 버튼 디자인을 거부해 밝은 white/slate·어두운 charcoal/slate 테마와 blue/violet 강조, 평면 버튼으로 변경.",
+    "details": "부모 /root 분업 범위는 ThemeService.cs와 App.xaml 두 파일. 기존 리소스키·바인딩 유지; 입체 받침·광택·hover 이동 제거; 버튼 높이38~40/radius8·명확한 윤곽/포커스; 텍스트 WCAG4.5 확인. 다른 코드·문서 수정, git/build/publish 금지. receivedAt은 부모가 제공한 실제 사용자 주요 원본 수신 시각이며 추가 guide 지시는 2026-10-06T11:46:55+09:00. 정확한 분업 메시지 수신시각은 미확인.",
+    "source": "current_chat/parent_delegation"
+  },
+  "response": {
+    "summary": "두 파일을 중립 팔레트와 평면 버튼으로 변경했습니다. 기존 resource key·Binding은 유지했고 텍스트 88조합의 대비가 모두 4.5 이상입니다. WPF 빌드와 실제 화면은 부모 통합 검증이 필요합니다.",
+    "details": "부모에게 실제 전달한 구현 완료·검증 범위 요약. 이 기록은 담당 코드 두 파일 변경만 완료로 표시하며 전체 사용자 요청의 배포·화면 완성을 뜻하지 않습니다.",
+    "source": "parent_delegation"
+  },
+  "status": "completed",
+  "workDone": [
+    "기존 31개 solid brush 키와 7개 gradient 키를 유지하며 초록 팔레트를 white/slate·charcoal/slate 및 blue/violet 강조로 교체",
+    "gradient 양끝을 같은 색으로 유지해 기존 brush 타입·키 호환을 보존하면서 평면화",
+    "버튼 Foot·HoverLight·광택·hover/pressed TranslateTransform 제거, minheight40/radius8, hover 외곽·키보드 포커스·누름 윤곽 추가",
+    "기본 입력·목록·탭 radius 축소 및 기본 카드·탭 그림자 제거"
+  ],
+  "verification": [
+    {
+      "name": "WCAG 텍스트 대비 88조합",
+      "result": "pass",
+      "evidence": [
+        "모든 검사 조합 4.5 이상; 전체 최소4.7694688057(밝음 AccentBrush/SheetBackBrush), 어두움 최소5.4196595952(AccentInkBrush/ActionFace)",
+        "주 버튼 대비 밝음6.2549059254·어두움5.4196595952"
+      ]
+    },
+    {
+      "name": "XAML XML 구문·리소스·바인딩 호환",
+      "result": "pass",
+      "evidence": [
+        "PowerShell [xml] Get-Content App.xaml: XML parse PASS",
+        "이전/변경 App.xaml x:Key 전체 및 Binding 문자열 배열 동일",
+        "모든 gradient 배열의 stops 동일색, Foot와 TranslateTransform 제거 정적 확인"
+      ]
+    },
+    {
+      "name": "WPF 빌드·실제 UI·설치 전달",
+      "result": "not_run",
+      "evidence": [
+        "분업 범위상 git/build/publish 금지; 부모 /root가 통합 검증 담당"
+      ]
+    }
+  ],
+  "nextActions": [],
+  "blockers": [],
+  "supersedes": []
+}
