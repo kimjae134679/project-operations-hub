@@ -63,8 +63,9 @@ public sealed class ProjectBridgeIntegrationTests : IDisposable
         foreach(var file in document.RootElement.GetProperty("files").EnumerateArray())
         {
             var path=file.GetProperty("path").GetString()!;
-            using var resource=assembly.GetManifestResourceStream("ProjectBridge/"+path);
-            Assert.NotNull(resource);
+            var name=assembly.GetManifestResourceNames().FirstOrDefault(n=>n.Replace('\\','/')=="ProjectBridge/"+path);
+            using var resource=name is null?null:assembly.GetManifestResourceStream(name);
+            Assert.True(resource is not null,"Missing bundled resource: "+path+"; available: "+string.Join(",",assembly.GetManifestResourceNames()));
             var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(resource)).ToLowerInvariant();
             Assert.Equal(file.GetProperty("sha256").GetString(),hash);
         }
