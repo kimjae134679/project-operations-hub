@@ -8,6 +8,14 @@
 
 focused RED 7 FAIL/18 PASS 및 invalid-registration side effect RED 1 FAIL 후 publisher/registered **46 PASS/0 FAIL**를 확인했습니다. 부모 fresh .NET code-only **642 PASS/0 FAIL**(실제 Window 검사 3개 제외), release code-only **121 PASS/0 FAIL**(Desktop helper 모듈 전체 제외)를 확인했습니다. 최초 부모 release 검사 5ERROR는 긴 시험 D TEMP 경로의 native MAX_PATH 오류였고, 짧은 소유 D TEMP의 같은 소스로 재검사하여 통과했습니다. 실제 일회 GitHub 결과는 아래에 추가하며, 기존 0.9.8 GUI가 이번 수정으로 자동 교체된 것은 아닙니다. 원본 프로젝트 dirty, 실제 중앙 clone/잠금, 보호 Bridge 설정과 원격은 변경하지 않습니다. receipt-driven review disabled/unmanaged, 예약 PAUSED를 유지합니다.
 
+### 이번 실제 일회 업로드 · 2026-10-07 18:36 KST
+
+- 검증 소스 e9d5f45857abe3c87388b350f4a27dd6af088832의 별도 framework-dependent 전용 CLI를 빌드했습니다. 정확 exe의 창 없는 fixture는 native0/Windows0/settings·MainVMfalse/downstream·sync·stop0입니다. 기존 운영 GUI의 app source c4f9669와 구분합니다.
+- 기존 0.9.8 소유 앱을 지원된 headless IPC로 정상 종료한 뒤 등록된 허브 metadata 경로만 실행했습니다. native0, metadata **41개 추가**로 [draft PR #33](https://github.com/kimjae134679/project-operations-hub/pull/33)을 만들었습니다. head `9e56e428c1fe3c35a6a1608b37e3ce6a80a27351`, 변경 41 ADDED/삭제0, main 미병합입니다.
+- 동일 자료 재실행도 native0·같은 batch e1cc23cf·같은 PR #33을 반환했습니다. 실제 API POST 횟수는 계측하지 않았으므로 POST0으로 주장하지 않습니다. 다른 프로젝트 게시·AI 호출·공지 확인 대필·자동 merge0입니다.
+- fixed guard로 기존 정확 0.9.8(c4f9669) 앱을 복귀했습니다. 새 PID11612/birth18:36:25.942125KST, tray/PC true를 확인했고 원격5996·Bridge5140은 동일 생존을 유지했습니다. GUI에는 이번 publisher 소스를 교체하지 않았으며 이는 일회 전용 CLI 공유입니다.
+- `CentralShared=false/CreatesAcknowledgement=false`입니다. 공개 상태 metadata 성공을 중앙 원문 clone 복구나 보호 Bridge 운영 설치로 바꾸지 않습니다. 최신 후속 로컬 checkpoint는 다음 공유 대기입니다. 본문·개인 경로·원문 명령/답변·actor/session은 업로드하지 않습니다.
+
 ### 이전 배포·게시 이력
 
 **현재 상태: 0.9.6 스테이징 완료·운영 미적용(activated=false).** 아래 0.9.5 일회 headless 공유 이력은 당시 실제 확인입니다. 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish/스테이징은 완료했지만 운영 미적용입니다(source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false). 현재 0.9.3 PID 16092의 PC/tray true와 기존 원격을 유지합니다. 이전 0.9.4 스테이징은 당시 이력입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
