@@ -160,23 +160,20 @@ public sealed partial class MainViewModel
     public string UserReadExplanation => IsReadOnlyView ? "로컬 조회의 읽음 표시는 이번 창의 임시 위치입니다. 저장하거나 AI 확인 기록을 변경하지 않습니다." : "이 화면의 읽음 표시는 사용자 읽기 위치입니다. AI 공지 확인을 대신 기록하지 않습니다.";
     public string EntryReadPositionKey => SelectedEntry is null ? "" : SelectedEntry.Entry.Identity + "/" + SelectedEntry.Entry.ContentHash;
     private readonly CommunicationService _communication = new();
-    private readonly CommunicationGitService _communicationGit = new();
     private readonly SemaphoreSlim _communicationLock = new(1,1);
     private readonly ManualCommunicationCollection _manualCollection=new(TimeSpan.FromMinutes(5),TimeSpan.FromMinutes(3),()=>DateTimeOffset.UtcNow);
     private Task _manualCollectionTask=Task.CompletedTask;
     private readonly RegisteredRecordPublishing _registeredRecordPublishing=new();
     private Task _recordPublicationTask=Task.CompletedTask;
-    private string _recordPublicationStatus="프로젝트 GitHub 공개 등록 대기 · 원문은 로컬에 보관";
+    private string _recordPublicationStatus="주 담당 AI의 명시 게시 명령 대기 · 원문은 로컬에 보관";
     public string RecordPublicationStatus {get=>_recordPublicationStatus;private set=>SetProperty(ref _recordPublicationStatus,value);}
     private string _manualCollectionStatus="로컬 수집 대기 · 중앙 공유 없음";
     public string ManualCollectionStatus {get=>_manualCollectionStatus;private set=>SetProperty(ref _manualCollectionStatus,value);}
-    private DateTime _lastCommunication = DateTime.MinValue, _lastCommunicationNetwork = DateTime.MinValue;
     private CommunicationSnapshot? _communicationSnapshot;
     private NoticeRow? _selectedNotice;
     private InboxRow? _selectedInbox;
     private CommunicationProjectRow? _selectedCommunicationProject;
     private bool _isCommunicating;
-    private bool _communicationPrepared;
     private string _communicationMessage = "공지와 프로젝트 전달 기록을 연결합니다.";
     private string _centralSyncMessage = "GitHub 연결 대기";
     private Dictionary<string,string> _communicationNames = new();
@@ -278,7 +275,7 @@ public sealed partial class MainViewModel
     }
     public bool AutoCommunication { get => _settings.AutoCommunication; set { _settings.AutoCommunication=value; SaveSettings(); OnPropertyChanged(); } }
     public bool AutoPublishCommunication { get => _settings.AutoPublishCommunication; set { _settings.AutoPublishCommunication=value; SaveSettings(); OnPropertyChanged(); } }
-    public string CommunicationHubPath { get => _settings.CommunicationHubPath; set { _settings.CommunicationHubPath=value; _lastCommunicationNetwork=DateTime.MinValue; SaveSettings(); OnPropertyChanged(); } }
+    public string CommunicationHubPath { get => _settings.CommunicationHubPath; set { _settings.CommunicationHubPath=value; SaveSettings(); OnPropertyChanged(); } }
     public bool IsCommunicating { get => _isCommunicating; private set => SetProperty(ref _isCommunicating,value); }
     public string CommunicationMessage { get => _communicationMessage; private set => SetProperty(ref _communicationMessage,value); }
     public string CentralSyncMessage { get => _centralSyncMessage; private set => SetProperty(ref _centralSyncMessage,value); }
@@ -356,7 +353,7 @@ public sealed partial class MainViewModel
     {
         if(BlockOperation())return;
         if(!_communicationNames.ContainsKey(id) || !Directory.Exists(folder)) { CommunicationMessage="연결할 프로젝트와 실제 폴더를 선택하세요."; return; }
-        _settings.CommunicationFolders[id]=Path.GetFullPath(folder); SaveSettings(); _lastCommunication=DateTime.MinValue;
+        _settings.CommunicationFolders[id]=Path.GetFullPath(folder); SaveSettings();
     }
     public void OpenCommunicationFolder() => OpenExisting(SelectedCommunicationProject?.Root is { Length:>0 } root ? Path.Combine(root,"_통합소통") : null);
     public void OpenCollectedFile()
@@ -375,9 +372,15 @@ public sealed partial class MainViewModel
     public async Task SyncCommunicationAsync(bool force=false)
     {
         if(ManualAdmissionClosed)return;
-        if(IsManualControl)
+        if(IsManualControl || !IsReadOnlyView)
         {
-            if(_disposed || !await _communicationLock.WaitAsync(0))return;
+            if(_disposed)return;
+            try
+            {
+                if(force && !IsManualControl)await _communicationLock.WaitAsync(_lifetime.Token);
+                else if(!await _communicationLock.WaitAsync(0))return;
+            }
+            catch(OperationCanceledException){return;}
             try
             {
                 var local=await _communication.ReadOnlyAsync(CommunicationHubPath,_lifetime.Token);
@@ -389,6 +392,7 @@ public sealed partial class MainViewModel
             catch(OperationCanceledException){}
             catch(Exception){CentralSyncMessage=CommunicationMessage="로컬 조회 보류 · 기존 자료는 변경하지 않았습니다. 중앙 공유 없음";}
             finally{_communicationLock.Release();}
+            // All GUI refreshes collect locally. Publication requires the dedicated explicit CLI.
             // Startup and manual refresh must not await an 82-second collection operation.
             _ = StartManualCollection(force);
             return;
@@ -409,41 +413,11 @@ public sealed partial class MainViewModel
             finally{_communicationLock.Release();}
             return;
         }
-        if(_disposed || !force && DateTime.UtcNow-_lastCommunication<TimeSpan.FromSeconds(15)) return;
-        try
-        {
-            if (force) await _communicationLock.WaitAsync(_lifetime.Token);
-            else if (!await _communicationLock.WaitAsync(0)) return;
-        }
-        catch (OperationCanceledException) { return; }
-        try
-        {
-            IsCommunicating=true; _lastCommunication=DateTime.UtcNow;
-            var network=force || DateTime.UtcNow-_lastCommunicationNetwork>TimeSpan.FromMinutes(1);
-            CommunicationGitResult? prepare=null;
-            if(network && !_settings.IsTemporary) { _lastCommunicationNetwork=DateTime.UtcNow; prepare=await _communicationGit.PrepareAsync(CommunicationHubPath,_lifetime.Token); _communicationPrepared=prepare.Success; CentralSyncMessage=prepare.Message; }
-            else if (_settings.IsTemporary) CentralSyncMessage="화면 검증용 로컬 자료 · GitHub 변경 없음";
-            if (!_settings.IsTemporary && !_communicationPrepared) { CommunicationMessage="전용 소통 저장소 연결 대기 · 기존 폴더의 자료는 보존합니다."; return; }
-            var manifest=Path.Combine(CommunicationHubPath,"04_COMMUNICATION","announcements","manifest.json");
-            if(!File.Exists(manifest)) { CommunicationMessage="공지를 아직 내려받지 못했습니다. 연결되면 다시 시도합니다."; return; }
-            var snapshot=await _communication.SyncAsync(CommunicationHubPath,GetCommunicationTargets(),_lifetime.Token);
-            if(network && prepare?.Success==true)
-            {
-                var published=await _communicationGit.SynchronizeAsync(CommunicationHubPath,snapshot.PublishablePaths,AutoPublishCommunication,_lifetime.Token);
-                CentralSyncMessage=published.Message;
-                if(published.Success) snapshot=await _communication.SyncAsync(CommunicationHubPath,GetCommunicationTargets(),_lifetime.Token);
-            }
-            if(!snapshot.Errors.Any(e=>e.Code=="manifest_invalid")) ReadCommunicationNames(manifest);
-            ApplyCommunicationSnapshot(snapshot);
-        }
-        catch(OperationCanceledException) { }
-        catch(Exception ex) { CommunicationMessage="소통 동기화 대기 · " + ProcessRunner.Sanitize(ex.Message); }
-        finally { IsCommunicating=false; _communicationLock.Release(); }
     }
     /// <summary>Tracked, exception-observed background operation; timers never await collection I/O.</summary>
     public Task StartManualCollection(bool force=false)
     {
-        if(!IsManualControl||_disposed||ManualAdmissionClosed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
+        if((!IsManualControl&&(IsReadOnlyView||_settings.IsTemporary))||_disposed||ManualAdmissionClosed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
         if(!_manualCollectionTask.IsCompleted)return _manualCollectionTask;
         try
         {
@@ -468,7 +442,6 @@ public sealed partial class MainViewModel
                 {
                     var existing=_communicationSnapshot??new CommunicationSnapshot([],[],[],[],[],result.CollectedAt,[]);
                     ApplyCommunicationSnapshot(ManualCommunicationCollection.Merge(existing,result));
-                    _ = StartRegisteredRecordPublishing(result);
                     ManualCollectionStatus=$"로컬 수집 {result.Records.Count}개 · 보류 {result.Errors.Count}개 · 중앙 공유 없음";
                 }
                 else if(refreshed.Status=="blocked")ManualCollectionStatus="로컬 수집 보류 · 마지막 정상 자료 유지 · 중앙 공유 없음";
@@ -487,44 +460,9 @@ public sealed partial class MainViewModel
     }
     public Task StartRegisteredRecordPublishing(CommunicationCollectionResult result)
     {
-        if(!IsManualControl||_disposed||ManualAdmissionClosed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
-        if(!_recordPublicationTask.IsCompleted)return _recordPublicationTask;
-        _recordPublicationTask=RunRegisteredRecordPublishingAsync(result,_lifetime.Token);
-        return _recordPublicationTask;
-    }
-    private async Task RunRegisteredRecordPublishingAsync(CommunicationCollectionResult collection,CancellationToken ct)
-    {
-        try
-        {
-            // Registry/transport work stays off dispatcher and is separately tracked from collection.
-            var status=await Task.Run(()=>_registeredRecordPublishing.PublishRegisteredAsync(true,collection,ct),ct).ConfigureAwait(false);
-            if(_disposed||ct.IsCancellationRequested)return;
-            await _dispatcher.InvokeAsync(()=>
-            {
-                if(_disposed||ct.IsCancellationRequested)return;
-                RecordPublicationStatus=status switch
-                {
-                    "pr_open"=>"프로젝트 GitHub 메타데이터 업로드 · 초안 PR 열림 · 병합 미확인",
-                    "pr_closed"=>"프로젝트 GitHub 초안 PR 닫힘 · 병합 없음",
-                    "pr_merged"=>"프로젝트 GitHub 메타데이터 PR 병합 확인",
-                    "branch_uploaded"=>"프로젝트 GitHub 브랜치 업로드 확인 · PR 미확인",
-                    "upload_uncertain" or "pr_uncertain"=>"프로젝트 GitHub 결과 미확인 · 자동 재시도 보류",
-                    "already_present"=>"프로젝트 GitHub 기준 브랜치에 같은 메타데이터 있음 · 중복 업로드 없음",
-                    "empty"=>"프로젝트 GitHub 공개 가능한 구조 메타데이터 없음",
-                    "cached"=>"프로젝트 GitHub 동일 수집분 중복 업로드 없음",
-                    "inflight"=>"프로젝트 GitHub 메타데이터 공유 중 · 중복 실행 없음",
-                    "disabled"=>"프로젝트 GitHub 명시 등록 대기 · 원문은 로컬에 보관",
-                    _=>"프로젝트 GitHub 공개 보류 · 원문은 로컬에 보관"
-                };
-                CentralSyncMessage=ManualCollectionStatus+" · "+RecordPublicationStatus;
-            });
-        }
-        catch(OperationCanceledException){}
-        catch(Exception)
-        {
-            if(_disposed||ct.IsCancellationRequested)return;
-            try{await _dispatcher.InvokeAsync(()=>{if(!_disposed&&!ct.IsCancellationRequested)RecordPublicationStatus="프로젝트 GitHub 공개 보류 · 원문은 로컬에 보관";});}catch(Exception){}
-        }
+        // Compatibility entry is fail-closed before registry or transport I/O in every GUI mode.
+        // Only --publish-records-once <ProjectId>, explicitly issued by the primary assistant, publishes.
+        return Task.CompletedTask;
     }
     internal void ApplyCommunicationSnapshot(CommunicationSnapshot snapshot)
     {

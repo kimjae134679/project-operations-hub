@@ -212,10 +212,32 @@ public sealed class RegisteredRecordPublishingTests
         foreach(var next in new[]{"StartupPolicy.TryCreate","StartRemoteSupervisor(e)","new Mutex","ControlTowerSettings.LoadReadOnly()","new MainWindow"})Assert.True(route<app.IndexOf(next,begin,StringComparison.Ordinal));
         Assert.Contains("_recordPublishLifetime?.Cancel()",app);
     }
-    [Fact] public void CompletedManualCollectionSchedulesSeparateTrackedPublicationWithoutWaiting()
+    [Fact] public void GuiCollectionCannotReachEitherAutomaticPublicationTransport()
     {
-        var vm=Source(Path.Combine("ViewModels","CommunicationViewModel.cs"));Assert.Contains("_recordPublicationTask",vm);Assert.Contains("StartRegisteredRecordPublishing(result)",vm);
-        Assert.DoesNotContain("await StartRegisteredRecordPublishing",vm);Assert.Contains("_lifetime.Token",vm);Assert.Contains("RecordPublicationStatus",vm);
+        var vm=Source(Path.Combine("ViewModels","CommunicationViewModel.cs"));
+        Assert.DoesNotContain("StartRegisteredRecordPublishing(result)",vm);
+        Assert.DoesNotContain("PublishRegisteredAsync(",vm);
+        Assert.DoesNotContain("_communicationGit.PrepareAsync",vm);
+        Assert.DoesNotContain("_communicationGit.SynchronizeAsync",vm);
+        Assert.DoesNotContain("_communication.SyncAsync",vm);
+        Assert.Contains("CollectOnlyAsync",vm);
+    }
+    [Theory]
+    [InlineData(false,false)]
+    [InlineData(true,false)]
+    [InlineData(false,true)]
+    public void GuiPublicationApiIsNoIoEvenForEnabledRegistration(bool manual,bool viewer)
+    {
+        using var fixture=new Fixture();var helper=(RegisteredRecordPublishing)fixture.New();
+        using var vm=new AIControlTower.ViewModels.MainViewModel(new(){IsTemporary=true,TransientReadOnly=viewer,
+            TransientDataDirectory=fixture.Root},false,()=>{},new StartupPolicy(viewer){IsManualControl=manual},null);
+        typeof(AIControlTower.ViewModels.MainViewModel).GetField("_registeredRecordPublishing",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(vm,helper);
+        // Invalid collection is an additional fail-closed safety net on the pre-change implementation.
+        var result=new CommunicationCollectionResult([], [new(null,"collection_blocked","Fixture only")],DateTimeOffset.UtcNow);
+        var task=vm.StartRegisteredRecordPublishing(result);
+        Assert.Same(Task.CompletedTask,task);
+        Assert.False(helper.IsRunning);
+        Assert.Null(Helper().GetField("_fingerprint",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(helper));
     }
     [Fact] public void HeadlessCollectorHasNoSettingsCentralGitOrGuiFallback()
     {

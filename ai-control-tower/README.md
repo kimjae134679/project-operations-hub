@@ -1,5 +1,9 @@
 # AI Control Tower
 
+## 최신 사용자 정책 · GitHub 전송은 명시 명령만
+
+2026-10-07 사용자 지시로 앱은 로컬 기록을 계속 수집·보관하되 GitHub 업로드는 관리 담당자의 명시 일회 실행에 한정합니다. 시작·자동 갱신·재연결·수집 완료에 따른 자동 Git 변경과 PR 생성을 중단합니다. 기존 `--publish-records-once <등록 프로젝트 ID>` 경로의 등록/검증/단일 실행/개인정보 경계는 유지합니다. 아래 자동 게시 성공은 과거 실행 이력이며 현재 자동 전송 권한이 아닙니다. 운영 전환 결과는 [기록 공유 안내](docs/project-record-publishing.md)의 최신 정책과 해당 로컬 checkpoint를 우선합니다.
+
 ## 최신 운영 확인 · 2026-10-07
 
 0.9.8 scoped 운영 앱(source `5e79fa1`, 현재 PID 21936)에 수정본을 반영했습니다. 지원되는 자동 교체와 유휴 정상 종료/재시작을 확인했고, 앱이 별도 업로드 CLI 없이 상태 메타데이터 45개를 [draft PR34](https://github.com/kimjae134679/project-operations-hub/pull/34)로 자동 공유했습니다. fresh .NET654 PASS·교체 helper43 PASS이며 실제 Window 검사3개는 미실행입니다. 원문은 로컬 보존, PR은 미병합이고 보호 원격 설치·중앙 clone 잠금은 미해결입니다. 정확한 앱/실행기 신원·검증·남은 범위는 [기록 공유 안내](docs/project-record-publishing.md)를 우선합니다. 아래 0.9.3 및 이전 현재 표현은 해당 시점의 이력입니다.
