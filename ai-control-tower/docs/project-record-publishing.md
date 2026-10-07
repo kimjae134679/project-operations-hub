@@ -2,11 +2,17 @@
 
 **현재 상태: 0.9.6 스테이징 완료·운영 미적용(activated=false).** 아래 0.9.5 일회 headless 공유 이력은 당시 실제 확인입니다. 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish/스테이징은 완료했지만 운영 미적용입니다(source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false). 현재 0.9.3 PID 16092의 PC/tray true와 기존 원격을 유지합니다. 이전 0.9.4 스테이징은 당시 이력입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
 
-## 최신 GitHub 정리 · 사용자 명시 한정 one-shot
+## 최신 사용자 지시 · main 병합 절차 진행(완료 미확인)
+
+사용자 최신 지시로 [허브 #24](https://github.com/kimjae134679/project-operations-hub/pull/24)·[허브 #26](https://github.com/kimjae134679/project-operations-hub/pull/26)·[Voice #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2)의 main 병합 절차를 진행합니다. 이 문서 정정 시점에는 3개 PR의 병합 성공을 확인하지 않았고 완료로 단정하지 않습니다. 최신 성공/실패 원본은 GitHub PR 실제 상태이며 아래 미merge/main 미반영/open·draft는 **2026-10-07 12:19~12:28 병합 전 업로드 점검**의 스냅샷입니다.
+
+main 코드/메타데이터 병합은 현재 앱의 0.9.6 활성화·보호 Bridge 업그레이드·중앙 clone 복구가 아닙니다. 기존 0.9.3·원격·dirty를 유지하고 자동 append/상시 반복은 미완료입니다. 새 코드/runtime·모델·계정·registry 변경과 리뷰 실행 없이 receipt-driven review disabled/unmanaged를 유지합니다.
+
+## 2026-10-07 12:19~12:28 병합 전 업로드 점검
 
 정확 0.9.6 exe로 사용자 명시 “일단 GitHub 자체 다 업로드하고 정리”의 한정 게시를 실행했습니다. 새 코드 변경 없이 이전 .NET 529/Python 68 검증과 source `84840a1` 미활성 스테이징을 유지합니다. 일회 게시와 GUI/자동 반복 활성화는 별개입니다.
 
-| 대상 | 최신 실제 상태 | 보존·미완료 경계 |
+| 대상 | 병합 전 업로드 점검 당시 상태 | 보존·미완료 경계 |
 |---|---|---|
 | 허브 | [PR #26](https://github.com/kimjae134679/project-operations-hub/pull/26), 구조 메타데이터 84개, open/draft | old #25의 76개 경로/blob SHA 모두 그대로+새 8개, added only·삭제 0·main 불변 |
 | old 허브 #25 | 본인 draft에 superseded 설명 후 closed/unmerged | branch 삭제 0, 과거 성공 증거 보존 |

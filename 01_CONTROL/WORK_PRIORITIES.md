@@ -10,7 +10,13 @@
 
 ## 최신 체크포인트 · 실제 검증과 아직 남은 일
 
-### 최신 GitHub 업로드 정리 · 사용자 명시 일회 실행
+### 최신 사용자 지시 · main 병합 절차 진행(완료 미확인)
+
+사용자 최신 지시에 따라 허브 #24/#26과 Voice #2의 main 병합 절차를 진행합니다. 이 문서 정정 시점에는 3개 PR의 병합 성공을 확인하지 않았으며 완료로 단정하지 않습니다. 최신 결과의 원본은 각 GitHub PR의 실제 상태입니다. 아래 미merge/main 미반영/open·draft 등의 업로드 상태는 **2026-10-07 12:19~12:28 병합 전 업로드 점검** 당시 증거로 보존합니다.
+
+main 코드/메타데이터 병합은 현재 앱의 0.9.6 활성화·보호 Bridge 업그레이드·중앙 clone 복구와 별개입니다. 기존 0.9.3·원격·dirty를 유지하고 자동 append/상시 반복은 아직 미완료입니다. 새 코드/runtime·모델·계정·registry 변경, 리뷰 실행은 없으며 receipt-driven review는 disabled/unmanaged입니다.
+
+### 2026-10-07 12:19~12:28 병합 전 업로드 점검
 
 사용자의 “일단 GitHub 자체 다 업로드하고 정리” 지시에 따라 정확 0.9.6 exe의 한정 one-shot을 확인했습니다. 허브 최신 구조 메타데이터 84개는 [draft PR #26](https://github.com/kimjae134679/project-operations-hub/pull/26)에 올라갔습니다. 이전 #25의 76개 경로/blob SHA를 모두 그대로 포함하고 새 8개만 추가했으며 삭제 0·main 불변입니다. #25는 superseded 설명 후 closed/unmerged이고 branch는 삭제하지 않았습니다. 최신 #26은 open/draft입니다.
 
