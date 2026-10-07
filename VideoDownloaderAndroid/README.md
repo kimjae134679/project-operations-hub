@@ -1,6 +1,6 @@
 # 영상다운로더 Android
 
-설치파일: [Galaxy S22·64비트 Android용 APK 1.0.2](https://github.com/kimjae134679/project-operations-hub/releases/download/video-downloader-android-v1.0.2/VideoDownloader-1.0.2-arm64-v8a.apk). [전체 배포 파일](https://github.com/kimjae134679/project-operations-hub/releases/tag/video-downloader-android-v1.0.2)에서 32비트 APK와 SHA256 체크섬도 확인할 수 있습니다.
+설치파일: [Galaxy S22·64비트 Android용 APK 1.1.0](https://github.com/kimjae134679/project-operations-hub/releases/download/video-downloader-android-v1.1.0/VideoDownloader-1.1.0-arm64-v8a.apk). [전체 배포 파일](https://github.com/kimjae134679/project-operations-hub/releases/tag/video-downloader-android-v1.1.0)에서 32비트 APK와 SHA256 체크섬도 확인할 수 있습니다.
 
 휴대폰에서 링크를 입력하고 이름 있는 목록으로 관리한 뒤 영상·음원을 직접 저장하는 앱입니다. PC 서버가 필요 없습니다. Android 10 이상이며 Galaxy S22는 arm64-v8a 설치파일을 사용합니다.
 
@@ -35,3 +35,15 @@ GitHub Actions는 컴파일·단위 검사·Android lint, 360/412/800px UI·다�
 디자인 참고: [Seal](https://github.com/JunkFood02/Seal)의 링크 추가/다운로드 상태 흐름, [Material](https://m3.material.io/)의 큰 터치 영역/하단 메뉴/선택 동작. 디자인·레이아웃은 이 프로젝트에서 작성했습니다.
 
 라이브러리 출처·라이선스: [yt-dlp](https://github.com/yt-dlp/yt-dlp), [youtubedl-android](https://github.com/yausername/youtubedl-android), [FFmpeg](https://ffmpeg.org/legal.html), [jsoup](https://jsoup.org/license).
+
+## UI 개편 1.1.0
+
+링크 추가 화면에서 주소를 입력한 뒤 **페이지 열기**로 앱 안에서 바로 이동할 수 있습니다. 목록에 저장하지 않고 페이지부터 볼 수 있고, 각 영상에서도 **페이지 열기**를 누릅니다. 브라우저 주소를 직접 바꾸거나 뒤로/앞으로 이동하고 페이지를 목록에 담을 수 있습니다.
+
+저장 형식과 화질은 자동으로 처리하므로 기본 화면에 선택 옵션이 없습니다. 다운로드 도움말은 설정의 접힌 영역에서 확인합니다. 목록/팝업/선택에는 짧은 애니메이션을 적용하며 기기의 동작 줄이기를 존중합니다.
+
+**삭제 방법 선택**에서 **목록에서만 삭제**하면 휴대폰 파일은 남습니다. **저장 파일 삭제**는 확인 후 선택한 항목의 실제 파일만 지우고 링크는 남깁니다. 진행 중인 영상은 먼저 일시정지해야 합니다. 파일 삭제 실패 시 실패 파일의 기록은 유지합니다.
+
+이전 1.0.2 빌드는 서명키를 보존하지 않았습니다. 업데이트가 거절되면 기존 앱에서 설정 → 목록 백업 → 내보내기를 먼저 하고, 기존 앱 삭제 후 1.1.0을 설치해 백업을 가져오세요. 공개 다운로드 파일은 유지되지만 삭제/재설치 전 백업은 필요합니다. 이번 버전부터 빌드 서명키를 캐시합니다.
+
+빌드·검증 완료 여부는 `task-ui-progress.json`과 해당 Actions 결과가 원본입니다. 실기기 Galaxy S22 테스트는 별도입니다.

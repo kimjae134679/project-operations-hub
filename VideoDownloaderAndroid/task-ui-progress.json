@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "recordType": "task_exchange",
+  "recordId": "video-downloader-ui-20261007",
+  "revision": 1,
+  "title": "영상다운로더 UI 마무리와 페이지 열기·삭제 구분",
+  "projectId": "Video-Downloader",
+  "actorId": "Codex-VideoDownloader",
+  "sessionId": "android-ui-20261007",
+  "receivedAt": "2026-10-07T10:33:00+09:00",
+  "updatedAt": "2026-10-07T01:39:11.825Z",
+  "request": {
+    "summary": "전체 UI 개편·애니메이션, 목록만 삭제/저장 파일 삭제 구분, 입력 직후 페이지 열기와 항목 페이지 열기, MP4 우선 및 해상도 옵션 제거",
+    "details": "통합소통 디자인 공지 참고, 기존 APK를 다듬어 설치파일까지 완료",
+    "source": "현재 ChatGPT 사용자 요청"
+  },
+  "response": {
+    "summary": "현재 UI·입력·삭제 분리 구현을 사용자에게 전달, 검증과 APK 빌드 진행 중",
+    "source": "실제 진행 답변"
+  },
+  "status": "in_progress",
+  "workDone": [
+    "최신 중앙 AGENTS·USER_POLICIES·N-0002·N-0010·디자인 참고 및 도구선택 지침을 읽음",
+    "목록 중심 레이아웃·녹색 포인트·명암 대비·SVG 하단 메뉴·팝업과 전환 애니메이션 구현",
+    "링크 입력창 페이지 열기, 목록/항목 페이지 열기, MP4/최고화질 기본 처리",
+    "목록 삭제와 실제 파일 삭제 명시 선택 분리, 진행 중 삭제 차단",
+    "기존 링크를 입력창에서 즉시 다운로드할 때 중복 항목도 시작하도록 보완"
+  ],
+  "verification": [
+    {
+      "name": "JavaScript syntax",
+      "result": "pass",
+      "evidence": [
+        "node --check assets/app.js, qa/ui.spec.js"
+      ]
+    },
+    {
+      "name": "로컬 UI 실행",
+      "result": "blocked",
+      "evidence": [
+        "npm registry network denied EACCES; CI에서 실행 예정"
+      ]
+    },
+    {
+      "name": "Android build and native QA",
+      "result": "pending",
+      "evidence": [
+        "GitHub Actions"
+      ]
+    }
+  ],
+  "nextActions": [
+    "전용 브랜치 커밋과 APK 1.1.0 빌드",
+    "실제 UI 캡처와 native 파일 삭제/브라우저/다운로드 검증",
+    "최종 릴리스 확인 및 사용자 전달"
+  ],
+  "blockers": [],
+  "location": {
+    "actual": "VideoDownloaderAndroid",
+    "defaultPolicy": "D:\\A_KJ\\AI",
+    "exception": "허용 작업폴더의 기존 Android 소스와 GitHub 빌드 환경 사용. 기존 PC 원본/바탕화면 미변경"
+  },
+  "sharing": {
+    "localRecord": true,
+    "centralAppCollection": "unverified"
+  }
+}

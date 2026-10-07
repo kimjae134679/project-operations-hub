@@ -7,6 +7,7 @@ import java.util.*;
 public final class Store {
     private static JSONObject data;
     private static Context context;
+    private static final Set<String> deletingFiles = new HashSet<>();
     public static synchronized void init(Context c) {
         context = c.getApplicationContext();
         if (data != null) return;
@@ -24,7 +25,20 @@ public final class Store {
     public static synchronized void patch(String id,JSONObject patch) {
         JSONArray a=data.optJSONArray("tasks"); for(int i=0;i<a.length();i++) { JSONObject o=a.optJSONObject(i); if(id.equals(o.optString("id"))) { Iterator<String> keys=patch.keys(); while(keys.hasNext()){String k=keys.next(); put(o,k,patch.opt(k));} put(o,"updated",System.currentTimeMillis()); save(); return; } }
     }
-    public static synchronized String next() { JSONArray a=data.optJSONArray("tasks"); for(int i=0;i<a.length();i++)if("queued".equals(a.optJSONObject(i).optString("status")))return a.optJSONObject(i).optString("id");return null; }
+    public static synchronized String next() { JSONArray a=data.optJSONArray("tasks"); for(int i=0;i<a.length();i++){JSONObject task=a.optJSONObject(i);if("queued".equals(task.optString("status"))&&!deletingFiles.contains(task.optString("id")))return task.optString("id");}return null; }
+    public static synchronized boolean reserveFileDeletion(String id) {
+        JSONObject task=task(id);
+        if(task==null||deletingFiles.contains(id)||Arrays.asList("queued","analyzing","downloading","exporting","pausing").contains(task.optString("status")))return false;
+        deletingFiles.add(id);return true;
+    }
+    public static synchronized void releaseFileDeletion(String id) { deletingFiles.remove(id); }
+    public static synchronized void forgetFile(String id,String uri) {
+        JSONObject task=task(id);if(task==null)return;JSONArray files=task.optJSONArray("files");if(files==null)return;
+        for(int i=files.length()-1;i>=0;i--)if(uri.equals(files.optJSONObject(i).optString("uri")))files.remove(i);
+        JSONObject change=obj("files",files);
+        if(files.length()==0&&Arrays.asList("completed","partial").contains(task.optString("status"))){put(change,"status","ready");put(change,"progress",0);put(change,"message","저장 파일을 삭제했습니다. 다시 다운로드할 수 있습니다.");put(change,"error","");}
+        patch(id,change);
+    }
     public static synchronized void recover() { JSONArray a=data.optJSONArray("tasks"); for(int i=0;i<a.length();i++){JSONObject o=a.optJSONObject(i); if(Arrays.asList("queued","analyzing","downloading","exporting","pausing").contains(o.optString("status"))){put(o,"status","paused");put(o,"message","다운로드가 중단되었습니다. 이어받기를 눌러 주세요.");}}save(); }
     public static synchronized JSONObject command(JSONObject cmd) {
         String action=cmd.optString("action");JSONArray tasks=data.optJSONArray("tasks"),lists=data.optJSONArray("lists");
@@ -40,6 +54,7 @@ public final class Store {
         }
         JSONArray ids=cmd.optJSONArray("ids");if(ids==null)ids=new JSONArray().put(cmd.optString("id"));
         for(int n=0;n<ids.length();n++){String id=ids.optString(n);for(int i=tasks.length()-1;i>=0;i--){JSONObject o=tasks.optJSONObject(i);if(!id.equals(o.optString("id")))continue;String status=o.optString("status");boolean active=Arrays.asList("analyzing","downloading","exporting","pausing").contains(status);
+            if(deletingFiles.contains(id))continue;
             if("enqueue".equals(action)&&!active&&!"completed".equals(status)){put(o,"status","queued");put(o,"message","순서를 기다리는 중");put(o,"error","");}
             if("pause".equals(action)&&!active&&!"completed".equals(status)){put(o,"status","paused");put(o,"message","일시정지");}
             if("remove".equals(action)&&!active){String cf=o.optString("cookieFile");if(!cf.isEmpty())new java.io.File(cf).delete();tasks.remove(i);}

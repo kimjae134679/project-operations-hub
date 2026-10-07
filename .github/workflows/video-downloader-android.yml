@@ -25,6 +25,11 @@ jobs:
         with:
           gradle-version: '8.14.3'
           cache-read-only: false
+      - name: Preserve installation signing identity for future builds
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: video-downloader-installation-key-v1
       - name: Compile, unit tests and Android lint
         run: gradle -p VideoDownloaderAndroid :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --no-daemon
       - uses: actions/setup-node@v4
@@ -63,15 +68,15 @@ jobs:
           mkdir -p VideoDownloaderAndroid/dist/qa
           BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
           for ABI in arm64-v8a armeabi-v7a; do
-            cp "VideoDownloaderAndroid/app/build/outputs/apk/release/app-$ABI-release.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.0.2-$ABI.apk"
-            "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.0.2-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
-            "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.0.2-$ABI.apk"
+            cp "VideoDownloaderAndroid/app/build/outputs/apk/release/app-$ABI-release.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.1.0-$ABI.apk"
+            "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.1.0-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
+            "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.1.0-$ABI.apk"
           done
           cp VideoDownloaderAndroid/app/build/reports/lint-results-debug.html VideoDownloaderAndroid/dist/qa/
           cp -r VideoDownloaderAndroid/qa/screenshots VideoDownloaderAndroid/dist/qa/screenshots
           cd VideoDownloaderAndroid/dist
           sha256sum *.apk > SHA256SUMS.txt
-          printf 'Build, JVM unit tests, Android lint, 6 responsive UI tests, Android 35 native MP4/HLS/DASH/short media/MediaStore/collision/recovery tests passed.\nSource commit: %s\n' "$GITHUB_SHA" > qa/RESULT.txt
+          printf 'Build, JVM unit tests, Android lint, 18 responsive UI tests, Android 35 native MP4/HLS/DASH/short media/MediaStore/collision/recovery/explicit-file-deletion tests passed.\nSource commit: %s\n' "$GITHUB_SHA" > qa/RESULT.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -86,7 +91,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create video-downloader-android-v1.0.2 VideoDownloaderAndroid/dist/*.apk VideoDownloaderAndroid/dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title '영상다운로더 Android 1.0.2' --notes 'Standalone Android downloader. Native MP4/HLS/DASH and responsive UI QA passed. Galaxy S22: arm64-v8a. Files saved in Download/VideoDownloader. Personal testing certificate; not a Play Store release.' --latest=false
+          gh release create video-downloader-android-v1.1.0 VideoDownloaderAndroid/dist/*.apk VideoDownloaderAndroid/dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title '영상다운로더 Android 1.1.0 · UI 개편' --notes 'Polished library UI, light/dark themes and short animations. Open pages directly from link entry or any task. MP4/best quality automatic defaults. Separate list-only removal and explicit saved-file deletion. Android 35 native download/file QA and 18 responsive UI checks passed. S22: arm64-v8a. The previous 1.0.2 build did not preserve its signing key; back up lists to JSON before reinstalling if Android rejects the update. This version caches its signing identity for subsequent builds.' --latest=false
           git config user.name 'Video Downloader Build'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f VideoDownloaderAndroid/dist/qa VideoDownloaderAndroid/dist/SHA256SUMS.txt
