@@ -22,25 +22,25 @@ Power Manager State:
   mHalAutoSuspendModeEnabled=false
   mHalInteractiveModeEnabled=true
   mWakeLockSummary=0x1
-  mNotifyLongScheduled=+20s583ms
-  mNotifyLongDispatched=-22s473ms
-  mNotifyLongNextCheck=+20s583ms
+  mNotifyLongScheduled=+448ms
+  mNotifyLongDispatched=-11s175ms
+  mNotifyLongNextCheck=+448ms
   mRequestWaitForNegativeProximity=false
   mInterceptedPowerKeyForProximity=false
   mSandmanScheduled=false
   mBatteryLevelLow=false
   mLightDeviceIdleMode=false
   mDeviceIdleMode=false
-  mDeviceIdleWhitelist=[2000, 10068, 10073, 10079, 10117, 10140, 10145]
+  mDeviceIdleWhitelist=[2000, 10069, 10072, 10079, 10119, 10142, 10143]
   mDeviceIdleTempWhitelist=[]
   mLowPowerStandbyActive=false
-  mLastWakeTime=0 (103664 ms ago)
-  mLastSleepTime=0 (103664 ms ago)
+  mLastWakeTime=0 (89387 ms ago)
+  mLastSleepTime=0 (89387 ms ago)
   mLastSleepReason=application
-  mLastGlobalWakeTimeRealtime=0 (103664 ms ago)
-  mLastGlobalSleepTimeRealtime=0 (103664 ms ago)
-  mLastInteractivePowerHintTime=30020 (73644 ms ago)
-  mLastScreenBrightnessBoostTime=0 (103664 ms ago)
+  mLastGlobalWakeTimeRealtime=0 (89387 ms ago)
+  mLastGlobalSleepTimeRealtime=0 (89387 ms ago)
+  mLastInteractivePowerHintTime=24614 (64773 ms ago)
+  mLastScreenBrightnessBoostTime=0 (89387 ms ago)
   mScreenBrightnessBoostInProgress=false
   mHoldingWakeLockSuspendBlocker=true
   mHoldingDisplaySuspendBlocker=true
@@ -103,58 +103,58 @@ UID states (changing=false changed=false):
   UID 1068:   ACTIVE  count=0 state=0
   UID 1073:   ACTIVE  count=0 state=0
   UID 2000:   ACTIVE  count=0 state=19
-  UID u0a60:   ACTIVE  count=0 state=19
-  UID u0a64:   ACTIVE  count=0 state=19
-  UID u0a65: INACTIVE  count=0 state=19
-  UID u0a67:   ACTIVE  count=0 state=19
-  UID u0a68: INACTIVE  count=0 state=19
-  UID u0a70:   ACTIVE  count=0 state=19
-  UID u0a73:   ACTIVE  count=0 state=19
-  UID u0a76:   ACTIVE  count=0 state=19
+  UID u0a62:   ACTIVE  count=0 state=19
+  UID u0a63:   ACTIVE  count=0 state=19
+  UID u0a64: INACTIVE  count=0 state=19
+  UID u0a66:   ACTIVE  count=0 state=19
+  UID u0a68:   ACTIVE  count=0 state=19
+  UID u0a69: INACTIVE  count=0 state=19
+  UID u0a72:   ACTIVE  count=0 state=15
+  UID u0a78:   ACTIVE  count=0 state=19
   UID u0a79:   ACTIVE  count=0 state=19
-  UID u0a82: INACTIVE  count=0 state=19
-  UID u0a87: INACTIVE  count=0 state=19
-  UID u0a95:   ACTIVE  count=0 state=19
-  UID u0a100:   ACTIVE  count=0 state=19
-  UID u0a102:   ACTIVE  count=0 state=19
+  UID u0a84: INACTIVE  count=0 state=19
+  UID u0a85: INACTIVE  count=0 state=19
+  UID u0a94:   ACTIVE  count=0 state=19
+  UID u0a99:   ACTIVE  count=0 state=19
+  UID u0a101:   ACTIVE  count=0 state=19
   UID u0a104: INACTIVE  count=0 state=19
   UID u0a105: INACTIVE  count=0 state=19
-  UID u0a107:   ACTIVE  count=0 state=7
-  UID u0a108:   ACTIVE  count=0 state=19
+  UID u0a108:   ACTIVE  count=0 state=7
   UID u0a109:   ACTIVE  count=0 state=19
-  UID u0a113:   ACTIVE  count=0 state=19
+  UID u0a110:   ACTIVE  count=0 state=19
+  UID u0a112:   ACTIVE  count=0 state=19
   UID u0a114:   ACTIVE  count=0 state=19
-  UID u0a115: INACTIVE  count=0 state=19
+  UID u0a116: INACTIVE  count=0 state=19
   UID u0a118: INACTIVE  count=0 state=19
-  UID u0a120:   ACTIVE  count=0 state=5
-  UID u0a122:   ACTIVE  count=0 state=0
-  UID u0a125:   ACTIVE  count=0 state=19
-  UID u0a126:   ACTIVE  count=0 state=19
-  UID u0a130:   ACTIVE  count=0 state=5
-  UID u0a135:   ACTIVE  count=0 state=0
-  UID u0a144:   ACTIVE  count=0 state=19
-  UID u0a145:   ACTIVE  count=0 state=19
-  UID u0a147:   ACTIVE  count=0 state=19
+  UID u0a120:   ACTIVE  count=0 state=0
+  UID u0a121:   ACTIVE  count=0 state=5
+  UID u0a127:   ACTIVE  count=0 state=0
+  UID u0a128:   ACTIVE  count=0 state=19
+  UID u0a129:   ACTIVE  count=0 state=19
+  UID u0a136:   ACTIVE  count=0 state=19
+  UID u0a137:   ACTIVE  count=0 state=19
+  UID u0a140:   ACTIVE  count=0 state=5
+  UID u0a143:   ACTIVE  count=0 state=19
   UID u0a148:   ACTIVE  count=0 state=2
   UID u0i1:   ACTIVE  count=0 state=3
 
 Looper state:
-  Looper (PowerManagerService, tid 51) {60ecc62}
-    Message 0: { when=+20s583ms what=4 target=android.os.Handler }
-    Message 1: { when=+28m39s356ms what=1 target=android.os.Handler }
+  Looper (PowerManagerService, tid 52) {c4c5ae9}
+    Message 0: { when=+448ms what=4 target=android.os.Handler }
+    Message 1: { when=+28m48s227ms what=1 target=android.os.Handler }
     (Total messages: 2, polling=true, quitting=false)
 
 Wake Locks: size=1
-  PARTIAL_WAKE_LOCK                 '*telephony-radio*' ACQ=-39s417ms (uid=1001 pid=1039 ws=WorkSource{1001 com.android.phone})
+  PARTIAL_WAKE_LOCK                 '*telephony-radio*' ACQ=-9s533ms (uid=1001 pid=1036 ws=WorkSource{1001 com.android.phone})
 
 Suspend Blockers: size=5
   PowerManagerService.Booting: ref count=0 []
-  PowerManagerService.WakeLocks: ref count=1 [unknown: (10-06 14:08:57.234)]
-  PowerManagerService.Display: ref count=1 [holding display: (10-06 14:08:46.905)]
+  PowerManagerService.WakeLocks: ref count=1 [unknown: (10-07 01:47:21.149)]
+  PowerManagerService.Display: ref count=1 [holding display: (10-07 01:47:12.762)]
   PowerManagerService.Broadcasts: ref count=0 []
   PowerManagerService.WirelessChargerDetector: ref count=0 []
 
-Display Power: com.android.server.power.PowerManagerService$1@c5f11f3
+Display Power: com.android.server.power.PowerManagerService$1@96be36e
 
 Battery saving stats:
   Battery Saver is currently: OFF
@@ -311,7 +311,7 @@ AttentionDetector:
  mMaxExtensionMillis=900000
  mPreDimCheckDurationMillis=2000
  mEffectivePostDimTimeout=0
- mLastUserActivityTime(excludingAttention)=30020
+ mLastUserActivityTime(excludingAttention)=24614
  mAttentionServiceSupported=false
  mRequested=false
 
@@ -319,8 +319,8 @@ Profile power states: size=0
 Display Group User Activity:
   displayGroupId=0
   userActivitySummary=0x1
-  lastUserActivityTime=30020 (73645 ms ago)
-  lastUserActivityTimeNoChangeLights=0 (103665 ms ago)
+  lastUserActivityTime=24614 (64774 ms ago)
+  lastUserActivityTimeNoChangeLights=0 (89388 ms ago)
   mWakeLockSummary=0x1
 
 Wireless Charger Detector State:
@@ -336,294 +336,300 @@ Wireless Charger Detector State:
   mFirstSampleX=0.0, mFirstSampleY=0.0, mFirstSampleZ=0.0
   mLastSampleX=0.0, mLastSampleY=0.0, mLastSampleZ=0.0
 Wake Lock Log
-  10-06 14:08:54.831 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:54.848 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:54.855 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:54.863 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:54.966 - 1000 (com.android.providers.settings,...) - ACQ GnssVisibilityControl (partial)
-  10-06 14:08:55.001 - 1000 (com.android.providers.settings,...) - REL GnssVisibilityControl
-  10-06 14:08:55.066 - 1000 (com.android.providers.settings,...) - ACQ WiredAccessoryManager (partial)
-  10-06 14:08:55.066 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:55.091 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:08:55.211 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:55.368 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:55.438 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:55.443 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:55.493 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:55.550 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:55.670 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:55.699 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:55.926 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:55.942 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:56.078 - 1000 (com.android.providers.settings,...) - REL WiredAccessoryManager
-  10-06 14:08:56.307 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:56.309 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:08:56.344 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:08:56.786 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:08:56.864 - 1002 (com.android.bluetooth) - ACQ bluetooth_timer (partial)
-  10-06 14:08:56.878 - 1002 (com.android.bluetooth) - REL bluetooth_timer
-  10-06 14:08:57.238 - 1001 (com.android.phone,...) - ACQ *telephony-radio* (partial)
-  10-06 14:08:57.238 - 1001 (com.android.phone,...) - REL *telephony-radio*
-  10-06 14:08:57.238 - 1001 (com.android.phone,...) - ACQ *telephony-radio* (partial)
-  10-06 14:08:57.461 - 1001 (com.android.phone,...) - ACQ RILJ_ACK_WL (partial)
-  10-06 14:08:57.475 - 1001 (com.android.phone,...) - ACQ GsmInboundSmsHandler (partial)
-  10-06 14:08:57.479 - 1001 (com.android.phone,...) - ACQ CdmaInboundSmsHandler (partial)
-  10-06 14:08:57.483 - 1073 (com.android.networkstack.tethering,...) - ACQ GsmCellBroadcastHandler (partial)
-  10-06 14:08:57.485 - 1073 (com.android.networkstack.tethering,...) - ACQ CellBroadcastHandler (partial)
-  10-06 14:08:57.486 - 1073 (com.android.networkstack.tethering,...) - ACQ CdmaServiceCategoryProgramHandler (partial)
-  10-06 14:08:57.883 - 1001 (com.android.phone,...) - REL GsmInboundSmsHandler
-  10-06 14:08:57.884 - 1001 (com.android.phone,...) - REL CdmaInboundSmsHandler
-  10-06 14:08:57.918 - 1001 (com.android.phone,...) - ACQ NitzSignalInputFilterPredicateFactory (partial)
-  10-06 14:08:57.918 - 1001 (com.android.phone,...) - REL NitzSignalInputFilterPredicateFactory
-  10-06 14:08:57.923 - 1000 (com.android.providers.settings,...) - ACQ time_detector (partial)
-  10-06 14:08:57.923 - 1000 (com.android.providers.settings,...) - REL time_detector
-  10-06 14:08:58.200 - 1001 (com.android.phone,...) - REL RILJ_ACK_WL
-  10-06 14:08:58.291 - 1001 (com.android.phone,...) - ACQ RILJ_ACK_WL (partial)
-  10-06 14:08:58.381 - 1001 (com.android.phone,...) - ACQ NitzSignalInputFilterPredicateFactory (partial)
-  10-06 14:08:58.381 - 1001 (com.android.phone,...) - REL NitzSignalInputFilterPredicateFactory
-  10-06 14:08:58.774 - 1001 (com.android.phone,...) - REL RILJ_ACK_WL
-  10-06 14:08:58.801 - 1001 (com.android.phone,...) - ACQ RILJ_ACK_WL (partial)
-  10-06 14:08:59.354 - 1001 (com.android.phone,...) - REL RILJ_ACK_WL
-  10-06 14:08:59.579 - 1000 (com.android.providers.settings,...) - ACQ GnssVisibilityControl (partial)
-  10-06 14:08:59.579 - 1000 (com.android.providers.settings,...) - REL GnssVisibilityControl
-  10-06 14:08:59.643 - 1001 (com.android.phone,...) - ACQ RILJ_ACK_WL (partial)
-  10-06 14:09:00.006 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:09:00.006 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:09:00.488 - 1073 (com.android.networkstack.tethering,...) - REL CdmaServiceCategoryProgramHandler
-  10-06 14:09:00.489 - 1073 (com.android.networkstack.tethering,...) - REL CellBroadcastHandler
-  10-06 14:09:00.489 - 1073 (com.android.networkstack.tethering,...) - REL GsmCellBroadcastHandler
-  10-06 14:09:00.528 - 1001 (com.android.phone,...) - REL RILJ_ACK_WL
-  10-06 14:09:00.783 - 1000 (com.android.providers.settings,...) - ACQ time_detector (partial)
-  10-06 14:09:00.783 - 1000 (com.android.providers.settings,...) - REL time_detector
-  10-06 14:09:01.249 - 1000 (com.android.providers.settings,...) - ACQ GnssVisibilityControl (partial)
-  10-06 14:09:01.252 - 1000 (com.android.providers.settings,...) - REL GnssVisibilityControl
-  10-06 14:09:01.458 - 1000 (com.android.providers.settings,...) - ACQ GnssVisibilityControl (partial)
-  10-06 14:09:01.458 - 1000 (com.android.providers.settings,...) - REL GnssVisibilityControl
-  10-06 14:09:01.465 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.s/.s.PrimarySubscriptionListChangedService (partial)
-  10-06 14:09:01.465 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.s/.s.PrimarySubscriptionListChangedService (partial)
-  10-06 14:09:01.467 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.s/.s.PrimarySubscriptionListChangedService
-  10-06 14:09:01.474 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.s/.s.PrimarySubscriptionListChangedService
-  10-06 14:09:01.840 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:01.859 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:02.402 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:02.470 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:02.507 - 1000 (com.android.providers.settings,...) - ACQ *launch* (partial)
-  10-06 14:09:02.667 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService (partial)
-  10-06 14:09:02.668 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService (partial)
-  10-06 14:09:02.670 - 1000 (com.android.providers.settings,...) - ACQ SyncLoopWakeLock (partial)
-  10-06 14:09:02.768 - 1000 (com.android.providers.settings,...) - REL *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService
-  10-06 14:09:02.772 - 1000 (com.android.providers.settings,...) - ACQ *job*/a/c.a.s.n.NotificationHistoryJobService (partial)
-  10-06 14:09:02.772 - 1000 (com.android.providers.settings,...) - ACQ *job*/a/c.a.s.n.NotificationHistoryJobService (partial)
-  10-06 14:09:02.781 - 1000 (com.android.providers.settings,...) - REL *job*/a/c.a.s.n.NotificationHistoryJobService
-  10-06 14:09:02.831 - 1000 (com.android.providers.settings,...) - REL SyncLoopWakeLock
-  10-06 14:09:02.843 - 1000 (com.android.providers.settings,...) - REL *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService
-  10-06 14:09:02.874 - 1000 (com.android.providers.settings,...) - REL *job*/a/c.a.s.n.NotificationHistoryJobService
-  10-06 14:09:03.019 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:03.401 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:03.458 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:03.525 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:03.603 - 10122 (com.android.systemui) - ACQ SysUI:BroadcastSender (partial)
-  10-06 14:09:03.630 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:03.660 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:03.674 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:03.704 - 10122 (com.android.systemui) - REL SysUI:BroadcastSender
-  10-06 14:09:03.713 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:03.840 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:03.848 - 1000 (com.android.providers.settings,...) - ACQ NetworkTimeUpdateService (partial)
-  10-06 14:09:03.880 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:03.894 - 1000 (com.android.providers.settings,...) - ACQ time_detector (partial)
-  10-06 14:09:03.894 - 1000 (com.android.providers.settings,...) - REL time_detector
-  10-06 14:09:03.895 - 1000 (com.android.providers.settings,...) - REL NetworkTimeUpdateService
-  10-06 14:09:03.965 - 1000 (com.android.providers.settings,...) - ACQ GnssVisibilityControl (partial)
-  10-06 14:09:03.965 - 1000 (com.android.providers.settings,...) - REL GnssVisibilityControl
-  10-06 14:09:04.007 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:04.018 - 1000 (com.android.providers.settings,...) - ACQ *location*:GnssLocationProvider (partial)
-  10-06 14:09:04.020 - 1000 (com.android.providers.settings,...) - ACQ *location*:PsdsDownload (partial)
-  10-06 14:09:04.020 - 1000 (com.android.providers.settings,...) - REL *location*:GnssLocationProvider
-  10-06 14:09:04.021 - 1000 (com.android.providers.settings,...) - REL *location*:PsdsDownload
-  10-06 14:09:04.120 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:04.199 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:04.205 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:04.226 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:android (partial)
-  10-06 14:09:04.325 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:04.421 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:04.422 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:04.423 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:04.430 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:android
-  10-06 14:09:04.641 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
-  10-06 14:09:04.642 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
-  10-06 14:09:04.659 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
-  10-06 14:09:05.284 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.285 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.317 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.587 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.i/.f.FcmRegistrationService (partial)
-  10-06 14:09:05.587 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.i/.f.FcmRegistrationService (partial)
-  10-06 14:09:05.595 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.i/.f.FcmRegistrationService
-  10-06 14:09:05.613 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.619 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.619 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.623 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.624 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.i/.f.FcmRegistrationService
-  10-06 14:09:05.627 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.627 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.629 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.641 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.675 - 10079 (com.android.providers.calendar) - ACQ CalendarReceiver_Provider (partial)
-  10-06 14:09:05.679 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p/.h.HibernationJobService (partial)
-  10-06 14:09:05.679 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p/.h.HibernationJobService (partial)
-  10-06 14:09:05.682 - 10079 (com.android.providers.calendar) - REL CalendarReceiver_Provider
-  10-06 14:09:05.684 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p/.h.HibernationJobService
-  10-06 14:09:05.691 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.722 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p/.h.HibernationJobService
-  10-06 14:09:05.791 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p/.p.s.PermissionEventCleanupJobService (partial)
-  10-06 14:09:05.791 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p/.p.s.PermissionEventCleanupJobService (partial)
-  10-06 14:09:05.792 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p/.p.s.PermissionEventCleanupJobService
-  10-06 14:09:05.839 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p/.p.s.PermissionEventCleanupJobService
-  10-06 14:09:05.894 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.894 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:05.895 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
-  10-06 14:09:05.917 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
-  10-06 14:09:06.319 - 1000 (com.android.providers.settings,...) - ACQ GnssVisibilityControl (partial)
-  10-06 14:09:06.331 - 1000 (com.android.providers.settings,...) - REL GnssVisibilityControl
-  10-06 14:09:06.629 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
-  10-06 14:09:06.629 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
-  10-06 14:09:06.631 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
-  10-06 14:09:06.846 - 1000 (com.android.providers.settings,...) - REL *launch*
-  10-06 14:09:06.927 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.m/.d.a.BackgroundWorkerService (partial)
-  10-06 14:09:06.927 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.m/.d.a.BackgroundWorkerService (partial)
-  10-06 14:09:06.928 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.m/.d.a.BackgroundWorkerService
-  10-06 14:09:06.932 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
-  10-06 14:09:08.048 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:08.091 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:08.243 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
-  10-06 14:09:08.243 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
-  10-06 14:09:08.386 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
-  10-06 14:09:08.413 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.m/.d.a.BackgroundWorkerService
-  10-06 14:09:08.560 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:08.625 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:09.022 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
-  10-06 14:09:09.187 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:09.187 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:09.197 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
-  10-06 14:09:09.197 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:09.198 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:09.208 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
-  10-06 14:09:09.591 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:09.693 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:09.694 - 1000 (com.android.providers.settings,...) - ACQ NetworkTimeUpdateService (partial)
-  10-06 14:09:09.695 - 1000 (com.android.providers.settings,...) - ACQ time_detector (partial)
-  10-06 14:09:09.695 - 1000 (com.android.providers.settings,...) - REL time_detector
-  10-06 14:09:09.695 - 1000 (com.android.providers.settings,...) - REL NetworkTimeUpdateService
-  10-06 14:09:09.766 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
-  10-06 14:09:10.682 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:09:10.698 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p.c/.CalendarProviderJobService (partial)
-  10-06 14:09:10.698 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p.c/.CalendarProviderJobService (partial)
-  10-06 14:09:10.707 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p.c/.CalendarProviderJobService
-  10-06 14:09:10.708 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:09:10.731 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p.c/.CalendarProviderJobService
-  10-06 14:09:11.088 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
-  10-06 14:09:11.377 - 1000 (com.android.providers.settings,...) - ACQ *launch* (partial)
-  10-06 14:09:12.339 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.w/o.c.a.n.AwComponentUpdateService (partial)
-  10-06 14:09:12.339 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.w/o.c.a.n.AwComponentUpdateService (partial)
-  10-06 14:09:12.345 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.w/o.c.a.n.AwComponentUpdateService
-  10-06 14:09:12.402 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher (partial)
-  10-06 14:09:12.402 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher (partial)
-  10-06 14:09:12.406 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher
-  10-06 14:09:12.722 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher
-  10-06 14:09:12.788 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.w/o.c.a.n.AwComponentUpdateService
-  10-06 14:09:12.809 - 1000 (com.android.providers.settings,...) - REL *launch*
-  10-06 14:09:13.499 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:13.499 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:13.504 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
-  10-06 14:09:14.308 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
-  10-06 14:09:20.366 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:09:20.367 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:20.383 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:20.384 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:09:23.499 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:23.680 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:23.704 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:23.884 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:25.261 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:09:25.261 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:09:25.262 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:25.262 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:09:25.264 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
-  10-06 14:09:25.281 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
-  10-06 14:09:32.479 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:32.684 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:39.187 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:39.390 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:39.493 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:09:39.496 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:09:39.498 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:39.516 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:39.522 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:09:39.543 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:09:39.879 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:39.955 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
-  10-06 14:09:40.081 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:40.537 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:40.537 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
-  10-06 14:09:40.747 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:45.551 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:09:45.552 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:09:46.787 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:46.902 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
-  10-06 14:09:46.989 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:47.058 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:47.059 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
-  10-06 14:09:47.262 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:53.245 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:53.451 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:54.556 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:54.604 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
-  10-06 14:09:54.757 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:09:54.838 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:09:54.838 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
-  10-06 14:09:55.042 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:00.000 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:10:00.000 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:10:00.966 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:01.168 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:02.266 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:02.469 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:03.346 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:03.548 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:04.308 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:04.510 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:04.944 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:10:04.961 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:10:04.970 - 1000 (com.android.providers.settings,...) - ACQ NetworkStats (partial)
-  10-06 14:10:04.991 - 1000 (com.android.providers.settings,...) - REL NetworkStats
-  10-06 14:10:05.268 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:05.471 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:06.230 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:06.434 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:07.312 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:07.515 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:08.273 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:08.476 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:09.235 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:09.438 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:10.079 - 1000 (com.android.providers.settings,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
-  10-06 14:10:10.187 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
-  10-06 14:10:10.281 - 1000 (com.android.providers.settings,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
-  10-06 14:10:10.505 - 1000 (com.android.providers.settings,...) - ACQ *launch* (partial)
-  10-06 14:10:11.660 - 1000 (com.android.providers.settings,...) - ACQ *alarm* (partial)
-  10-06 14:10:11.660 - 1000 (com.android.providers.settings,...) - REL *alarm*
-  10-06 14:10:11.660 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:10:11.660 - 1000 (com.android.providers.settings,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
-  10-06 14:10:11.661 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
-  10-06 14:10:11.721 - 1000 (com.android.providers.settings,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
-  10-06 14:10:12.279 - 1000 (com.android.providers.settings,...) - REL *launch*
-  10-06 14:10:17.242 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
-  10-06 14:10:17.242 - 1000 (com.android.providers.settings,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
-  10-06 14:10:17.243 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
-  10-06 14:10:17.258 - 1000 (com.android.providers.settings,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
+  10-07 01:47:19.132 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.148 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.156 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.180 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.249 - 1000 (com.android.localtransport,...) - ACQ GnssVisibilityControl (partial)
+  10-07 01:47:19.262 - 1000 (com.android.localtransport,...) - REL GnssVisibilityControl
+  10-07 01:47:19.285 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.293 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.373 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.374 - 1000 (com.android.localtransport,...) - ACQ WiredAccessoryManager (partial)
+  10-07 01:47:19.385 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:19.421 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.422 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.423 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.424 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.425 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.426 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.426 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:19.429 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:19.433 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:20.375 - 1000 (com.android.localtransport,...) - REL WiredAccessoryManager
+  10-07 01:47:20.520 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:20.540 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:20.624 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:20.781 - 1002 (com.android.bluetooth) - ACQ bluetooth_timer (partial)
+  10-07 01:47:20.781 - 1002 (com.android.bluetooth) - REL bluetooth_timer
+  10-07 01:47:21.151 - 1001 (com.android.mms.service,...) - ACQ *telephony-radio* (partial)
+  10-07 01:47:21.156 - 1001 (com.android.mms.service,...) - REL *telephony-radio*
+  10-07 01:47:21.156 - 1001 (com.android.mms.service,...) - ACQ *telephony-radio* (partial)
+  10-07 01:47:21.364 - 1001 (com.android.mms.service,...) - ACQ RILJ_ACK_WL (partial)
+  10-07 01:47:21.494 - 1001 (com.android.mms.service,...) - ACQ GsmInboundSmsHandler (partial)
+  10-07 01:47:21.504 - 1073 (com.android.cellbroadcastservice,...) - ACQ GsmCellBroadcastHandler (partial)
+  10-07 01:47:21.505 - 1001 (com.android.mms.service,...) - ACQ CdmaInboundSmsHandler (partial)
+  10-07 01:47:21.525 - 1073 (com.android.cellbroadcastservice,...) - ACQ CellBroadcastHandler (partial)
+  10-07 01:47:21.526 - 1073 (com.android.cellbroadcastservice,...) - ACQ CdmaServiceCategoryProgramHandler (partial)
+  10-07 01:47:21.802 - 1001 (com.android.mms.service,...) - REL RILJ_ACK_WL
+  10-07 01:47:21.805 - 1001 (com.android.mms.service,...) - ACQ RILJ_ACK_WL (partial)
+  10-07 01:47:21.854 - 1001 (com.android.mms.service,...) - REL GsmInboundSmsHandler
+  10-07 01:47:21.860 - 1001 (com.android.mms.service,...) - REL CdmaInboundSmsHandler
+  10-07 01:47:21.903 - 1001 (com.android.mms.service,...) - ACQ NitzSignalInputFilterPredicateFactory (partial)
+  10-07 01:47:21.903 - 1001 (com.android.mms.service,...) - REL NitzSignalInputFilterPredicateFactory
+  10-07 01:47:21.910 - 1000 (com.android.localtransport,...) - ACQ time_detector (partial)
+  10-07 01:47:21.911 - 1000 (com.android.localtransport,...) - REL time_detector
+  10-07 01:47:22.121 - 1001 (com.android.mms.service,...) - REL RILJ_ACK_WL
+  10-07 01:47:22.257 - 1001 (com.android.mms.service,...) - ACQ RILJ_ACK_WL (partial)
+  10-07 01:47:22.357 - 1001 (com.android.mms.service,...) - ACQ NitzSignalInputFilterPredicateFactory (partial)
+  10-07 01:47:22.358 - 1001 (com.android.mms.service,...) - REL NitzSignalInputFilterPredicateFactory
+  10-07 01:47:22.709 - 1001 (com.android.mms.service,...) - REL RILJ_ACK_WL
+  10-07 01:47:22.804 - 1001 (com.android.mms.service,...) - ACQ RILJ_ACK_WL (partial)
+  10-07 01:47:23.119 - 1001 (com.android.mms.service,...) - REL RILJ_ACK_WL
+  10-07 01:47:23.203 - 1000 (com.android.localtransport,...) - ACQ GnssVisibilityControl (partial)
+  10-07 01:47:23.203 - 1000 (com.android.localtransport,...) - REL GnssVisibilityControl
+  10-07 01:47:23.262 - 1001 (com.android.mms.service,...) - ACQ RILJ_ACK_WL (partial)
+  10-07 01:47:24.141 - 10120 (com.android.systemui) - ACQ SysUI:BroadcastSender (partial)
+  10-07 01:47:24.142 - 10120 (com.android.systemui) - REL SysUI:BroadcastSender
+  10-07 01:47:24.195 - 1001 (com.android.mms.service,...) - REL RILJ_ACK_WL
+  10-07 01:47:24.206 - 1000 (com.android.localtransport,...) - ACQ time_detector (partial)
+  10-07 01:47:24.206 - 1000 (com.android.localtransport,...) - REL time_detector
+  10-07 01:47:24.498 - 1000 (com.android.localtransport,...) - ACQ *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService (partial)
+  10-07 01:47:24.505 - 1000 (com.android.localtransport,...) - ACQ *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService (partial)
+  10-07 01:47:24.506 - 1000 (com.android.localtransport,...) - REL *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService
+  10-07 01:47:24.506 - 1000 (com.android.localtransport,...) - ACQ *job*/a/c.a.s.n.NotificationHistoryJobService (partial)
+  10-07 01:47:24.506 - 1000 (com.android.localtransport,...) - ACQ *job*/a/c.a.s.n.NotificationHistoryJobService (partial)
+  10-07 01:47:24.506 - 1000 (com.android.localtransport,...) - REL *job*/a/c.a.s.n.NotificationHistoryJobService
+  10-07 01:47:24.511 - 1000 (com.android.localtransport,...) - REL *job*/@.a.p.s/.WriteFallbackSettingsFilesJobService
+  10-07 01:47:24.525 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:24.526 - 1000 (com.android.localtransport,...) - REL *job*/a/c.a.s.n.NotificationHistoryJobService
+  10-07 01:47:24.527 - 1073 (com.android.cellbroadcastservice,...) - REL CdmaServiceCategoryProgramHandler
+  10-07 01:47:24.527 - 1073 (com.android.cellbroadcastservice,...) - REL CellBroadcastHandler
+  10-07 01:47:24.527 - 1073 (com.android.cellbroadcastservice,...) - REL GsmCellBroadcastHandler
+  10-07 01:47:24.608 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:25.157 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:25.209 - 1000 (com.android.localtransport,...) - ACQ *launch* (partial)
+  10-07 01:47:25.309 - 1000 (com.android.localtransport,...) - ACQ GnssVisibilityControl (partial)
+  10-07 01:47:25.310 - 1000 (com.android.localtransport,...) - REL GnssVisibilityControl
+  10-07 01:47:25.365 - 1000 (com.android.localtransport,...) - ACQ SyncLoopWakeLock (partial)
+  10-07 01:47:25.367 - 1000 (com.android.localtransport,...) - REL SyncLoopWakeLock
+  10-07 01:47:25.540 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:25.745 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:25.961 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:26.213 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.s/.s.PrimarySubscriptionListChangedService (partial)
+  10-07 01:47:26.221 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.s/.s.PrimarySubscriptionListChangedService (partial)
+  10-07 01:47:26.264 - 1000 (com.android.localtransport,...) - REL *job*/c.a.s/.s.PrimarySubscriptionListChangedService
+  10-07 01:47:26.299 - 1000 (com.android.localtransport,...) - REL *job*/c.a.s/.s.PrimarySubscriptionListChangedService
+  10-07 01:47:26.343 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:26.466 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
+  10-07 01:47:26.467 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
+  10-07 01:47:26.469 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
+  10-07 01:47:26.477 - 1000 (com.android.localtransport,...) - ACQ GnssVisibilityControl (partial)
+  10-07 01:47:26.477 - 1000 (com.android.localtransport,...) - REL GnssVisibilityControl
+  10-07 01:47:26.551 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:26.703 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.BackgroundWorkerService (partial)
+  10-07 01:47:26.703 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.BackgroundWorkerService (partial)
+  10-07 01:47:26.705 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.BackgroundWorkerService
+  10-07 01:47:26.707 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
+  10-07 01:47:26.819 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
+  10-07 01:47:26.819 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
+  10-07 01:47:26.843 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
+  10-07 01:47:27.101 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
+  10-07 01:47:27.102 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
+  10-07 01:47:27.107 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
+  10-07 01:47:27.108 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.BackgroundWorkerService
+  10-07 01:47:27.122 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:27.210 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:27.232 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:27.357 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:27.407 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:android (partial)
+  10-07 01:47:27.412 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:27.488 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:27.540 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
+  10-07 01:47:27.616 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:android
+  10-07 01:47:27.725 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
+  10-07 01:47:27.725 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.m/.d.a.ActionServiceImpl (partial)
+  10-07 01:47:27.725 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
+  10-07 01:47:27.738 - 1000 (com.android.localtransport,...) - REL *job*/c.a.m/.d.a.ActionServiceImpl
+  10-07 01:47:27.766 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:27.803 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:27.834 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:27.858 - 10079 (com.android.providers.calendar) - ACQ CalendarReceiver_Provider (partial)
+  10-07 01:47:27.859 - 10079 (com.android.providers.calendar) - REL CalendarReceiver_Provider
+  10-07 01:47:27.903 - 1000 (com.android.localtransport,...) - ACQ GnssVisibilityControl (partial)
+  10-07 01:47:27.903 - 1000 (com.android.localtransport,...) - REL GnssVisibilityControl
+  10-07 01:47:27.905 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:27.910 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p/.h.HibernationJobService (partial)
+  10-07 01:47:27.910 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p/.h.HibernationJobService (partial)
+  10-07 01:47:27.914 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p/.h.HibernationJobService
+  10-07 01:47:27.920 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:27.996 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p/.h.HibernationJobService
+  10-07 01:47:28.014 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p/.p.s.PermissionEventCleanupJobService (partial)
+  10-07 01:47:28.014 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p/.p.s.PermissionEventCleanupJobService (partial)
+  10-07 01:47:28.015 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p/.p.s.PermissionEventCleanupJobService
+  10-07 01:47:28.041 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:28.048 - 1000 (com.android.localtransport,...) - ACQ NetworkTimeUpdateService (partial)
+  10-07 01:47:28.053 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.053 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.054 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.055 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p/.p.s.PermissionEventCleanupJobService
+  10-07 01:47:28.075 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:28.076 - 1000 (com.android.localtransport,...) - ACQ *location*:GnssLocationProvider (partial)
+  10-07 01:47:28.078 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.078 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.078 - 1000 (com.android.localtransport,...) - ACQ *location*:PsdsDownload (partial)
+  10-07 01:47:28.079 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.080 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.i/.f.FcmRegistrationService (partial)
+  10-07 01:47:28.080 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.i/.f.FcmRegistrationService (partial)
+  10-07 01:47:28.085 - 1000 (com.android.localtransport,...) - REL *job*/c.a.i/.f.FcmRegistrationService
+  10-07 01:47:28.085 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.085 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.085 - 1000 (com.android.localtransport,...) - REL *location*:GnssLocationProvider
+  10-07 01:47:28.085 - 1000 (com.android.localtransport,...) - REL *location*:PsdsDownload
+  10-07 01:47:28.091 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.100 - 1000 (com.android.localtransport,...) - REL NetworkTimeUpdateService
+  10-07 01:47:28.101 - 1000 (com.android.localtransport,...) - ACQ time_detector (partial)
+  10-07 01:47:28.101 - 1000 (com.android.localtransport,...) - REL time_detector
+  10-07 01:47:28.111 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.123 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.d/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.140 - 1000 (com.android.localtransport,...) - REL *job*/c.a.i/.f.FcmRegistrationService
+  10-07 01:47:28.151 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:28.200 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.204 - 1000 (com.android.localtransport,...) - ACQ GnssVisibilityControl (partial)
+  10-07 01:47:28.208 - 1000 (com.android.localtransport,...) - REL GnssVisibilityControl
+  10-07 01:47:28.211 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.211 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:28.214 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
+  10-07 01:47:28.267 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.s/a.w.i.b.s.SystemJobService
+  10-07 01:47:29.004 - 1000 (com.android.localtransport,...) - REL *launch*
+  10-07 01:47:29.869 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:29.869 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:29.870 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
+  10-07 01:47:29.871 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:29.871 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:29.872 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
+  10-07 01:47:30.037 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
+  10-07 01:47:30.245 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:30.296 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:30.400 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.r/a.w.i.b.s.SystemJobService
+  10-07 01:47:30.465 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:30.479 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:30.923 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:30.929 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:30.932 - 1000 (com.android.localtransport,...) - ACQ NetworkTimeUpdateService (partial)
+  10-07 01:47:30.933 - 1000 (com.android.localtransport,...) - ACQ time_detector (partial)
+  10-07 01:47:30.933 - 1000 (com.android.localtransport,...) - REL time_detector
+  10-07 01:47:30.933 - 1000 (com.android.localtransport,...) - REL NetworkTimeUpdateService
+  10-07 01:47:31.462 - 1000 (com.android.localtransport,...) - ACQ *launch* (partial)
+  10-07 01:47:32.090 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.w/o.c.a.n.AwComponentUpdateService (partial)
+  10-07 01:47:32.090 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.w/o.c.a.n.AwComponentUpdateService (partial)
+  10-07 01:47:32.093 - 1000 (com.android.localtransport,...) - REL *job*/c.a.w/o.c.a.n.AwComponentUpdateService
+  10-07 01:47:32.242 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher (partial)
+  10-07 01:47:32.242 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher (partial)
+  10-07 01:47:32.244 - 1000 (com.android.localtransport,...) - REL *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher
+  10-07 01:47:32.449 - 1000 (com.android.localtransport,...) - REL *job*/c.a.w/o.c.a.s.AwVariationsSeedFetcher
+  10-07 01:47:32.489 - 1000 (com.android.localtransport,...) - REL *job*/c.a.w/o.c.a.n.AwComponentUpdateService
+  10-07 01:47:32.562 - 1000 (com.android.localtransport,...) - REL *launch*
+  10-07 01:47:32.861 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:47:32.868 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p.c/.CalendarProviderJobService (partial)
+  10-07 01:47:32.870 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p.c/.CalendarProviderJobService (partial)
+  10-07 01:47:32.872 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p.c/.CalendarProviderJobService
+  10-07 01:47:32.874 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:47:32.877 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p.c/.CalendarProviderJobService
+  10-07 01:47:33.171 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
+  10-07 01:47:33.326 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:47:33.326 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:47:33.328 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
+  10-07 01:47:41.050 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:47:41.259 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:47:42.624 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:47:42.624 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:47:42.627 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:42.627 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:47:42.628 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
+  10-07 01:47:42.648 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
+  10-07 01:47:42.649 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:47:42.651 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:47:48.675 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:47:48.878 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:47:54.105 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:47:54.308 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:47:54.745 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:47:54.835 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
+  10-07 01:47:54.946 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:47:55.364 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:47:55.365 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
+  10-07 01:47:55.567 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:47:59.999 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:48:00.000 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:48:00.000 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:48:00.000 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:48:00.400 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:00.481 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
+  10-07 01:48:00.601 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:00.880 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:00.881 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
+  10-07 01:48:00.923 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:48:00.926 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:48:00.931 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:48:00.958 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:48:00.964 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:48:00.982 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:48:01.084 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:05.888 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:06.091 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:07.192 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:07.394 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:07.416 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
+  10-07 01:48:07.651 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:07.652 - 10148 (kr.co.kjw.videodownloader) - ACQ VideoDownloader:transfer (partial)
+  10-07 01:48:07.856 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:08.215 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:48:08.216 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:48:12.610 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:12.812 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:13.912 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:14.115 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:14.993 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:15.196 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:15.954 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:16.156 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:16.712 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:48:16.745 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:48:16.751 - 1000 (com.android.localtransport,...) - ACQ NetworkStats (partial)
+  10-07 01:48:16.769 - 1000 (com.android.localtransport,...) - REL NetworkStats
+  10-07 01:48:16.917 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:17.120 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:17.878 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:18.081 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:18.958 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:19.161 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:19.921 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:20.123 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:20.881 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:21.084 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:21.846 - 1000 (com.android.localtransport,...) - ACQ NotificationManagerService:post:kr.co.kjw.videodownloader (partial)
+  10-07 01:48:21.921 - 10148 (kr.co.kjw.videodownloader) - REL VideoDownloader:transfer
+  10-07 01:48:22.050 - 1000 (com.android.localtransport,...) - REL NotificationManagerService:post:kr.co.kjw.videodownloader
+  10-07 01:48:22.281 - 1000 (com.android.localtransport,...) - ACQ *launch* (partial)
+  10-07 01:48:23.170 - 1000 (com.android.localtransport,...) - REL *launch*
+  10-07 01:48:23.480 - 1000 (com.android.localtransport,...) - ACQ *launch* (partial)
+  10-07 01:48:23.680 - 1000 (com.android.localtransport,...) - ACQ *alarm* (partial)
+  10-07 01:48:23.680 - 1000 (com.android.localtransport,...) - REL *alarm*
+  10-07 01:48:23.680 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:48:23.681 - 1000 (com.android.localtransport,...) - ACQ *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService (partial)
+  10-07 01:48:23.683 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
+  10-07 01:48:23.701 - 1000 (com.android.localtransport,...) - REL *job*/@.w.s.a.p.m.m/a.w.i.b.s.SystemJobService
+  10-07 01:48:24.104 - 1000 (com.android.localtransport,...) - REL *launch*
+  10-07 01:48:24.251 - 1000 (com.android.localtransport,...) - ACQ *launch* (partial)
+  10-07 01:48:25.332 - 1000 (com.android.localtransport,...) - REL *launch*
+  10-07 01:48:30.258 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
+  10-07 01:48:30.258 - 1000 (com.android.localtransport,...) - ACQ *job*/c.a.p.m.m/c.a.p.m.MediaService (partial)
+  10-07 01:48:30.258 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
+  10-07 01:48:30.263 - 1000 (com.android.localtransport,...) - REL *job*/c.a.p.m.m/c.a.p.m.MediaService
   -
-  Events: 285, Time-Resets: 52
-  Buffer, Bytes used: 1181
+  Events: 291, Time-Resets: 43
+  Buffer, Bytes used: 1115
 
 Wakefulness Session Observer:
 default timeout: 1800000
@@ -631,9 +637,9 @@ override timeout: -1
   Wakefulness Session Power Group powerGroupId: 0
     current wakefulness: 0
     current user activity event: 1
-    current user activity duration: 73648
+    current user activity duration: 64777
     previous user activity event: 0
-    previous user activity duration: 74842
+    previous user activity duration: 65106
     is in override timeout: false
 
 FaceDownDetector:
