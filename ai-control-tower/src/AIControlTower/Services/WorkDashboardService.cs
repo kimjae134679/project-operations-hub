@@ -154,9 +154,9 @@ public sealed class WorkDashboardService
                 worker = ClassifyWorker(program.Kind,matched[0].FileName);
                 command = SafeText("등록 카탈로그 명령: " + matched[0].Name + " → " + matched[0].FileName + " · 인수/프롬프트 원문 비공개");
             }
-            else if(known && row.ProgramId==projectId+"/jev" && row.Title=="Jev 작업")
+            else if(known && row.Title=="Jev 작업" && (row.ProgramId==projectId+"/jev" || JevExecutionWorkspace.MatchesScopedProgram(project!,row.ProgramId)))
             {
-                // This exact identity is created by RunJevTask. Never infer from model, actor or process name.
+                // Exact legacy or registered workspace identity created by RunJevTask; never infer from a model/process name.
                 worker="Jev";command="Jev 작업";
             }
             else worker = "미확인";

@@ -211,13 +211,20 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public int RunningCount => _jobs.RunningCount;
     public bool IsBusy => _jobs.BusyProjectCount > 0;
     public bool CanStopSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
-    public bool CanLaunchSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
+    public bool CanLaunchSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && CanOpenSelectedProgram && _jobs.CanRun(SelectedProgram);
     public bool CanOpenSelectedProgram => SelectedProgram is not null && (File.Exists(SelectedProgram.Path) || Directory.Exists(SelectedProgram.Path));
     public bool HasSelectedCommands => SelectedProgram?.CanLaunch == true;
     public bool ShowSeparateOpenButton => HasSelectedCommands || SelectedProgram?.HasEditorLauncher == true;
     public string RootPath { get => _settings.RootPath; set { if (_settings.RootPath == value) return; _settings.RootPath = value; _needsDiscovery = true; OnPropertyChanged(); } }
     private bool? _jevSessionEnabled;
     private bool _jevSessionVerified;
+    private bool _independentJevWorkspace;
+    public bool IndependentJevWorkspace
+    {
+        get => _independentJevWorkspace;
+        set { if (SetProperty(ref _independentJevWorkspace, value)) OnPropertyChanged(nameof(JevWorkspacePath)); }
+    }
+    public string JevWorkspacePath => IndependentJevWorkspace ? SelectedProgram?.WorkingDirectory ?? "등록 작업 폴더 선택 필요" : ProjectPath;
     public bool EnableJev
     {
         get => JevExecutionPolicy.ResolveSessionEnable(_settings.EnableJev,IsManualControl,_jevSessionEnabled);
@@ -259,8 +266,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         get => _selectedProject;
         set
         {
+            var sameScopeProject = value is not null && _selectedProject is not null
+                && value.Id == _selectedProject.Id && SameJevWorkspacePath(value.Path, _selectedProject.Path);
+            var previousProgramId = SelectedProgram?.Id;
             if (!SetProperty(ref _selectedProject, value)) return;
-            SelectedProgram = value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
+            if (!sameScopeProject) IndependentJevWorkspace = false;
+            // Discovery replaces DTOs. Restore the semantic selection without temporarily choosing another scope.
+            SelectedProgram = (sameScopeProject ? value?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id == previousProgramId) : null)
+                ?? value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
             WorkDashboard.SetProjectContext(value?.Id??"",value?.DisplayName??"");
             ProgramSearch = "";
@@ -270,10 +283,27 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public ProgramItem? SelectedProgram
     {
         get => _selectedProgram;
-        set { if (!SetProperty(ref _selectedProgram, value)) return; SelectedCommand = value?.Commands.FirstOrDefault(); OnPropertyChanged(nameof(CanStopSelectedProgram)); OnPropertyChanged(nameof(CanLaunchSelectedProgram)); OnPropertyChanged(nameof(CanOpenSelectedProgram)); OnPropertyChanged(nameof(HasSelectedCommands)); OnPropertyChanged(nameof(ShowSeparateOpenButton)); }
+        set
+        {
+            var sameScope = value is not null && _selectedProgram is not null && value.Id == _selectedProgram.Id
+                && value.ProjectId == _selectedProgram.ProjectId && value.CanLaunch && _selectedProgram.CanLaunch
+                && SameJevWorkspacePath(value.WorkingDirectory, _selectedProgram.WorkingDirectory);
+            if (!SetProperty(ref _selectedProgram, value)) return;
+            if (!sameScope) IndependentJevWorkspace = false;
+            SelectedCommand = value?.Commands.FirstOrDefault(); OnPropertyChanged(nameof(JevWorkspacePath)); OnPropertyChanged(nameof(CanStopSelectedProgram)); OnPropertyChanged(nameof(CanLaunchSelectedProgram)); OnPropertyChanged(nameof(CanOpenSelectedProgram)); OnPropertyChanged(nameof(HasSelectedCommands)); OnPropertyChanged(nameof(ShowSeparateOpenButton));
+        }
+    }
+    private static bool SameJevWorkspacePath(string left, string right)
+    {
+        try { return JevExecutionWorkspace.Same(left, right); }
+        catch (Exception ex) when (ex is ArgumentException or IOException or NotSupportedException or InvalidOperationException) { return false; }
     }
     public ProgramCommand? SelectedCommand { get => _selectedCommand; set => SetProperty(ref _selectedCommand, value); }
-    public string ProjectPath { get => _projectPath; set => SetProperty(ref _projectPath, value); }
+    public string ProjectPath
+    {
+        get => _projectPath;
+        set { var samePath = SameJevWorkspacePath(_projectPath, value); if (!SetProperty(ref _projectPath, value)) return; if (!samePath) IndependentJevWorkspace = false; OnPropertyChanged(nameof(JevWorkspacePath)); }
+    }
     public string TaskInput { get => _taskInput; set => SetProperty(ref _taskInput, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public bool IsRefreshing { get => _isRefreshing; private set => SetProperty(ref _isRefreshing, value); }
@@ -476,14 +506,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (program is null || command is null) { Message = "실행할 프로그램과 등록된 명령을 선택하세요."; return; }
         await RunProgramAsync(program, command);
     }
-    private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null,AiCompletionContract? aiContract=null)
+    private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null,AiCompletionContract? aiContract=null,string? independentWorkspaceRoot=null)
     {
         if(BlockRegisteredOperation())return;
-        if (_jobs.IsProjectBusy(program.ProjectId)) { Message = "이 프로젝트에는 실행 중인 작업이 있습니다."; return; }
+        if (!_jobs.CanRun(program, independentWorkspaceRoot)) { Message = "같은 실행 ID·공유 프로젝트·겹치는 작업 폴더에 소유 작업이 있습니다."; return; }
         try
         {
             UpdateProgramState(program, "실행 중 · " + command.Name);
-            var result = await _jobs.RunAsync(program, command, _lifetime.Token, input,aiContract:aiContract);
+            var result = await _jobs.RunAsync(program, command, _lifetime.Token, input,aiContract:aiContract,independentWorkspaceRoot:independentWorkspaceRoot);
             UpdateProgramState(program, result.State + (result.ExitCode is null ? "" : " · exit " + result.ExitCode));
             Message = program.DisplayName + " · " + program.StatusLabel + " · 작업 기록에서 결과를 확인하세요.";
         }
@@ -513,21 +543,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         { _jevSessionVerified=false;if(IsManualControl)_jevSessionEnabled=false;OnPropertyChanged(nameof(EnableJev));OnPropertyChanged(nameof(IsLocalJevExecutionAllowed));OnPropertyChanged(nameof(LocalJevPolicyMessage));Message="Jev 실행 보류 · " + (evidence.IsVerified?reason:evidence.Reason);return; }
         if (string.IsNullOrWhiteSpace(TaskInput)) { Message = "작업 내용을 입력하세요."; return; }
         if (!Directory.Exists(ProjectPath)) { Message = "존재하는 프로젝트 경로를 선택하세요. 다른 폴더로 대체 실행하지 않습니다."; return; }
+        JevExecutionTarget target;
+        try { target = JevExecutionWorkspace.Resolve(SelectedProject, SelectedProgram, ProjectPath, IndependentJevWorkspace); }
+        catch (Exception ex) { Message = ProcessRunner.Sanitize(ex.Message); return; }
         var node = EnvironmentProbe.FindCommand("node.exe");
         if (node is null) { Message = "설치된 Node 런처를 찾지 못했습니다."; return; }
         string package;
         try { package=JevNativeLauncher.Prepare(); }
         catch { Message="Jev 런처 검증 실패 · 기존 파일은 덮어쓰지 않습니다.";return; }
-        var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
-        var program = new ProgramItem { Id = projectId + "/jev", ProjectId = projectId, Name = "Jev · Codex 작업", Kind = "Jev", Path = ProjectPath, WorkingDirectory = ProjectPath };
         var command = new ProgramCommand { Name = "Jev 작업", FileName = node, Arguments = JevExecutionPolicy.BuildArguments(package,contract!.RequestedModel).ToArray(), TimeoutSeconds = 1800 };
-        await RunProgramAsync(program, command, TaskInput,contract);
+        await RunProgramAsync(target.Program, command, TaskInput,contract,target.IndependentWorkspaceRoot);
     }
     public Task CancelJevTaskAsync()
     {
         if(BlockRegisteredOperation())return Task.CompletedTask;
-        var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
-        Message = _jobs.Stop(projectId + "/jev") ? "이 프로젝트 Jev 작업의 취소를 요청했습니다." : "이 프로젝트에서 관제탑이 시작한 Jev 작업이 없습니다.";
+        try
+        {
+            var target = JevExecutionWorkspace.Resolve(SelectedProject, SelectedProgram, ProjectPath, IndependentJevWorkspace);
+            Message = _jobs.Stop(target.Program.Id) ? "선택한 Jev 소유 작업의 취소를 요청했습니다." : "선택한 범위에서 관제탑이 시작한 Jev 작업이 없습니다.";
+        }
+        catch (Exception ex) { Message = ProcessRunner.Sanitize(ex.Message); }
         return Task.CompletedTask;
     }
     public async Task ConsolidateRemoteStartupAsync()

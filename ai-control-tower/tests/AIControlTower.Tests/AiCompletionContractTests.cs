@@ -30,14 +30,14 @@ public sealed class AiCompletionContractTests
         Observe(evaluator, "{\"type\":\"turn.completed\",\"usage\":{\"output_tokens\":1}}");
     }
     [Fact]
-    public void RunAsyncRetainsExistingArgumentsAndAddsOnlyOptionalContract()
+    public void RunAsyncRetainsExistingArgumentsAndAddsOnlyOptionalWorkspaceScope()
     {
         var parameters = typeof(JobManager).GetMethod("RunAsync")!.GetParameters();
-        Assert.Equal(5, parameters.Length);
-        Assert.Equal("cancellationToken", parameters[2].Name);
-        Assert.Equal("standardInput", parameters[3].Name);
-        Assert.Equal("aiContract", parameters[4].Name);
-        Assert.True(parameters[4].IsOptional);
+        Assert.Equal(6, parameters.Length);
+        Assert.Equal(new[] { "program", "command", "cancellationToken", "standardInput", "aiContract", "independentWorkspaceRoot" }, parameters.Select(p => p.Name));
+        Assert.Equal(new[] { typeof(AIControlTower.Models.ProgramItem), typeof(AIControlTower.Models.ProgramCommand), typeof(CancellationToken), typeof(string), typeof(AiCompletionContract), typeof(string) }, parameters.Select(p => p.ParameterType));
+        Assert.False(parameters[0].IsOptional); Assert.False(parameters[1].IsOptional);
+        foreach (var parameter in parameters.Skip(2)) { Assert.True(parameter.IsOptional); Assert.Null(parameter.DefaultValue); }
     }
     [Theory]
     [InlineData("{\"type\":\"turn.failed\",\"error\":{\"message\":\"account failure\"}}")]
