@@ -25,11 +25,18 @@ public sealed class ScopedJevExecutionTests
     }
     private static ProgramItem Program(string id, string work, string project = "fixture") => new()
     { Id = id, ProjectId = project, Name = id, Kind = "Jev", WorkingDirectory = work, Path = work, Commands = [Hold()] };
-    private static ProgramCommand Hold() => new()
+    private static ProgramCommand Hold(bool pauseReadyPublication = false)
     {
-        Name = "fixture", FileName = "powershell.exe", TimeoutSeconds = 20,
-        Arguments = ["-NoProfile", "-Command", "[IO.File]::WriteAllText((Join-Path (Get-Location) 'ready.pid'),[string]$PID); while(!(Test-Path 'release')){Start-Sleep -Milliseconds 40}; exit 0"]
-    };
+        var publicationBarrier = pauseReadyPublication
+            ? "[IO.File]::WriteAllText('publishing',''); while(!(Test-Path 'publish-release')){Start-Sleep -Milliseconds 40}; "
+            : "";
+        return new()
+        {
+            Name = "fixture", FileName = "powershell.exe", TimeoutSeconds = 20,
+            // Publish the final marker only after the same-directory temporary writer has closed.
+            Arguments = ["-NoProfile", "-Command", "$path=Join-Path (Get-Location) 'ready.pid'; $writer=[IO.StreamWriter]::new($path+'.tmp'); try {$writer.Write([string]$PID); $writer.Flush(); " + publicationBarrier + "} finally {$writer.Dispose()}; [IO.File]::Move($path+'.tmp',$path); while(!(Test-Path 'release')){Start-Sleep -Milliseconds 40}; exit 0"]
+        };
+    }
     private static Task<JobResult> Scoped(JobManager manager, ProgramItem program, string root, CancellationToken ct = default)
     {
         var method = typeof(JobManager).GetMethods().Single(m => m.Name == "RunAsync");
@@ -54,6 +61,27 @@ public sealed class ScopedJevExecutionTests
         foreach (var path in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)) File.Delete(path);
         foreach (var path in Directory.EnumerateDirectories(root, "*", SearchOption.AllDirectories).OrderByDescending(p => p.Length)) Directory.Delete(path);
         Directory.Delete(root);
+    }
+    [Fact]
+    public async Task ReadyPidIsPublishedOnlyAfterItsWriterIsClosed()
+    {
+        var root = Fixture(); var work = Path.Combine(root, "a"); var manager = new JobManager(Path.Combine(root, "data"));
+        Task<JobResult>? task = null;
+        try
+        {
+            task = manager.RunAsync(Program("fixture/publication", work), Hold(pauseReadyPublication: true));
+            var until = DateTime.UtcNow.AddSeconds(8);
+            while (!File.Exists(Path.Combine(work, "publishing")) && DateTime.UtcNow < until) await Task.Delay(30);
+            Assert.True(File.Exists(Path.Combine(work, "publishing")), "Owned fixture did not reach its publication barrier.");
+            // Deliberately keep the PID writer open: the consumer's final marker must still be invisible.
+            Assert.False(File.Exists(Path.Combine(work, "ready.pid")));
+            File.WriteAllText(Path.Combine(work, "publish-release"), "go");
+            var pid = await Ready(work);
+            Assert.True(Alive(pid));
+            File.WriteAllText(Path.Combine(work, "release"), "go");
+            Assert.Equal("succeeded", (await task).State);
+        }
+        finally { manager.StopAllOwned(); if (task is not null) await task; Cleanup(root); }
     }
     [Fact]
     public async Task DeclaredSiblingJevWorkspacesRunTogetherAndStopIsScopeOwned()
