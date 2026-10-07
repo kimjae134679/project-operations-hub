@@ -6,10 +6,10 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $probed = $false
 $versions = 'D:\A_KJ\AI\Applications\AIControlTower\versions'
-$package = '0.9.9-20261008-remote-repair'
-$expectedVersion = '0.9.9'
-$expectedSource = '3212594dc46d291002205c0b4cf4eb1c2467cd98'
-$expectedHash = '04cc278615b872dcdb130147f265ff37f74277970985d756ecc3a17bcaec0127'
+$package = '0.9.10-20261008-relay-repair'
+$expectedVersion = '0.9.10'
+$expectedSource = 'dc5e99ce848037a2c98398901693c38b29069330'
+$expectedHash = '464e4fb128f2dd9b93175c49b8bcf1dad24000fe35b3acf54a428a8c69e9d63f'
 function Finish([int]$Code,[string]$Status,[string]$Reason) {
     [Console]::Out.WriteLine((@{status=$Status;reason=$Reason;started=($Status -eq 'started');instanceProbed=$probed} | ConvertTo-Json -Compress))
     exit $Code

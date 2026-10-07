@@ -10,7 +10,7 @@ import unittest
 HERE = Path(__file__).resolve().parent
 CHECKS = Path(r"D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks")
 VERSIONS = Path(r"D:\A_KJ\AI\Applications\AIControlTower\versions")
-PACKAGE = "0.9.9-20261008-remote-repair"
+PACKAGE = "0.9.10-20261008-relay-repair"
 APP = VERSIONS / PACKAGE
 SCRIPT = HERE / "start_installed_control.ps1"
 PS = Path(os.environ.get("WINDIR", r"C:\Windows")) / "System32/WindowsPowerShell/v1.0/powershell.exe"
@@ -80,7 +80,7 @@ class InstalledControlLauncherTests(unittest.TestCase):
         self.assert_held(dict(self.descriptor, sourceCommit="f" * 40))
 
     def test_unknown_package_version_is_held(self):
-        self.assert_held(dict(self.descriptor, version="0.9.10"))
+        self.assert_held(dict(self.descriptor, version="0.9.11"))
 
     def test_unactivated_or_string_activation_is_held(self):
         for activation in (False, "true"):
@@ -88,7 +88,7 @@ class InstalledControlLauncherTests(unittest.TestCase):
                 self.assert_held(dict(self.descriptor, activated=activation))
 
     def test_wrong_product_version_is_held(self):
-        self.assert_held(dict(self.descriptor, productVersion="0.9.9+" + "f" * 40))
+        self.assert_held(dict(self.descriptor, productVersion="0.9.10+" + "f" * 40))
 
     def test_non_utc_original_deadline_metadata_is_held(self):
         self.assert_held(dict(self.descriptor, expiresAtUtc="2000-01-01T00:00:00+09:00"))
@@ -139,7 +139,7 @@ class InstalledControlLauncherTests(unittest.TestCase):
             os.rmdir(link)
 
     def test_current_manual_instance_is_held_without_activation(self):
-        shim = "function Get-CimInstance { [pscustomobject]@{ExecutablePath=(Join-Path $versions '0.9.9-20261008-remote-repair\\AIControlTower.exe');CommandLine='AIControlTower.exe --manual-control --no-activate-existing'} }"
+        shim = "function Get-CimInstance { [pscustomobject]@{ExecutablePath=(Join-Path $versions '0.9.10-20261008-relay-repair\\AIControlTower.exe');CommandLine='AIControlTower.exe --manual-control --no-activate-existing'} }"
         code, row = self.run_guard(check=False, shim=shim)
         self.assertEqual(3, code)
         self.assertEqual("manual_instance_running", row["reason"])
