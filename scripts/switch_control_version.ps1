@@ -55,6 +55,7 @@ function Test-SwitchExitCapability($Request) {
         [pscustomobject]@{Version='0.9.8';SourceCommit='c4f9669fcc287dcb47d74c97dd1f3661e621b488';Sha256='484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b'}
         [pscustomobject]@{Version='0.9.8';SourceCommit='8630f1bac112ded73cce20883309fc9dfaae7ee4';Sha256='4d0601c700dd12c7e217bd52f3e994b0ab51fa26bfff6c86d1ef04805daf05c9'}
         [pscustomobject]@{Version='0.9.8';SourceCommit='5e79fa1db693982a876187c455d06369b4762511';Sha256='606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a'}
+        [pscustomobject]@{Version='0.9.8';SourceCommit='541e72552496f3f52b5fe0074433b452a894c0cb';Sha256='31ec900bd8eaa29b94cde4e1639045edd944309bc18ac96a05d1d6fb75d516d9'}
     )
     foreach ($build in $knownCapableBuilds) {
         if ($Request.ExpectedCurrentVersion -ceq $build.Version -and $Request.ExpectedCurrentSourceCommit -ieq $build.SourceCommit -and

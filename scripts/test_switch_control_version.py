@@ -129,6 +129,36 @@ if($case.StartsWith('version_validator_')){
     $results | ConvertTo-Json -Depth 5 -Compress
     return
 }
+if($case -eq 'capability_actual_098_commandonly_table'){
+    # Root verified this exact command-only package with real idle IPC/guard restart.
+    # Pure real-table queries precede orchestration mocks; no live IPC or launch.
+    $commit='541e72552496f3f52b5fe0074433b452a894c0cb'
+    $hash='31ec900bd8eaa29b94cde4e1639045edd944309bc18ac96a05d1d6fb75d516d9'
+    $previous=@(
+        @{name='scoped';version='0.9.8';commit='5e79fa1db693982a876187c455d06369b4762511';hash='606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a'},
+        @{name='records';version='0.9.8';commit='8630f1bac112ded73cce20883309fc9dfaae7ee4';hash='4d0601c700dd12c7e217bd52f3e994b0ab51fa26bfff6c86d1ef04805daf05c9'},
+        @{name='managed';version='0.9.8';commit='c4f9669fcc287dcb47d74c97dd1f3661e621b488';hash='484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b'},
+        @{name='c1';version='0.9.7';commit='5b0f3296d259ce03882e16eba1d8f93604af570f';hash='2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f'}
+    )
+    $cases=@(
+        @{name='exact_commandonly_098';version='0.9.8';commit=$commit;hash=$hash},
+        @{name='wrong_version';version='0.9.7';commit=$commit;hash=$hash},
+        @{name='wrong_source';version='0.9.8';commit=('0'*40);hash=$hash},
+        @{name='wrong_sha';version='0.9.8';commit=$commit;hash=('0'*64)}
+    )
+    foreach($old in $previous){
+        $cases+=,@{name=('commandonly_source_'+$old.name+'_sha');version='0.9.8';commit=$commit;hash=$old.hash}
+        $cases+=,@{name=($old.name+'_source_commandonly_sha');version=$old.version;commit=$old.commit;hash=$hash}
+        $cases+=,@{name=($old.name+'_preserved');version=$old.version;commit=$old.commit;hash=$old.hash}
+    }
+    $results=[ordered]@{}
+    foreach($candidate in $cases){
+        $request=[pscustomobject]@{ExpectedCurrentVersion=$candidate.version;ExpectedCurrentSourceCommit=$candidate.commit;ExpectedCurrentSha256=$candidate.hash}
+        $results[$candidate.name]=Test-SwitchExitCapability $request
+    }
+    $results | ConvertTo-Json -Compress
+    return
+}
 if($case -eq 'capability_actual_098_scoped_table'){
     # Actual scoped GUI tuple verified by the owned idle exit/guard roundtrip.
     # Query the real allowlist before mocks; never exercise live IPC or launch.
@@ -875,6 +905,16 @@ class SwitchControlVersionTests(unittest.TestCase):
             self.finish_gated_cleanup_fixture(owned, child, gate)
         self.assertIsInstance(failure, AssertionError, 'held cleanup must report an explicit owned-fixture deadline failure')
         self.assertEqual(before, retained, 'held cleanup partially removed evidence before file release')
+
+    def test_actual_capability_table_admits_verified_098_commandonly_only_as_exact_tuple(self):
+        out = self.run_case('capability_actual_098_commandonly_table')
+        expected = {'exact_commandonly_098': True, 'wrong_version': False,
+                    'wrong_source': False, 'wrong_sha': False}
+        for prior in ('scoped', 'records', 'managed', 'c1'):
+            expected['commandonly_source_' + prior + '_sha'] = False
+            expected[prior + '_source_commandonly_sha'] = False
+            expected[prior + '_preserved'] = True
+        self.assertEqual(expected, out)
 
     def test_actual_capability_table_admits_verified_098_scoped_only_as_exact_tuple(self):
         out = self.run_case('capability_actual_098_scoped_table')

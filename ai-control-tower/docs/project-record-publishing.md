@@ -6,6 +6,18 @@
 
 아래 자동 게시 성공과 PR34는 이전 지시에 따른 실제 실행 이력이며 삭제하거나 새로운 자동 전송 권한으로 해석하지 않습니다. 이번 정책 전환은 기존 중앙 clone 잠금이나 보호 Bridge 설정을 건드리는 복구 작업이 아닙니다. 실제 운영 적용 결과는 새 checkpoint/DEPLOYMENT에서 별도로 확인합니다. 이번 변경은 로컬에 기록하고 스스로 자동 업로드하지 않습니다.
 
+### 실제 정책 적용 · 2026-10-07 19:52 KST
+
+- 앱: `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-commandonly-final\AIControlTower.exe`, source `541e72552496f3f52b5fe0074433b452a894c0cb`, FileVersion `0.9.8.0`, ProductVersion `0.9.8+541e72552496f3f52b5fe0074433b452a894c0cb`, SHA-256 `31ec900bd8eaa29b94cde4e1639045edd944309bc18ac96a05d1d6fb75d516d9`입니다.
+- 지원 helper38480/native0으로 이전21936 실제 종료→새31828을 확인했습니다. 이어 exact exit client38636의 `graceful_exit_accepted`/native0/empty stderr→31828 실제 종료→fixed guard17324/native0→현재28624, birth ticks `639269671480252491`, tray·PC true를 확인했습니다. 원격5996/Bridge5140은 같은 birth로 보존했습니다. 운영 busy drain·화면 조작 검증은 아닙니다.
+- 전환 준비 동안 등록파일의 Enabled를 임시 false로 하여 다음 자동 전송을 차단하고 원본 byte/hash를 보관했습니다. 기존21936 종료와 새 명시 전용 소스를 확인한 뒤 원본 bytes/SHA `468E9785…`를 복원했습니다. 등록 가능 상태는 일회 CLI의 권한이며 GUI 자동 전송을 다시 켠 것이 아닙니다. 실제 protected config/clone/ACL은 변경하지 않았습니다.
+- 수동 GUI의 수집 완료→publisher 호출과 일반 GUI의 Git prepare/synchronize 경로를 제거했습니다. GUI 게시 API도 registry/transport I/O 전에 즉시 완료합니다. 로컬 읽기/수집/보관과 기존 명시 일회 CLI의 등록·파싱·metadata·배타 실행 검사는 유지합니다.
+- TDD 예상 RED3사례→focused71 PASS, writer Debug전체658 PASS, Release관련78 PASS, 부모 최종 fresh Release **658 PASS/0 FAIL/0 skip(14초)**입니다. Window.Show3검사는 제외·미실행입니다. 최초 부모 Release657 PASS/1 timeout 및 동등 조건 격리1 PASS의 원본을 보존했으며 자원/시작 지연 근본원인은 확정하지 않았습니다. 새 로컬 읽기 fixture는 unrelated collector를 시작하지 않게 했고 운영 신뢰검사·8초 deadline은 완화하지 않았습니다.
+- 첫 staging은 SDK가 source revision을 두 번 붙인 ProductVersion 때문에 실제 종료 전에 source binding에서 거부됐습니다. 미활성 실패 산출물과 진단을 보존하고 build metadata 설정을 바로잡은 별도 final 패키지를 검증했습니다. fixed guard SHA `a608ac…` 및 기존 expiry instant `2026-10-08T06:07:57.4661913+00:00`는 그대로입니다.
+- 증거는 `D:\A_KJ\AI\ControlTowerData\version-replacement\20261007-explicit-publish`의 `SUSPEND.json`, `REGISTRY_RESTORED.json`, `FULL_HANDOFF.json`, `NEW_IDLE_ROUNDTRIP.json`, `ENTRY_UPDATE.json`, `STAGING_METADATA_REFUSAL.json`입니다. 정확 exe의 detached fixture는 exit0/Windows0/settings·MainVM false/downstream·sync·stop0이며 live UI를 읽지 않았습니다. 최신 실행 입구만 새 fixed guard에 연결했고 중복 실행을 피하려 wrapper는 재실행하지 않았습니다.
+- 이번 작업의 GitHub 업로드·PR 생성·merge는 실행하지 않았습니다. source local commit과 원문 기록은 로컬에 남습니다. 기존 PR31/34·보호 Bridge 업데이트·중앙 Git 잠금 상태를 완료로 바꾸지 않습니다.
+- 새 exact 앱의 실제 종료/재시작 증거 후 교체 helper에 이 version/source/hash 튜플만 추가했습니다. RED1→GREEN1(16행렬), 최종 helper44 PASS/0 FAIL(80.418초)이며 wrong version/source/hash·cross-pair·기존4튜플 경계는 유지합니다. helper/문서 commit은 앱 source541e725와 별개이고 앱을 다시 빌드하지 않습니다.
+
 ## 최신 확인 · 2026-10-07 운영 교체와 앱 자동 metadata 게시
 
 현재 운영 앱은 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-scoped`의 **0.9.8 / PID 21936**이며 endpoint birth ticks는 `639269645633576474`, fresh tray·PC 연결은 true입니다. 앱에 포함된 소스는 `5e79fa1db693982a876187c455d06369b4762511`, exe SHA-256은 `606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a`입니다. 아래 c4f9669 운영·이번 수정 GUI 미반영·publisher 미활성 표시는 이전 시점의 이력이며 이 최신 확인이 우선합니다.
