@@ -1,5 +1,7 @@
 """Isolated PowerShell orchestration tests: no live process or application launch."""
 import json
+import ctypes
+from ctypes import wintypes
 import hashlib
 import os
 from pathlib import Path
@@ -7,7 +9,9 @@ import subprocess
 import shutil
 import sys
 import time
+import threading
 import unittest
+from unittest import mock
 import uuid
 
 
@@ -123,6 +127,26 @@ if($case.StartsWith('version_validator_')){
         $results[$candidate.name]=[pscustomobject]@{allowed=$allowed;trace=@($script:validationTrace.ToArray());capable=(Test-SwitchExitCapability $script:vr)}
     }
     $results | ConvertTo-Json -Depth 5 -Compress
+    return
+}
+if($case -eq 'capability_actual_098_table'){
+    # Real table only, before any mock: exact released package identity, no IPC.
+    $commit='c4f9669fcc287dcb47d74c97dd1f3661e621b488'
+    $hash='484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b'
+    $cases=@(
+        @{name='exact_098';version='0.9.8';commit=$commit;hash=$hash},
+        @{name='wrong_version';version='0.9.7';commit=$commit;hash=$hash},
+        @{name='wrong_source';version='0.9.8';commit=('0'*40);hash=$hash},
+        @{name='wrong_sha';version='0.9.8';commit=$commit;hash=('0'*64)},
+        @{name='unknown_099';version='0.9.9';commit=$commit;hash=$hash},
+        @{name='c1_preserved';version='0.9.7';commit='5b0f3296d259ce03882e16eba1d8f93604af570f';hash='2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f'}
+    )
+    $results=[ordered]@{}
+    foreach($candidate in $cases){
+        $request=[pscustomobject]@{ExpectedCurrentVersion=$candidate.version;ExpectedCurrentSourceCommit=$candidate.commit;ExpectedCurrentSha256=$candidate.hash}
+        $results[$candidate.name]=Test-SwitchExitCapability $request
+    }
+    $results | ConvertTo-Json -Compress
     return
 }
 if($case -eq 'capability_actual_table'){
@@ -303,6 +327,40 @@ $result=Invoke-ControlVersionSwitch $r
 
 
 class SwitchControlVersionTests(unittest.TestCase):
+    def start_gated_cleanup_fixture(self):
+        owned = SwitchControlVersionTests('test_guard_json_result_does_not_wait_for_descendant_stdout_eof')
+        owned.setUp()
+        ready, done, gate = (owned.root / name for name in ('cleanup-ready.txt', 'cleanup-done.txt', 'cleanup-release.txt'))
+        script = owned.root / 'owned-cleanup-child.py'
+        script.write_text('from pathlib import Path\nimport time\n'
+                          f'Path({str(ready)!r}).write_text("ready")\n'
+                          f'Path({str(done)!r}).write_text("done before handle close")\n'
+                          'deadline=time.monotonic()+6\n'
+                          f'while not Path({str(gate)!r}).exists() and time.monotonic()<deadline:\n'
+                          '    time.sleep(0.01)\n', encoding='utf-8')
+        (owned.root / 'preserve-evidence.txt').write_text('retain on cleanup hold', encoding='utf-8')
+        temp = owned.root / 'temp'
+        temp.mkdir()
+        with (owned.root / 'cleanup-held-stderr.log').open('wb') as stderr:
+            child = subprocess.Popen([sys.executable, str(script)], stdin=subprocess.DEVNULL,
+                                     stdout=subprocess.DEVNULL, stderr=stderr,
+                                     creationflags=subprocess.CREATE_NO_WINDOW,
+                                     env=dict(os.environ, TEMP=str(temp), TMP=str(temp)))
+        owned.fixture_markers.append((ready, done))
+        deadline = time.monotonic() + 3
+        while not done.exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        self.assertTrue(done.exists(), 'owned cleanup fixture did not signal ready/done')
+        self.assertIsNone(child.poll(), 'owned fixture must still hold inherited stderr')
+        return owned, child, gate
+
+    def finish_gated_cleanup_fixture(self, owned, child, gate):
+        if owned.root.exists():
+            gate.write_text('natural release', encoding='utf-8')
+        self.assertEqual(0, child.wait(timeout=8))
+        if owned.root.exists():
+            owned.tearDown()
+
     def setUp(self):
         self.assertTrue(SCRIPT.exists(), 'safe wait-and-launch replacement utility is missing')
         self.root = CHECKS / ('version-switch-unit-' + uuid.uuid4().hex)
@@ -313,15 +371,49 @@ class SwitchControlVersionTests(unittest.TestCase):
 
     def tearDown(self):
         if hasattr(self, 'root'):
-            # These are only our short-lived fixture children. Let them finish naturally;
-            # never terminate an application, enumerate live processes, or remove their root early.
-            for ready, done in self.fixture_markers:
-                deadline = time.monotonic() + 8
-                while ready.exists() and not done.exists() and time.monotonic() < deadline:
-                    time.sleep(0.05)
             resolved = self.root.resolve()
             self.assertEqual(CHECKS.resolve(), resolved.parent)
+            # One unchanged 8s cleanup budget. A done marker is not a file-handle
+            # release barrier; it can precede natural interpreter shutdown.
+            deadline = time.monotonic() + 8
+            while True:
+                pending = any(ready.exists() and not done.exists()
+                              for ready, done in self.fixture_markers)
+                released = not pending and self.owned_fixture_files_released(resolved)
+                if time.monotonic() >= deadline:
+                    self.fail('owned_fixture_file_release_timeout; fixture preserved')
+                if released:
+                    break
+                time.sleep(0.05)
+            # Exactly one deletion, only after all owned file handles released.
+            # No delete retry, ignored error, process enumeration or termination.
             shutil.rmtree(resolved)
+
+    def owned_fixture_files_released(self, root):
+        kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+        create = kernel.CreateFileW
+        create.argtypes = (wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                           wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE)
+        create.restype = wintypes.HANDLE
+        close = kernel.CloseHandle
+        close.argtypes = (wintypes.HANDLE,)
+        close.restype = wintypes.BOOL
+        invalid = ctypes.c_void_p(-1).value
+        for path in root.rglob('*'):
+            self.assertTrue(path.resolve().is_relative_to(root), 'owned fixture path escaped boundary')
+            if path.is_dir():
+                continue
+            # GENERIC_READ / share=0 / OPEN_EXISTING: probe only, no content read,
+            # file creation, write, metadata change or ACL manipulation.
+            handle = create(str(path), 0x80000000, 0, None, 3, 0x80, None)
+            if handle == invalid:
+                error = ctypes.get_last_error()
+                if error in (32, 33):
+                    return False
+                raise ctypes.WinError(error)
+            if not close(handle):
+                raise ctypes.WinError(ctypes.get_last_error())
+        return True
 
     def run_case(self, case):
         if case.startswith('guard_'):
@@ -689,6 +781,51 @@ class SwitchControlVersionTests(unittest.TestCase):
         self.assertEqual(0, out['calls'])
         self.assertIsNone(out['boundary'])
         self.assertTrue((self.root / 'old-runtime' / 'runtime-temp').is_dir())
+
+
+    def test_cleanup_waits_for_owned_file_release_after_done_marker(self):
+        owned, child, gate = self.start_gated_cleanup_fixture()
+        timer = threading.Timer(0.35, lambda: gate.write_text('natural release', encoding='utf-8'))
+        timer.start()
+        failure = None
+        removed = False
+        try:
+            try:
+                owned.tearDown()
+                removed = not owned.root.exists()
+            except (OSError, AssertionError) as error:
+                failure = error
+        finally:
+            timer.join()
+            self.finish_gated_cleanup_fixture(owned, child, gate)
+        self.assertIsNone(failure, f'cleanup used done marker before owned file release: {failure!r}')
+        self.assertTrue(removed, 'released fixture was not cleaned within the original 8s budget')
+
+    def test_cleanup_preserves_owned_fixture_when_file_release_deadline_expires(self):
+        owned, child, gate = self.start_gated_cleanup_fixture()
+        before = {path.relative_to(owned.root) for path in owned.root.rglob('*')}
+        failure = None
+        retained = set()
+        clock = iter((100.0, 109.0))
+        try:
+            # Real owned stderr remains open; only this cleanup clock is advanced.
+            with mock.patch.object(time, 'monotonic', side_effect=lambda: next(clock, 109.0)):
+                try:
+                    owned.tearDown()
+                except (OSError, AssertionError) as error:
+                    failure = error
+            if owned.root.exists():
+                retained = {path.relative_to(owned.root) for path in owned.root.rglob('*')}
+        finally:
+            self.finish_gated_cleanup_fixture(owned, child, gate)
+        self.assertIsInstance(failure, AssertionError, 'held cleanup must report an explicit owned-fixture deadline failure')
+        self.assertEqual(before, retained, 'held cleanup partially removed evidence before file release')
+
+    def test_actual_capability_table_admits_verified_098_and_preserves_c1(self):
+        out = self.run_case('capability_actual_098_table')
+        self.assertEqual({'exact_098': True, 'wrong_version': False,
+                          'wrong_source': False, 'wrong_sha': False,
+                          'unknown_099': False, 'c1_preserved': True}, out)
 
 
 if __name__ == '__main__':

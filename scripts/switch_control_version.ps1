@@ -52,6 +52,7 @@ function Test-SwitchExitCapability($Request) {
     # bytes here after build verification; no runtime CLI capability override.
     $knownCapableBuilds = @(
         [pscustomobject]@{Version='0.9.7';SourceCommit='5b0f3296d259ce03882e16eba1d8f93604af570f';Sha256='2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f'}
+        [pscustomobject]@{Version='0.9.8';SourceCommit='c4f9669fcc287dcb47d74c97dd1f3661e621b488';Sha256='484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b'}
     )
     foreach ($build in $knownCapableBuilds) {
         if ($Request.ExpectedCurrentVersion -ceq $build.Version -and $Request.ExpectedCurrentSourceCommit -ieq $build.SourceCommit -and
