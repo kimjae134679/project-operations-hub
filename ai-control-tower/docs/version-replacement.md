@@ -2,7 +2,19 @@
 
 `scripts/switch_control_version.ps1`은 정확히 승인된 legacy **0.9.6** 또는 **0.9.7 이상** 현재본의 종료를 확인한 뒤, 별도 폴더의 검증된 manual-control을 한 번 실행하는 코드 전용 도우미입니다. 검증된 종료 IPC 기능이 없는 기존 빌드는 정상 사용자 종료를 기다립니다. 검증된 IPC 기능이 등록된 빌드만 정확한 기존 EXE의 headless 종료 요청을 사용하며 강제 종료는 하지 않습니다.
 
-## 최신 검증 · 2026-10-07
+## 최신 운영·검증 · 2026-10-07
+
+현재 **0.9.8 manual-control PID 25772**, 생성 17:39:00.861918 KST/endpoint ticks `639269591408619180`입니다. 루트 담당자가 fresh trayRegistered/pcConnected true·ownedJobsBusy false와 endpoint 신원을 확인했습니다. 패키지는 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-managed`, 앱 소스 `c4f9669fcc287dcb47d74c97dd1f3661e621b488`, ProductVersion `0.9.8+c4f9669fcc287dcb47d74c97dd1f3661e621b488`, FileVersion `0.9.8.0`, 크기 135,902,087바이트, SHA-256 `484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b`입니다. helper/Python 소스는 `cbdefbfa09caed87439ad9e680e744a446ef20b3`; 앱·guard 바이트는 바꾸지 않았습니다. 정확한 0.9.8 capability 튜플을 등록했으며 exact EXE의 비운영 fixture exit0/WindowsCreated0/settingsfalse/MainVMfalse/processes0/syncfalse/stopped0도 확인했습니다.
+
+helper PID 37016이 **한 번/종료 코드 0**으로 C1 PID 9552 실제 종료 → 다른 0.9.8 패키지 PID 376 실행(17:37:24.751947 KST, ticks `639269590447519475`)을 완료했습니다. `FULL_HANDOFF.json`: operatingHandoffConfirmed=true, **oldExitReplyDirectlyCaptured=false**입니다. 구버전 종료 수락 원문을 별도 직접 캡처했다고 주장하지 않습니다. 이어 exact 새 client PID 28344의 `graceful_exit_accepted/0`·빈 stderr → PID 376 실제 종료 → 고정 guard PID 23092 CheckOnly 0·명시 재시작 0 → 현재 PID 25772를 확인했습니다(`NEW_IDLE_ROUNDTRIP.json`). activated/automaticDifferentPackageHandoffVerified/idleCliRoundtripVerified=true, **busyDrainOperatingVerified=false**입니다. 별도 패키지 helper 전체 교체와 새 앱의 유휴 CLI 왕복은 확인했지만 운영 busy drain은 미검증입니다.
+
+최종 **scripts 119 PASS/0 FAIL(119.066초, 종료 코드 0, 실행기 41개)**입니다. 앱 C# 추가 변경 없이 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)** 근거를 유지합니다. 직전 117개/118.331초의 teardown 1 ERROR 이력은 보존합니다. cleanup RED 2 FAIL(16.568초) → GREEN 5 PASS(15.034초); 기존 8초 안에서 모든 소유 파일의 exclusive read/share0 release를 확인한 뒤 한 번 삭제하며 지속 held는 증거 보존·명확 실패입니다. **이 검사 barrier는 프로세스 종료 증거가 아닙니다.** 기존 production 20초/외부 20·35초 제한은 변경하지 않았습니다. Python CLI RED 6 FAIL/4 PASS(15.112초) → GREEN 10 PASS(14.896초), DAG 차단·replay 1·privacy 0은 소스 CLI 검증이며 기존 Bridge 3.0 운영 설치 변경이 아닙니다.
+
+root supervisor PID 5996은 그대로이며 Bridge PID 5140/v3 localReady·relayConnected true/parallel 4(08:39:30Z), 별도 Remote pong(08:39:27Z)을 확인했습니다. X는 트레이 유지, 강제 종료·창 제어는 없습니다. 보호 config·중앙 Git locks·실제 여러 Jev 모델 완료·모든 GPT 자동 연결은 미완료이며 PR #31 draft·미병합, review disabled/unmanaged, 예약 PAUSED입니다.
+
+## 이전 C1 운영·0.9.8 준비 검증 · 2026-10-07
+
+아래의 현재/미배포 표현은 활성화 전 당시 기록이며 위 최신 운영 확인이 우선합니다.
 
 다음 **0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다.** 버전은 ASCII 정규형 3부분(각 0~65535·선행 0/부호/공백/접미사 없음), 정확한 버전 폴더와 숫자 순서로 검증합니다. 대상은 0.9.7 이상이며 현재보다 낮을 수 없고, 모든 nonlegacy 현재본은 고정 descriptor 신원까지 확인합니다. 명시 AI 항목 오류는 후속 성공으로 지우지 않으며 일반 도구 nonzero는 회복 가능한 오류로 구분합니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)**, **scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)**입니다. 근거는 `full-handoff-net-final.log/trx`, `full-handoff-scripts-final.log`입니다. 신규 패키지 신원·등록·전체 자동 버전 교체 운영 성공은 아직 확정하지 않습니다.
 

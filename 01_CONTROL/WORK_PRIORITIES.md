@@ -1,4 +1,16 @@
-## 최신 운영 확인 · 2026-10-07 · 첫 전환과 유휴 정상 종료 검증
+## 최신 운영 확인 · 2026-10-07 · 0.9.8 자동 교체 완료
+
+현재 **0.9.8 manual-control PID 25772**, 생성 17:39:00.861918 KST/endpoint ticks `639269591408619180`입니다. 루트 담당자가 fresh 트레이·PC 연결 true, ownedJobsBusy false와 endpoint 신원을 확인했습니다. 패키지는 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-managed`, 앱 소스 `c4f9669fcc287dcb47d74c97dd1f3661e621b488`, SHA-256 `484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b`입니다. helper/Python 소스는 `cbdefbfa09caed87439ad9e680e744a446ef20b3`; 기존 앱·guard 바이트를 덮어쓰지 않았습니다.
+
+실제 helper PID 37016이 **한 번 실행·종료 코드 0**으로 C1 PID 9552의 실제 종료 → 다른 0.9.8 패키지 PID 376 실행(17:37:24.751947 KST)을 완료했습니다. `FULL_HANDOFF.json`의 operatingHandoffConfirmed는 true이며 **구버전 종료 수락 원문은 별도 직접 캡처하지 않았습니다**(`oldExitReplyDirectlyCaptured=false`). 이어 정확한 새 client PID 28344의 `graceful_exit_accepted/0`·빈 stderr → PID 376 실제 종료 → guard PID 23092 CheckOnly 0·재시작 0 → 현재 PID 25772를 확인했습니다(`NEW_IDLE_ROUNDTRIP.json`). activated/automaticDifferentPackageHandoffVerified/idleCliRoundtripVerified는 true, **busyDrainOperatingVerified는 false**입니다. X는 트레이를 유지하고 강제 종료·창 제어는 하지 않았습니다.
+
+최종 **scripts 119 PASS/0 FAIL(119.066초, 종료 코드 0, 실행기 41개)**입니다. 앱 C# 추가 변경 없이 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)** 근거를 유지합니다. 직전 117개 검사의 118.331초/teardown 1 ERROR 이력은 보존합니다. cleanup RED 2 FAIL(16.568초) → focused GREEN 5 PASS(15.034초); 기존 8초 안에서 소유 파일 release를 확인하는 검사 barrier이며 프로세스 종료 증거가 아닙니다. production deadline은 변경하지 않았습니다. Python CLI는 RED 6 FAIL/4 PASS(15.112초) → GREEN 10 PASS(14.896초), DAG 차단·replay 1·privacy 0 근거를 확보했으나 기존 Bridge 3.0 운영 설치를 수정한 것은 아닙니다.
+
+root supervisor PID 5996은 그대로입니다. Bridge PID 5140/v3 localReady·relayConnected true/parallel 4는 08:39:30Z, 별도 Remote pong은 08:39:27Z에 확인했습니다. 보호 config·중앙 Git locks·실제 여러 Jev 모델 완료·모든 GPT 자동 연결은 여전히 막힘/미완료입니다. PR #31 draft·미병합, review disabled/unmanaged, 예약 PAUSED를 유지합니다.
+
+## 이전 C1 운영·0.9.8 준비 기록
+
+아래의 현재/미배포 표현은 0.9.8 활성화 전 당시 상태이며 위 최신 확인이 우선합니다.
 
 다음 **0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다.** 교체 실행기는 선행 0 없는 ASCII 숫자 3부분(각 0~65535)·버전별 정확한 폴더·다운그레이드 거부·모든 nonlegacy 현재 descriptor 검증을 유지하도록 확장했습니다. 명시 AI 항목 오류는 이후 성공에도 오류 상태를 유지하고, 일반 도구의 nonzero 종료는 회복 가능한 오류로 구분합니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)**, **scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)**입니다(`full-handoff-net-final.log/trx`, `full-handoff-scripts-final.log`). 신규 패키지 신원·capability·실제 전체 자동 교체는 아직 확정하지 않습니다.
 
