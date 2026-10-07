@@ -16,7 +16,7 @@ public sealed class ProjectBridgeService : IDisposable
     public string Home { get; }
     public string Executable => Path.Combine(Home, "프로젝트연결.exe");
     public ProjectBridgeService(string? home = null, HttpClient? client = null)
-    { Home = home ?? DefaultHome; _client = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(3) }; }
+    { Home = home ?? DefaultHome; _client = client ?? new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false}) { Timeout = TimeSpan.FromSeconds(3) }; }
     internal static string Text(JsonElement j, string key, string fallback = "") => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? fallback : fallback;
     private static bool Flag(JsonElement j, string key) => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.True;
     private static int Number(JsonElement j, string key, int fallback) => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out var n) ? n : fallback;
@@ -38,7 +38,12 @@ public sealed class ProjectBridgeService : IDisposable
     };
     private (Uri Address, string Token) Endpoint()
     {
-        using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Home, "state", "local_endpoint.json")));
+        var path=Path.Combine(Home,"state","local_endpoint.json");
+        for(var item=path;!string.IsNullOrEmpty(item);item=Path.GetDirectoryName(item))
+            if((File.Exists(item)||Directory.Exists(item))&&(File.GetAttributes(item)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("로컬 연결 메타데이터 경로를 확인하세요.");
+        using var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read);
+        if(stream.Length>64*1024)throw new InvalidDataException("로컬 연결 메타데이터가 너무 큽니다.");
+        using var doc = JsonDocument.Parse(stream,new JsonDocumentOptions{MaxDepth=16});
         var row = doc.RootElement; var address = ValidateEndpoint(Text(row, "baseUrl")); var token = Text(row, "token");
         if (token.Length < 20 || token.Length > 200 || token.Any(char.IsControl)) throw new InvalidDataException("로컬 연결 인증을 확인하세요.");
         return (address, token);
@@ -49,10 +54,38 @@ public sealed class ProjectBridgeService : IDisposable
         request.Headers.Add("X-ProjectBridge-Token", ep.Token);
         if (value is not null) request.Content = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
         using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-        if (!response.IsSuccessStatusCode) throw new IOException($"PC 연결 요청 실패 ({(int)response.StatusCode})");
-        var bytes = await response.Content.ReadAsByteArrayAsync(ct);
-        if (bytes.Length > 900 * 1024) throw new InvalidDataException("결과가 너무 큽니다. 읽을 범위를 줄이세요.");
-        return JsonDocument.Parse(bytes);
+        if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.StatusCode is System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.Unauthorized?"PC 로컬 API 권한 거부":"PC 연결 요청 실패",null,response.StatusCode);
+        using var input=await response.Content.ReadAsStreamAsync(ct);using var output=new MemoryStream();var buffer=new byte[8192];
+        while(true){var count=await input.ReadAsync(buffer,ct);if(count==0)break;if(output.Length+count>900*1024)throw new InvalidDataException("결과가 너무 큽니다. 읽을 범위를 줄이세요.");output.Write(buffer,0,count);}
+        return JsonDocument.Parse(output.ToArray(),new JsonDocumentOptions{MaxDepth=32});
+    }
+    /// <summary>Existing authenticated API only: no config read, installer, native fallback or process start.</summary>
+    public async Task<PcConnectionSnapshot> CheckApiOnlyAsync(CancellationToken ct)
+    {
+        var installed=File.Exists(Executable);
+        try
+        {
+            using var doc=await RequestAsync(HttpMethod.Get,"v1/status",null,ct);var j=doc.RootElement;
+            var now=DateTimeOffset.UtcNow;
+            var fresh=DateTimeOffset.TryParse(Text(j,"updatedAt"),out var at)&&now-at<TimeSpan.FromSeconds(30)&&at<now.AddMinutes(1);
+            var stage=Text(j,"stage","unknown");var jobs=new List<PcJobSnapshot>();
+            if(j.TryGetProperty("jobs",out var rows)&&rows.ValueKind==JsonValueKind.Array)
+                foreach(var row in rows.EnumerateArray().Take(200))jobs.Add(new(Text(row,"id"),Text(row,"title",ActionName(Text(row,"action"))),Text(row,"projectId"),Text(row,"toolId","ProjectBridge"),Text(row,"state","unknown"),Text(row,"action")));
+            return new(installed,fresh&&Flag(j,"localReady")&&stage is not("stopped" or "disconnected" or "paused"),fresh&&Flag(j,"relayConnected"),Text(j,"deviceId","기기 미확인"),fresh?stage:"stale",
+                fresh?"기존 인증 API 응답 확인 · 연결 상태와 작업을 조회합니다. 설정/설치/원격 프로세스는 변경하지 않습니다.":"API 응답 시각이 오래되었습니다. 제한된 간격으로 상태만 다시 확인합니다.",Text(j,"relayCode"),Number(j,"activeJobCount",0),Math.Clamp(Number(j,"parallelLimit",4),1,8),jobs);
+        }
+        catch(OperationCanceledException){ct.ThrowIfCancellationRequested();return new(installed,false,false,"기기 미확인","offline","PC 상태 조회 시간 초과 · 기존 연결 실행기에 복구를 맡기고 상태만 다시 확인합니다.","",0,4,[]);}
+        catch(Exception e) when(e is IOException or HttpRequestException or JsonException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            var denied=e is UnauthorizedAccessException||e is HttpRequestException{StatusCode:System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.Unauthorized};
+            return new(installed,false,false,"기기 미확인",denied?"permission_denied":"offline",denied?"PC 로컬 API 권한 거부 · 자동 재시도/복구 중지 · 인증은 별도로 확인해야 합니다.":"기존 PC API 응답 없음 · 설치/설정 변경이나 새 실행기 시작 없이 제한된 간격으로 조회합니다.","",0,4,[]);
+        }
+    }
+    public async Task ControlApiOnlyAsync(string action,CancellationToken ct)
+    {
+        if(action is not("resume" or "pause" or "stop"))throw new ArgumentException("알 수 없는 연결 동작");
+        using var response=await RequestAsync(HttpMethod.Post,"v1/control",new{action},ct);
+        if(!Flag(response.RootElement,"accepted"))throw new IOException("PC 연결 제어 승인 응답이 없습니다.");
     }
     public async Task<PcConnectionSnapshot> CheckAsync(CancellationToken ct)
     {
@@ -102,8 +135,12 @@ public sealed class ProjectBridgeService : IDisposable
         info.ArgumentList.Add("--" + action); info.ArgumentList.Add("--background"); Process.Start(info)?.Dispose();
     }
     public async Task<string> SubmitAsync(string project, string tool, string action, object args, CancellationToken ct)
+        => await SubmitCoreAsync(project,tool,action,args,ct,false);
+    public async Task<string> SubmitApiOnlyAsync(string project,string tool,string action,object args,CancellationToken ct)
+        => await SubmitCoreAsync(project,tool,action,args,ct,true);
+    private async Task<string> SubmitCoreAsync(string project,string tool,string action,object args,CancellationToken ct,bool apiOnly)
     {
-        var state = await CheckAsync(ct); if (!state.Connected) throw new InvalidOperationException("PC 연결이 준비되지 않았습니다.");
+        var state = apiOnly?await CheckApiOnlyAsync(ct):await CheckAsync(ct); if (!state.Connected) throw new InvalidOperationException("PC 연결이 준비되지 않았습니다.");
         var id = "tower-" + Guid.NewGuid().ToString("N"); var now = DateTimeOffset.UtcNow;
         using var doc = await RequestAsync(HttpMethod.Post, "v1/jobs", new { id, target = "PC", deviceId = state.Device, projectId = CanonicalProjectId(project),
             toolId = tool, action, createdAt = now.ToString("o"), expiresAt = now.AddDays(1).ToString("o"), args }, ct);

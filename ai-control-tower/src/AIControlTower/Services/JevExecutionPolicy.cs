@@ -18,9 +18,10 @@ public static class JevExecutionPolicy
         if (!accountExecutionVerified) { reason = "이 계정의 해당 모델 실행 지원 검증이 필요합니다. 모델 목록 표시는 실행 성공 증거가 아닙니다."; return false; }
         contract = new("codex-jsonl-v1", model!); reason = ""; return true;
     }
+    public static bool ResolveSessionEnable(bool configured,bool manual,bool? sessionOverride) => manual ? sessionOverride ?? false : configured;
     public static IReadOnlyList<string> BuildArguments(string package, string model)
     {
         if (!IsExplicitAllowedModel(model) || model != "gpt-6.1-sol") throw new ArgumentException("known explicit non-Astra model required", nameof(model));
-        return [package, "exec", "--model", model, "--json", "--sandbox", "workspace-write", "-c", "approval_policy=\"never\"", "-"];
+        return [package, "--model", model, "--json", "--sandbox", "workspace-write", "-"];
     }
 }

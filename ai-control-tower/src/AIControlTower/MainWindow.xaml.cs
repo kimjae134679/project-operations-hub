@@ -24,30 +24,78 @@ public partial class MainWindow : Window
     private bool _paneWidthsInitialized,_restoringReaderOrigin;
     private double _expandedLogHeight=140;
     private ReaderOrigin? _readerOrigin;
+    private SystemTrayService? _tray;
+    private bool _trayExitRequested,_sessionEnding;
+    private DateTimeOffset _lastRuntimeStatus;
     private sealed record ReaderOrigin(TabItem Tab,WorkspaceReaderSelection Selection,
         (ScrollViewer View,double Vertical,double Horizontal)[] Scrolls,(Expander View,bool Expanded)[] Groups);
 
-    public MainWindow(ControlTowerSettings? settings = null)
+    public MainWindow(ControlTowerSettings? settings = null) : this(settings,null) { }
+    public MainWindow(ControlTowerSettings? settings, StartupPolicy? startupPolicy)
     {
-        _viewModel = new(settings);
+        _viewModel = new(settings,true,JobManager.RecoverInterruptedRuns,startupPolicy,null);
         ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
-        if(_viewModel.IsReadOnlyView)Title=$"통합 관제탑 · {_viewModel.ApplicationVersionLabel} · 로컬 조회 (외부 실행/공유 보류)";
+        if(_viewModel.IsManualControl)Title=$"통합 관제탑 · {_viewModel.ApplicationVersionLabel}";
+        else if(_viewModel.IsReadOnlyView)Title=$"통합 관제탑 · {_viewModel.ApplicationVersionLabel} · 로컬 조회 (외부 실행/공유 보류)";
         _viewModel.Documents.Opened+=(_,_)=>WorkspaceTabs.SelectedItem=DocumentReaderTab;
         _viewModel.Documents.Opening+=(_,_)=>CaptureReaderOrigin();
         _viewModel.Documents.ReturnRequested+=(_,_)=>RestoreReaderOrigin();
         _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
+        if(_viewModel.IsManualControl)_viewModel.PcConnection.PropertyChanged+=(_,_)=>SaveManualRuntimeStatus();
         PcJobsHost.Content = _pcJobsPanel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
         SourceInitialized += (_, _) => ApplyTitlebarTheme();
-        Loaded += async (_, _) => await InitializeAsync();
+        Loaded += async (_, _) => { EnsureSelectedTabVisible(WorkspaceTabs);StartOwnedTray();await InitializeAsync(); };
         SizeChanged += (_, _) => ApplyResponsiveLayout();
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.DarkMode)) ApplyTitlebarTheme(); };
         _viewModel.CatalogRefreshing += (_, _) => CaptureCatalogView();
         _viewModel.CatalogRefreshed += (_, _) => Dispatcher.BeginInvoke(RestoreCatalogView, System.Windows.Threading.DispatcherPriority.Loaded);
-        Closed += (_, _) => _viewModel.Dispose();
+        Closing += HandleWindowClosing;
+        Closed += (_, _) => { _tray?.Dispose();_viewModel.Dispose(); };
+    }
+    private void StartOwnedTray()
+    {
+        if(!_viewModel.IsManualControl || _tray is not null)return;
+        _tray=new SystemTrayService();
+        _tray.AvailabilityChanged+=(_,_)=>{if(!_tray.IsAvailable&&!IsVisible&&!_sessionEnding)Show();SaveManualRuntimeStatus();};
+        _tray.TryStart(()=>{Show();if(WindowState==WindowState.Minimized)WindowState=WindowState.Normal;Activate();},RequestTrayExit);
+        SaveManualRuntimeStatus();
+    }
+    private void SaveManualRuntimeStatus()
+    {
+        if(!_viewModel.IsManualControl || _sessionEnding)return;
+        var now=DateTimeOffset.UtcNow;if(now-_lastRuntimeStatus<TimeSpan.FromSeconds(1))return;
+        try
+        {
+            const string root=@"D:\A_KJ\AI\ControlTowerData\manual-control";
+            Directory.CreateDirectory(root);
+            File.WriteAllText(Path.Combine(root,"manual-control-status.json"),System.Text.Json.JsonSerializer.Serialize(new
+            { schemaVersion=1,mode="manual-control",processId=Environment.ProcessId,version=typeof(MainWindow).Assembly.GetName().Version?.ToString(),
+              updatedAt=now,trayRegistered=_tray?.IsAvailable==true,pcConnected=_viewModel.PcConnection.IsConnected,
+              autoReconnectSuppressed=_viewModel.PcConnection.AutoReconnectSuppressed,ownedJobsBusy=_viewModel.IsBusy }));
+            _lastRuntimeStatus=now;
+        }
+        catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){ }
+    }
+    public void PrepareSessionEnding() => _sessionEnding=true;
+    private void HandleWindowClosing(object? sender,System.ComponentModel.CancelEventArgs e)
+    {
+        if(!_viewModel.IsManualControl)return;
+        var decision=BackgroundLifetimePolicy.EvaluateClose(_tray?.IsAvailable==true,_trayExitRequested,_viewModel.IsBusy,_sessionEnding);
+        if(decision==WindowCloseAction.Exit)return;
+        e.Cancel=true;
+        if(decision==WindowCloseAction.HideToTray)Hide();
+        else { _trayExitRequested=false;if(!IsVisible)Show(); }
+    }
+    private void RequestTrayExit()
+    {
+        _trayExitRequested=true;
+        if(_viewModel.IsBusy){_trayExitRequested=false;Show();return;}
+        Close();
+        if(_trayExitRequested)Application.Current.Shutdown();
     }
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
@@ -57,6 +105,20 @@ public partial class MainWindow : Window
         DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int));
     }
     private void Theme_Click(object sender, RoutedEventArgs e) => _viewModel.DarkMode = !_viewModel.DarkMode;
+    private void LightTheme_Click(object sender,RoutedEventArgs e)=>_viewModel.DarkMode=false;
+    private void DarkTheme_Click(object sender,RoutedEventArgs e)=>_viewModel.DarkMode=true;
+    public static void EnsureSelectedTabVisible(TabControl tabs)
+    {
+        tabs.UpdateLayout();
+        if(tabs.SelectedItem is not TabItem selected)return;
+        var scroll=Descendants(tabs).OfType<ScrollViewer>().FirstOrDefault(s=>s.Name=="TabHeaderScroll");
+        if(scroll is null)return;
+        FrameworkElement viewport=Descendants(scroll).OfType<ScrollContentPresenter>().FirstOrDefault()??(FrameworkElement)scroll;
+        if(viewport.ActualWidth<=0 || !viewport.IsAncestorOf(selected))return;
+        var bounds=selected.TransformToAncestor(viewport).TransformBounds(new Rect(selected.RenderSize));
+        var delta=bounds.Right>viewport.ActualWidth?bounds.Right-viewport.ActualWidth+2:bounds.Left<0?bounds.Left-2:0;
+        if(delta!=0)scroll.ScrollToHorizontalOffset(Math.Max(0,scroll.HorizontalOffset+delta));
+    }
 
     private static IEnumerable<DependencyObject> Descendants(DependencyObject element)
     {
@@ -85,7 +147,8 @@ public partial class MainWindow : Window
         ApplyResponsiveLayout();
         if (!SystemParameters.ClientAreaAnimation) _viewModel.ReduceMotion = true;
         FadeIn(WorkspaceContent);
-        await new StartupPolicy(_viewModel.IsReadOnlyView).InitializeAsync(
+        if(_viewModel.IsManualControl){ await _viewModel.InitializeManualAsync(); return; }
+        await _viewModel.StartupMode.InitializeAsync(
             _viewModel.DiscoverAsync,
             async()=>{await _viewModel.RefreshAsync();await _viewModel.RefreshWorkDashboardAsync();await _viewModel.SyncCommunicationAsync(true);},
             InitializeOperationalAsync);
@@ -218,7 +281,9 @@ public partial class MainWindow : Window
 
     private void WorkspaceTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.OriginalSource != sender || WorkspaceContent is null || _restoringReaderOrigin) return;
+        if (e.OriginalSource != sender || WorkspaceContent is null) return;
+        Dispatcher.BeginInvoke(()=>EnsureSelectedTabVisible(WorkspaceTabs),System.Windows.Threading.DispatcherPriority.Loaded);
+        if(_restoringReaderOrigin)return;
         FadeIn(WorkspaceContent);
         if (CommunicationTab.IsSelected) _viewModel.MarkCommunicationViewed();
         if (WorkDashboardTab.IsSelected || ManagementProcessTab.IsSelected) _ = _viewModel.RefreshWorkDashboardAsync();
@@ -315,7 +380,8 @@ public partial class MainWindow : Window
 
     private void Jev_Click(object sender, RoutedEventArgs e)
     {
-        if(_viewModel.BlockOperation())return;
+        if(_viewModel.BlockRegisteredOperation())return;
+        _viewModel.PrepareJevSession();
         if (_jevWindow is { IsLoaded: true }) { _jevWindow.Activate(); return; }
         _jevWindow = new JevControlWindow(_viewModel) { Owner = this };
         _jevWindow.Closed += (_, _) => _jevWindow = null;

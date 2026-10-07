@@ -7,7 +7,7 @@ public static class RefreshMotion
 {
  public static readonly DependencyProperty ActiveProperty = DependencyProperty.RegisterAttached("Active",typeof(bool),typeof(RefreshMotion),new PropertyMetadata(false,Changed));
  public static readonly DependencyProperty ReduceMotionProperty = DependencyProperty.RegisterAttached("ReduceMotion",typeof(bool),typeof(RefreshMotion),new PropertyMetadata(false,Changed));
- public static readonly DependencyProperty DurationMillisecondsProperty = DependencyProperty.RegisterAttached("DurationMilliseconds",typeof(double),typeof(RefreshMotion),new PropertyMetadata(1200d,Changed));
+ public static readonly DependencyProperty DurationMillisecondsProperty = DependencyProperty.RegisterAttached("DurationMilliseconds",typeof(double),typeof(RefreshMotion),new PropertyMetadata(1400d,Changed));
  private static readonly DependencyProperty StateProperty = DependencyProperty.RegisterAttached("State",typeof(State),typeof(RefreshMotion));
  public static void SetActive(DependencyObject target,bool value) => target.SetValue(ActiveProperty,value);
  public static bool GetActive(DependencyObject target) => (bool)target.GetValue(ActiveProperty);
@@ -15,7 +15,23 @@ public static class RefreshMotion
  public static bool GetReduceMotion(DependencyObject target) => (bool)target.GetValue(ReduceMotionProperty);
  public static void SetDurationMilliseconds(DependencyObject target,double value) => target.SetValue(DurationMillisecondsProperty,value);
  public static double GetDurationMilliseconds(DependencyObject target) => (double)target.GetValue(DurationMillisecondsProperty);
- private sealed class State { public RotateTransform Rotation { get; } = new(); public bool Running; public bool Finishing; public int Generation; }
+ private sealed class State { public RotateTransform Rotation { get; } = new(); public bool Running; public bool Finishing; public int Generation; public double AppliedDuration; }
+ private static double NormalizeDuration(double milliseconds)=>double.IsFinite(milliseconds)?Math.Clamp(milliseconds,600,3000):1400;
+ public static bool ShouldAnimate(bool loaded,bool reduceMotion,bool systemAnimations)=>loaded && !reduceMotion && systemAnimations;
+ public static bool ShouldReplaceClock(bool running,bool finishing,bool active,double applied,double requested)
+ {
+  if(!running)return active;
+  var rateChanged=NormalizeDuration(applied)!=NormalizeDuration(requested);
+  return active?finishing || rateChanged:!finishing || rateChanged;
+ }
+ public static DoubleAnimation CreateRotationAnimation(double angle,double milliseconds,bool finishing)
+ {
+  angle=double.IsFinite(angle)?((angle%360)+360)%360:0;
+  var duration=NormalizeDuration(milliseconds);
+  return finishing
+   ? new DoubleAnimation(angle,360,TimeSpan.FromMilliseconds(duration*(360-angle)/360)) { FillBehavior=FillBehavior.HoldEnd }
+   : new DoubleAnimation(angle,angle+360,TimeSpan.FromMilliseconds(duration)) { RepeatBehavior=RepeatBehavior.Forever };
+ }
  private static void Changed(DependencyObject target,DependencyPropertyChangedEventArgs args)
  {
   if (target is not FrameworkElement element) return;
@@ -28,19 +44,20 @@ public static class RefreshMotion
  }
  private static void Update(FrameworkElement element,State state)
  {
-  if (!element.IsLoaded || GetReduceMotion(element) || !SystemParameters.ClientAreaAnimation) { Stop(state); return; }
-  if (GetActive(element))
+  if (!ShouldAnimate(element.IsLoaded,GetReduceMotion(element),SystemParameters.ClientAreaAnimation)) { Stop(state); return; }
+  var active=GetActive(element);var duration=NormalizeDuration(GetDurationMilliseconds(element));
+  if(!ShouldReplaceClock(state.Running,state.Finishing,active,state.AppliedDuration,duration))return;
+  if (active)
   {
-   if (state.Running && !state.Finishing) return;
-   var angle = state.Rotation.Angle % 360; state.Generation++; state.Running = true; state.Finishing = false;
+   var angle = state.Rotation.Angle; state.Generation++; state.Running = true; state.Finishing = false;state.AppliedDuration=duration;
    // Linear interpolation keeps angular velocity at every wrap; no timer, easing or per-turn restart.
-   var animation = new DoubleAnimation(angle,angle+360,TimeSpan.FromMilliseconds(Math.Clamp(GetDurationMilliseconds(element),600,3000))) { RepeatBehavior = RepeatBehavior.Forever };
+   var animation = CreateRotationAnimation(angle,duration,false);
    state.Rotation.BeginAnimation(RotateTransform.AngleProperty,animation,HandoffBehavior.SnapshotAndReplace);
   }
-  else if (state.Running && !state.Finishing)
+  else if (state.Running)
   {
-   state.Finishing = true; var generation = ++state.Generation; var angle = state.Rotation.Angle % 360;
-   var animation = new DoubleAnimation(angle,360,TimeSpan.FromMilliseconds(Math.Clamp(GetDurationMilliseconds(element),600,3000)*(360-angle)/360)) { FillBehavior = FillBehavior.HoldEnd };
+   state.Finishing = true; state.AppliedDuration=duration;var generation = ++state.Generation; var angle = state.Rotation.Angle;
+   var animation = CreateRotationAnimation(angle,duration,true);
    animation.Completed += (_,_) => { if (generation == state.Generation) Stop(state); };
    state.Rotation.BeginAnimation(RotateTransform.AngleProperty,animation,HandoffBehavior.SnapshotAndReplace);
   }

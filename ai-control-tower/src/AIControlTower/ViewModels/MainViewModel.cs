@@ -15,7 +15,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly ProjectDiscoveryService _discovery = new();
     private readonly ProjectCatalogService _catalogService = new();
     private readonly CatalogDefinition _catalog = ProjectCatalogService.Load();
-    private readonly JobManager _jobs = new();
+    private readonly JobManager _jobs;
     private readonly WorkDashboardService _workDashboardService;
     // Explicit central registry IDs supplied by the user/project notice map, never guessed from names.
     private static readonly IReadOnlyDictionary<string,string> DashboardProjectAliases=new Dictionary<string,string>(StringComparer.Ordinal)
@@ -29,9 +29,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string ApplicationSourceLabel => "실행 파일: " + (Environment.ProcessPath ?? "미확인");
     private readonly ControlTowerSettings _settings;
     private readonly StartupPolicy _startupPolicy;
+    public StartupPolicy StartupMode => _startupPolicy;
+    public bool IsManualControl => _startupPolicy.IsManualControl;
+    public bool CanRunRegisteredTasks => _startupPolicy.AllowRegisteredTasks;
+    public bool CanReadLiveStatus => _startupPolicy.AllowLiveQueries;
     public bool IsReadOnlyView => _settings.TransientReadOnly;
     public bool CanMutate => !IsReadOnlyView;
-    public string ViewModeLabel => IsReadOnlyView ? "로컬 조회 · 외부 연결/실행/공유는 중지 · 표시 시각 ≠ 생존" : "자동으로 최신 상태 유지";
+    public string ViewModeLabel => IsManualControl ? "연결 자동 유지 · 등록 작업 수동 실행 · 설정/Git/설치 자동 변경 없음" : IsReadOnlyView ? "로컬 조회 · 외부 연결/실행/공유는 중지 · 표시 시각 ≠ 생존" : "자동으로 최신 상태 유지";
+    public bool BlockRegisteredOperation()
+    { if(CanRunRegisteredTasks)return false;return BlockOperation(); }
     public bool BlockOperation()
     { if(!IsReadOnlyView)return false; Message="로컬 조회 · 외부 연결/실행/공유 보류 · 기존 파일과 작업은 변경하지 않습니다."; return true; }
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
@@ -44,6 +50,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private FileSystemWatcher? _watcher;
     private DateTime _lastScan = DateTime.MinValue;
     private DateTime _lastStatus = DateTime.MinValue;
+    private DateTime _lastManualDashboardRefresh = DateTime.MinValue;
     private volatile bool _needsDiscovery;
     private string _projectPath = "";
     private string _taskInput = "";
@@ -58,16 +65,20 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     public MainViewModel(ControlTowerSettings? settings = null, bool enablePolling = true) : this(settings,enablePolling,JobManager.RecoverInterruptedRuns) { }
     public MainViewModel(ControlTowerSettings? settings, bool enablePolling, Action recoverRuns)
+        : this(settings,enablePolling,recoverRuns,null,null) { }
+    public MainViewModel(ControlTowerSettings? settings, bool enablePolling, Action recoverRuns, StartupPolicy? startupPolicy, ProjectBridgeService? pcService)
     {
         _settings = settings ?? ControlTowerSettings.Load();
-        _startupPolicy = new(IsReadOnlyView);
-        _workDashboardService = IsReadOnlyView ? new WorkDashboardService(Path.Combine(_settings.ViewDataDirectory,"runs")) : new WorkDashboardService(Path.Combine(ControlTowerSettings.DataDirectory,"runs"),_jobs.IsRunning,
-            async ct => { using var bridge=new ProjectBridgeService(); return await bridge.CheckAsync(ct); },
-            async (id,ct) => { using var bridge=new ProjectBridgeService(); return await bridge.ResultAsync(id,ct); });
+        _startupPolicy = startupPolicy ?? new(IsReadOnlyView);
+        if(IsManualControl){_settings.TransientReadOnly=true;_settings.TransientDataDirectory??=@"D:\A_KJ\AI\ControlTowerData\manual-control";}
+        _jobs=IsManualControl?new JobManager(_settings.ViewDataDirectory):new JobManager();
+        _workDashboardService = IsReadOnlyView && !IsManualControl ? new WorkDashboardService(Path.Combine(_settings.ViewDataDirectory,"runs")) : new WorkDashboardService(Path.Combine(IsManualControl?_settings.ViewDataDirectory:ControlTowerSettings.DataDirectory,"runs"),_jobs.IsRunning,
+            async ct => { if(IsManualControl)return PcConnection.Snapshot;if(pcService is not null)return await pcService.CheckAsync(ct);using var bridge=new ProjectBridgeService(); return await bridge.CheckAsync(ct); },
+            async (id,ct) => { if(pcService is not null)return await pcService.ResultAsync(id,ct);using var bridge=new ProjectBridgeService(); return await bridge.ResultAsync(id,ct); });
         foreach(var path in (_settings.ContinuousStatePaths ?? []).Take(40)) _workDashboardService.ContinuousPaths.Add(path);
         if(!IsReadOnlyView && File.Exists(WorkDashboardService.FoundationState) && !_workDashboardService.ContinuousPaths.Contains(WorkDashboardService.FoundationState,StringComparer.OrdinalIgnoreCase))
             _workDashboardService.ContinuousPaths.Add(WorkDashboardService.FoundationState);
-        PcConnection = new(null,(root,path,title) => Documents.OpenAsync(root,path,title),IsReadOnlyView);
+        PcConnection = new(pcService,(root,path,title) => Documents.OpenAsync(root,path,title),IsReadOnlyView,IsManualControl);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath, [], _settings.CommunicationFolders.Values);
         WorkDashboard = new(_workDashboardService.ReadAsync,_workDashboardService.DetailsAsync,_jobs.IsRunning,_jobs.Stop)
         {
@@ -100,9 +111,18 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
         _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(RosterRefreshSeconds) };
-        _serverLiveTimer.Tick += async (_, _) => await RefreshRosterAsync();
+        _serverLiveTimer.Tick += async (_, _) => {await RefreshRosterAsync();if(IsManualControl)await RefreshServerAsync();};
         _pcLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        _pcLiveTimer.Tick += async (_, _) => await PcConnection.PollAsync();
+        _pcLiveTimer.Tick += async (_, _) =>
+        {
+            if(IsManualControl)
+            {
+                await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
+                if(!_disposed&&DateTime.UtcNow-_lastManualDashboardRefresh>=TimeSpan.FromSeconds(5))
+                {_lastManualDashboardRefresh=DateTime.UtcNow;await RefreshWorkDashboardAsync();}
+            }
+            else await PcConnection.PollAsync();
+        };
         if (enablePolling && !IsReadOnlyView)
         {
             _startupPolicy.RecoverRuns(recoverRuns);
@@ -110,6 +130,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             _serverLiveTimer.Start();
             _pcLiveTimer.Start();
         }
+        if(enablePolling && IsManualControl){_pcLiveTimer.Start();_serverLiveTimer.Start();}
+    }
+    public async Task InitializeManualAsync()
+    {
+        if(!IsManualControl || _disposed)return;
+        await DiscoverAsync();await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
+        await RefreshAsync();await RefreshWorkDashboardAsync();await SyncCommunicationAsync(true);
+        await RefreshRosterAsync(true);await RefreshServerAsync(true);
     }
     public ObservableCollection<ProjectItem> Projects { get; } = [];
     public ObservableCollection<ToolStatusViewModel> Statuses { get; } = [];
@@ -169,16 +197,27 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public int ProgramsCount => Projects.Sum(p => p.Functions.Sum(f => f.Programs.Count));
     public int RunningCount => _jobs.RunningCount;
     public bool IsBusy => _jobs.BusyProjectCount > 0;
-    public bool CanStopSelectedProgram => CanMutate && SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
-    public bool CanLaunchSelectedProgram => CanMutate && SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
+    public bool CanStopSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
+    public bool CanLaunchSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
     public bool CanOpenSelectedProgram => SelectedProgram is not null && (File.Exists(SelectedProgram.Path) || Directory.Exists(SelectedProgram.Path));
     public bool HasSelectedCommands => SelectedProgram?.CanLaunch == true;
     public bool ShowSeparateOpenButton => HasSelectedCommands || SelectedProgram?.HasEditorLauncher == true;
     public string RootPath { get => _settings.RootPath; set { if (_settings.RootPath == value) return; _settings.RootPath = value; _needsDiscovery = true; OnPropertyChanged(); } }
+    private bool? _jevSessionEnabled;
+    private bool _jevSessionVerified;
     public bool EnableJev
     {
-        get => _settings.EnableJev;
-        set { if (_settings.EnableJev == value) return; _settings.EnableJev = value; SaveSettings(); OnPropertyChanged(); OnPropertyChanged(nameof(IsLocalJevExecutionAllowed)); OnPropertyChanged(nameof(LocalJevPolicyMessage)); }
+        get => JevExecutionPolicy.ResolveSessionEnable(_settings.EnableJev,IsManualControl,_jevSessionEnabled);
+        set
+        {
+            if(IsManualControl)
+            {
+                if(value&&!_jevSessionVerified){Message="gpt-6.1-sol · 계정 검증 필요";return;}
+                if(_jevSessionEnabled==value)return;_jevSessionEnabled=value;
+            }
+            else {if(_settings.EnableJev==value)return;_settings.EnableJev=value;SaveSettings();}
+            OnPropertyChanged();OnPropertyChanged(nameof(IsLocalJevExecutionAllowed));OnPropertyChanged(nameof(LocalJevPolicyMessage));
+        }
     }
     public bool ReduceMotion
     {
@@ -213,9 +252,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string TaskInput { get => _taskInput; set => SetProperty(ref _taskInput, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public bool IsRefreshing { get => _isRefreshing; private set => SetProperty(ref _isRefreshing, value); }
-    public bool IsLocalJevExecutionAllowed => CanMutate && EnableJev;
-    public string LocalJevPolicyMessage => IsReadOnlyView ? "로컬 조회 · Jev 실행/중지 보류 · 저장된 기록만 표시합니다." : EnableJev ? "Jev를 이 관제탑에서 선택해 사용할 수 있습니다. 설치·키 존재는 인증이나 실행 성공을 뜻하지 않습니다." : LocalExecutionPolicy.LocalJevDisabledMessage;
-    public string ActivitySummary => IsReadOnlyView ? "로컬 저장 기록 조회 · 실제 작업/프로세스 생존 미확인" : IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
+    public bool IsLocalJevExecutionAllowed => CanRunRegisteredTasks && EnableJev;
+    public string LocalJevPolicyMessage => IsReadOnlyView && !IsManualControl ? "로컬 조회 · 실행 보류" : IsManualControl ? (_jevSessionVerified ? (EnableJev ? "gpt-6.1-sol · 계정 검증됨" : "Jev 사용 안 함") : "gpt-6.1-sol · 계정 검증 필요") : EnableJev ? "gpt-6.1-sol · 실행 전 검증" : LocalExecutionPolicy.LocalJevDisabledMessage;
+    public string ActivitySummary => IsReadOnlyView && !IsManualControl ? "로컬 저장 기록 조회 · 실제 작업/프로세스 생존 미확인" : IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
     public async Task RefreshWorkDashboardAsync()
     {
         if(_disposed)return;
@@ -296,6 +335,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task RefreshAsync()
     {
+        if(IsManualControl)
+        {
+            await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
+            Statuses.Clear();Statuses.Add(new(new("project-bridge","ProjectBridge",PcConnection.IsConnected?StatusKind.Ready:StatusKind.Unknown,PcConnection.DetailText,DateTimeOffset.UtcNow)));
+            RefreshToolEvidence();Message=ViewModeLabel;OnPropertyChanged(nameof(UserFacingStatuses));OnPropertyChanged(nameof(FilteredToolStatuses));return;
+        }
         if(IsReadOnlyView)
         {
             await PcConnection.PollAsync();
@@ -341,7 +386,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task ActivateSelectedProgramAsync()
     {
-        if(BlockOperation())return;
+        if(BlockRegisteredOperation())return;
         if (SelectedProgram is { HasEditorLauncher: true } editor)
         {
             if (!File.Exists(editor.EditorOpenScript)) { Message = "편집기 열기 파일을 찾지 못했습니다."; return; }
@@ -398,7 +443,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task LaunchProgramAsync()
     {
-        if(BlockOperation())return;
+        if(BlockRegisteredOperation())return;
         var program = SelectedProgram;
         var command = SelectedCommand;
         if (program is null || command is null) { Message = "실행할 프로그램과 등록된 명령을 선택하세요."; return; }
@@ -406,7 +451,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null,AiCompletionContract? aiContract=null)
     {
-        if(BlockOperation())return;
+        if(BlockRegisteredOperation())return;
         if (_jobs.IsProjectBusy(program.ProjectId)) { Message = "이 프로젝트에는 실행 중인 작업이 있습니다."; return; }
         try
         {
@@ -420,22 +465,32 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public void StopProgram()
     {
-        if(BlockOperation())return;
+        if(BlockRegisteredOperation())return;
         Message = SelectedProgram is not null && _jobs.Stop(SelectedProgram.Id) ? "선택한 관제탑 작업의 취소를 요청했습니다." : "관제탑이 소유한 해당 실행 작업이 없습니다.";
+    }
+    public void PrepareJevSession()
+    {
+        if(BlockRegisteredOperation())return;
+        var evidence=JevExecutionEvidenceReader.ReadDefault();
+        _jevSessionVerified=evidence.IsVerified;
+        if(IsManualControl)_jevSessionEnabled=evidence.IsVerified;
+        OnPropertyChanged(nameof(EnableJev));OnPropertyChanged(nameof(IsLocalJevExecutionAllowed));OnPropertyChanged(nameof(LocalJevPolicyMessage));
+        if(!evidence.IsVerified)Message="gpt-6.1-sol · 계정 검증 필요";
     }
     public async void RunJevTask()
     {
-        if(BlockOperation())return;
+        if(BlockRegisteredOperation())return;
         if (!EnableJev) { Message = LocalJevPolicyMessage; return; }
-        // No model/account-execution verification is configured in this UI yet. Installation/key existence is not proof.
-        if(!JevExecutionPolicy.TryCreate(null,false,out var contract,out var reason))
-        { Message="Jev 실행 보류 · " + reason + " · 명시 모델 및 현재 계정 실행 지원 검증이 필요합니다.";return; }
+        var evidence=JevExecutionEvidenceReader.ReadDefault();
+        if(!JevExecutionPolicy.TryCreate(evidence.RequestedModel,evidence.IsVerified,out var contract,out var reason))
+        { _jevSessionVerified=false;if(IsManualControl)_jevSessionEnabled=false;OnPropertyChanged(nameof(EnableJev));OnPropertyChanged(nameof(IsLocalJevExecutionAllowed));OnPropertyChanged(nameof(LocalJevPolicyMessage));Message="Jev 실행 보류 · " + (evidence.IsVerified?reason:evidence.Reason);return; }
         if (string.IsNullOrWhiteSpace(TaskInput)) { Message = "작업 내용을 입력하세요."; return; }
         if (!Directory.Exists(ProjectPath)) { Message = "존재하는 프로젝트 경로를 선택하세요. 다른 폴더로 대체 실행하지 않습니다."; return; }
-        var package = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "node_modules", "jev-router", "bin", "jev-codex.mjs");
         var node = EnvironmentProbe.FindCommand("node.exe");
-        if (!File.Exists(package) || node is null) { Message = "설치된 Jev node 런처를 찾지 못했습니다."; return; }
-        if (!EnvironmentProbe.HasAnyEnvironmentVariable("JEV_API_KEY", "TYPESAFE_API_KEY")) { Message = "Jev 키 설정을 확인하지 못했습니다. 비밀값은 화면에 표시하지 않습니다."; return; }
+        if (node is null) { Message = "설치된 Node 런처를 찾지 못했습니다."; return; }
+        string package;
+        try { package=JevNativeLauncher.Prepare(); }
+        catch { Message="Jev 런처 검증 실패 · 기존 파일은 덮어쓰지 않습니다.";return; }
         var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
         var program = new ProgramItem { Id = projectId + "/jev", ProjectId = projectId, Name = "Jev · Codex 작업", Kind = "Jev", Path = ProjectPath, WorkingDirectory = ProjectPath };
         var command = new ProgramCommand { Name = "Jev 작업", FileName = node, Arguments = JevExecutionPolicy.BuildArguments(package,contract!.RequestedModel).ToArray(), TimeoutSeconds = 1800 };
@@ -443,7 +498,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public Task CancelJevTaskAsync()
     {
-        if(BlockOperation())return Task.CompletedTask;
+        if(BlockRegisteredOperation())return Task.CompletedTask;
         var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
         Message = _jobs.Stop(projectId + "/jev") ? "이 프로젝트 Jev 작업의 취소를 요청했습니다." : "이 프로젝트에서 관제탑이 시작한 Jev 작업이 없습니다.";
         return Task.CompletedTask;
@@ -482,7 +537,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _pcLiveTimer.Stop(); _watcher?.Dispose(); if(CanMutate)_jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog; PcConnection.Dispose();
+        _disposed = true; _timer.Stop(); _serverLiveTimer.Stop(); _pcLiveTimer.Stop(); _watcher?.Dispose(); if(CanMutate)_jobs.StopAllOwned(); else if(CanRunRegisteredTasks)_jobs.StopAllOwned(); _lifetime.Cancel(); _rosterMonitor.Dispose(); _serverMonitor.Dispose(); _jobs.Log -= OnJobLog; PcConnection.Dispose();
         // Semaphores remain available for in-flight finally blocks during shutdown.
     }
 }

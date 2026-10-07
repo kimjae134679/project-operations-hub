@@ -6,12 +6,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>0.9.2</Version>
+    <Version>0.9.3</Version>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>Assets\control-tower.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup><Resource Include="Assets\control-tower.ico" /><EmbeddedResource Include="../../../project.catalog.json" Link="project.catalog.json" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="Assets\jev-native-launcher.mjs" /><Resource Include="Assets\control-tower.ico" /><EmbeddedResource Include="../../../project.catalog.json" Link="project.catalog.json" /></ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="../../../04_COMMUNICATION/remote-bridge/releases/20261006-v3/**/*.py;../../../04_COMMUNICATION/remote-bridge/releases/20261006-v3/**/*.cs;../../../04_COMMUNICATION/remote-bridge/releases/20261006-v3/install.ps1;../../../04_COMMUNICATION/remote-bridge/releases/20261006-v3/release_manifest.json;../../../04_COMMUNICATION/remote-bridge/releases/20261006-v3/*.md" Exclude="../../../04_COMMUNICATION/remote-bridge/releases/20261006-v3/hotfix-v2-worker.py">
       <LogicalName>ProjectBridge/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>

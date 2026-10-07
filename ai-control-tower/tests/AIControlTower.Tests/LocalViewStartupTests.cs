@@ -152,7 +152,7 @@ public sealed class LocalViewStartupTests
     {
         var root=Path.Combine(SourceRoot(),"ai-control-tower","src","AIControlTower");var window=File.ReadAllText(Path.Combine(root,"MainWindow.xaml.cs"));
         foreach(var name in new[]{"Install_Click","Uninstall_Click","Restore_Click","StopRemote_Click","Jev_Click"})
-        {var at=window.IndexOf("void "+name);Assert.True(at>0);Assert.Contains("BlockOperation()",window.Substring(at,Math.Min(200,window.Length-at)));}
+        {var at=window.IndexOf("void "+name);Assert.True(at>0);Assert.Contains(name=="Jev_Click"?"BlockRegisteredOperation()":"BlockOperation()",window.Substring(at,Math.Min(200,window.Length-at)));}
         var panel=File.ReadAllText(Path.Combine(root,"PcJobsWindow.cs"));Assert.Contains("IsEnabled=!vm.IsReadOnly",panel);Assert.Contains("if(vm.IsReadOnly)",panel);
         var communication=File.ReadAllText(Path.Combine(root,"Views","CommunicationWorkspaceView.xaml"));Assert.Contains("Click=\"LinkCommunicationProject_Click\" IsEnabled=\"{Binding CanMutate}\"",communication);
         var vm=File.ReadAllText(Path.Combine(root,"ViewModels","MainViewModel.cs"));Assert.Contains("if(CanMutate)_jobs.StopAllOwned()",vm);Assert.Contains("enablePolling && !IsReadOnlyView",vm);

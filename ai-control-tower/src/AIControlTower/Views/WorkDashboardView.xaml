@@ -2,18 +2,18 @@
  <Grid Margin="0,16,0,0">
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="320"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <Grid Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-   <StackPanel><TextBlock Text="{Binding Heading}" FontSize="24" FontWeight="SemiBold"/><TextBlock Text="{Binding ContextMessage}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,6,14,0"/></StackPanel>
-   <Button Grid.Column="1" Content="지금 조회" Click="Refresh_Click" VerticalAlignment="Center" AutomationProperties.Name="프로젝트 작업 기록 지금 조회"/>
+   <TextBlock Text="{Binding Heading}" FontSize="24" FontWeight="SemiBold" ToolTip="{Binding ContextMessage}"/>
+   <Button Grid.Column="1" Content="지금 조회" Click="Refresh_Click" VerticalAlignment="Center" ToolTip="{Binding Message}" AutomationProperties.Name="프로젝트 작업 기록 지금 조회"/>
   </Grid>
   <Grid Grid.Row="1" Margin="0,0,0,10"><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="160"/><ColumnDefinition Width="12"/><ColumnDefinition Width="230"/><ColumnDefinition Width="12"/><ColumnDefinition Width="170"/></Grid.ColumnDefinitions>
-   <TextBox x:Name="WorkSearch" Text="{Binding Search,UpdateSourceTrigger=PropertyChanged}" ToolTip="프로젝트 · 실행기 · 프로그램 · 작업 · 상태 검색" AutomationProperties.Name="프로젝트 실행기 작업 검색" VerticalContentAlignment="Center"/>
+   <Grid><TextBox x:Name="WorkSearch" Text="{Binding Search,UpdateSourceTrigger=PropertyChanged}" ToolTip="프로젝트 · 실행기 · 프로그램 · 작업 · 상태 검색" AutomationProperties.Name="작업 검색" VerticalContentAlignment="Center"/><TextBlock x:Name="WorkSearchWatermark" Text="작업 검색" Margin="12,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text,ElementName=WorkSearch}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
    <ComboBox Grid.Column="2" ItemsSource="{Binding ProjectFilters}" DisplayMemberPath="Label" SelectedValuePath="Id" SelectedValue="{Binding ProjectFilterId,Mode=TwoWay}" AutomationProperties.Name="프로젝트 작업 필터" ToolTip="프로젝트 식별자로 필터 · 같은 이름도 구분"/>
    <ComboBox Grid.Column="4" ItemsSource="{Binding WorkerFilters}" DisplayMemberPath="Label" SelectedValuePath="Id" SelectedValue="{Binding WorkerFilterKey,Mode=TwoWay}" AutomationProperties.Name="등록 실행기 종류 필터" ToolTip="등록 근거가 있는 실행기 종류 · 미확인 포함"/>
   </Grid>
-  <Grid Grid.Row="2" Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-   <TextBox Text="{Binding SourcePathInput,UpdateSourceTrigger=PropertyChanged}" ToolTip="연결할 state.json의 정확한 절대 경로 · 임의 콘솔 감시 아님" AutomationProperties.Name="연속 실행기 상태 파일 절대 경로" VerticalContentAlignment="Center"/>
+  <Expander x:Name="AdvancedSources" Grid.Row="2" Header="고급" IsExpanded="False" Margin="0,0,0,8"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <Grid><TextBox x:Name="StatePathInput" Text="{Binding SourcePathInput,UpdateSourceTrigger=PropertyChanged}" ToolTip="등록할 state.json의 절대 경로" AutomationProperties.Name="연속 실행기 상태 파일 경로" VerticalContentAlignment="Center"/><TextBlock x:Name="StatePathWatermark" Text="state.json 경로" Margin="12,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text,ElementName=StatePathInput}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
    <Button Grid.Column="1" Content="상태 파일 연결" Click="Register_Click" IsEnabled="{Binding CanRegisterSource}" Margin="8,0,0,0" AutomationProperties.Name="명시한 상태 파일 연결"/>
-  </Grid>
+  </Grid></Expander>
   <Grid Grid.Row="3"><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="240"/><ColumnDefinition Width="12"/><ColumnDefinition Width="390" MinWidth="300"/></Grid.ColumnDefinitions>
    <ListBox x:Name="WorkList" ItemsSource="{Binding GroupedActivities}" SelectedItem="{Binding Selected,Mode=TwoWay}" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.VirtualizationMode="Recycling" AutomationProperties.Name="프로젝트와 실행기별 실제 작업 목록" HorizontalContentAlignment="Stretch">
     <ListBox.GroupStyle>
@@ -51,6 +51,5 @@
     </Grid>
    </Border>
   </Grid>
-  <TextBlock Grid.Row="4" Text="{Binding Message}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,12,0,0" FontSize="12"/>
  </Grid>
 </UserControl>

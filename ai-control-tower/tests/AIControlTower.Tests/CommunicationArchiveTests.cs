@@ -85,7 +85,9 @@ public sealed class CommunicationArchiveTests
         Assert.NotNull(root);
         var document=XDocument.Load(Path.Combine(root!.FullName,"ai-control-tower","src","AIControlTower","Views","CommunicationWorkspaceView.xaml"));
         Assert.Contains(document.Descendants(),e=>e.Name.LocalName=="GridSplitter" && e.Attribute("Grid.Row") is not null);
-        Assert.Contains(document.Descendants(),e=>(string?)e.Attribute("Text")=="{Binding SelectedEntry.SourceLabel}");
+        Assert.Contains(document.Descendants(),e=>e.Name.LocalName=="TextBlock" &&
+            (string?)e.Attribute("Text")=="{Binding SelectedEntry.SourceName}" &&
+            (string?)e.Attribute("ToolTip")=="{Binding SelectedEntry.SourceLabel}");
     }
     private static string Property(object value,string name)
     {

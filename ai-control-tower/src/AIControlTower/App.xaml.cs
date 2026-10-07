@@ -13,6 +13,7 @@ public partial class App : Application
     protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
     {
         e.Cancel = false;
+        if(MainWindow is MainWindow window)window.PrepareSessionEnding();
         _remoteLifetime?.Cancel();
         base.OnSessionEnding(e);
     }
@@ -82,6 +83,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         if(!Services.StartupPolicy.TryCreate(e.Args,out var policy)){Shutdown(2);return;}
+        if(policy.IsManualControl)ShutdownMode=ShutdownMode.OnExplicitShutdown;
         var workFixture = Array.IndexOf(e.Args,"--verify-work-dashboard");
         if(workFixture>=0)
         {
@@ -111,7 +113,8 @@ public partial class App : Application
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
         if (!_owns) { if (ShouldActivateExistingInstance(e.Args)) _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);
-        var settings = policy.IsLocalView ? Services.ControlTowerSettings.LoadReadOnly() : Services.ControlTowerSettings.Load();
+        var settings = policy.IsLocalView || policy.IsManualControl ? Services.ControlTowerSettings.LoadReadOnly() : Services.ControlTowerSettings.Load();
+        if(policy.IsManualControl)settings.TransientDataDirectory=@"D:\A_KJ\AI\ControlTowerData\manual-control";
         if (e.Args.Contains("--verify-ui")) settings.IsTemporary = true;
         var communicationRoot = Array.IndexOf(e.Args, "--communication-hub");
         if (communicationRoot >= 0 && communicationRoot + 1 < e.Args.Length)
@@ -119,7 +122,7 @@ public partial class App : Application
             settings.CommunicationHubPath = Path.GetFullPath(e.Args[communicationRoot + 1]);
             if (e.Args.Contains("--verify-ui")) settings.AutoPublishCommunication = false;
         }
-        MainWindow = new MainWindow(settings);
+        MainWindow = new MainWindow(settings,policy);
         if (!policy.IsLocalView)
         _listener = ThreadPool.RegisterWaitForSingleObject(_activate, (_, _) => Dispatcher.InvokeAsync(() =>
         {

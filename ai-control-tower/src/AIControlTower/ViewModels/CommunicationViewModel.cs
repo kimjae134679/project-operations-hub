@@ -36,6 +36,11 @@ public sealed record NoticeRow(CommunicationNotice Notice, string ReadSummary)
 }
 public sealed record InboxRow(string Project, string Title, string Preview, string Body, string Path, string Time) : INotifyPropertyChanged
 {
+    // WPF selectors cache item identity/hash. Read state and binding subscriptions change
+    // during selection; generated record value equality would invalidate that cache.
+    // Keep record `with` cloning, but each visible row has stable reference identity.
+    public bool Equals(InboxRow? other) => ReferenceEquals(this,other);
+    public override int GetHashCode() => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
     public event PropertyChangedEventHandler? PropertyChanged;
     private bool _isUnread;
     public bool IsUnread { get => _isUnread; set { if (_isUnread == value) return; _isUnread = value; PropertyChanged?.Invoke(this,new(nameof(IsUnread))); PropertyChanged?.Invoke(this,new(nameof(Unread))); PropertyChanged?.Invoke(this,new(nameof(UnreadLabel))); } }
@@ -224,7 +229,20 @@ public sealed partial class MainViewModel
     public bool NoNotices => Notices.Count==0;
     public bool NoInboxItems => InboxItems.Count==0;
     public NoticeRow? SelectedNotice { get => _selectedNotice; set { if(SetProperty(ref _selectedNotice,value)) UpdateNoticeReceipts(); } }
-    public InboxRow? SelectedInbox { get => _selectedInbox; set { if(SetProperty(ref _selectedInbox,value)) { UpdateEntries(); if(!_selectingInternally && !_rebuildingCommunication) MarkCommunicationViewed(); } } }
+    public InboxRow? SelectedInbox
+    {
+        get => _selectedInbox;
+        set
+        {
+            if (EqualityComparer<InboxRow?>.Default.Equals(_selectedInbox,value)) return;
+            _selectedInbox = value;
+            // Publish the topic only after its entries/body are coherent. WPF selection bindings
+            // and read-position observers run synchronously inside PropertyChanged.
+            UpdateEntries();
+            OnPropertyChanged(nameof(SelectedInbox));
+            if(!_selectingInternally && !_rebuildingCommunication) MarkCommunicationViewed();
+        }
+    }
     private void UpdateEntries()
     {
         var selectedId = SelectedEntry?.Entry.Identity;

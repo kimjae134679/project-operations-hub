@@ -100,16 +100,16 @@ public sealed class NavigationPresentationTests
     {
         var source=XDocument.Load(Source("MainWindow.xaml"));var tabs=source.Descendants().First(e=>e.Name.LocalName=="TabControl");
         var names=tabs.Elements().Select(e=>(string?)e.Attribute(XName.Get("Name","http://schemas.microsoft.com/winfx/2006/xaml"))).ToArray();
-        Assert.Equal(new[]{"WorkDashboardTab","ManagementProcessTab","PcConnectionTab","CommunicationTab","NoticeTab","DocumentReaderTab","ToolsTab","ProjectsTab","ServerTab"},names);
+        Assert.Equal(new[]{"ProjectsTab","WorkDashboardTab","ManagementProcessTab","PcConnectionTab","CommunicationTab","NoticeTab","DocumentReaderTab","ToolsTab","ServerTab"},names);
         var body=File.ReadAllText(Source("MainWindow.xaml.cs"));Assert.Contains("RestoreReaderOrigin",body);Assert.Contains("_restoringReaderOrigin",body);
     }
     [Fact] public void AppJevHandlerRequiresExplicitVerifiedModelBeforeInspectingLauncherOrSpawning()
     {
         var body=File.ReadAllText(Source("ViewModels/MainViewModel.cs"));var start=body.IndexOf("public async void RunJevTask()",StringComparison.Ordinal);
         var end=body.IndexOf("public Task CancelJevTaskAsync()",start,StringComparison.Ordinal);var method=body[start..end];
-        var policy=method.IndexOf("JevExecutionPolicy.TryCreate(null,false",StringComparison.Ordinal);
-        Assert.True(policy>=0,"No current-account/model evidence is configured: fail closed before launcher/key lookup.");
-        Assert.True(policy<method.IndexOf("var package",StringComparison.Ordinal));Assert.DoesNotContain("TryCreate(null,true",method);
+        var policy=method.IndexOf("JevExecutionPolicy.TryCreate(evidence.RequestedModel,evidence.IsVerified",StringComparison.Ordinal);
+        Assert.True(policy>=0,"Only fresh installation/account-bound evidence permits execution.");
+        Assert.True(method.IndexOf("JevExecutionEvidenceReader.ReadDefault",StringComparison.Ordinal)<policy);Assert.True(policy<method.IndexOf("JevNativeLauncher.Prepare",StringComparison.Ordinal));Assert.DoesNotContain("TryCreate(null,true",method);
         var run=typeof(MainViewModel).GetMethod("RunProgramAsync",BindingFlags.Instance|BindingFlags.NonPublic);Assert.NotNull(run);
         Assert.Contains(run.GetParameters(),p=>p.ParameterType.Name=="AiCompletionContract" && p.IsOptional);
     }

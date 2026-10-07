@@ -9,6 +9,9 @@ public sealed record RefreshSpeedOption(int Milliseconds, string Label);
 
 public sealed partial class MainViewModel
 {
+    public static bool ShouldQueryServer(bool allowLiveQueries,bool disposed)=>allowLiveQueries && !disposed;
+    public static bool ShouldWriteServerSummary(bool canMutate,bool temporary,bool automatic,bool knownRoot)
+        => canMutate && !temporary && automatic && knownRoot;
     public RosterRefreshOption[] RosterRefreshOptions { get; } = [new(1,"1초"),new(3,"3초"),new(5,"5초"),new(10,"10초")];
     public RefreshSpeedOption[] RefreshSpeedOptions { get; } = [new(1000,"빠르게"),new(1400,"보통"),new(2000,"느리게")];
     public int RosterRefreshSeconds
@@ -61,19 +64,19 @@ public sealed partial class MainViewModel
     public string ServerSummaryMessage { get => _serverSummaryMessage; private set => SetProperty(ref _serverSummaryMessage,value); }
     public async Task RefreshServerAsync(bool force = false)
     {
-        if(IsReadOnlyView){ServerSummaryMessage="로컬 조회 · 서버/API 확인 없음 · 현재 생존 미확인";return;}
+        if(!ShouldQueryServer(StartupMode.AllowLiveQueries,_disposed)){ServerSummaryMessage="로컬 조회 · 서버/API 확인 없음 · 현재 생존 미확인";return;}
         if (_disposed || !force && DateTime.UtcNow-_lastServerCheck<TimeSpan.FromSeconds(15) || !await _serverLock.WaitAsync(0)) return;
         try
         {
             IsCheckingServer = true; _lastServerCheck=DateTime.UtcNow;
             _serverSnapshot = await _serverMonitor.FetchAsync(_lifetime.Token);
             ServerModes.Clear(); foreach(var mode in _serverSnapshot.Modes) ServerModes.Add(mode);
-            if (!_settings.IsTemporary && AutoCommunication && Directory.Exists(ServerRootPath))
+            if (ShouldWriteServerSummary(CanMutate,_settings.IsTemporary,AutoCommunication,Directory.Exists(ServerRootPath)))
             {
                 var summary = await _serverMonitor.WriteSummary(_serverSnapshot,ServerRootPath,_lifetime.Token);
                 ServerSummaryMessage = summary.Warning ?? "상태가 바뀌면 소통 자료로 저장됩니다.";
             }
-            else ServerSummaryMessage = Directory.Exists(ServerRootPath) ? "서버 상태 확인됨 · 자동 자료 수집은 설정에 따릅니다." : "서버 작업 폴더를 연결하면 공지와 상태 기록도 동기화됩니다.";
+            else ServerSummaryMessage = !CanMutate ? "읽기 전용 서버 조회 · 자료 저장/공유 없음" : Directory.Exists(ServerRootPath) ? "서버 상태 확인됨 · 자동 자료 수집은 설정에 따릅니다." : "서버 작업 폴더를 연결하면 공지와 상태 기록도 동기화됩니다.";
             foreach(var property in new[]{nameof(ServerSnapshot),nameof(ServerHealth),nameof(ServerOnline),nameof(ServerPreparing),nameof(ServerPlaying),nameof(ServerCheckedAt),nameof(ServerObservedAt),nameof(ServerUpdatePolicy),nameof(ServerMinimumBuild),nameof(ServerBlockedBuilds),nameof(ServerPolicyHealth)}) OnPropertyChanged(property);
         }
         catch(OperationCanceledException) { }
@@ -93,7 +96,7 @@ public sealed partial class MainViewModel
     public string RosterCheckedAt => _rosterCheckedAt is { } time ? "마지막 확인 " + time.LocalDateTime.ToString("HH:mm:ss") : "";
     public async Task RefreshRosterAsync(bool manual = false)
     {
-        if(IsReadOnlyView){_rosterHealth="로컬 조회 · 접속자/API 확인 없음";OnPropertyChanged(nameof(RosterStatus));return;}
+        if(!ShouldQueryServer(StartupMode.AllowLiveQueries,_disposed)){_rosterHealth="로컬 조회 · 접속자/API 확인 없음";OnPropertyChanged(nameof(RosterStatus));return;}
         if (_disposed) return;
         try
         {
