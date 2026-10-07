@@ -15,6 +15,7 @@ import com.yausername.youtubedl_android.YoutubeDL;
 public class MainActivity extends Activity {
     public WebView web;
     private String shared="";
+    private android.widget.FrameLayout root;
     private volatile FileDeletion deletion;
     private static final int DELETE_CONSENT=102;
     private static final class DeleteTarget {
@@ -26,6 +27,7 @@ public class MainActivity extends Activity {
         final java.util.ArrayList<DeleteTarget> targets=new java.util.ArrayList<>();
         final java.util.LinkedHashSet<String> reserved=new java.util.LinkedHashSet<>();
         int position,deleted,failed;
+        volatile boolean waitingConsent,cancelled;
     }
     @Override public void onCreate(Bundle state){
         super.onCreate(state);Store.init(this);if(!DownloadService.running)Store.recover();receive(getIntent());
@@ -33,11 +35,11 @@ public class MainActivity extends Activity {
         if(BuildConfig.DEBUG)WebView.setWebContentsDebuggingEnabled(true);
         web.addJavascriptInterface(new Bridge(),"Android");
         web.setWebViewClient(new WebViewClient(){@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){if(r.getUrl().toString().equals("file:///android_asset/index.html"))return false;return true;}});
-        android.widget.FrameLayout root=new android.widget.FrameLayout(this);
+        root=new android.widget.FrameLayout(this);
         root.setBackgroundColor(0xfff7f8fc);
         root.addView(web,new android.widget.FrameLayout.LayoutParams(-1,-1));
         root.setOnApplyWindowInsetsListener((v,insets)->{if(Build.VERSION.SDK_INT>=30){android.graphics.Insets bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());android.graphics.Insets ime=insets.getInsets(WindowInsets.Type.ime());v.setPadding(bars.left,bars.top,bars.right,Math.max(bars.bottom,ime.bottom));return WindowInsets.CONSUMED;}v.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());return insets.consumeSystemWindowInsets();});
-        setContentView(root);root.requestApplyInsets();web.loadUrl("file:///android_asset/index.html");
+        setContentView(root);applyNativeTheme(Store.state().optString("theme","system"));root.post(()->applyNativeTheme(Store.state().optString("theme","system")));root.requestApplyInsets();web.loadUrl("file:///android_asset/index.html");
     }
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);receive(intent);if(web!=null)web.evaluateJavascript("window.checkShared&&checkShared()",null);}
     private void receive(Intent i){if(i!=null&&(Intent.ACTION_SEND.equals(i.getAction())||Intent.ACTION_SEND_MULTIPLE.equals(i.getAction())))shared=i.getStringExtra(Intent.EXTRA_TEXT)==null?"":i.getStringExtra(Intent.EXTRA_TEXT);}
@@ -56,7 +58,7 @@ public class MainActivity extends Activity {
             if("import".equals(a)){runOnUiThread(()->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").putExtra(Intent.EXTRA_MIME_TYPES,new String[]{"text/plain","application/json","text/json"}).addCategory(Intent.CATEGORY_OPENABLE),100));return "{}";}
             if("export".equals(a)){runOnUiThread(()->startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").putExtra(Intent.EXTRA_TITLE,"다운로드목록.json"),101));return "{}";}
             if("update".equals(a)){new Thread(()->{if(DownloadService.running){message("다운로드가 끝난 뒤 업데이트해 주세요.");return;}try{DownloadService.initialize(MainActivity.this);YoutubeDL.getInstance().updateYoutubeDL(MainActivity.this,YoutubeDL.UpdateChannel._STABLE);message("다운로드 엔진이 최신 상태입니다.");}catch(Exception e){message("엔진 업데이트 실패. 네트워크를 확인해 주세요.");}},"engine-update").start();return "{}";}
-            if("theme".equals(a)){runOnUiThread(()->{boolean dark="dark".equals(c.optString("value"));if(Build.VERSION.SDK_INT>=30){WindowInsetsController ctl=getWindow().getDecorView().getWindowInsetsController();if(ctl!=null)ctl.setSystemBarsAppearance(dark?0:WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS|WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS|WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);}else getWindow().getDecorView().setSystemUiVisibility(dark?0:View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);});}
+            if("theme".equals(a))runOnUiThread(()->applyNativeTheme(c.optString("value","system")));
             return Store.command(c).toString();
         }catch(Exception e){return Store.obj("error","요청을 처리하지 못했습니다.").toString();}}
     }
@@ -65,6 +67,12 @@ public class MainActivity extends Activity {
         else {String text;try(InputStream in=getContentResolver().openInputStream(uri)){ByteArrayOutputStream buf=new ByteArrayOutputStream();byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1){if(buf.size()+n>2*1024*1024)throw new IOException();buf.write(b,0,n);}text=buf.toString("UTF-8");}try{JSONObject backup=new JSONObject(text);JSONArray lists=backup.getJSONArray("lists"),tasks=backup.getJSONArray("tasks");java.util.HashMap<String,String> map=new java.util.HashMap<>();for(int i=0;i<lists.length();i++){JSONObject l=lists.getJSONObject(i);String id=Store.command(Store.obj("action","addList","name",l.optString("name","가져온 목록"))).optString("id","default");map.put(l.optString("id"),id);}int added=0;for(int i=0;i<Math.min(tasks.length(),500);i++){JSONObject o=tasks.getJSONObject(i);JSONObject addedResult=Store.command(Store.obj("action","add","text",o.optString("url"),"title",o.optString("title"),"list",map.getOrDefault(o.optString("list"),"default"),"format",o.optString("format","mp4"),"quality",o.optString("quality","best"),"playlist",o.optBoolean("playlist")));added+=addedResult.optInt("added");}message(added+"개 주소를 가져왔습니다.");}catch(JSONException e){JSONObject r=Store.command(Store.obj("action","add","text",text));message(r.optString("error").isEmpty()?r.optInt("added")+"개 주소를 가져왔습니다.":r.optString("error"));}}
     }catch(Exception e){message("파일을 읽거나 저장할 수 없습니다. 2MB 이하 TXT/JSON을 사용해 주세요.");}},"list-file").start();}
     static String browserUrl(String input){String url=input==null?"":input.trim();if(!url.contains("://")&&!url.contains(" ")&&!url.contains("\n"))url="https://"+url;return url;}
+    private void applyNativeTheme(String theme){
+        boolean dark="dark".equals(theme)||("system".equals(theme)&&(getResources().getConfiguration().uiMode&android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES);
+        int color=dark?0xff10191c:0xfff6f7f9;if(root!=null)root.setBackgroundColor(color);if(web!=null)web.setBackgroundColor(color);
+        getWindow().setStatusBarColor(color);getWindow().setNavigationBarColor(color);
+        if(Build.VERSION.SDK_INT>=30){WindowInsetsController controller=getWindow().getDecorView().getWindowInsetsController();if(controller!=null)controller.setSystemBarsAppearance(dark?0:WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS|WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS|WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);}else getWindow().getDecorView().setSystemUiVisibility(dark?0:View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+    }
     private void beginFileDeletion(JSONObject cmd){
         if(deletion!=null){message("파일 삭제가 진행 중입니다.");return;}
         FileDeletion job=new FileDeletion();JSONArray ids=cmd.optJSONArray("ids");if(ids==null)ids=new JSONArray().put(cmd.optString("id"));
@@ -73,9 +81,10 @@ public class MainActivity extends Activity {
     }
     private void continueFileDeletion(boolean denied){
         FileDeletion job=deletion;if(job==null)return;
+        job.waitingConsent=false;
         if(denied){job.failed++;job.position++;}
         new Thread(()->{
-            while(job.position<job.targets.size()){
+            while(!job.cancelled&&job.position<job.targets.size()){
                 DeleteTarget target=job.targets.get(job.position);Uri uri=Uri.parse(target.file.optString("uri"));boolean verified=false;
                 try{
                     // Only an explicit saved download from this app's folder may be deleted.
@@ -91,11 +100,11 @@ public class MainActivity extends Activity {
                     Store.forgetFile(target.id,uri.toString());job.deleted++;job.position++;
                 }catch(RecoverableSecurityException e){
                     if(target.consentRequested){job.failed++;job.position++;continue;}target.consentRequested=true;
-                    runOnUiThread(()->{try{startIntentSenderForResult(e.getUserAction().getActionIntent().getIntentSender(),DELETE_CONSENT,null,0,0,0);}catch(Exception failure){continueFileDeletion(true);}});return;
+                    requestDeleteConsent(job,e.getUserAction().getActionIntent());return;
                 }catch(SecurityException e){
                     if(Build.VERSION.SDK_INT>=30&&verified&&!target.consentRequested){
                         target.consentRequested=true;
-                        try{PendingIntent consent=MediaStore.createDeleteRequest(getContentResolver(),java.util.Collections.singletonList(uri));runOnUiThread(()->{try{startIntentSenderForResult(consent.getIntentSender(),DELETE_CONSENT,null,0,0,0);}catch(Exception failure){continueFileDeletion(true);}});return;}catch(Exception unsupported){/* Downloads providers may require the system Files app. */}
+                        try{PendingIntent consent=MediaStore.createDeleteRequest(getContentResolver(),java.util.Collections.singletonList(uri));requestDeleteConsent(job,consent);return;}catch(Exception unsupported){/* Downloads providers may require the system Files app. */}
                     }
                     job.failed++;job.position++;
                 }catch(Exception e){job.failed++;job.position++;}
@@ -104,6 +113,7 @@ public class MainActivity extends Activity {
             runOnUiThread(()->{if(deletion!=job)return;deletion=null;JSONObject result=Store.obj("deleted",job.deleted,"failed",job.failed);if(web!=null&&!isDestroyed())web.evaluateJavascript("window.onFilesDeleted&&onFilesDeleted("+result+")",null);message(job.failed>0?job.deleted+"개 파일 삭제 · "+job.failed+"개는 삭제하지 못했습니다.":job.deleted+"개 저장 파일을 삭제했습니다.");});
         },"delete-saved-media").start();
     }
+    private void requestDeleteConsent(FileDeletion job,PendingIntent consent){job.waitingConsent=true;runOnUiThread(()->{if(job.cancelled)return;if(isDestroyed()||isFinishing()){continueFileDeletion(true);return;}try{startIntentSenderForResult(consent.getIntentSender(),DELETE_CONSENT,null,0,0,0);}catch(Exception failure){continueFileDeletion(true);}});}
     @Override public void onBackPressed(){web.evaluateJavascript("window.handleBack&&handleBack()",v->{if(!"true".equals(v))super.onBackPressed();});}
-    @Override protected void onDestroy(){if(web!=null){web.removeJavascriptInterface("Android");web.destroy();}super.onDestroy();}
+    @Override protected void onDestroy(){FileDeletion job=deletion;if(job!=null&&job.waitingConsent){job.cancelled=true;for(String id:job.reserved)Store.releaseFileDeletion(id);deletion=null;}if(web!=null){web.removeJavascriptInterface("Android");web.destroy();}super.onDestroy();}
 }

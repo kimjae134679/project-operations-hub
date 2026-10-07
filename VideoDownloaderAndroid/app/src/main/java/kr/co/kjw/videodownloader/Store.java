@@ -57,7 +57,7 @@ public final class Store {
             if(deletingFiles.contains(id))continue;
             if("enqueue".equals(action)&&!active&&!"completed".equals(status)){put(o,"status","queued");put(o,"message","순서를 기다리는 중");put(o,"error","");}
             if("pause".equals(action)&&!active&&!"completed".equals(status)){put(o,"status","paused");put(o,"message","일시정지");}
-            if("remove".equals(action)&&!active){String cf=o.optString("cookieFile");if(!cf.isEmpty())new java.io.File(cf).delete();tasks.remove(i);}
+            if("remove".equals(action)&&!active&&!"queued".equals(status)){String cf=o.optString("cookieFile");if(!cf.isEmpty())new java.io.File(cf).delete();tasks.remove(i);}
             if("move".equals(action))put(o,"list",cmd.optString("list","default"));
             if("edit".equals(action)&&!active){put(o,"title",cmd.optString("title",o.optString("title")));put(o,"format",cmd.optString("format",o.optString("format")));put(o,"quality",cmd.optString("quality",o.optString("quality")));put(o,"playlist",cmd.optBoolean("playlist",o.optBoolean("playlist")));String url=cmd.optString("url",o.optString("url"));if(LinkParser.valid(url))put(o,"url",url);}
         }}save();return obj("ok",true);

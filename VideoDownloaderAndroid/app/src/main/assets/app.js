@@ -6,7 +6,7 @@ const statusName={ready:'준비',queued:'대기',analyzing:'분석 중',download
 const formatName={mp4:'영상',original:'영상',audio:'음원'};
 const icons={link:'<svg viewBox="0 0 24 24"><path d="m10 13 4-4m-6 7-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 1 1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg>',play:'<svg viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></svg>',more:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>'};
 const icon=n=>`<span class="icon" aria-hidden="true">${icons[n]||icons.link}</span>`;
-function urls(text){return [...new Set((text.match(/https?:\/\/[^\s<>"']+/gi)||[]).map(x=>x.replace(/[),.;]+$/,'')))];}
+function urls(text){return [...new Set(text.split(/\s+/).filter(x=>/^https?:\/\//i.test(x)||/^(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:[/?#]|$)/i.test(x)).map(x=>(/^https?:\/\//i.test(x)?x:'https://'+x).replace(/[),.;]+$/,'')).filter(x=>{try{let u=new URL(x);return ['http:','https:'].includes(u.protocol)&&!!u.hostname;}catch{return false;}}))];}
 function host(url){try{return new URL(url).hostname.replace(/^www\./,'');}catch{return '영상 페이지';}}
 function animatePage(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;$('#main').animate([{opacity:0,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:190,easing:'ease-out'});}
 let state={lists:[{id:'default',name:'내 다운로드'}],tasks:[],theme:'system'},page='lists',list='default',filter='all',search='',selected=new Set(),last='',toastTimer;
