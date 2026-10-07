@@ -32,6 +32,14 @@ scripts/project_notice.py를 중앙에서 실행할 때는 --root 실제프로�
 
 보낼자료에 작성됨, 앱에 수집됨, 중앙에 공유됨은 별개입니다. 앱 종료·미연결·인증 문제는 공유 대기이며 규칙 공지나 도우미 설치만으로 다른 AI가 읽었거나 독립 채팅의 명령이 자동 기록됐다고 말하지 않습니다. 다른 AI를 대신 기록하거나 본인 답변을 추측해 만들지 않습니다. 오래된 기록은 실제 저장소의 현재 상태를 대신하지 않습니다. 비밀값·개인 대화 원문 전체는 넣지 않고 필요한 명령·답변을 요약합니다.
 
+## 프로젝트 GitHub 공유 · 0.9.5 구현과 일회 실행 확인
+
+승인된 자동 공유 경로는 **구조 메타데이터만** 내보냅니다: project ID, 불투명 기록 식별 hash, revision, 허용 상태/시각, verification의 pass/fail/not_run/partial 개수. request/response·명령·제목·요약·다음 일·evidence 본문, actor/session 원문과 개인 경로는 자동 업로드하지 않고 앱/로컬 원본에 유지합니다. GPT 호출은 필요하지 않습니다.
+
+본인 record 등록은 위 도우미로 계속합니다. 이후 **로컬 수집 → 별도 branch 업로드 → draft PR 생성 → 별도 merge**를 각각 확인하며 record/validate/render 성공을 GitHub 공유 성공으로 바꾸지 않습니다. 응답 불명확 시 본인 latest와 원격 branch/PR을 조회해 대조하고 업무·업로드를 무작정 반복하지 않습니다. 실제 origin/저장소 identity/허용 prefix로 명시 등록된 프로젝트만 대상입니다. 기존 dirty/index/clone과 본인 확인기록은 변경하지 않습니다. [등록·보류 상태](../ai-control-tower/docs/project-record-publishing.md).
+
+0.9.5 소스·코드 검사와 허브/Voice의 실제 headless draft PR을 확인했습니다. 두 PR은 미merge이며 현재 0.9.3 앱에 새 반복 수집/공유를 활성화한 것은 아닙니다. Threads는 task 기록 3개 검증 실패로 API 쓰기 전에 보류했습니다. completed에 남은 필수 작업·blocker를 함께 적거나 필수 필드/지원 상태가 빠지면 공유를 보류하며 parser를 완화하거나 원본을 자동 수정하지 않습니다. 본인 실제 결과에 맞춘 새 revision으로 갱신합니다. N-0007의 본인 작업 기록 의무와 공지 check/ack는 계속 별개입니다. 상세 검사·PR·배포 경계는 위 등록 안내에서 확인합니다.
+
 ## 중단 뒤 저장 여부 확인
 
 record는 stored 또는 already_stored와 로컬 파일 경로·revision·contentSha256을 JSON으로 반환합니다. 통신이 끊겨 저장 결과가 불명확하면 먼저 latest로 본인 project·actor·record-id를 모두 지정해 조회합니다. found는 검증된 최고 revision·작업 상태·파일 원본 바이트 SHA-256이며, not_found는 exit 3, 충돌·손상·소유자 불일치는 held와 exit 1입니다. 조회는 파일을 만들거나 수정하지 않습니다. 같은 내용의 저장 재시도는 업무 재실행이 아닙니다.

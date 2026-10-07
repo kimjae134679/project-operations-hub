@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 namespace AIControlTower;
 public partial class App : Application
 {
@@ -9,11 +9,14 @@ public partial class App : Application
     private RegisteredWaitHandle? _listener;
     private bool _owns;
     private CancellationTokenSource? _remoteLifetime;
+    private CancellationTokenSource? _recordPublishLifetime;
+    private Task? _recordPublishTask;
     private System.Windows.Interop.HwndSource? _shutdownWindow;
     protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
     {
         e.Cancel = false;
         if(MainWindow is MainWindow window)window.PrepareSessionEnding();
+        _recordPublishLifetime?.Cancel();
         _remoteLifetime?.Cancel();
         base.OnSessionEnding(e);
     }
@@ -80,8 +83,27 @@ public partial class App : Application
         catch (OperationCanceledException) { }
         finally { await Dispatcher.InvokeAsync(() => Shutdown()); }
     }
+    private bool TryStartRecordPublishing(StartupEventArgs e)
+    {
+        if(!Services.RegisteredRecordPublishing.RequestsOnce(e.Args))return false;
+        // Fail-closed dedicated headless entry: never falls through settings/mutex/GUI/remote initialization.
+        ShutdownMode=ShutdownMode.OnExplicitShutdown;
+        if(e.Args.Length!=2||e.Args[0]!="--publish-records-once") {Services.RegisteredRecordPublishing.WriteConsoleOutcome(new{Status="invalid_request",ExitCode=2});Shutdown(2);return true;}
+        _recordPublishLifetime=new CancellationTokenSource();
+        _recordPublishTask=RunRecordPublishingAsync(e.Args,_recordPublishLifetime.Token);
+        return true;
+    }
+    private async Task RunRecordPublishingAsync(string[] args,CancellationToken ct)
+    {
+        var code=1;
+        try{code=await Task.Run(()=>new Services.RegisteredRecordPublishing().RunOnceAsync(args,ct),ct);}
+        catch(OperationCanceledException){}
+        catch(Exception){}
+        finally{await Dispatcher.InvokeAsync(()=>Shutdown(code));}
+    }
     protected override void OnStartup(StartupEventArgs e)
     {
+        if(TryStartRecordPublishing(e))return;
         if(!Services.StartupPolicy.TryCreate(e.Args,out var policy)){Shutdown(2);return;}
         if(policy.IsManualControl)ShutdownMode=ShutdownMode.OnExplicitShutdown;
         var workFixture = Array.IndexOf(e.Args,"--verify-work-dashboard");
@@ -151,6 +173,7 @@ public partial class App : Application
     }
     protected override void OnExit(ExitEventArgs e)
     {
+        _recordPublishLifetime?.Cancel(); _recordPublishLifetime?.Dispose();
         _remoteLifetime?.Cancel(); _shutdownWindow?.Dispose(); _remoteLifetime?.Dispose();
         _listener?.Unregister(null); _activate?.Dispose();
         if (_owns) _instance?.ReleaseMutex();

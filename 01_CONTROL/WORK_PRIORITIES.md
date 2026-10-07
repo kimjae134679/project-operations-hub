@@ -10,21 +10,34 @@
 
 ## 최신 체크포인트 · 실제 검증과 아직 남은 일
 
-아래 현재 상태가 이전 시점의 미완료 표현보다 우선합니다. 지난 검사·실행 증거는 아래 이력에 보존하며, 격리 검증을 모든 프로젝트의 업무 완료로 확대하지 않습니다. 최신 소스는 **0.9.4**이며 현재 운영 앱은 **0.9.3 PID 16092** 그대로입니다. 0.9.4는 운영 활성화하지 않았습니다.
+### 프로젝트별 기록 공유 · 0.9.5 소스와 실제 headless 검증
+
+**구현·코드 검사·일회 headless 실행 확인 / 운영 앱 반복 활성화 미완료:** GPT 없이 명시 등록된 프로젝트 GitHub의 별도 branch에 구조 메타데이터만 올려 draft PR을 만드는 경로를 구현했습니다. project ID·불투명 기록 식별 hash·revision·통제된 상태/시각·검증 결과별 개수만 공유하며 명령·답변·제목·설명 등 자유 본문은 앱/로컬에 남깁니다. 로컬 수집, branch 업로드, PR 생성, merge는 별도이고 main 직접 반영·자동 merge는 하지 않습니다. 응답이 불명확하면 원격 상태를 읽어 대조하며 중복 업로드/PR을 무작정 재시도하지 않습니다.
+
+실제 origin·repository ID·base·허용 prefix·Enabled를 고정 D registry에 명시하고 일치하지 않으면 보류합니다. 기존 dirty/index/clone/lock은 그대로 보존합니다. 이 개발은 기존 중앙 clone 막힘의 복구 완료나 모든 담당자의 공지 확인을 뜻하지 않습니다. N-0007의 본인 작업 기록 의무는 유지하며 다른 담당자의 실제 작성·읽음/적용은 미확인입니다. [운영 경계와 등록 계약](../ai-control-tower/docs/project-record-publishing.md).
+
+고정 D registry에는 허브·Threads·Voice 3개가 Enabled로 등록됐습니다. 허브는 실제 124건 수집·76건 메타데이터 export 후 [draft PR #25](https://github.com/kimjae134679/project-operations-hub/pull/25)를 만들었고 동일 실행 재확인에서도 GET 6회/POST 0회·같은 PR을 유지했습니다. Voice는 메타데이터 10개를 [draft PR #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2)로 공유했습니다. 두 PR 모두 draft/open/unmerged, main 변경·모델 호출 0이며 기존 오디오북 제작을 새로 시작하거나 중지하지 않았습니다.
+
+Threads는 실제 13건 수집·수집 오류 0이지만 task_exchange 3개 모두 형식/상태 검증에서 보류됐습니다. 2개는 completed와 남은 필수 작업/막힘이 함께 있었고 1개는 필수 필드 5개 누락·지원하지 않는 상태였습니다. API 쓰기 전에 중단했고 원본 3개 hash를 보존했습니다. parser 완화·가짜 완료·원본 자동 수정은 하지 않습니다.
+
+0.9.5 소스의 단계 표시 수정 후 부모 최종 fresh 검사는 .NET 509 PASS/0 FAIL, scripts 68 PASS/0 FAIL(17.897초)입니다. 최초 병렬 Git fixture 실패는 LocalExecutionPolicyTests의 비병렬 collection만 수정한 뒤 전체 재검사로 구분합니다. 두 PR의 실제 파일은 각각 구조 메타데이터 76/10개 ADDED이며 삭제 0입니다. 0.9.5 publish는 아직 대기이며 source `726a856`의 기존 0.9.4 스테이징은 미교체·미활성입니다. 현재 0.9.3 PID 16092는 PC/tray true·busy false로 유지됐고 자동 GUI 교체나 새 반복 수집/공유 활성화는 하지 않았습니다.
+
+아래 현재 상태가 이전 시점의 미완료 표현보다 우선합니다. 지난 검사·실행 증거는 아래 이력에 보존하며 일회 기록 공유를 모든 프로젝트 업무 완료나 앱 상시 운영으로 확대하지 않습니다. 최신 소스는 **0.9.5**이며 현재 운영 앱은 **0.9.3 PID 16092** 그대로입니다. 새 소스는 운영 활성화하지 않았습니다.
 
 | 구분 | 이번에 확인한 상태 | 남은 경계 |
 |---|---|---|
+| P2 · 0.9.5 기록 공유 | 최종 .NET 509/scripts 68 통과, 허브 76개·Voice 10개 메타데이터 draft PR 실제 생성, 허브 재확인 POST 0 | 미merge·현재 앱 반복 경로 미활성; Threads 원본 기록 3개 검증 보류 |
 | P1 · 0.9.4 소스 검증 | .NET 471 PASS/0 FAIL, Python scripts 68 PASS/0 FAIL(22.859초); 경계 검사 17개에 수정 전 반례 2개 포함 | Window.Show 휠 검사 3개 미실행; live UI·0.9.4 운영 활성화·사용자 조작 검증은 아님 |
 | P1 · 현재 수동운영 앱 | 기존 0.9.3 manual-control PID 16092 유지 | 새 소스의 기능을 현재 앱에 적용했다고 표시하지 않음 |
 | P2 · 로컬 수집 연결 | collect-only를 앱 소스에 연결 | 현재 운영 0.9.3에는 미반영; 로컬 수집·중앙 공유·공지 본인 확인은 각각 별도 |
 | P3 · 중단 대비 기록 | 실제 latest found r1 및 동일 내용 재등록 already_stored 각각 exit 0; 바이트·mtime·속성 불변, 본인 r2 저장 | 업무 재실행 0; 전체 대화 자동 백업·중앙 공유 성공은 아님 |
 | P2 · 게임 조회 연결 | 지원된 V33 start-only 경로 1회 실행 후 TCP 29000·29001, roster 및 앱 service healthy 실제 확인 | copy/stop/firewall 변경 0; 사용자 휴대폰 플레이는 미검증 |
-| P2 · 보호된 운영 갱신·중앙 공유 | 보호 Bridge config 설치와 clone Git locks 막힘은 유지 | 운영 설치 재시도·속성/ACL 변경·lock 삭제로 우회하지 않음; 중앙 공유 성공으로 표시하지 않음 |
+| P2 · 보호된 운영 갱신·중앙 공유 | 보호 Bridge config 설치와 clone Git locks 막힘은 유지 | 운영 설치 재시도·속성/ACL 변경·lock 삭제로 우회하지 않음; 새 metadata PR 성공을 기존 중앙 clone 동기화 성공으로 표시하지 않음 |
 | P3 · 격리 연속 실행 | 실제 Jev `gpt-6.1-sol` 1회·tool 0 → 결정적 validator → dependent finalizer 성공; 동일 승인 계획 재실행에서도 전 단계 attempts 1·산출물 hash 불변 | AI 응답은 adapter 호스트가 저장; 실제 프로젝트 업무·전체 자율운영·앱 버튼을 통한 동일 업무 실행 검증과는 별개 |
 | P4 · VoiceAudiobook | 18/128 ready, 기존 제작 진행 중; ‘윽’ regex 격리 검사 10 PASS | live 미적용, 중복 생성하지 않음; 청취·품질 및 전체 제작 완료 미확인 |
 | P4 · Threads | D 평가 67건 실제 보존 복원·conflict 0 | C 원본 hash 불변·제작 버전/점수 그대로 보존·private backup 검증; 외부 게시/GUI 사용 완료는 아님 |
 
-최신 코드 검증 근거: `foundation-continuity-full-green2.trx`, Python `full-green.log`. 기록 복구 실제 검증: `checks/continuity-record-recovery-actual-green.json`. 과거 검사 수는 당시 이력으로 보존합니다.
+최신 코드 검증 근거: `record-publishing-full-final.trx`, Python `record-publishing-full-green.log`. 앞선 0.9.5 검사는 `record-publishing-full-green2.trx`, 0.9.4 검사는 `foundation-continuity-full-green2.trx`, Python `full-green.log`에 보존합니다. 기록 복구 실제 검증: `checks/continuity-record-recovery-actual-green.json`. 과거 검사 수는 당시 이력으로 보존합니다.
 
 P3 fake 검사 18개(Node 14 + Python 4)와 위 실제 실행은 별도 증거입니다. 실제 typed receipt는 process exit 0·terminal/report 관측·fresh artifact 검증 성공입니다. 계획 hash는 `6682eaa97ef7c49984a799a086c2a1610511e0f22d602447723125bd4ae1e38f`, 산출물 SHA-256은 `cef011964f492a3e92d5a13a61f142b8350aa7318e316933eba4fd8bb39750ca`입니다. 입력 14,010 / 출력 44 토큰을 관측했지만 절감률은 산정하지 않았습니다. 증거 위치: `checks/jev-task-chain-20261007-1000/workspace/state/state.json`, `report-provenance.json`, `validation.json`, `final-summary.json`.
 

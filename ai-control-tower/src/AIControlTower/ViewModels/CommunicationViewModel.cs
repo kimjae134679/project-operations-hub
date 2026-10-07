@@ -123,6 +123,10 @@ public sealed partial class MainViewModel
     private readonly SemaphoreSlim _communicationLock = new(1,1);
     private readonly ManualCommunicationCollection _manualCollection=new(TimeSpan.FromMinutes(5),TimeSpan.FromMinutes(3),()=>DateTimeOffset.UtcNow);
     private Task _manualCollectionTask=Task.CompletedTask;
+    private readonly RegisteredRecordPublishing _registeredRecordPublishing=new();
+    private Task _recordPublicationTask=Task.CompletedTask;
+    private string _recordPublicationStatus="프로젝트 GitHub 공개 등록 대기 · 원문은 로컬에 보관";
+    public string RecordPublicationStatus {get=>_recordPublicationStatus;private set=>SetProperty(ref _recordPublicationStatus,value);}
     private string _manualCollectionStatus="로컬 수집 대기 · 중앙 공유 없음";
     public string ManualCollectionStatus {get=>_manualCollectionStatus;private set=>SetProperty(ref _manualCollectionStatus,value);}
     private DateTime _lastCommunication = DateTime.MinValue, _lastCommunicationNetwork = DateTime.MinValue;
@@ -421,6 +425,7 @@ public sealed partial class MainViewModel
                 {
                     var existing=_communicationSnapshot??new CommunicationSnapshot([],[],[],[],[],result.CollectedAt,[]);
                     ApplyCommunicationSnapshot(ManualCommunicationCollection.Merge(existing,result));
+                    _ = StartRegisteredRecordPublishing(result);
                     ManualCollectionStatus=$"로컬 수집 {result.Records.Count}개 · 보류 {result.Errors.Count}개 · 중앙 공유 없음";
                 }
                 else if(refreshed.Status=="blocked")ManualCollectionStatus="로컬 수집 보류 · 마지막 정상 자료 유지 · 중앙 공유 없음";
@@ -435,6 +440,47 @@ public sealed partial class MainViewModel
         {
             if(_disposed||ct.IsCancellationRequested)return;
             try{await _dispatcher.InvokeAsync(()=>{if(!_disposed){ManualCollectionStatus=CentralSyncMessage="로컬 수집 보류 · 기존 자료 보존 · 중앙 공유 없음";IsCommunicating=_manualCollection.IsRunning;}});}catch(Exception){}
+        }
+    }
+    public Task StartRegisteredRecordPublishing(CommunicationCollectionResult result)
+    {
+        if(!IsManualControl||_disposed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
+        if(!_recordPublicationTask.IsCompleted)return _recordPublicationTask;
+        _recordPublicationTask=RunRegisteredRecordPublishingAsync(result,_lifetime.Token);
+        return _recordPublicationTask;
+    }
+    private async Task RunRegisteredRecordPublishingAsync(CommunicationCollectionResult collection,CancellationToken ct)
+    {
+        try
+        {
+            // Registry/transport work stays off dispatcher and is separately tracked from collection.
+            var status=await Task.Run(()=>_registeredRecordPublishing.PublishRegisteredAsync(true,collection,ct),ct).ConfigureAwait(false);
+            if(_disposed||ct.IsCancellationRequested)return;
+            await _dispatcher.InvokeAsync(()=>
+            {
+                if(_disposed||ct.IsCancellationRequested)return;
+                RecordPublicationStatus=status switch
+                {
+                    "pr_open"=>"프로젝트 GitHub 메타데이터 업로드 · 초안 PR 열림 · 병합 미확인",
+                    "pr_closed"=>"프로젝트 GitHub 초안 PR 닫힘 · 병합 없음",
+                    "pr_merged"=>"프로젝트 GitHub 메타데이터 PR 병합 확인",
+                    "branch_uploaded"=>"프로젝트 GitHub 브랜치 업로드 확인 · PR 미확인",
+                    "upload_uncertain" or "pr_uncertain"=>"프로젝트 GitHub 결과 미확인 · 자동 재시도 보류",
+                    "already_present"=>"프로젝트 GitHub 기준 브랜치에 같은 메타데이터 있음 · 중복 업로드 없음",
+                    "empty"=>"프로젝트 GitHub 공개 가능한 구조 메타데이터 없음",
+                    "cached"=>"프로젝트 GitHub 동일 수집분 중복 업로드 없음",
+                    "inflight"=>"프로젝트 GitHub 메타데이터 공유 중 · 중복 실행 없음",
+                    "disabled"=>"프로젝트 GitHub 명시 등록 대기 · 원문은 로컬에 보관",
+                    _=>"프로젝트 GitHub 공개 보류 · 원문은 로컬에 보관"
+                };
+                CentralSyncMessage=ManualCollectionStatus+" · "+RecordPublicationStatus;
+            });
+        }
+        catch(OperationCanceledException){}
+        catch(Exception)
+        {
+            if(_disposed||ct.IsCancellationRequested)return;
+            try{await _dispatcher.InvokeAsync(()=>{if(!_disposed&&!ct.IsCancellationRequested)RecordPublicationStatus="프로젝트 GitHub 공개 보류 · 원문은 로컬에 보관";});}catch(Exception){}
         }
     }
     internal void ApplyCommunicationSnapshot(CommunicationSnapshot snapshot)

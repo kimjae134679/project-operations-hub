@@ -3,6 +3,11 @@ using AIControlTower.ViewModels;
 
 namespace AIControlTower.Tests;
 
+// This collection alone owns process-global environment mutation; other collections remain parallel.
+[CollectionDefinition("ProcessEnvironment", DisableParallelization = true)]
+public sealed class ProcessEnvironmentCollection { }
+
+[Collection("ProcessEnvironment")]
 public sealed class LocalExecutionPolicyTests
 {
     [Fact]
