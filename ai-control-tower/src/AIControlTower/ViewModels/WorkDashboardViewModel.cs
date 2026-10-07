@@ -17,7 +17,7 @@ public sealed class WorkDashboardViewModel : ObservableObject
     private bool _refreshing, _managementOnly;
     private int _selectionVersion;
     private int _detailRequestVersion;
-    private string _projectFilterId = "", _workerFilterKey = "";
+    private string _projectFilterId = "", _workerFilterKey = "", _statusFilterKey = "";
     private string _currentProjectId="",_currentProjectName="";
     private WorkActivity? _selectedRecord,_selectedExecution;
     public string CurrentProjectName => _currentProjectName;
@@ -56,7 +56,26 @@ public sealed class WorkDashboardViewModel : ObservableObject
     private IEnumerable<WorkActivity> ScopedActivities => Activities.Where(r => r.IsManagementRecord == _managementOnly);
     public IReadOnlyList<WorkActivity> FilteredActivities => ScopedActivities.Where(r => (ProjectFilterId.Length==0 || (r.ProjectGroupKey.Length==0?"__unassigned":r.ProjectGroupKey)==ProjectFilterId)
         && (WorkerFilterKey.Length==0 || r.WorkerKind==WorkerFilterKey)
+        && (StatusFilterKey.Length==0 || StateGroup(r)==StatusFilterKey)
         && (string.IsNullOrWhiteSpace(Search) || new[] { r.ProjectLabel, r.ProjectId, r.Worker, r.WorkerKind, r.ProgramId, r.Title, r.StatusLabel, r.Stage, r.Source }.Any(x => x.Contains(Search.Trim(), StringComparison.OrdinalIgnoreCase)))).ToArray();
+    // Groups describe reported evidence only; filtering never submits, pauses or completes jobs.
+    private static string StateGroup(WorkActivity row) => row.Status switch
+    {
+        "completed" or "succeeded" => "completed",
+        "running" when row.LivenessKnown => "active",
+        "in_progress" => "active",
+        "queued" or "pending" or "accepted" => "waiting",
+        _ => "attention"
+    };
+    public IReadOnlyList<WorkFilterOption> StatusFilters { get; } =
+    [
+        new("", "모든 상태"), new("active", "실행·진행 기록"),
+        new("waiting", "대기·접수"), new("attention", "오류·중단·확인 필요"),
+        new("completed", "완료 기록")
+    ];
+    public string StatusFilterKey { get => _statusFilterKey; set { if (SetProperty(ref _statusFilterKey, value ?? "")) NotifyFilters(); } }
+    public bool NoMatchingActivities => FilteredActivities.Count == 0;
+    public string ResultCountText => $"조건에 맞는 실제 기록 {FilteredActivities.Count}개";
     public IReadOnlyList<WorkFilterOption> ProjectFilters
     {
         get
@@ -93,6 +112,7 @@ public sealed class WorkDashboardViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(FilteredActivities));OnPropertyChanged(nameof(GroupedActivities));OnPropertyChanged(nameof(ProjectGroups));
         OnPropertyChanged(nameof(ProjectFilters));OnPropertyChanged(nameof(WorkerFilters));
+        OnPropertyChanged(nameof(ResultCountText));OnPropertyChanged(nameof(NoMatchingActivities));
     }
     public string ProjectFilterId { get=>_projectFilterId;set { if(SetProperty(ref _projectFilterId,value??""))NotifyFilters(); } }
     public string WorkerFilterKey { get=>_workerFilterKey;set { if(SetProperty(ref _workerFilterKey,value??""))NotifyFilters(); } }

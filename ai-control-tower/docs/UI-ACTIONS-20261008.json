@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "ui_source_verification",
+  "baseCommit": "d36d9b0fe01838ac256e2ad7741934046ffe4ec3",
+  "branch": "codex/hub-action-ui-20261008",
+  "verifiedAt": "2026-10-07T20:58:52.9158108+00:00",
+  "tests": {
+    "baselinePassed": 737,
+    "finalPassed": 752,
+    "failed": 0,
+    "excludedClass": "MouseWheelRoutingTests",
+    "reason": "Native windows must not be shown during this task",
+    "newStateFilterTests": 12,
+    "newLayoutAndFailureTests": 3,
+    "warnings": "Existing CS8602 MainViewModel.cs:108 and xUnit2031/xUnit2013"
+  },
+  "render": {
+    "sizes": [
+      "1460x900",
+      "1060x720"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "screens": 9,
+    "data": "Actual allowed local records; no invented fixtures in rendered screenshots",
+    "nativeWindowsShown": 0,
+    "externalQueriesAllowed": false,
+    "registeredExecutionAllowed": false,
+    "menuItemsVerified": 9,
+    "workRowBoundsVerified": true,
+    "fileOpenActionBoundsVerified": true
+  },
+  "review": {
+    "finding": "P2: read status hidden in tooltip",
+    "resolution": "Visible ReadStatus line and retained-record failure regression test",
+    "protectedScope": "No bridge/App/MainViewModel/StartupPolicy/catalog/Threads changes"
+  },
+  "pcConnectionContentIdentical": true,
+  "releasePublish": {
+    "result": "pass",
+    "selfContained": false,
+    "installed": false,
+    "launched": false,
+    "launcherArgument": "--local-view",
+    "assemblyVersion": "0.9.11.0"
+  },
+  "referenceImages": {
+    "result": "blocked",
+    "reason": "Library transfer returned HTTP 403",
+    "pixelsViewed": false,
+    "retriedAfter403": false
+  },
+  "operationalProcessesPreserved": [
+    21420,
+    24020,
+    27032
+  ],
+  "deployment": "not requested; not performed",
+  "screenshotsUploaded": false
+}

@@ -35,13 +35,15 @@ public sealed class VisualLayoutFixTests
         Assert.Same(resources["AccentBrush"],border.BorderBrush);
     });
     [Theory] [InlineData(false)] [InlineData(true)]
-    public void DashboardRemovesSearchFiltersAndAdvancedWhileRetainingOnlyOwnedStop(bool dark)=>Sta(()=>
+    public void DashboardSupportsActionFiltersAndCollapsedTechnicalDetailsWhileRetainingOnlyOwnedStop(bool dark)=>Sta(()=>
     {
         var view=new AIControlTower.Views.WorkDashboardView{Resources=Resources(dark)};
         var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<AIControlTower.Models.WorkActivity>>([]),owns:id=>id=="fixture-owned");view.DataContext=vm;Layout(view,1060,660);
-        Assert.Empty(Children(view).OfType<TextBox>());Assert.Empty(Children(view).OfType<ComboBox>());Assert.Empty(Children(view).OfType<Expander>());
+        Assert.Equal("WorkSearch",Assert.Single(Children(view).OfType<TextBox>()).Name);
+        Assert.Equal(2,Children(view).OfType<ComboBox>().Count());
+        Assert.All(Children(view).OfType<Expander>(),e=>Assert.False(e.IsExpanded));
         Assert.Null(view.FindName("WorkSearchWatermark"));Assert.Null(view.FindName("AdvancedSources"));Assert.Null(view.FindName("StatePathInput"));
-        var stop=Assert.Single(Children(view).OfType<Button>(),b=>Equals(b.Content,"소유 작업 중지"));
+        var stop=Assert.Single(Children(view).OfType<Button>());
         Assert.Equal(Visibility.Collapsed,stop.Visibility);
         vm.Selected=new(){Id="owned",OwnedProgramId="fixture-owned"};Layout(view,1060,660);Assert.Equal(Visibility.Visible,stop.Visibility);Assert.True(stop.IsEnabled);
         vm.Selected=new(){Id="external"};Layout(view,1060,660);Assert.Equal(Visibility.Collapsed,stop.Visibility);
@@ -60,6 +62,32 @@ public sealed class VisualLayoutFixTests
         foreach(var button in buttons){Assert.True(button.ActualHeight>=40);Assert.True(button.ActualWidth>=72);Assert.True(button.SnapsToDevicePixels);var chrome=Children(button).OfType<Border>().Single(b=>b.Name=="Chrome");Assert.Equal(button.RenderSize,chrome.RenderSize);}
         Assert.Same(controls.Resources["SelectionBrush"],(dark?dim:light).Background);
         model.DarkMode=!dark;Layout(controls,600,100);Assert.Same(controls.Resources["SelectionBrush"],(dark?light:dim).Background);
+    });
+    [Theory] [InlineData(false)] [InlineData(true)]
+    public void CompactWorkRowsAndStatusBadgesRemainInsideTheViewport(bool dark)=>Sta(()=>
+    {
+        var view=new AIControlTower.Views.WorkDashboardView{Resources=Resources(dark)};
+        var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<AIControlTower.Models.WorkActivity>>([]));
+        vm.ApplySnapshot([new(){Id="long",Title=string.Concat(Enumerable.Repeat("긴 작업 제목 ",18)),Status="completed",Stage="원본 검토"}]);
+        view.DataContext=vm;Layout(view,840,610);
+        var list=Children(view).OfType<ListBox>().Single(x=>x.Name=="WorkList");
+        var viewport=Children(list).OfType<ScrollContentPresenter>().First();
+        var row=Assert.Single(Children(list).OfType<ListBoxItem>());
+        var bounds=row.TransformToAncestor(viewport).TransformBounds(new Rect(row.RenderSize));
+        Assert.InRange(bounds.Right,0,viewport.ActualWidth+1);
+        var badge=Children(row).OfType<StatusBadge>().Single();
+        var badgeBounds=badge.TransformToAncestor(viewport).TransformBounds(new Rect(badge.RenderSize));
+        Assert.InRange(badgeBounds.Right,0,viewport.ActualWidth+1);Assert.True(badge.ActualWidth>0);
+    });
+    [Fact] public void FailedRefreshKeepsTheFailureVisibleAlongsideRetainedRecords()=>Sta(()=>
+    {
+        var vm=new WorkDashboardViewModel(_=>Task.FromException<IReadOnlyList<AIControlTower.Models.WorkActivity>>(new IOException("source unavailable")));
+        vm.ApplySnapshot([new(){Id="retained",Title="Last confirmed record",Status="completed"}]);
+        var view=new AIControlTower.Views.WorkDashboardView{Resources=Resources(false),DataContext=vm};
+        vm.RefreshAsync().GetAwaiter().GetResult();Layout(view,840,610);
+        var status=Children(view).OfType<TextBlock>().Single(x=>x.Name=="ReadStatus");
+        Assert.Equal(Visibility.Visible,status.Visibility);Assert.Contains("조회 실패",status.Text);Assert.Contains("source unavailable",status.Text);
+        Assert.Equal("retained",Assert.Single(vm.FilteredActivities).Id);
     });
     private sealed class ThemeFixture:ObservableObject {private bool _dark;public bool DarkMode{get=>_dark;set=>SetProperty(ref _dark,value);}public string ViewModeLabel=>"로컬 조회 · 외부 실행 보류";}
     private static string Source(string file){var dir=new DirectoryInfo(AppContext.BaseDirectory);while(dir is not null&&!File.Exists(Path.Combine(dir.FullName,"ai-control-tower","src","AIControlTower","App.xaml")))dir=dir.Parent;Assert.NotNull(dir);return Path.Combine(dir.FullName,"ai-control-tower","src","AIControlTower",file);}
