@@ -4,6 +4,7 @@ namespace AIControlTower.Services;
 public sealed record StartupPolicy(bool IsLocalView)
 {
     public bool IsManualControl { get; init; }
+    public bool NoActivateExisting { get; init; }
     public bool AllowMutations => !IsLocalView && !IsManualControl;
     public bool AllowRegisteredTasks => !IsLocalView;
     public bool AllowLiveQueries => !IsLocalView;
@@ -14,8 +15,11 @@ public sealed record StartupPolicy(bool IsLocalView)
     public static bool TryCreate(string[] args,out StartupPolicy policy)
     {
         var manual=args.Any(a=>a.Equals("--manual-control",StringComparison.OrdinalIgnoreCase));
-        policy=new(RequestsLocalView(args)){IsManualControl=manual};
-        if(manual)return !policy.IsLocalView && args.Length==1 && args[0]=="--manual-control";
+        var noActivate=args.Any(a=>a.Equals("--no-activate-existing",StringComparison.OrdinalIgnoreCase));
+        policy=new(RequestsLocalView(args)){IsManualControl=manual,NoActivateExisting=noActivate};
+        if(manual)return !policy.IsLocalView && args[0]=="--manual-control" &&
+            (args.Length==1 || args.Length==2 && args[1]=="--no-activate-existing");
+        if(noActivate)return false;
         // A viewer request never falls through into remote/control/verification modes.
         return !policy.IsLocalView || args.Length==1 && args[0]=="--local-view";
     }

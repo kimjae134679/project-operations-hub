@@ -1,6 +1,6 @@
 # 프로젝트 기록 공유
 
-**상태: 0.9.5 소스 구현·코드 검사·실제 일회 headless 공유 확인.** 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish는 대기이며 기존 미활성 0.9.4 스테이징과 운영 0.9.3 앱은 그대로입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
+**상태: 0.9.5 소스 구현·코드 검사·실제 일회 headless 공유 확인.** 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish/스테이징은 완료했지만 운영 미적용입니다(source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false). 현재 0.9.3 PID 16092의 PC/tray true와 기존 원격을 유지합니다. 이전 0.9.4 스테이징은 당시 이력입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
 
 ## 실제 확인 · 2026-10-07
 
@@ -13,9 +13,17 @@
 
 확인한 PR head: 허브 `bdd7adcedae0f42b0d77c30a39a9d1ee5766d373`, Voice `e8b11994c53610add9bf2932ebbc66ac8caeb7d9`. 모델 호출 0, 자동 merge 0입니다. 실제 readonly GitHub 조회에서 허브 identity·base main을 대조했으며 인증/계정 권한을 바꾸지 않았습니다.
 
-단계 표시 수정 후 부모 최종 fresh 코드 검사: .NET **509 PASS/0 FAIL**(`record-publishing-full-final.trx`), scripts **68 PASS/0 FAIL**, 17.897초(`record-publishing-full-green.log`). 최초 병렬 Git fixture 실패는 LocalExecutionPolicyTests를 비병렬 collection으로 옮긴 뒤 전체 재검사했습니다. 실제 PR 파일도 각각 메타데이터 76/10개 ADDED·삭제 0임을 확인했습니다. 이 검사는 운영 앱의 새 반복 경로 활성화를 뜻하지 않습니다.
+0.9.5 당시 단계 표시 수정 후 부모 최종 fresh 코드 검사: .NET **509 PASS/0 FAIL**(`record-publishing-full-final.trx`), scripts **68 PASS/0 FAIL**, 17.897초(`record-publishing-full-green.log`). 최초 병렬 Git fixture 실패는 LocalExecutionPolicyTests를 비병렬 collection으로 옮긴 뒤 전체 재검사했습니다. 실제 PR 파일도 각각 메타데이터 76/10개 ADDED·삭제 0임을 확인했습니다. 이 검사는 운영 앱의 새 반복 경로 활성화를 뜻하지 않습니다.
 
 Threads 2개는 completed에 남은 필수 작업/막힘이 함께 있었고 1개는 필수 필드 5개 누락·지원하지 않는 상태였습니다. parser 완화·가짜 완료·원본 자동 수정 없이 본인 작성자의 새 revision을 기다립니다. 보호 Bridge 설치 및 기존 clone Git lock 막힘도 그대로이며 이 PR을 해당 복구 완료로 표시하지 않습니다. 예약 PAUSED·review disabled/unmanaged를 유지합니다.
+
+## 최신 소스와 반복 게시 보류
+
+최신 소스 버전은 0.9.6입니다. 안전한 2인자 manual 실행/launcher 소스 결합의 focused 검사 **20 PASS/0 FAIL**(`manual-source-binding-green.trx`)을 확인했습니다. CheckOnly는 descriptor·실제 ProductVersion/commit·SHA-256·UTC 24시간 유효성을 확인하며 start/probe를 실행하지 않습니다. .NET SHA를 사용해 PowerShell 5.1의 Get-FileHash cmdlet 부재에 의존하지 않습니다. 부모 fresh 전체 .NET 검사 **529 PASS/0 FAIL**(8초, `safe-continuation-full-green.trx`)을 확인했습니다. Window.Show 휠 검사 3개는 제외·미실행입니다. 최신 Python 재검사도 68 PASS/0 FAIL(16.781초, `safe-continuation-full-green.log`)이며 0.9.6 publish/스테이징·실제 활성화는 아직 대기입니다. 기존 CS8602/xUnit 경고를 별도로 남기며 live UI 검증으로 확대하지 않습니다.
+
+동일 batch 재확인에서 기존 성공/같은 PR을 유지한 것과 **변경 batch가 기존 PR을 재사용하는 것**은 다릅니다. 후자는 미구현입니다. 현재 branch 이름은 batchHash별로 나뉘므로 매 변경마다 새 PR을 만드는 반복 게시를 실제 활성화하지 않습니다. 기존 성공 증거를 변경 batch/상시 운영 성공으로 확대하지 않습니다.
+
+append 테스트 파일 작성은 도구 정책 거절로 **작성 0·production 변경 0·GitHub 쓰기 0**, 우회 0입니다. 이번에 새로운 valid 게시를 실행하지 않았습니다. 현재 GUI 종료·전환, 보호된 원격 config/clone locks 우회는 하지 않으며 예약 PAUSED·review disabled/unmanaged를 유지합니다.
 
 ## 무엇을 공유하나요
 

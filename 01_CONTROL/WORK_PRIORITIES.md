@@ -10,7 +10,7 @@
 
 ## 최신 체크포인트 · 실제 검증과 아직 남은 일
 
-### 프로젝트별 기록 공유 · 0.9.5 소스와 실제 headless 검증
+### 프로젝트별 기록 공유 · 일회 게시 이력과 최신 스테이징
 
 **구현·코드 검사·일회 headless 실행 확인 / 운영 앱 반복 활성화 미완료:** GPT 없이 명시 등록된 프로젝트 GitHub의 별도 branch에 구조 메타데이터만 올려 draft PR을 만드는 경로를 구현했습니다. project ID·불투명 기록 식별 hash·revision·통제된 상태/시각·검증 결과별 개수만 공유하며 명령·답변·제목·설명 등 자유 본문은 앱/로컬에 남깁니다. 로컬 수집, branch 업로드, PR 생성, merge는 별도이고 main 직접 반영·자동 merge는 하지 않습니다. 응답이 불명확하면 원격 상태를 읽어 대조하며 중복 업로드/PR을 무작정 재시도하지 않습니다.
 
@@ -20,13 +20,17 @@
 
 Threads는 실제 13건 수집·수집 오류 0이지만 task_exchange 3개 모두 형식/상태 검증에서 보류됐습니다. 2개는 completed와 남은 필수 작업/막힘이 함께 있었고 1개는 필수 필드 5개 누락·지원하지 않는 상태였습니다. API 쓰기 전에 중단했고 원본 3개 hash를 보존했습니다. parser 완화·가짜 완료·원본 자동 수정은 하지 않습니다.
 
-0.9.5 소스의 단계 표시 수정 후 부모 최종 fresh 검사는 .NET 509 PASS/0 FAIL, scripts 68 PASS/0 FAIL(17.897초)입니다. 최초 병렬 Git fixture 실패는 LocalExecutionPolicyTests의 비병렬 collection만 수정한 뒤 전체 재검사로 구분합니다. 두 PR의 실제 파일은 각각 구조 메타데이터 76/10개 ADDED이며 삭제 0입니다. 0.9.5 publish는 아직 대기이며 source `726a856`의 기존 0.9.4 스테이징은 미교체·미활성입니다. 현재 0.9.3 PID 16092는 PC/tray true·busy false로 유지됐고 자동 GUI 교체나 새 반복 수집/공유 활성화는 하지 않았습니다.
+0.9.5 당시 소스의 단계 표시 수정 후 부모 최종 fresh 검사는 .NET 509 PASS/0 FAIL, scripts 68 PASS/0 FAIL(17.897초)입니다. 최초 병렬 Git fixture 실패는 LocalExecutionPolicyTests의 비병렬 collection만 수정한 뒤 전체 재검사로 구분합니다. 두 PR의 실제 파일은 각각 구조 메타데이터 76/10개 ADDED이며 삭제 0입니다. 0.9.5 publish/스테이징은 실제 완료했으며 source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false입니다. 이는 운영 앱 교체·적용 완료가 아닙니다. 이전 source `726a856`의 0.9.4 스테이징은 당시 이력으로 보존합니다. 현재 0.9.3 PID 16092는 PC/tray true·busy false로 유지됐고 자동 GUI 교체나 새 반복 수집/공유 활성화는 하지 않았습니다.
 
-아래 현재 상태가 이전 시점의 미완료 표현보다 우선합니다. 지난 검사·실행 증거는 아래 이력에 보존하며 일회 기록 공유를 모든 프로젝트 업무 완료나 앱 상시 운영으로 확대하지 않습니다. 최신 소스는 **0.9.5**이며 현재 운영 앱은 **0.9.3 PID 16092** 그대로입니다. 새 소스는 운영 활성화하지 않았습니다.
+아래 현재 상태가 이전 시점의 미완료 표현보다 우선합니다. 지난 검사·실행 증거는 아래 이력에 보존하며 일회 기록 공유를 모든 프로젝트 업무 완료나 앱 상시 운영으로 확대하지 않습니다. 최신 소스는 **0.9.6**이며 현재 운영 앱은 **0.9.3 PID 16092** 그대로입니다. 새 소스는 운영 활성화하지 않았습니다.
+
+**0.9.6 최신 소스 검사 / 배포 대기:** 안전한 2인자 manual 실행/launcher의 소스 결합 focused 검사 20 PASS/0 FAIL을 확인했습니다(`manual-source-binding-green.trx`). CheckOnly는 descriptor·실제 ProductVersion/commit·SHA-256·UTC 24시간 유효성을 확인하는 경로이며 start/probe를 실행하지 않습니다. SHA 검사는 .NET을 사용해 PowerShell 5.1의 Get-FileHash cmdlet 부재에 의존하지 않습니다. 부모 fresh 전체 .NET 검사 529 PASS/0 FAIL(8초, `safe-continuation-full-green.trx`)을 확인했습니다. Window.Show 기반 휠 검사 3개는 제외·미실행입니다. 최신 Python 재검사도 68 PASS/0 FAIL(16.781초, `safe-continuation-full-green.log`)이며 0.9.6 publish/스테이징·실제 활성화는 아직 대기입니다. 기존 CS8602/xUnit 경고는 별도로 남기며, 경고 없음·live UI 검증 완료로 표시하지 않습니다.
+
+**반복 게시 보류:** 동일 batch의 기존 성공/같은 PR 유지 증거는 있지만, 변경된 batch가 기존 PR을 재사용하는 기능은 아직 구현하지 않았습니다. 매 변경마다 새 PR을 만들지 않도록 실제 반복 수집→게시 활성화를 보류합니다. append 테스트 파일 작성은 도구 정책 거절로 작성 0·production 변경 0·GitHub 쓰기 0이며 우회하지 않았습니다. 이번에 새로운 valid 게시를 실행하지 않았고 GUI 종료·전환도 하지 않습니다.
 
 | 구분 | 이번에 확인한 상태 | 남은 경계 |
 |---|---|---|
-| P2 · 0.9.5 기록 공유 | 최종 .NET 509/scripts 68 통과, 허브 76개·Voice 10개 메타데이터 draft PR 실제 생성, 허브 재확인 POST 0 | 미merge·현재 앱 반복 경로 미활성; Threads 원본 기록 3개 검증 보류 |
+| P2 · 0.9.5 기록 공유 | 당시 최종 .NET 509/scripts 68 통과, 허브 76개·Voice 10개 메타데이터 draft PR 실제 생성, 허브 재확인 POST 0 | 미merge·현재 앱 반복 경로 미활성; 변경 batch 기존 PR 재사용 미구현·반복 게시 보류; Threads 원본 기록 3개 검증 보류 |
 | P1 · 0.9.4 소스 검증 | .NET 471 PASS/0 FAIL, Python scripts 68 PASS/0 FAIL(22.859초); 경계 검사 17개에 수정 전 반례 2개 포함 | Window.Show 휠 검사 3개 미실행; live UI·0.9.4 운영 활성화·사용자 조작 검증은 아님 |
 | P1 · 현재 수동운영 앱 | 기존 0.9.3 manual-control PID 16092 유지 | 새 소스의 기능을 현재 앱에 적용했다고 표시하지 않음 |
 | P2 · 로컬 수집 연결 | collect-only를 앱 소스에 연결 | 현재 운영 0.9.3에는 미반영; 로컬 수집·중앙 공유·공지 본인 확인은 각각 별도 |

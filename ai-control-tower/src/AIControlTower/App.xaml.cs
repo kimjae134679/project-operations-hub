@@ -3,7 +3,11 @@ namespace AIControlTower;
 public partial class App : Application
 {
     public static bool ShouldActivateExistingInstance(IEnumerable<string> arguments)
-        => !arguments.Contains("--background", StringComparer.Ordinal) && !Services.StartupPolicy.RequestsLocalView(arguments);
+    {
+        var args=arguments.ToArray();
+        if(Services.StartupPolicy.TryCreate(args,out var policy) && policy.NoActivateExisting)return false;
+        return !args.Contains("--background", StringComparer.Ordinal) && !Services.StartupPolicy.RequestsLocalView(args);
+    }
     private Mutex? _instance;
     private EventWaitHandle? _activate;
     private RegisteredWaitHandle? _listener;
