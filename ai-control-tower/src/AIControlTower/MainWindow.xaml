@@ -52,7 +52,7 @@
       </DataTemplate></ListBox.ItemTemplate></ListBox><TextBlock Text="프로젝트 없음" Foreground="{DynamicResource RailMutedBrush}" Margin="14,18" Visibility="{Binding NoProjectSearchResults, Converter={StaticResource BoolVisibility}}"/></Grid>
      </Grid></Border>
      <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" AutomationProperties.Name="프로젝트 목록 너비 조절"/>
-     <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="140"/></Grid.RowDefinitions>
+     <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="140"/></Grid.RowDefinitions>
 
       <Border x:Name="ProjectHeader" Margin="0,0,0,18">
        <Grid>
@@ -68,7 +68,33 @@
         </Border>
        </Grid>
       </Border>
-      <TabControl x:Name="ProjectContentTabs" Grid.Row="1" SelectionChanged="ProjectContentTabs_SelectionChanged">
+          <Border x:Name="ProjectProgressCard" Grid.Row="1" DataContext="{Binding SelectedProjectProgress}" Background="{DynamicResource CardFace}" BorderBrush="{DynamicResource RimBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+           <StackPanel>
+            <WrapPanel><TextBlock Text="{Binding Headline}" FontSize="16" FontWeight="SemiBold" Margin="0,0,12,2"/><TextBlock Text="{Binding CountsText}" VerticalAlignment="Center" FontSize="12"/></WrapPanel>
+            <ProgressBar Value="{Binding ProgressValue}" Minimum="0" Maximum="100" Height="4" Margin="0,4,0,6" Visibility="{Binding IsKnown,Converter={StaticResource BoolVisibility}}"/>
+            <WrapPanel><TextBlock Text="{Binding ScopeText}" FontSize="12" Margin="0,0,12,2"/><TextBlock Text="{Binding ChapterText}" FontSize="12" Margin="0,0,12,2"/><TextBlock Text="{Binding StageText}" FontSize="12"/></WrapPanel>
+            <TextBlock Text="{Binding FreshnessText}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding SourceTimeText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap"/>
+            <Expander Header="진행 근거·실제 인수인계" IsExpanded="False" Margin="0,6,0,0"><ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto"><StackPanel>
+             <TextBlock Text="{Binding OverallText}" FontSize="12" TextWrapping="Wrap"/>
+             <TextBlock Text="{Binding ObservationTimeText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap"/>
+             <TextBlock Text="{Binding WorkerText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,8"/>
+             <StackPanel DataContext="{Binding DataContext,RelativeSource={RelativeSource AncestorType=Window}}">
+              <TextBlock Text="{Binding ProjectHandoffSummary}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding ProjectCommunicationFlowText}" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,6"/>
+              <TextBlock Text="명령 / 이미 전달한 답변" FontSize="11" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding SelectedProjectHandoff.CommandSummary}" FontSize="12" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding SelectedProjectHandoff.ResponseSummary}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,6"/>
+              <TextBlock Text="실제 한 일 / 검증·다음 할 일" FontSize="11" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding SelectedProjectHandoff.RecentLog}" FontSize="12" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding SelectedProjectHandoff.NextCheckpoint}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,8"/>
+              <TextBlock Text="등록 프로젝트 진행 요약 · 전체 완료율 아님" FontSize="11" FontWeight="SemiBold"/>
+              <ItemsControl ItemsSource="{Binding ProjectProgressSummaries}"><ItemsControl.ItemTemplate><DataTemplate><WrapPanel><TextBlock Text="{Binding ProjectName}" FontSize="12" Margin="0,0,12,2"/><TextBlock Text="{Binding Headline}" FontSize="12" Foreground="{DynamicResource MutedBrush}"/></WrapPanel></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+             </StackPanel>
+            </StackPanel></ScrollViewer></Expander>
+           </StackPanel>
+          </Border>
+      <TabControl x:Name="ProjectContentTabs" Grid.Row="2" SelectionChanged="ProjectContentTabs_SelectionChanged">
        <TabItem Header="프로그램·자료" IsSelected="True"><Grid><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="140"/><RowDefinition Height="28"/><RowDefinition x:Name="JobLogRow" Height="Auto" MinHeight="0" MaxHeight="320"/></Grid.RowDefinitions>
       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="240"/><ColumnDefinition Width="28"/><ColumnDefinition x:Name="InspectorColumn" Width="258" MinWidth="220" MaxWidth="500"/></Grid.ColumnDefinitions>
        <Grid>

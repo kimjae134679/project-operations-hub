@@ -17,6 +17,38 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly CatalogDefinition _catalog = ProjectCatalogService.Load();
     private readonly JobManager _jobs;
     private readonly WorkDashboardService _workDashboardService;
+    private readonly ProjectProgressService _projectProgressService = new();
+    private readonly SemaphoreSlim _projectProgressLock = new(1,1);
+    private IReadOnlyList<ProjectProgressSnapshot> _projectProgressSummaries = [];
+    public IReadOnlyList<ProjectProgressSnapshot> ProjectProgressSummaries => _projectProgressSummaries;
+    public ProjectProgressSnapshot SelectedProjectProgress => _projectProgressSummaries.FirstOrDefault(p=>p.ProjectId==SelectedProject?.Id && SameJevWorkspacePath(p.ProjectRoot,SelectedProject.Path))
+        ?? ProjectProgressService.Unknown(SelectedProject,DateTimeOffset.UtcNow);
+    public WorkActivity? SelectedProjectHandoff => WorkDashboard.ProjectRecords.FirstOrDefault();
+    public string ProjectHandoffSummary => SelectedProjectHandoff is {} record
+        ? WorkDashboardService.SafeText($"마지막 작업 기록 · {record.Title} · {record.UpdatedLabel} · 작성자 {record.ActorId} · 현재 실행과 별개")
+        : "연결된 명령·답변 기록 없음 · 다른 대화의 활동은 추정하지 않습니다.";
+    public string ProjectCommunicationFlowText => SelectedProject is {} project && _catalog.Projects.Any(p=>p.Id==project.Id && SameJevWorkspacePath(p.Path,project.Path))
+        ? WorkDashboardService.SafeText($"AI는 본인 기록을 {Path.Combine(project.Path,"_통합소통","보낼자료")}에 남깁니다. 앱은 기존 소통 흐름으로 로컬 수집합니다. 자동 GitHub 공유·다른 AI 확인기록 작성 없음.")
+        : "소통 경로 미확인 · 등록된 프로젝트의 실제 작업 기록만 표시합니다.";
+    private void NotifyProjectProgress()
+    {
+        OnPropertyChanged(nameof(ProjectProgressSummaries));OnPropertyChanged(nameof(SelectedProjectProgress));
+        OnPropertyChanged(nameof(SelectedProjectHandoff));OnPropertyChanged(nameof(ProjectHandoffSummary));OnPropertyChanged(nameof(ProjectCommunicationFlowText));
+    }
+    public async Task RefreshProjectProgressAsync()
+    {
+        if(_disposed || ManualAdmissionClosed || !await _projectProgressLock.WaitAsync(0))return;
+        try
+        {
+            var projects=Projects.Take(200).Select(p=>new ProjectItem{Id=p.Id,Name=p.Name,DisplayName=p.DisplayName,Path=p.Path}).ToArray();
+            var at=DateTimeOffset.UtcNow;
+            var snapshots=await Task.Run(()=>projects.Select(p=>_projectProgressService.Read(p,_catalog,at)).ToArray(),_lifetime.Token);
+            if(_disposed || ManualAdmissionClosed)return;
+            _projectProgressSummaries=snapshots;NotifyProjectProgress();
+        }
+        catch(OperationCanceledException) { }
+        finally {_projectProgressLock.Release();}
+    }
     // Explicit central registry IDs supplied by the user/project notice map, never guessed from names.
     private static readonly IReadOnlyDictionary<string,string> DashboardProjectAliases=new Dictionary<string,string>(StringComparer.Ordinal)
     {
@@ -288,6 +320,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 ?? value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
             WorkDashboard.SetProjectContext(value?.Id??"",value?.DisplayName??"");
+            NotifyProjectProgress();
             ProgramSearch = "";
             OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults));
         }
@@ -330,6 +363,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
         await WorkDashboard.RefreshAsync(_lifetime.Token);
         if(!_disposed) ManagementDashboard.ApplySnapshot(WorkDashboard.Activities.ToArray());
+        await RefreshProjectProgressAsync();
         RefreshToolEvidence();
     }
 
@@ -394,6 +428,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             RefreshToolEvidence();
             _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
                 Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
+            await RefreshProjectProgressAsync();
             Message = $"프로젝트 {ProjectsCount}개 · 프로그램/산출물 {ProgramsCount}개를 확인했습니다.";
             foreach (var warning in results.Warnings) AddLog("탐색 참고 · " + warning);
             if (results.Warnings.Count > 0) Message += $" 참고 {results.Warnings.Count}건은 로그에서 확인하세요.";
@@ -405,6 +440,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public async Task RefreshAsync()
     {
         if(ManualAdmissionClosed)return;
+        await RefreshProjectProgressAsync();
         if(IsManualControl)
         {
             await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);

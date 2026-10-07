@@ -224,7 +224,7 @@ def _task_pairs(pairs):
     return result
 
 
-def _load_task_bytes(path):
+def _read_task_bytes(path):
     path = Path(path)
     for item in (path, *path.parents):
         if item.is_symlink() or (item.exists() and getattr(item.lstat(), "st_file_attributes", 0) & 0x400):
@@ -236,6 +236,11 @@ def _load_task_bytes(path):
     def invalid_constant(_):
         raise ValueError("유효하지 않은 JSON 숫자입니다.")
     value = json.loads(data.decode("utf-8-sig"), object_pairs_hook=_task_pairs, parse_constant=invalid_constant)
+    return value, data
+
+
+def _load_task_bytes(path):
+    value, data = _read_task_bytes(path)
     return validate_task(value), data
 
 
@@ -245,6 +250,20 @@ def load_task(path):
 
 def task_key(value):
     return (value["projectId"], value["actorId"], value["recordId"])
+
+
+def _raw_task_owner(value):
+    """Prove ownership only; this does not accept a task's schema or contents."""
+    if not isinstance(value, dict):
+        return None
+    for field in ("projectId", "recordId"):
+        item = value.get(field)
+        if not isinstance(item, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,119}", item):
+            return None
+    actor = value.get("actorId")
+    if not isinstance(actor, str) or not actor.strip() or len(actor) > 200:
+        return None
+    return task_key(value)
 
 
 def _task_filename(value):
@@ -268,11 +287,14 @@ def _task_history(root, project, actor, record_id):
     if folder.exists():
         for path in folder.glob("task-*-r*.json"):
             path = safe(root, "보낼자료/" + path.name)
-            old = load_task(path)
-            # Preserve unrelated valid legacy filenames. A requested payload key OR its
-            # canonical filename prefix remains in scope, so forged owners cannot hide.
-            if task_key(old) != requested_key and not path.name.startswith(requested_prefix):
+            raw, _ = _read_task_bytes(path)
+            raw_owner = _raw_task_owner(raw)
+            # Isolate only proven other owners, without accepting or repairing their
+            # payloads. Unsafe/ambiguous raw inputs still fail closed. A requested
+            # payload key OR canonical filename prefix always requires full validation.
+            if raw_owner is not None and raw_owner != requested_key and not path.name.startswith(requested_prefix):
                 continue
+            old = validate_task(raw)
             if old["projectId"] != actual_project or task_key(old) != requested_key or path.name != _task_filename(old):
                 raise ValueError("기록 파일명과 실제 작성자·프로젝트·버전이 일치하지 않습니다.")
             previous.append((path, old))

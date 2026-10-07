@@ -208,6 +208,121 @@ class TaskRecoveryTests(unittest.TestCase):
         self.assertEqual(before, path.read_bytes())
         self.assertEqual(1, len(list(folder.glob("*.json"))))
 
+    def test_proven_unrelated_invalid_schema_or_dates_do_not_block_owned_history(self):
+        mine = sample()
+        saved = helper.record_task(self.root, mine)
+        path = self.root / "보낼자료" / "task-unrelated-history-r1.json"
+        changes = [
+            lambda v: v.update(receivedAt="INVALID_TIME"),
+            lambda v: v.update(updatedAt="INVALID_TIME"),
+            lambda v: v.update(status="UNKNOWN_STATUS"),
+            lambda v: v.update(extra="legacy-field"),
+            lambda v: v.pop("request"),
+            lambda v: v.update(sessionId=[]),
+        ]
+        def snapshot(p):
+            stat = p.stat()
+            return p.read_bytes(), stat.st_mtime_ns, getattr(stat, "st_file_attributes", 0)
+        for change in changes:
+            with self.subTest(change=changes.index(change)):
+                unrelated = copy.deepcopy(mine)
+                unrelated.update(actorId="another-owner", recordId="another-record")
+                change(unrelated)
+                path.write_text(json.dumps(unrelated), encoding="utf-8")
+                before = snapshot(path), snapshot(Path(saved["path"]))
+                try:
+                    latest = helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+                    retry = helper.record_task(self.root, mine)
+                except ValueError as error:
+                    self.fail("Proven unrelated malformed history blocked the owned record: " + str(error))
+                self.assertEqual("found", latest["status"])
+                self.assertEqual("already_stored", retry["status"])
+                self.assertEqual(before, (snapshot(path), snapshot(Path(saved["path"]))))
+                with self.assertRaises(ValueError):
+                    helper.latest_task(self.root, project="Control-Tower", actor="another-owner", record_id="another-record")
+
+    def test_requested_prefix_or_payload_still_requires_complete_valid_record(self):
+        mine = sample()
+        folder = self.root / "보낼자료"
+        folder.mkdir()
+        for matching_filename in (True, False):
+            for invalid_field in ("receivedAt", "sessionId", "revision"):
+                with self.subTest(filename=matching_filename, field=invalid_field):
+                    bad = copy.deepcopy(mine)
+                    filename = helper._task_filename(mine) if matching_filename else "task-wrong-owner-filename-r1.json"
+                    if matching_filename:
+                        bad.update(actorId="another-owner", recordId="another-record")
+                    bad[invalid_field] = "INVALID_TIME" if invalid_field == "receivedAt" else []
+                    path = folder / filename
+                    path.write_text(json.dumps(bad), encoding="utf-8")
+                    before = path.read_bytes()
+                    try:
+                        with self.assertRaises(ValueError):
+                            helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+                        with self.assertRaises(ValueError):
+                            helper.record_task(self.root, mine)
+                        self.assertEqual(before, path.read_bytes())
+                    finally:
+                        path.unlink()
+
+    def test_unestablished_or_ambiguous_raw_owner_stays_fail_closed(self):
+        folder = self.root / "보낼자료"
+        folder.mkdir()
+        for invalid_owner in ({"actorId": []}, {"projectId": "../unsafe"}, {"recordId": ""}):
+            bad = {**sample(), **invalid_owner, "receivedAt": "INVALID_TIME"}
+            path = folder / "task-unknown-owner-r1.json"
+            path.write_text(json.dumps(bad), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+        unrelated = {**sample(), "actorId": "another-owner", "recordId": "another-record"}
+        text = json.dumps(unrelated).replace('"actorId": "another-owner"', '"actorId": "/root", "actorId": "another-owner"')
+        path.write_text(text, encoding="utf-8")
+        with self.assertRaises(ValueError):
+            helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+
+    def test_unrelated_raw_unreadable_or_oversized_file_cannot_be_skipped(self):
+        folder = self.root / "보낼자료"
+        folder.mkdir()
+        path = folder / "task-unknown-owner-r1.json"
+        for raw in (b"{not-json", b" " * (helper.MAX_RECORD_BYTES + 1)):
+            path.write_bytes(raw)
+            with self.assertRaises(ValueError):
+                helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+        path.write_text(json.dumps({**sample(), "actorId": "another-owner"}), encoding="utf-8")
+        with patch.object(Path, "open", side_effect=PermissionError("unreadable synthetic input")):
+            with self.assertRaises(PermissionError):
+                helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+
+    def test_unrelated_reparse_file_remains_unsafe_before_owner_filter(self):
+        folder = self.root / "보낼자료"
+        folder.mkdir()
+        path = folder / "task-other-owner-r1.json"
+        path.write_text(json.dumps({**sample(), "actorId": "another-owner"}), encoding="utf-8")
+        original = Path.is_symlink
+        with patch.object(Path, "is_symlink", autospec=True, side_effect=lambda p: p == path or original(p)):
+            with self.assertRaises(ValueError):
+                helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+            with self.assertRaises(ValueError):
+                helper._read_task_bytes(path)
+
+    def test_proven_other_key_is_scoped_by_project_actor_and_record_together(self):
+        folder = self.root / "보낼자료"
+        folder.mkdir()
+        path = folder / "task-other-key-r1.json"
+        for identity in ({"actorId": "another-owner"}, {"recordId": "another-record"}, {"projectId": "Threads"}):
+            path.write_text(json.dumps({**sample(), **identity, "receivedAt": "INVALID_TIME"}), encoding="utf-8")
+            found = helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+            self.assertEqual("not_found", found["status"])
+
+    def test_nonfinite_raw_json_cannot_establish_an_unrelated_record(self):
+        folder = self.root / "보낼자료"
+        folder.mkdir()
+        path = folder / "task-other-owner-r1.json"
+        value = {**sample(), "actorId": "another-owner", "revision": float("nan")}
+        path.write_text(json.dumps(value), encoding="utf-8")
+        with self.assertRaises(ValueError):
+            helper.latest_task(self.root, project="Control-Tower", actor="/root", record_id="REQ-1")
+
 if __name__ == "__main__":
     unittest.main()
 
