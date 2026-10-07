@@ -12,6 +12,7 @@ focused RED 7 FAIL/18 PASS 및 invalid-registration side effect RED 1 FAIL 후 p
 
 - 검증 소스 e9d5f45857abe3c87388b350f4a27dd6af088832의 별도 framework-dependent 전용 CLI를 빌드했습니다. 정확 exe의 창 없는 fixture는 native0/Windows0/settings·MainVMfalse/downstream·sync·stop0입니다. 기존 운영 GUI의 app source c4f9669와 구분합니다.
 - 기존 0.9.8 소유 앱을 지원된 headless IPC로 정상 종료한 뒤 등록된 허브 metadata 경로만 실행했습니다. native0, metadata **41개 추가**로 [draft PR #33](https://github.com/kimjae134679/project-operations-hub/pull/33)을 만들었습니다. head `9e56e428c1fe3c35a6a1608b37e3ce6a80a27351`, 변경 41 ADDED/삭제0, main 미병합입니다.
+- 기존 app 생성 metadata draft #27/#28/#29/#30/#32는 각각 journal/현재 head를 대조하고 모든 경로의 blob SHA가 #33 head에 동일함을 검증한 뒤 superseded로 닫았습니다. 브랜치·내용 삭제0·merge0이며 현재 허브 metadata open PR은 #33 하나입니다. 이는 자동 append 구현이 아니라 이번 명시 한정 수동 정리입니다.
 - 동일 자료 재실행도 native0·같은 batch e1cc23cf·같은 PR #33을 반환했습니다. 실제 API POST 횟수는 계측하지 않았으므로 POST0으로 주장하지 않습니다. 다른 프로젝트 게시·AI 호출·공지 확인 대필·자동 merge0입니다.
 - fixed guard로 기존 정확 0.9.8(c4f9669) 앱을 복귀했습니다. 새 PID11612/birth18:36:25.942125KST, tray/PC true를 확인했고 원격5996·Bridge5140은 동일 생존을 유지했습니다. GUI에는 이번 publisher 소스를 교체하지 않았으며 이는 일회 전용 CLI 공유입니다.
 - `CentralShared=false/CreatesAcknowledgement=false`입니다. 공개 상태 metadata 성공을 중앙 원문 clone 복구나 보호 Bridge 운영 설치로 바꾸지 않습니다. 최신 후속 로컬 checkpoint는 다음 공유 대기입니다. 본문·개인 경로·원문 명령/답변·actor/session은 업로드하지 않습니다.
