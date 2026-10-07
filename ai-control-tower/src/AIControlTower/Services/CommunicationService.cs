@@ -61,6 +61,156 @@ public sealed class CommunicationService
         finally { _syncLock.Release(); }
     }
 
+    /// <summary>
+    /// Read existing project records without delivery, acknowledgement, Git or project writes.
+    /// Only the explicitly owned local collection destination may be created; this is not central sharing.
+    /// </summary>
+    public async Task<CommunicationCollectionResult> CollectOnlyAsync(string boardRoot,
+        IEnumerable<CommunicationTarget> targets, string ownedInboxRoot, CancellationToken ct = default)
+    {
+        await _syncLock.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            var records = new List<CommunicationCollectedRecord>();
+            var errors = new List<CommunicationIssue>();
+            string sink;
+            Board board;
+            CommunicationTarget[] registered;
+            try
+            {
+                ct.ThrowIfCancellationRequested();
+                var root = ExistingRoot(boardRoot);
+                board = await LoadBoard(root, ct).ConfigureAwait(false);
+                sink = CollectionSink(ownedInboxRoot);
+                registered = targets.ToArray();
+                var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var roots = new HashSet<string>(PathComparer);
+                if (Overlaps(sink, root)) throw new InvalidDataException("Collection destination overlaps board.");
+                foreach (var target in registered)
+                {
+                    ValidateId(target.ProjectId);
+                    var project = ExistingRoot(target.RootPath);
+                    if (!board.Projects.Contains(target.ProjectId) || !ids.Add(target.ProjectId) || !roots.Add(CanonicalDirectory(project)) || Overlaps(sink, project))
+                        throw new InvalidDataException("Collection registration is ambiguous.");
+                }
+            }
+            catch (Exception ex) when (IsFileError(ex))
+            {
+                Hold(errors, null, "collection_blocked");
+                return new(records, errors, DateTimeOffset.UtcNow);
+            }
+
+            foreach (var target in registered)
+            {
+                ct.ThrowIfCancellationRequested();
+                var project = ExistingRoot(target.RootPath);
+                var seen = 0;
+                foreach (var (kind, relativeFolder) in new[] {
+                    ("outbox", "_통합소통/보낼자료"),
+                    ("notice-receipt", "_통합소통/확인기록"),
+                    ("received-notice", "_통합소통/받은공지") })
+                {
+                    string folder;
+                    try { folder = Inside(project, relativeFolder); }
+                    catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "path_blocked"); continue; }
+                    foreach (var path in EnumerateSafe(folder, errors, target.ProjectId))
+                    {
+                        if (++seen > MaximumFilesPerFolder) { Hold(errors, target.ProjectId, "file_limit"); break; }
+                        var extension = Path.GetExtension(path).ToLowerInvariant();
+                        if (kind == "outbox" ? extension is not (".md" or ".txt" or ".json") : kind == "notice-receipt" ? extension != ".json" : extension != ".md") continue;
+                        try
+                        {
+                            var sourceName = Path.GetRelativePath(project, path).Replace('\\', '/');
+                            if (HasSecret(sourceName)) { Hold(errors, target.ProjectId, "secret_held"); continue; }
+                            var body = await ReadSettled(path, ct).ConfigureAwait(false);
+                            if (HasSecret(body)) { Hold(errors, target.ProjectId, "secret_held"); continue; }
+                            if (extension == ".json") { using var json = JsonDocument.Parse(body); }
+                            if (kind == "notice-receipt")
+                            {
+                                var receipt = ParseReceipt(body, board);
+                                if (receipt.ProjectId != target.ProjectId || Path.GetFileName(path) != ReceiptFileName(receipt.ActorId, receipt.SessionId))
+                                    throw new InvalidDataException("Receipt owner mismatch.");
+                            }
+                            if (kind == "received-notice")
+                            {
+                                var noticeId = Path.GetFileNameWithoutExtension(path);
+                                if (!board.Notices.TryGetValue(noticeId, out var notice) || !Applicable(notice, target.ProjectId) ||
+                                    ContentHash(body) != notice.Notice.ContentSha256 || Path.GetDirectoryName(path) != folder)
+                                    throw new InvalidDataException("Delivered notice is not current.");
+                            }
+                            var record = await StoreCollected(sink, target.ProjectId, kind, sourceName,
+                                Path.GetFullPath(path), body, extension, ct).ConfigureAwait(false);
+                            records.Add(record);
+                        }
+                        catch (Exception ex) when (IsFileError(ex)) { Hold(errors, target.ProjectId, "collection_retry"); }
+                    }
+                }
+            }
+            return new(records, errors, DateTimeOffset.UtcNow);
+        }
+        finally { _syncLock.Release(); }
+    }
+
+    private const string CollectionBase = @"D:\A_KJ\AI\ControlTowerData\collected-communication";
+    private static string CanonicalDirectory(string path) => Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+    private static bool IsAtOrInside(string path, string root) => PathComparer.Equals(path, root) || path.StartsWith(root + Path.DirectorySeparatorChar,
+        OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+    private static bool Overlaps(string left, string right) => IsAtOrInside(CanonicalDirectory(left), CanonicalDirectory(right)) || IsAtOrInside(CanonicalDirectory(right), CanonicalDirectory(left));
+
+    private static string CollectionSink(string value)
+    {
+        if (!OperatingSystem.IsWindows() || !Path.IsPathFullyQualified(value) || value.StartsWith(@"\\", StringComparison.Ordinal))
+            throw new InvalidDataException("Explicit owned D destination required.");
+        var full = CanonicalDirectory(value);
+        if (!IsAtOrInside(full, CanonicalDirectory(CollectionBase))) throw new InvalidDataException("Collection destination outside owned boundary.");
+        RejectLinks(full);
+        for (var current = full; !string.IsNullOrEmpty(current); current = Path.GetDirectoryName(current))
+        {
+            var git = Path.Combine(current, ".git");
+            RejectLinks(git);
+            if (File.Exists(git) || Directory.Exists(git)) throw new InvalidDataException("Collection destination cannot be a Git worktree.");
+        }
+        return full;
+    }
+
+    private static async Task<CommunicationCollectedRecord> StoreCollected(string sink, string projectId, string kind,
+        string sourceName, string sourcePath, string body, string extension, CancellationToken ct)
+    {
+        CollectionSink(sink);
+        var hash = ContentHash(body);
+        var relativeFolder = projectId + "/" + hash;
+        var relativeContent = relativeFolder + "/content" + extension;
+        var storedPath = Inside(sink, relativeContent);
+        CollectionSink(Path.GetDirectoryName(storedPath)!);
+        var provenance = JsonSerializer.Serialize(new { projectId, kind, sourceName, sourcePath, contentSha256 = hash, storedPath }, JsonOptions);
+        var metadata = relativeFolder + "/source-" + ContentHash(provenance) + ".json";
+        var metadataPath = Inside(sink, metadata);
+        if (File.Exists(storedPath))
+        {
+            if (await ReadText(storedPath, ct).ConfigureAwait(false) != body) throw new InvalidDataException("Existing collected content differs.");
+        }
+        else await AtomicWrite(sink, relativeContent, StrictUtf8.GetBytes(body), false, ct).ConfigureAwait(false);
+        var collectedAt = DateTimeOffset.UtcNow;
+        if (File.Exists(metadataPath))
+        {
+            using var existing = JsonDocument.Parse(await ReadText(metadataPath, ct).ConfigureAwait(false));
+            var value = existing.RootElement;
+            if (value.GetProperty("schemaVersion").GetInt32() != 1 || value.GetProperty("projectId").GetString() != projectId ||
+                value.GetProperty("kind").GetString() != kind || value.GetProperty("sourceName").GetString() != sourceName ||
+                value.GetProperty("sourcePath").GetString() != sourcePath || value.GetProperty("contentSha256").GetString() != hash ||
+                value.GetProperty("storedPath").GetString() != storedPath) throw new InvalidDataException("Existing collection provenance differs.");
+            collectedAt = ParseTime(value.GetProperty("collectedAt").GetString());
+        }
+        else
+        {
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(new { schemaVersion = 1, projectId, kind, sourceName, sourcePath,
+                contentSha256 = hash, storedPath, collectedAt }, JsonOptions);
+            if (bytes.Length > MaximumFileBytes) throw new InvalidDataException("Collection provenance too large.");
+            await AtomicWrite(sink, metadata, bytes, false, ct).ConfigureAwait(false);
+        }
+        return new(projectId, kind, sourceName, sourcePath, hash, storedPath, body, collectedAt);
+    }
+
     public static string NormalizeText(byte[] data)
     {
         var text = StrictUtf8.GetString(data);
@@ -601,4 +751,14 @@ public sealed class CommunicationService
         }
         finally { if (File.Exists(temp)) File.Delete(temp); }
     }
+}
+
+/// <summary>Local copies of pre-existing records; never central publication or generated acknowledgement.</summary>
+public sealed record CommunicationCollectedRecord(string ProjectId, string Kind, string SourceName, string SourcePath,
+    string ContentSha256, string StoredPath, string Body, DateTimeOffset CollectedAt);
+public sealed record CommunicationCollectionResult(IReadOnlyList<CommunicationCollectedRecord> Records,
+    IReadOnlyList<CommunicationIssue> Errors, DateTimeOffset CollectedAt)
+{
+    public bool CentralShared => false;
+    public bool CreatesAcknowledgement => false;
 }
