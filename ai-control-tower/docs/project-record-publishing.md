@@ -2,16 +2,36 @@
 
 **현재 상태: 0.9.6 스테이징 완료·운영 미적용(activated=false).** 아래 0.9.5 일회 headless 공유 이력은 당시 실제 확인입니다. 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish/스테이징은 완료했지만 운영 미적용입니다(source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false). 현재 0.9.3 PID 16092의 PC/tray true와 기존 원격을 유지합니다. 이전 0.9.4 스테이징은 당시 이력입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
 
-## 실제 확인 · 2026-10-07
+## 최신 GitHub 정리 · 사용자 명시 한정 one-shot
+
+정확 0.9.6 exe로 사용자 명시 “일단 GitHub 자체 다 업로드하고 정리”의 한정 게시를 실행했습니다. 새 코드 변경 없이 이전 .NET 529/Python 68 검증과 source `84840a1` 미활성 스테이징을 유지합니다. 일회 게시와 GUI/자동 반복 활성화는 별개입니다.
+
+| 대상 | 최신 실제 상태 | 보존·미완료 경계 |
+|---|---|---|
+| 허브 | [PR #26](https://github.com/kimjae134679/project-operations-hub/pull/26), 구조 메타데이터 84개, open/draft | old #25의 76개 경로/blob SHA 모두 그대로+새 8개, added only·삭제 0·main 불변 |
+| old 허브 #25 | 본인 draft에 superseded 설명 후 closed/unmerged | branch 삭제 0, 과거 성공 증거 보존 |
+| 허브 exact replay | 같은 #26·같은 batch/head | 이번 API count 미계측; POST 0으로 주장하지 않음 |
+| Voice exact replay | 기존 [PR #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2), 같은 head·10개 파일 | 기존 dirty 1·제작 보존; 새 제작/원본 소스 commit 없음 |
+| Threads exact call | exit 1·held, failure stage record_validation | 기존 원본 3개 검증 오류 동일, 업로드 API 전에 보류; dirty 11+3 보존·원본 소스 commit/push 0 |
+| PhoneLOL | D 원본/mailbox ID·private repository ID 1378550871·main/push 일치, task JSON 0 | registry 변경 명령 CreateProcess 정책 거절: 실행 0·파일 쓰기 0·재시도/우회 0, 미등록·게시 0 |
+| origin 미확인 3개 | 등록 안 함 | 폴더명/유사 이름으로 추측 등록 0 |
+
+허브 #26 head는 `5316147acc0402c27d69f29d3b928ee3ffe28925`, batch는 `7a28924188791a414f906e1fa17589b7f19a39d80a77afc8a169f2ddf16dbe03`입니다. main의 확인 접두 `629afc…`는 불변입니다. Voice head는 기존 `e8b11994c53610add9bf2932ebbc66ac8caeb7d9`입니다.
+
+[소스 PR #24](https://github.com/kimjae134679/project-operations-hub/pull/24)의 정리 전 remote HEAD는 `10039da`이며 제목은 “통합관제탑0.9.6코드와운영경계정리”입니다. GitHub 코드/문서 업로드는 main merge가 아닙니다. 모든 원본 프로젝트 소스를 commit/push한 것으로 확대하지 않습니다. 새 공지 ACK·모델·GUI·원격 config/clone·예약/review 변경은 0이고 반복 publisher active=false를 유지합니다. 변경 batch의 기존 PR 재사용은 여전히 미구현이며 이번 수동 supersede 정리를 해당 기능의 구현으로 표시하지 않습니다.
+
+아래는 이전 #25/509검사 등의 당시 이력입니다. 당시 GET 6회/POST 0회는 그때의 계측 근거이며 최신 replay의 API count로 재사용하지 않습니다.
+
+## 이전 일회 게시 확인 · 2026-10-07
 
 | 대상 | 실제 결과 | 남은 경계 |
 |---|---|---|
-| 허브 | 124건 로컬 수집·수집 오류 0, 구조 메타데이터 76개로 [draft PR #25](https://github.com/kimjae134679/project-operations-hub/pull/25) 생성 | draft/open/unmerged, main 변경 없음 |
+| 허브 | 124건 로컬 수집·수집 오류 0, 구조 메타데이터 76개로 [draft PR #25](https://github.com/kimjae134679/project-operations-hub/pull/25) 생성 | 당시 draft/open/unmerged, main 변경 없음; 최신 closed 상태는 위 스냅샷 |
 | 허브 동일 실행 재확인 | GET 6회·POST 0회, 같은 PR 유지 | 업무 재실행·추가 업로드 아님 |
 | Voice | 메타데이터 10개로 [draft PR #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2) 생성 | draft/open/unmerged; 기존 제작 작업 생존·무변경, 새 업무 실행 0 |
 | Threads | 13건 수집·수집 오류 0, task JSON 3개 모두 검증 보류 | API 쓰기 전 중단; 원본 3개 hash 불변 |
 
-확인한 PR head: 허브 `bdd7adcedae0f42b0d77c30a39a9d1ee5766d373`, Voice `e8b11994c53610add9bf2932ebbc66ac8caeb7d9`. 모델 호출 0, 자동 merge 0입니다. 실제 readonly GitHub 조회에서 허브 identity·base main을 대조했으며 인증/계정 권한을 바꾸지 않았습니다.
+당시 확인한 PR head: 허브 `bdd7adcedae0f42b0d77c30a39a9d1ee5766d373`, Voice `e8b11994c53610add9bf2932ebbc66ac8caeb7d9`. 모델 호출 0, 자동 merge 0입니다. 실제 readonly GitHub 조회에서 허브 identity·base main을 대조했으며 인증/계정 권한을 바꾸지 않았습니다.
 
 0.9.5 당시 단계 표시 수정 후 부모 최종 fresh 코드 검사: .NET **509 PASS/0 FAIL**(`record-publishing-full-final.trx`), scripts **68 PASS/0 FAIL**, 17.897초(`record-publishing-full-green.log`). 최초 병렬 Git fixture 실패는 LocalExecutionPolicyTests를 비병렬 collection으로 옮긴 뒤 전체 재검사했습니다. 실제 PR 파일도 각각 메타데이터 76/10개 ADDED·삭제 0임을 확인했습니다. 이 검사는 운영 앱의 새 반복 경로 활성화를 뜻하지 않습니다.
 
@@ -30,7 +50,7 @@ Threads 2개는 completed에 남은 필수 작업/막힘이 함께 있었고 1�
 
 동일 batch 재확인에서 기존 성공/같은 PR을 유지한 것과 **변경 batch가 기존 PR을 재사용하는 것**은 다릅니다. 후자는 미구현입니다. 현재 branch 이름은 batchHash별로 나뉘므로 매 변경마다 새 PR을 만드는 반복 게시를 실제 활성화하지 않습니다. 기존 성공 증거를 변경 batch/상시 운영 성공으로 확대하지 않습니다.
 
-append 테스트 파일 작성은 도구 정책 거절로 **작성 0·production 변경 0·GitHub 쓰기 0**, 우회 0입니다. 이번에 새로운 valid 게시·메타데이터 GitHub 쓰기·모델 호출은 0이며 등록 publisher active=false를 유지합니다. 현재 GUI 종료·전환, 보호된 원격 config/clone locks 우회는 하지 않으며 예약 PAUSED·review disabled/unmanaged를 유지합니다.
+append 테스트 파일 작성은 도구 정책 거절로 **작성 0·production 변경 0·GitHub 쓰기 0**, 우회 0입니다. 당시 스테이징 점검의 새로운 valid 게시·메타데이터 GitHub 쓰기·모델 호출은 0이었습니다. 이후 사용자 명시 한정 게시는 위 최신 스냅샷으로 구분하며 등록 publisher active=false는 유지합니다. 현재 GUI 종료·전환, 보호된 원격 config/clone locks 우회는 하지 않으며 예약 PAUSED·review disabled/unmanaged를 유지합니다.
 
 ## 무엇을 공유하나요
 

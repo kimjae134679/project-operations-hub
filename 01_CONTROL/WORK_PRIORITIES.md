@@ -10,13 +10,23 @@
 
 ## 최신 체크포인트 · 실제 검증과 아직 남은 일
 
+### 최신 GitHub 업로드 정리 · 사용자 명시 일회 실행
+
+사용자의 “일단 GitHub 자체 다 업로드하고 정리” 지시에 따라 정확 0.9.6 exe의 한정 one-shot을 확인했습니다. 허브 최신 구조 메타데이터 84개는 [draft PR #26](https://github.com/kimjae134679/project-operations-hub/pull/26)에 올라갔습니다. 이전 #25의 76개 경로/blob SHA를 모두 그대로 포함하고 새 8개만 추가했으며 삭제 0·main 불변입니다. #25는 superseded 설명 후 closed/unmerged이고 branch는 삭제하지 않았습니다. 최신 #26은 open/draft입니다.
+
+허브 exact replay는 같은 #26/batch/head를 유지했지만 이번 API count는 직접 계측하지 않았으므로 POST 0으로 표시하지 않습니다. Voice exact replay는 기존 [PR #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2)의 head·10개 파일 그대로입니다. Threads는 exit 1·held(record_validation), 이전과 같은 원본 3개 검증 오류로 업로드 API 전에 보류했습니다. dirty 11+3과 원본을 보존했고 원본 소스 commit/push는 0입니다. Voice 기존 dirty 1도 보존했습니다.
+
+PhoneLOL은 D 원본/mailbox ID·private origin identity·main/push 일치를 확인했지만 task JSON 0입니다. registry 등록 변경 명령은 CreateProcess 도구 정책 거절로 실행 0·파일 쓰기 0이고 재시도/다른 도구 우회 0입니다. 등록되지 않았으며 게시 0입니다. origin 미확인 3개는 추측 등록하지 않았습니다. 모든 프로젝트 소스 업로드 완료나 모든 AI 공지 확인으로 표시하지 않습니다.
+
+소스/문서 [PR #24](https://github.com/kimjae134679/project-operations-hub/pull/24)의 정리 전 remote HEAD는 `10039da`, 제목은 “통합관제탑0.9.6코드와운영경계정리”입니다. GitHub에 코드·문서가 올라간 것과 main merge는 별개입니다. 새 코드 변경·모델·GUI·공지 ACK·원격 config/clone·예약/review 변경은 0이고, 0.9.6 source `84840a1` 스테이징 미활성·운영 0.9.3 보존·반복 publisher 비활성은 그대로입니다. 이번 일회 게시를 자동 반복 활성화로 확대하지 않습니다. 아래 #25·검사·제작·P3 기록은 과거 증거로 보존합니다.
+
 ### 프로젝트별 기록 공유 · 일회 게시 이력과 최신 스테이징
 
 **구현·코드 검사·일회 headless 실행 확인 / 운영 앱 반복 활성화 미완료:** GPT 없이 명시 등록된 프로젝트 GitHub의 별도 branch에 구조 메타데이터만 올려 draft PR을 만드는 경로를 구현했습니다. project ID·불투명 기록 식별 hash·revision·통제된 상태/시각·검증 결과별 개수만 공유하며 명령·답변·제목·설명 등 자유 본문은 앱/로컬에 남깁니다. 로컬 수집, branch 업로드, PR 생성, merge는 별도이고 main 직접 반영·자동 merge는 하지 않습니다. 응답이 불명확하면 원격 상태를 읽어 대조하며 중복 업로드/PR을 무작정 재시도하지 않습니다.
 
 실제 origin·repository ID·base·허용 prefix·Enabled를 고정 D registry에 명시하고 일치하지 않으면 보류합니다. 기존 dirty/index/clone/lock은 그대로 보존합니다. 이 개발은 기존 중앙 clone 막힘의 복구 완료나 모든 담당자의 공지 확인을 뜻하지 않습니다. N-0007의 본인 작업 기록 의무는 유지하며 다른 담당자의 실제 작성·읽음/적용은 미확인입니다. [운영 경계와 등록 계약](../ai-control-tower/docs/project-record-publishing.md).
 
-고정 D registry에는 허브·Threads·Voice 3개가 Enabled로 등록됐습니다. 허브는 실제 124건 수집·76건 메타데이터 export 후 [draft PR #25](https://github.com/kimjae134679/project-operations-hub/pull/25)를 만들었고 동일 실행 재확인에서도 GET 6회/POST 0회·같은 PR을 유지했습니다. Voice는 메타데이터 10개를 [draft PR #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2)로 공유했습니다. 두 PR 모두 draft/open/unmerged, main 변경·모델 호출 0이며 기존 오디오북 제작을 새로 시작하거나 중지하지 않았습니다.
+고정 D registry에는 허브·Threads·Voice 3개가 Enabled로 등록됐습니다. 다음은 이전 일회 게시 이력입니다. 허브는 실제 124건 수집·76건 메타데이터 export 후 [draft PR #25](https://github.com/kimjae134679/project-operations-hub/pull/25)를 만들었고 동일 실행 재확인에서도 GET 6회/POST 0회·같은 PR을 유지했습니다. Voice는 메타데이터 10개를 [draft PR #2](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/pull/2)로 공유했습니다. 당시 두 PR 모두 draft/open/unmerged였으며(#25의 최신 closed 상태는 위 스냅샷 참조), main 변경·모델 호출 0이고 기존 오디오북 제작을 새로 시작하거나 중지하지 않았습니다.
 
 Threads는 실제 13건 수집·수집 오류 0이지만 task_exchange 3개 모두 형식/상태 검증에서 보류됐습니다. 2개는 completed와 남은 필수 작업/막힘이 함께 있었고 1개는 필수 필드 5개 누락·지원하지 않는 상태였습니다. API 쓰기 전에 중단했고 원본 3개 hash를 보존했습니다. parser 완화·가짜 완료·원본 자동 수정은 하지 않습니다.
 
@@ -26,11 +36,12 @@ Threads는 실제 13건 수집·수집 오류 0이지만 task_exchange 3개 모�
 
 **0.9.6 최신 소스 검사 / 스테이징 완료·운영 미적용:** 안전한 2인자 manual 실행/launcher의 소스 결합 focused 검사 20 PASS/0 FAIL을 확인했습니다(`manual-source-binding-green.trx`). CheckOnly는 descriptor·실제 ProductVersion/commit·SHA-256·UTC 24시간 유효성을 확인하는 경로이며 start/probe를 실행하지 않습니다. SHA 검사는 .NET을 사용해 PowerShell 5.1의 Get-FileHash cmdlet 부재에 의존하지 않습니다. 부모 fresh 전체 .NET 검사 529 PASS/0 FAIL(8초, `safe-continuation-full-green.trx`)을 확인했습니다. Window.Show 기반 휠 검사 3개는 제외·미실행입니다. 최신 Python 재검사도 68 PASS/0 FAIL(16.781초, `safe-continuation-full-green.log`)이며 0.9.6 publish/스테이징은 source `84840a1`로 완료했고 activated=false·운영 미적용입니다. 정확 exe의 창 없는 fixture는 exit 0, 미등록 게시 인자 거절은 exit 2, CheckOnly는 exit 0·기동/instance 조회 0을 확인했습니다. 실제 launcher NonCheck·GUI 활성화는 0이며 START_LATEST_VIEW.cmd의 0.9.3 대상은 그대로입니다. 기존 CS8602/xUnit 경고는 별도로 남기며, 경고 없음·live UI 검증 완료로 표시하지 않습니다.
 
-**반복 게시 보류:** 동일 batch의 기존 성공/같은 PR 유지 증거는 있지만, 변경된 batch가 기존 PR을 재사용하는 기능은 아직 구현하지 않았습니다. 매 변경마다 새 PR을 만들지 않도록 실제 반복 수집→게시 활성화를 보류합니다. append 테스트 파일 작성은 도구 정책 거절로 작성 0·production 변경 0·GitHub 쓰기 0이며 우회하지 않았습니다. 이번에 새로운 valid 게시·메타데이터 GitHub 쓰기·모델 호출은 0이며 등록 publisher active=false를 유지합니다. GUI 종료·전환도 하지 않습니다.
+**반복 게시 보류:** 동일 batch의 기존 성공/같은 PR 유지 증거는 있지만, 변경된 batch가 기존 PR을 재사용하는 기능은 아직 구현하지 않았습니다. 매 변경마다 새 PR을 만들지 않도록 실제 반복 수집→게시 활성화를 보류합니다. append 테스트 파일 작성은 도구 정책 거절로 작성 0·production 변경 0·GitHub 쓰기 0이며 우회하지 않았습니다. 그 스테이징 점검 시점의 새로운 valid 게시·메타데이터 GitHub 쓰기·모델 호출은 0이었습니다. 이후 사용자 명시 한정 일회 게시 결과는 위 최신 스냅샷과 구분하며, 등록 publisher active=false와 자동 반복 보류를 유지합니다. GUI 종료·전환도 하지 않습니다.
 
 | 구분 | 이번에 확인한 상태 | 남은 경계 |
 |---|---|---|
-| P2 · 0.9.5 기록 공유 | 당시 최종 .NET 509/scripts 68 통과, 허브 76개·Voice 10개 메타데이터 draft PR 실제 생성, 허브 재확인 POST 0 | 미merge·현재 앱 반복 경로 미활성; 변경 batch 기존 PR 재사용 미구현·반복 게시 보류; Threads 원본 기록 3개 검증 보류 |
+| P2 · 최신 일회 기록 공유 | 허브 #26 메타데이터 84개·#25의 기존 76개 불변+새 8개, Voice #2 기존 10개 유지 | main 미merge·반복 비활성; Threads 검증 보류, PhoneLOL 미등록/게시 0 |
+| P2 · 0.9.5 기록 공유 이력 | 당시 최종 .NET 509/scripts 68 통과, 허브 76개·Voice 10개 메타데이터 draft PR 실제 생성, 허브 재확인 POST 0 | 미merge·현재 앱 반복 경로 미활성; 변경 batch 기존 PR 재사용 미구현·반복 게시 보류; Threads 원본 기록 3개 검증 보류 |
 | P1 · 0.9.4 소스 검증 | .NET 471 PASS/0 FAIL, Python scripts 68 PASS/0 FAIL(22.859초); 경계 검사 17개에 수정 전 반례 2개 포함 | Window.Show 휠 검사 3개 미실행; live UI·0.9.4 운영 활성화·사용자 조작 검증은 아님 |
 | P1 · 현재 수동운영 앱 | 기존 0.9.3 manual-control PID 16092 유지 | 새 소스의 기능을 현재 앱에 적용했다고 표시하지 않음 |
 | P2 · 로컬 수집 연결 | collect-only를 앱 소스에 연결 | 현재 운영 0.9.3에는 미반영; 로컬 수집·중앙 공유·공지 본인 확인은 각각 별도 |
@@ -41,7 +52,7 @@ Threads는 실제 13건 수집·수집 오류 0이지만 task_exchange 3개 모�
 | P4 · VoiceAudiobook | 18/128 ready, 기존 제작 진행 중; ‘윽’ regex 격리 검사 10 PASS | live 미적용, 중복 생성하지 않음; 청취·품질 및 전체 제작 완료 미확인 |
 | P4 · Threads | D 평가 67건 실제 보존 복원·conflict 0 | C 원본 hash 불변·제작 버전/점수 그대로 보존·private backup 검증; 외부 게시/GUI 사용 완료는 아님 |
 
-최신 코드 검증 근거: `record-publishing-full-final.trx`, Python `record-publishing-full-green.log`. 앞선 0.9.5 검사는 `record-publishing-full-green2.trx`, 0.9.4 검사는 `foundation-continuity-full-green2.trx`, Python `full-green.log`에 보존합니다. 기록 복구 실제 검증: `checks/continuity-record-recovery-actual-green.json`. 과거 검사 수는 당시 이력으로 보존합니다.
+최신 코드 검증 근거는 `safe-continuation-full-green.trx`(.NET 529), `safe-continuation-full-green.log`(Python 68)이며 이번 GitHub 정리는 새 코드 변경 0으로 이전 검사를 유지합니다. 0.9.5 당시 근거는 `record-publishing-full-final.trx`, Python `record-publishing-full-green.log`에 보존합니다. 앞선 0.9.5 검사는 `record-publishing-full-green2.trx`, 0.9.4 검사는 `foundation-continuity-full-green2.trx`, Python `full-green.log`에 보존합니다. 기록 복구 실제 검증: `checks/continuity-record-recovery-actual-green.json`. 과거 검사 수는 당시 이력으로 보존합니다.
 
 P3 fake 검사 18개(Node 14 + Python 4)와 위 실제 실행은 별도 증거입니다. 실제 typed receipt는 process exit 0·terminal/report 관측·fresh artifact 검증 성공입니다. 계획 hash는 `6682eaa97ef7c49984a799a086c2a1610511e0f22d602447723125bd4ae1e38f`, 산출물 SHA-256은 `cef011964f492a3e92d5a13a61f142b8350aa7318e316933eba4fd8bb39750ca`입니다. 입력 14,010 / 출력 44 토큰을 관측했지만 절감률은 산정하지 않았습니다. 증거 위치: `checks/jev-task-chain-20261007-1000/workspace/state/state.json`, `report-provenance.json`, `validation.json`, `final-summary.json`.
 
