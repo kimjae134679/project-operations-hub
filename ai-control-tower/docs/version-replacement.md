@@ -4,7 +4,11 @@
 
 ## 최신 검증 · 2026-10-07
 
-최신 **scripts 102 PASS / 0 FAIL(89.035초, 실행기 34개 포함)**이며 근거는 `automatic-exit-scripts-C2-final-102.log`입니다. 환경·외부 EOF focused 4개도 PASS(6.217초), 앱 .NET 검사는 624 PASS/0 FAIL입니다. C1 앱의 아래 등록 소스·SHA·바이트는 불변이며 현재 `475a0fc` 운영본은 첫 교체 때 사용자 트레이 종료가 필요합니다. 실제 운영 자동 종료·교체 성공을 확인한 것은 아닙니다.
+앞선 **scripts 102 PASS / 0 FAIL(89.035초, 실행기 34개 포함)**의 근거는 `automatic-exit-scripts-C2-final-102.log`입니다. 환경·외부 EOF focused 4 PASS(6.217초), 앱 .NET 624 PASS/0 FAIL도 이번 운영 전환 후 재실행한 검사가 아닙니다. C1 앱의 아래 등록 소스·SHA·바이트와 C2 helper 바이트/해시는 불변입니다.
+
+사용자 트레이 종료 확인 후 legacy `475a0fc` PID 37456 소멸 → 검증 helper의 C1 PID 25136 실행(16:46:33.798088 KST)으로 첫 전환을 완료했습니다. 정확 C1 headless client PID 22216의 단일 `--request-manual-exit`가 `graceful_exit_accepted/0`·빈 stderr를 반환했고 PID 25136의 실제 종료를 확인했습니다. 고정 guard CheckOnly 0·명시 재시작 0으로 현재 C1 PID 9552가 실행됐습니다(16:48:14.613517 KST). 루트 담당자가 fresh trayRegistered/pcConnected true·ownedJobsBusy false와 endpoint PID 9552 신원을 확인했고 root supervisor PID 5996은 그대로입니다.
+
+이번 증거는 **유휴 정상 CLI 종료 → 동일 C1 패키지 guard 재시작을 한 번 확인한 것**입니다. capable 기존본 → 다른 새 패키지의 helper 전체 자동 교체나 운영 busy drain 증거는 아닙니다. 강제 종료·창 제어·Bridge/Git/설정 변경은 하지 않았습니다. 보호 Bridge 설정·중앙 clone locks와 실제 여러 모델 동시 작업 증거는 여전히 막힘/미확인이며 PR #31은 draft·미병합, review는 disabled/unmanaged입니다.
 
 종료 client는 검증된 **기존** D 패키지의 `bundle-extract`·`runtime-temp` 디렉터리를 reparse 검사한 뒤 `DOTNET_BUNDLE_EXTRACT_BASE_DIR`·`TEMP`·`TMP`를 자식 환경에 고정합니다. Python harness는 소유 D 출력 파일과 정확한 부모 프로세스 종료 대기로 상속 자식 EOF를 기다리지 않습니다. 기존 내부 20초·외부 35초 제한과 elapsed 검사는 유지합니다.
 
@@ -34,7 +38,7 @@
 
 소스의 `Test-SwitchExitCapability`는 **버전·소스 커밋·SHA-256 고정 allowlist**만 검사합니다. 루트 담당자가 실제 IPC 빌드를 검증한 뒤 아래 정확한 튜플을 등록했습니다. 운영 CLI로 capability를 등록하거나 임의 bool로 지원을 주장할 수 없습니다. 목록에 없는 빌드는 기존 방식대로 종료를 기다립니다.
 
-등록된 C1 패키지: 버전 `0.9.7`, 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`, ProductVersion `0.9.7+5b0f3296d259ce03882e16eba1d8f93604af570f`, FileVersion `0.9.7.0`, 크기 135,902,087바이트입니다. 루트의 `automatic-exit-C1-exact-proof.json`은 정확한 self-contained EXE의 pure fixture 성공(Windows·설정·MainViewModel·자식 프로세스·동기화·중지 없이), owner 없는 headless 요청 `unsupported/4`, 추가 인수 `invalid_request/2`, 단일 JSON stdout·빈 stderr를 확인했습니다. **이 증거는 실제 운영 앱의 종료나 교체 성공을 뜻하지 않습니다.** 현재 `475a0fc` 운영본은 목록 밖으로 남아 첫 지원본 교체에는 사용자 트레이 종료가 필요합니다.
+등록된 C1 패키지: 버전 `0.9.7`, 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`, ProductVersion `0.9.7+5b0f3296d259ce03882e16eba1d8f93604af570f`, FileVersion `0.9.7.0`, 크기 135,902,087바이트입니다. 루트의 `automatic-exit-C1-exact-proof.json`은 정확한 self-contained EXE의 pure fixture 성공(Windows·설정·MainViewModel·자식 프로세스·동기화·중지 없이), owner 없는 headless 요청 `unsupported/4`, 추가 인수 `invalid_request/2`, 단일 JSON stdout·빈 stderr를 확인했습니다. **이 비운영 증거 자체는 실제 운영 종료·교체 성공을 뜻하지 않습니다.** 목록 밖의 종전 `475a0fc` 첫 전환은 사용자 트레이 종료로 완료했으며 이번 유휴 운영 정상 종료 증거는 위 최신 구역과 구분합니다.
 
 목록에 등록된 manual-control 빌드만 **기존 EXE 자체 + 단일 `--request-manual-exit` 인수**를 호출합니다. 새 대상 EXE를 기존 서버의 client로 사용하지 않습니다. 응답의 schemaVersion=1·status/동일 reason·exitCode·native 종료 코드가 일치해야 합니다. `graceful_exit_accepted/0`은 요청 수락일 뿐 실제 종료가 아닙니다. 이후 원래 PID/생성 시각/경로의 실제 종료를 확인하며 종료 요청을 반복하지 않습니다.
 
