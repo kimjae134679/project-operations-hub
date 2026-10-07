@@ -1,0 +1,38 @@
+{
+  "actorId": "ProjectBridge/KJW-80ea388278fd",
+  "blockers": [],
+  "nextActions": [],
+  "projectId": "Threads",
+  "receivedAt": "2026-10-07T08:27:01.420Z",
+  "recordId": "pc-bridge-threads-sol-flow-image-20261007-50",
+  "recordType": "task_exchange",
+  "request": {
+    "details": "사용자가 요청한 공용 PC 작업. 세부 내용은 비공개 경로에 보관.",
+    "source": "private_pc_bridge_queue",
+    "summary": "파일 읽기"
+  },
+  "response": {
+    "details": "실제 결과는 비공개 PC 작업 경로에서 확인합니다. 파일·명령·로그·화면은 공개하지 않습니다.",
+    "source": "project_bridge_operational_result",
+    "summary": "파일 읽기 완료"
+  },
+  "revision": 1,
+  "schemaVersion": 1,
+  "sessionId": "KJW-80ea388278fd",
+  "status": "completed",
+  "supersedes": [],
+  "title": "PC 작업 · 파일 읽기",
+  "updatedAt": "2026-10-07T08:27:07.952149+00:00",
+  "verification": [
+    {
+      "evidence": [
+        "private_pc_bridge_result:KJW-80ea388278fd/threads-sol-flow-image-20261007-50"
+      ],
+      "name": "실제 작업 결과",
+      "result": "pass"
+    }
+  ],
+  "workDone": [
+    "파일 읽기"
+  ]
+}
