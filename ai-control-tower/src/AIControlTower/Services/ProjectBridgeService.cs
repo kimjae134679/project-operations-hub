@@ -10,6 +10,8 @@ public sealed record PcConnectionSnapshot(bool Installed, bool Connected, bool R
     string Stage, string Detail, string RelayCode, int ActiveJobs, int ParallelLimit, IReadOnlyList<PcJobSnapshot> Jobs)
 {
     public string StatusReasonCode { get; init; } = "unknown";
+    public int? PublicationConflictCount { get; init; }
+    public int? PendingPublicationCount { get; init; }
 }
 
 // Only allowlisted metadata may be persisted. Never add raw errors, body, endpoint or device data.
@@ -106,7 +108,9 @@ public sealed class ProjectBridgeService : IDisposable
                 foreach(var row in rows.EnumerateArray().Take(200))jobs.Add(new(Text(row,"id"),Text(row,"title",ActionName(Text(row,"action"))),Text(row,"projectId"),Text(row,"toolId","ProjectBridge"),Text(row,"state","unknown"),Text(row,"action")));
             return new(installed,fresh&&Flag(j,"localReady")&&stage is not("stopped" or "disconnected" or "paused"),fresh&&Flag(j,"relayConnected"),Text(j,"deviceId","기기 미확인"),fresh?stage:"stale",
                 fresh?"기존 인증 API 응답 확인 · 연결 상태와 작업을 조회합니다. 설정/설치/원격 프로세스는 변경하지 않습니다.":"API 응답 시각이 오래되었습니다. 제한된 간격으로 상태만 다시 확인합니다.",Text(j,"relayCode"),Number(j,"activeJobCount",0),Math.Clamp(Number(j,"parallelLimit",4),1,8),jobs)
-                {StatusReasonCode=fresh?"status_confirmed":parsed?"stale_status":"invalid_status_timestamp"};
+                {StatusReasonCode=fresh?"status_confirmed":parsed?"stale_status":"invalid_status_timestamp",
+                    PublicationConflictCount=fresh?PublicationCount(j,"publicationConflictCount"):null,
+                    PendingPublicationCount=fresh?PublicationCount(j,"pendingPublicationCount"):null};
         }
         catch(OperationCanceledException){ct.ThrowIfCancellationRequested();return new(installed,false,false,"기기 미확인","offline","PC 상태 조회 시간 초과 · 기존 연결 실행기에 복구를 맡기고 상태만 다시 확인합니다.","",0,4,[]) {StatusReasonCode="timeout"};}
         catch(Exception e) when(e is IOException or HttpRequestException or JsonException or UnauthorizedAccessException or InvalidOperationException)
@@ -164,7 +168,9 @@ public sealed class ProjectBridgeService : IDisposable
                 foreach (var r in rows.EnumerateArray().Take(200)) jobs.Add(new(Text(r, "id"), Text(r, "title", ActionName(Text(r, "action"))), Text(r, "projectId"), Text(r, "toolId", "ProjectBridge"), Text(r, "state", "unknown"), Text(r,"action")));
             return new(true, connected, fresh && Flag(j, "relayConnected"), Text(j, "deviceId", device), fresh ? stage : "stale",
                 fresh ? "파일·명령은 병렬 처리하고 화면 조작과 같은 파일 수정은 순서대로 처리합니다." : "최근 응답이 없습니다. 연결을 다시 시작하세요.",
-                Text(j, "relayCode"), Number(j, "activeJobCount", 0), Math.Clamp(Number(j, "parallelLimit", 4), 1, 8), jobs);
+                Text(j, "relayCode"), Number(j, "activeJobCount", 0), Math.Clamp(Number(j, "parallelLimit", 4), 1, 8), jobs)
+                {PublicationConflictCount=fresh?PublicationCount(j,"publicationConflictCount"):null,
+                    PendingPublicationCount=fresh?PublicationCount(j,"pendingPublicationCount"):null};
         }
         catch (Exception e) when (e is IOException or HttpRequestException or JsonException or UnauthorizedAccessException or TaskCanceledException)
         {
@@ -245,5 +251,7 @@ public sealed class ProjectBridgeService : IDisposable
         return "PC 연결 설치가 완료되지 않았습니다. 설치 기록과 보존된 백업을 확인하세요. (installation_failed)";
     }
     public static string ActionName(string action) => action switch { "capabilities" => "PC 기능 확인", "list_dir" => "폴더 확인", "read_file" => "파일 읽기", "write_file" => "파일 수정", "run_command" => "명령 실행", "start_process" => "장기 작업", "process_status" => "진행 확인", "stop_process" => "작업 중지", "ui_control" => "화면 조작", _ => "PC 작업" };
+    private static int? PublicationCount(JsonElement row,string name)
+        =>row.ValueKind==JsonValueKind.Object&&row.TryGetProperty(name,out var value)&&value.ValueKind==JsonValueKind.Number&&value.TryGetInt32(out var count)&&count>=0?count:null;
     public void Dispose() => _client.Dispose();
 }

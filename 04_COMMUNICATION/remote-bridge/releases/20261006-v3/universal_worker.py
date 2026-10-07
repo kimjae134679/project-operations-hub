@@ -172,7 +172,7 @@ class UniversalWorker:
  def status(self):
   with self.lock:
    paused=(self.state/'disconnected.flag').exists()
-   rows=list(self.journal.items());candidates=[];active=set(self.active);jobs=[]
+   rows=list(self.journal.items());candidates=[];active=set(self.active);jobs=[];conflicts=[];invalid_conflicts=0
    for jid,r in rows:
     if self.registered_process(r):
      if self.detached_states.get(jid) not in ('completed','failed','timed_out','stopped'):candidates.append((jid,r))
@@ -182,6 +182,9 @@ class UniversalWorker:
     self.detached_cursor=(offset+len(batch))%len(candidates)
     for jid,r in batch:self.detached_states[jid]=self.effective_state(r,self.live_process(r))
    for jid,r in rows:
+    if 'publicationConflict' in r:
+     if self.valid_publication_conflict(jid,r):conflicts.append({'id':jid,**r['publicationConflict']})
+     else:invalid_conflicts+=1
     state=self.detached_states.get(jid,self.effective_state(r))
     if jid not in self.detached_states and jid in pending_ids:state='starting'
     if state in ('starting','running') and r.get('action')=='start_process':active.add(jid)
@@ -193,6 +196,8 @@ class UniversalWorker:
     'deviceId':self.device,'localReady':not self.stop_event.is_set(),'relayConnected':self.relay_available,'parallelLimit':self.worker_count,'activeJobCount':len(active),
     'device':self.device,'workerPid':os.getpid(),'updatedAt':now(),'localChannelAvailable':not self.stop_event.is_set(),
     'privateChannelAvailable':self.relay_available,'relayCode':self.relay_code,'maxWorkers':self.worker_count,
+    'publicationConflictCount':len(conflicts),'publicationConflicts':conflicts[-100:],'invalidPublicationConflictCount':invalid_conflicts,
+    'pendingPublicationCount':sum(r.get('state')=='finished' and r.get('source','github')=='github' and 'publicationConflict' not in r for jid,r in rows),
     'runningJobs':len(active),'pendingJobs':sum(r.get('state')=='queued' for r in self.journal.values()),'jobs':jobs}
  def ui(self,*unused,**ignored):atomic(self.state/'universal_status.json',self.status())
  def verify_private(self):
@@ -239,6 +244,8 @@ class UniversalWorker:
     if isinstance(process.get('finishedAt'),(int,float)):
      output['result']['finishedAt']=dt.datetime.fromtimestamp(process['finishedAt'],dt.timezone.utc).isoformat()
    elif 'acceptedResult' in row:output['acceptedResult']=json.loads(json.dumps(row['acceptedResult']))
+   if 'publicationConflict' in row:
+    output['publication']={'state':'quarantined',**row['publicationConflict']} if self.valid_publication_conflict(jid,row) else {'state':'blocked','code':'invalid_publication_conflict'}
    return output
  def execute(self,jid,record,prerequisite_failed=False):
   job=record['job']
@@ -285,9 +292,52 @@ class UniversalWorker:
     failed=any(d.get('result',{}).get('outcome')!='completed' for d in deps)
     self.held.update(keys);self.active[jid]=(self.pool.submit(self.execute,jid,record,failed),keys)
    self.ui()
+ def relay_context_digest(self):
+  return digest(serialized([self.config.get('privateRepository'),self.config.get('privateBranch','remote/pc-bridge')]))
+ def legacy_publication_identity(self,jid,record):
+  accepted=record.get('acceptedResult');result=record.get('result');revision=record.get('publicationRevision')
+  if not isinstance(accepted,dict) or not isinstance(result,dict):return False
+  key=record.get('jobHash')
+  if not isinstance(key,str) or not re.fullmatch(r'[a-f0-9]{64}',key):return False
+  if record.get('state')!='finished' or record.get('source','github')!='github' or record.get('action')!='start_process' or record.get('processFinished') is not True:return False
+  if type(revision) is not int or revision<2:return False
+  if any(v.get('device')!=self.device or v.get('jobId')!=jid or v.get('jobSha256')!=key for v in (accepted,result)):return False
+  data=accepted.get('data')
+  if not isinstance(data,dict) or accepted.get('outcome')!='completed' or data.get('stage') not in ('starting','running') or data.get('done') is not False:return False
+  if not isinstance(data.get('processId'),str) or not re.fullmatch(r'[a-f0-9]{32}',data['processId']):return False
+  return result.get('outcome') in ('completed','failed','timed_out','stopped','interrupted') and result!=accepted
+ def valid_publication_conflict(self,jid,record):
+  marker=record.get('publicationConflict')
+  fields={'schemaVersion','code','observedAt','localResultSha256','acceptedResultSha256','remoteResultSha256','relayContextSha256'}
+  if not isinstance(marker,dict) or set(marker)!=fields or type(marker.get('schemaVersion')) is not int or marker['schemaVersion']!=1 or marker.get('code')!='legacy_acceptance_result_conflict' or not self.legacy_publication_identity(jid,record):return False
+  if not isinstance(marker.get('observedAt'),str) or len(marker['observedAt'])>64:return False
+  try:stamp(marker['observedAt'])
+  except UniversalError:return False
+  accepted=digest(serialized(record['acceptedResult']))
+  return marker['localResultSha256']==digest(serialized(record['result'])) and marker['acceptedResultSha256']==accepted and marker['remoteResultSha256']==accepted and marker['relayContextSha256']==self.relay_context_digest()
  def publish(self,jid,record):
-  self.verify_private();self.private.publish(self.result_path(jid),record['result'])
-  if self.public is None:return
+  self.verify_private()
+  try:self.private.publish(self.result_path(jid),record['result'])
+  except Exception as exc:
+   # Only the observed legacy acceptance collision is recoverable. The worker
+   # can run as __main__, so its BridgeError class need not be the imported one.
+   import sys
+   from bridge_worker import BridgeError
+   actual_error=getattr(sys.modules.get(type(self.private).__module__),'BridgeError',None)
+   errors=(BridgeError,actual_error) if isinstance(actual_error,type) and issubclass(actual_error,Exception) else (BridgeError,)
+   if not isinstance(exc,errors) or str(exc)!='remote_result_conflict' or not self.legacy_publication_identity(jid,record):raise
+   try:remote=json.loads(self.private.read_bytes(self.result_path(jid)))
+   except (ValueError,UnicodeError):raise UniversalError('unrecognized_remote_result_conflict') from None
+   if remote!=record['acceptedResult']:raise
+   marker={'schemaVersion':1,'code':'legacy_acceptance_result_conflict','observedAt':now(),
+    'localResultSha256':digest(serialized(record['result'])),'acceptedResultSha256':digest(serialized(record['acceptedResult'])),
+    'remoteResultSha256':digest(serialized(remote)),'relayContextSha256':self.relay_context_digest()}
+   with self.lock:
+    current=self.journal[jid]
+    if current.get('result')!=record['result'] or current.get('acceptedResult')!=record['acceptedResult']:raise UniversalError('publication_record_changed')
+    current['publicationConflict']=marker;self.save_record(jid,current);self.checkpoint()
+   return False
+  if self.public is None:return True
   result=record['result'];ok=result['outcome']=='completed';title=NAMES[record.get('action','capabilities')]
   finished=result['finishedAt'];rid='pc-bridge-'+jid;project=record.get('projectId','Control-Tower');revision=record.get('publicationRevision',1)
   item={'schemaVersion':1,'recordType':'task_exchange','recordId':rid,'revision':revision,'title':'PC 작업 · '+title,'projectId':project,'actorId':'ProjectBridge/'+self.device,'sessionId':self.device,'receivedAt':record.get('createdAt',finished),'updatedAt':finished,
@@ -298,10 +348,18 @@ class UniversalWorker:
   h=digest(serialized(item));base='04_COMMUNICATION/project-inbox/'+project+'/'+h;self.public.publish(base+'/content.json',item)
   source_hash=digest(json.dumps([project,item['actorId'],rid],ensure_ascii=False).encode())
   self.public.publish(base+'/item.json',{'projectId':project,'contentSha256':h,'sourceName':'task-'+source_hash+'-r'+str(revision)+'.json','centralPath':base+'/content.json','collectedAt':finished})
+  return True
  def publish_pending(self):
-  with self.lock:pending=[(jid,json.loads(json.dumps(r))) for jid,r in self.journal.items() if r.get('state')=='finished' and r.get('source','github')=='github']
+  with self.lock:
+   pending=[]
+   for jid,r in self.journal.items():
+    if r.get('state')!='finished' or r.get('source','github')!='github':continue
+    if 'publicationConflict' in r:
+     if not self.valid_publication_conflict(jid,r):raise UniversalError('invalid_publication_conflict')
+     continue
+    if len(pending)<100:pending.append((jid,json.loads(json.dumps(r))))
   for jid,record in pending:
-   self.publish(jid,record)
+   if not self.publish(jid,record):continue
    with self.lock:self.journal[jid]['state']='published';self.save_record(jid,self.journal[jid]);self.checkpoint()
  def relay_tick(self):
   self.verify_private();self.relay_available=True;self.relay_code=None;self.publish_pending()

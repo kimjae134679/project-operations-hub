@@ -16,7 +16,7 @@
     },
     {
       "path": "universal_worker.py",
-      "sha256": "1714375136f649928356a71af7e628c07e3e050966a1a84dc0baa639537e0861"
+      "sha256": "d9e552538792081c40d5df24ed97925f70cc814e82673521c532f0fa4fe76d94"
     },
     {
       "path": "universal_actions.py",
@@ -40,7 +40,7 @@
     },
     {
       "path": "UNIVERSAL_PROTOCOL.md",
-      "sha256": "410bca8842f3b833a5c57750bdd002d12c2c858d017805bb97edc8bbfbc5f084"
+      "sha256": "121ec3412877350446f94ca869533e8d8b2dd890d240bfd7507ab1f5ec9e7b07"
     },
     {
       "path": "프로젝트_사용안내.md",
@@ -52,7 +52,7 @@
     },
     {
       "path": "tests/test_universal_worker.py",
-      "sha256": "4c76b26ab732d8076763b64baa27c8a2036e49acbdc50f6d9222782263ae50a5"
+      "sha256": "43ac7b9a54f215ab01e0f94c9b1b5b1b67037aae6906d806fe23bb3568b9bde1"
     },
     {
       "path": "tests/test_universal_actions.py",
@@ -64,7 +64,7 @@
     },
     {
       "path": "tests/test_shared_scheduler.py",
-      "sha256": "b0abc1301c1c7be538d56ad22d69f46df11e7e159fd7d5e4f7827e9294f6d5d9"
+      "sha256": "c2884e64005a36699e5ef58ddb74d959213bf26769728fec5f64bba3d07830f9"
     },
     {
       "path": "tests/test_github_client.py",

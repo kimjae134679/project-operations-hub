@@ -104,7 +104,9 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     public string RelayStatusText => IsReadOnly ? "로컬 조회 · 원격/API 상태 미확인 · 기존 연결은 변경하지 않습니다." : _snapshot.RelayConnected ? "다른 GPT의 원격 요청 통로도 연결됨" : _snapshot.RelayCode switch { "github_login_required" => "원격 요청 통로: GitHub 로그인 필요", "github_http_404" => "원격 요청 통로: 저장소 접근 또는 주소 확인 필요", _ => "원격 요청 통로 대기 · PC 안의 도구는 로컬 연결로 작업합니다." };
     public string CommanderStatusText=>IsReadOnly?"Desktop Commander · 로컬 조회 모드에서는 현재 상태 미확인":_commander.DisplayText;
     public string CommanderRecoveryText=>IsReadOnly?"자동 복구 감시 상태 미확인":_commander.RecoveryText;
-    public string BridgeStatusText=>IsReadOnly?"ProjectBridge · 현재 연결 미확인":"ProjectBridge · PC 안의 명령 통로: "+(IsConnected?"사용 가능":"연결 확인 필요")+" · 원격 GitHub 중계: "+(_snapshot.RelayConnected?"연결됨":"연결 확인 필요");
+    public string BridgeStatusText=>IsReadOnly?"ProjectBridge · 현재 연결 미확인":"ProjectBridge · PC 안의 명령 통로: "+(IsConnected?"사용 가능":"연결 확인 필요")+" · 원격 GitHub 중계: "+(_snapshot.RelayConnected?"연결됨":"연결 확인 필요")
+        +(_snapshot.PublicationConflictCount is >0?$" · 과거 결과 {_snapshot.PublicationConflictCount}건 보존·분리 · 새 요청 처리와 별개":"")
+        +(_snapshot.PendingPublicationCount is >0?$" · 결과 게시 대기 {_snapshot.PendingPublicationCount}건":"");
     public string PrimaryPathText=>IsReadOnly?"작업 실행 없음 · 읽기 전용":IsConnected?"기본 작업 통로: ProjectBridge · Desktop Commander 잔여량이 0%여도 이 통로로 PC 작업을 실행합니다.":"ProjectBridge 작업 통로 미확인 · PC 연결 시작을 누르세요. 설치가 없거나 손상되었으면 설치·복구를 사용하세요. 다른 통로의 성공은 보장하지 않습니다.";
     private void Notify() { foreach(var p in new[]{nameof(DeviceLabel),nameof(IsInstalled),nameof(IsConnected),nameof(HasError),nameof(IsBusy),nameof(ActiveJobCount),nameof(ParallelLimit),nameof(StatusText),nameof(DetailText),nameof(RelayStatusText),nameof(AutoReconnectSuppressed),nameof(NextRetryAt),nameof(CommanderStatusText),nameof(CommanderRecoveryText),nameof(BridgeStatusText),nameof(PrimaryPathText)}) OnPropertyChanged(p); }
     private void ShowError(Exception e) { _error = ProcessRunner.Sanitize(e.Message); Notify(); }
