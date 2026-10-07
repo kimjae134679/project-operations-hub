@@ -153,6 +153,13 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     }
     private Task InstallAsync() => RunAsync(async()=>{await _service.InstallAsync(_lifetime.Token);await Task.Delay(1000,_lifetime.Token);});
     public Task<string> SubmitAsync(string project, string tool, string action, object args) => IsReadOnly ? Task.FromException<string>(new InvalidOperationException("로컬 조회 · PC 명령 제출 보류")) : _manualControl?_service.SubmitApiOnlyAsync(project,tool,action,args,_lifetime.Token):_service.SubmitAsync(project,tool,action,args,_lifetime.Token);
-    public Task<string> ResultAsync(string id) => IsReadOnly ? Task.FromException<string>(new InvalidOperationException("로컬 조회 · 외부 API 결과 확인 없음")) : _service.ResultAsync(id,_lifetime.Token);
+    public Task<string> ResultAsync(string id) => ResultAsync(id,CancellationToken.None);
+    public async Task<string> ResultAsync(string id,CancellationToken ct)
+    {
+        if(IsReadOnly)throw new InvalidOperationException("로컬 조회 · 외부 API 결과 확인 없음");
+        using var linked=CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token,ct);
+        linked.Token.ThrowIfCancellationRequested();
+        return await _service.ResultAsync(id,linked.Token).ConfigureAwait(false);
+    }
     public void Dispose() { _lifetime.Cancel(); _service.Dispose(); }
 }

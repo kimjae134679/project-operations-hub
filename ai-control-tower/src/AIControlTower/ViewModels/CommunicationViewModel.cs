@@ -55,6 +55,7 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public int PostCount => EntryCount-CommentCount-RecordCount-GuideCount;
     public int RevisionCount { get; init; } = 1;
     public string TimeDisplay => Time;
+    public string CommunityTimeDisplay => ThreadEntries.FirstOrDefault(e => !e.IsComment)?.TimeDisplay ?? Time;
     public string ConversationSummary => Exchange is not null ? $"게시글 1 · 수정 이력 {RevisionCount}" : $"게시글 {PostCount} · 댓글 {CommentCount} · 답변·기록 {RecordCount} · 안내 {GuideCount}";
     public string StatusColorKey => Warning is not null || Exchange?.Status == "blocked" ? "Blocked" : Exchange?.Status == "completed" ? "Complete" : Exchange?.Status == "in_progress" ? "Running" : "Waiting";
     public string ProjectId { get; init; } = "";
@@ -98,6 +99,46 @@ public sealed partial class MainViewModel
 {
     // Binding seam for the communication workspace; all existing commands remain on this VM.
     public MainViewModel Communication => this;
+    private IReadOnlyList<CommunicationProjectTarget> _currentCommunicationProjects = [];
+    public ObservableCollection<NoticeProjectCheck> NoticeProjectRows { get; } = [];
+    public ObservableCollection<CommunityCommentRow> CommunityComments { get; } = [];
+    private string _selectedCommunityBody = "";
+    public string SelectedCommunityBody => _selectedCommunityBody;
+    public string CommunityReadPositionKey => SelectedInbox is null ? "" : SelectedInbox.Identity + "/" + CommunicationService.ContentHash(_selectedCommunityBody + string.Join("/", CommunityComments.Select(c => c.Entry.ContentHash)));
+    public string CommunityAuthorLabel => SelectedInbox?.Author ?? "";
+    public string CommunityTimeLabel => SelectedInbox?.ThreadEntries.FirstOrDefault(e => !e.IsComment)?.TimeDisplay ?? "";
+    public string CommunityCommentCountLabel => $"댓글 {CommunityComments.Count}";
+    public string CurrentProjectCheckSummary => $"{NoticeProjectRows.Count(r => r.IsChecked)} / {NoticeProjectRows.Count(r => r.IsApplicable)} 프로젝트 확인";
+    public void SetCurrentCommunicationProjects(IReadOnlyList<CommunicationProjectTarget> projects)
+    {
+        _currentCommunicationProjects = projects.DistinctBy(p => p.ProjectId, StringComparer.Ordinal).ToArray();
+        UpdateNoticeProjectChecks();
+    }
+    private void UpdateNoticeProjectChecks()
+    {
+        var rows = NoticeProjectChecks.Project(SelectedNotice?.Notice, _currentCommunicationProjects, _communicationSnapshot?.Receipts ?? []);
+        for (var i = 0; i < rows.Count; i++)
+        {
+            if (i < NoticeProjectRows.Count && NoticeProjectRows[i] == rows[i]) continue;
+            if (i < NoticeProjectRows.Count) NoticeProjectRows[i] = rows[i]; else NoticeProjectRows.Add(rows[i]);
+        }
+        while (NoticeProjectRows.Count > rows.Count) NoticeProjectRows.RemoveAt(NoticeProjectRows.Count - 1);
+        OnPropertyChanged(nameof(CurrentProjectCheckSummary));
+    }
+    private void UpdateCommunityArticle()
+    {
+        var article = CommunityPostProjection.Project(SelectedInbox?.ThreadEntries ?? [], ManualCommunicationCollection.IsCollectedPath(SelectedInbox?.Path));
+        _selectedCommunityBody = article.Body;
+        for (var i = 0; i < article.Comments.Count; i++)
+        {
+            if (i < CommunityComments.Count && CommunityComments[i] == article.Comments[i]) continue;
+            if (i < CommunityComments.Count) CommunityComments[i] = article.Comments[i]; else CommunityComments.Add(article.Comments[i]);
+        }
+        while (CommunityComments.Count > article.Comments.Count) CommunityComments.RemoveAt(CommunityComments.Count - 1);
+        OnPropertyChanged(nameof(SelectedCommunityBody));
+        OnPropertyChanged(nameof(CommunityAuthorLabel)); OnPropertyChanged(nameof(CommunityTimeLabel));
+        OnPropertyChanged(nameof(CommunityCommentCountLabel)); OnPropertyChanged(nameof(CommunityReadPositionKey));
+    }
     private string _inboxProjectFilterId = "";
     public ObservableCollection<CommunicationProjectRow> InboxProjectFilters { get; } = [];
     public string InboxProjectFilterId
@@ -255,6 +296,7 @@ public sealed partial class MainViewModel
             // Publish the topic only after its entries/body are coherent. WPF selection bindings
             // and read-position observers run synchronously inside PropertyChanged.
             UpdateEntries();
+            UpdateCommunityArticle();
             OnPropertyChanged(nameof(SelectedInbox));
             if(!_selectingInternally && !_rebuildingCommunication) MarkCommunicationViewed();
         }
@@ -609,6 +651,7 @@ public sealed partial class MainViewModel
     }
     private void UpdateNoticeReceipts()
     {
+        UpdateNoticeProjectChecks();
         _allNoticeReceipts.Clear();
         if(_communicationSnapshot is null || SelectedNotice is null) { FilterNoticeReceipts(); return; }
         foreach(var r in CurrentNoticeReceipts(SelectedNotice.Notice.Id).OrderBy(r=>r.ProjectId).ThenBy(r=>r.ActorId).ThenByDescending(r=>r.CheckedAt))

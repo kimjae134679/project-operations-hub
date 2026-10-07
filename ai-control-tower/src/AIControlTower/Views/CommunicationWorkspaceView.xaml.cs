@@ -37,12 +37,12 @@ public partial class CommunicationWorkspaceView : UserControl
     }
     private void SelectionChanged(object? sender,PropertyChangedEventArgs e)
     {
-        if(e.PropertyName is nameof(MainViewModel.SelectedInbox) or nameof(MainViewModel.SelectedEntry))
+        if(e.PropertyName is nameof(MainViewModel.SelectedInbox) or nameof(MainViewModel.CommunityReadPositionKey))
             RestorePosition();
     }
     private void RestorePosition()
     {
-        var next = _vm?.EntryReadPositionKey ?? "";
+        var next = _vm?.CommunityReadPositionKey ?? "";
         if(next == _readingKey) return;
         if(_readingKey.Length > 0) { _readPositions[_readingKey] = ArticleReader.VerticalOffset; _rawPositions[_readingKey] = RawReader.VerticalOffset; }
         _readingKey = next;

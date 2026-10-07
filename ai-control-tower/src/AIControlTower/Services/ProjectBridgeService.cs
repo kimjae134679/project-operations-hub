@@ -75,12 +75,17 @@ public sealed class ProjectBridgeService : IDisposable
     private async Task<JsonDocument> RequestAsync(HttpMethod method, string path, object? value, CancellationToken ct)
     {
         var ep = Endpoint(); using var request = new HttpRequestMessage(method, new Uri(ep.Address, path));
+        // ResponseHeadersRead ends HttpClient.Timeout at headers. Bound GET body reads too;
+        // POST/control and their existing fallback/uncertain-result semantics are unchanged.
+        using var deadline=method==HttpMethod.Get?CancellationTokenSource.CreateLinkedTokenSource(ct):null;
+        if(deadline is not null && _client.Timeout!=Timeout.InfiniteTimeSpan)deadline.CancelAfter(_client.Timeout);
+        var requestToken=deadline?.Token??ct;
         request.Headers.Add("X-ProjectBridge-Token", ep.Token);
         if (value is not null) request.Content = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
-        using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, requestToken);
         if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.StatusCode is System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.Unauthorized?"PC 로컬 API 권한 거부":"PC 연결 요청 실패",null,response.StatusCode);
-        using var input=await response.Content.ReadAsStreamAsync(ct);using var output=new MemoryStream();var buffer=new byte[8192];
-        while(true){var count=await input.ReadAsync(buffer,ct);if(count==0)break;if(output.Length+count>900*1024)throw new InvalidDataException("결과가 너무 큽니다. 읽을 범위를 줄이세요.");output.Write(buffer,0,count);}
+        using var input=await response.Content.ReadAsStreamAsync(requestToken);using var output=new MemoryStream();var buffer=new byte[8192];
+        while(true){var count=await input.ReadAsync(buffer,requestToken);if(count==0)break;if(output.Length+count>900*1024)throw new InvalidDataException("결과가 너무 큽니다. 읽을 범위를 줄이세요.");output.Write(buffer,0,count);}
         return JsonDocument.Parse(output.ToArray(),new JsonDocumentOptions{MaxDepth=32});
     }
     /// <summary>Existing authenticated API only: no config read, installer, native fallback or process start.</summary>

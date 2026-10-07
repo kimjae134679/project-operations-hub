@@ -3,7 +3,7 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  AutomationProperties.Name="통합 문서 읽기">
  <Grid>
-  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <StackPanel Margin="0,0,0,12">
    <WrapPanel Margin="0,0,0,8">
     <Button Content="이전 문서" Click="Back_Click" IsEnabled="{Binding CanGoBack}" Margin="0,0,6,6" AutomationProperties.Name="이전 안내 문서로 돌아가기"/>
@@ -15,9 +15,6 @@
    <TextBlock Text="{Binding Error}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,0"/>
   </StackPanel>
   <WrapPanel Grid.Row="1" Margin="0,0,0,10">
-   <TextBox Text="{Binding SearchText,UpdateSourceTrigger=PropertyChanged}" Width="210" Margin="0,0,8,6" AutomationProperties.Name="문서 본문 검색" ToolTip="본문 검색 · 결과 선택 시 원문 위치로 이동"/>
-   <Button Content="이전 결과" Click="Previous_Click" Margin="0,0,6,6"/>
-   <Button Content="다음 결과" Click="Next_Click" Margin="0,0,12,6"/>
    <CheckBox Content="원문 보기" IsChecked="{Binding ShowRaw}" Margin="0,8,12,6"/>
    <CheckBox Content="원문 줄바꿈" IsChecked="{Binding WrapText}" Margin="0,8,12,6"/>
   </WrapPanel>
@@ -31,6 +28,5 @@
     </TextBox>
    </Grid>
   </Border>
-  <TextBlock Grid.Row="3" Text="{Binding SearchSummary}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,0" FontSize="12"/>
  </Grid>
 </UserControl>

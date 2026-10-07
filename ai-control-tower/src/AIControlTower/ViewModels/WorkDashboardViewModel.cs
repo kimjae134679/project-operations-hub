@@ -18,6 +18,37 @@ public sealed class WorkDashboardViewModel : ObservableObject
     private int _selectionVersion;
     private int _detailRequestVersion;
     private string _projectFilterId = "", _workerFilterKey = "";
+    private string _currentProjectId="",_currentProjectName="";
+    private WorkActivity? _selectedRecord,_selectedExecution;
+    public string CurrentProjectName => _currentProjectName;
+    // Explicit catalog identity only; current project does not depend on legacy UI filters or actor names.
+    public IReadOnlyList<WorkActivity> ProjectRecords => Activities.Where(r=>_currentProjectId.Length>0 && r.ProjectId==_currentProjectId && r.IsConversation)
+        .OrderByDescending(r=>r.UpdatedAt).ThenByDescending(r=>r.Revision).Take(200).ToArray();
+    public IReadOnlyList<WorkActivity> ProjectExecutions => Activities.Where(r=>_currentProjectId.Length>0 && r.ProjectId==_currentProjectId && r.IsRegisteredExecution)
+        .OrderByDescending(r=>r.UpdatedAt).Take(200).ToArray();
+    public bool NoProjectRecords => ProjectRecords.Count==0;
+    public bool NoProjectExecutions => ProjectExecutions.Count==0;
+    public WorkActivity? SelectedRecord { get=>_selectedRecord;set=>SetProperty(ref _selectedRecord,value); }
+    public WorkActivity? SelectedExecution { get=>_selectedExecution;set {if(SetProperty(ref _selectedExecution,value))OnPropertyChanged(nameof(CanStopExecution));} }
+    public bool CanStopExecution => SelectedExecution?.OwnedProgramId is {} id && _owns(id);
+    public void StopSelectedExecutionOwned()
+    {
+        if(!CanStopExecution)return;
+        Selected=SelectedExecution;StopSelectedOwned();OnPropertyChanged(nameof(CanStopExecution));
+    }
+    public void SetProjectContext(string projectId,string name)
+    {
+        var changed=_currentProjectId!=projectId;
+        _currentProjectId=projectId??"";_currentProjectName=WorkDashboardService.SafeText(name??"");
+        if(changed) { _selectedRecord=null;_selectedExecution=null; }
+        NotifyProjectContext();
+    }
+    private void NotifyProjectContext()
+    {
+        _selectedRecord=ProjectRecords.FirstOrDefault(r=>r.Id==_selectedRecord?.Id)??ProjectRecords.FirstOrDefault();
+        _selectedExecution=ProjectExecutions.FirstOrDefault(r=>r.Id==_selectedExecution?.Id)??ProjectExecutions.FirstOrDefault();
+        foreach(var name in new[]{nameof(CurrentProjectName),nameof(ProjectRecords),nameof(ProjectExecutions),nameof(NoProjectRecords),nameof(NoProjectExecutions),nameof(SelectedRecord),nameof(SelectedExecution),nameof(CanStopExecution)})OnPropertyChanged(name);
+    }
     public WorkDashboardViewModel(Func<CancellationToken, Task<IReadOnlyList<WorkActivity>>> read,
         Func<WorkActivity, Task<string>>? details = null, Func<string, bool>? owns = null, Func<string, bool>? stop = null)
     { _read = read; _details = details ?? (r => Task.FromResult(r.Evidence)); _owns = owns ?? (_ => false); _stop = stop ?? (_ => false); }
@@ -113,6 +144,7 @@ public sealed class WorkDashboardViewModel : ObservableObject
         foreach (var row in incoming.Values) Activities.Add(row);
         Selected = id is null ? null : Activities.FirstOrDefault(r => r.Id == id);
         NotifyFilters(); OnPropertyChanged(nameof(CanStopOwned));
+        NotifyProjectContext();
         SnapshotApplied?.Invoke(this,EventArgs.Empty);
     }
     public async Task LoadSelectedDetailsAsync()

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Net.Http;
 using System.Text.Json;
+using System.Security.Cryptography;
 using AIControlTower.Models;
 
 namespace AIControlTower.Services;
@@ -15,6 +16,15 @@ public sealed class WorkDashboardService
     private readonly Func<string, CancellationToken, Task<string>>? _bridgeDetail;
     public List<string> ContinuousPaths { get; } = [];
     public List<string> ExchangeRoots { get; } = [];
+    /// <summary>Registers a validated read source in memory only. Never saves settings or starts work.</summary>
+    public bool RegisterContinuousSource(string path, bool localView, bool manualControl)
+    {
+        if (localView && !manualControl) return false;
+        var full=SafePath(path); _=ReadContinuous(full);
+        if (ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return true;
+        if (ContinuousPaths.Count>=40) throw new InvalidDataException("상태 파일 연결은 최대 40개입니다.");
+        ContinuousPaths.Add(full); return true;
+    }
     private Dictionary<string, ProjectItem> _catalog = new(StringComparer.Ordinal);
     private Dictionary<string, string> _aliases = new(StringComparer.Ordinal);
     private HashSet<string> _managementProjects = new(["Control-Tower"], StringComparer.Ordinal);
@@ -75,7 +85,7 @@ public sealed class WorkDashboardService
             foreach (var path in paths)
             {
                 ct.ThrowIfCancellationRequested();
-                try { result.Add(ReadContinuous(path)); }
+                try { result.Add(ReadContinuous(path)); result.AddRange(ReadContinuousSteps(path)); }
                 catch (Exception ex) when (IsReadError(ex)) { result.Add(ReadError(path, "연속 실행기", ex)); }
             }
             var records = new List<WorkActivity>();
@@ -95,7 +105,12 @@ public sealed class WorkDashboardService
                 }
                 catch (Exception ex) when (IsReadError(ex)) { result.Add(ReadError(root, "관제 과정 기록", ex) with { IsManagementRecord = true }); }
             }
-            result.AddRange(records.GroupBy(r => r.Id).Select(g => g.OrderByDescending(r => r.Revision).ThenByDescending(r => r.UpdatedAt).First()));
+            result.AddRange(records.GroupBy(r=>r.Id).Select(g=>
+            {
+                var latest=g.OrderByDescending(r=>r.Revision).ThenByDescending(r=>r.UpdatedAt).First();
+                var conflict=g.GroupBy(r=>r.Revision).Any(revisions=>revisions.Select(r=>r.RecordFingerprint).Distinct(StringComparer.Ordinal).Take(2).Count()>1);
+                return conflict?latest with {Title="기록 충돌",Status="unknown",SessionId="",CommandSummary="",ResponseSummary="",RequestSource="",ResponseSource="",RecentLog="",NextCheckpoint="",ResultSummary="같은 기록 revision 내용 충돌",Error="같은 기록 revision 내용 충돌 · 원본 확인 필요",DetailPath=null}:latest;
+            }));
             return result;
         }, ct);
         if (_bridge is not null)
@@ -107,7 +122,7 @@ public sealed class WorkDashboardService
                     Title = "PC 연결", Status = snapshot.Connected ? "ready" : snapshot.Stage == "stale" ? "stale" : "unknown",
                     Stage = snapshot.Stage, Evidence = SafeText(snapshot.Detail), UpdatedAt = DateTimeOffset.UtcNow, LivenessKnown = snapshot.Connected });
                 rows.AddRange(snapshot.Jobs.Select(j => new WorkActivity { Id = "bridge:" + j.Id, BridgeJobId = j.Id,
-                    Project = SafeText(j.Project), ProjectId = j.Project, Worker = SafeText(j.Tool), Source = "ProjectBridge GET",
+                    Project = SafeText(j.Project), ProjectId = j.Project, Worker = SafeText(j.Tool),WorkerKind="PC 작업",ExecutionId=SafeText(j.Id), Source = "ProjectBridge GET",
                     CommandSummary = "등록된 PC 작업: " + SafeText(j.Action),
                     Title = SafeText(j.Title), Status = !snapshot.Connected ? "stale" : j.Action == "start_process" && j.State is "accepted" or "succeeded" or "completed" ? "accepted" : j.State,
                     Stage = SafeText(j.State), Evidence = !snapshot.Connected ? "오래된/미연결 응답 · 현재 실행 미확인" : j.Action=="start_process" ? "시작 접수와 종료 확인을 분리합니다. 요약만으로 자식 완료 미확인 · 상세 조회 필요" : "최근 로컬 응답의 보고 상태 · 실제 결과는 상세 조회",
@@ -139,6 +154,11 @@ public sealed class WorkDashboardService
                 worker = ClassifyWorker(program.Kind,matched[0].FileName);
                 command = SafeText("등록 카탈로그 명령: " + matched[0].Name + " → " + matched[0].FileName + " · 인수/프롬프트 원문 비공개");
             }
+            else if(known && row.ProgramId==projectId+"/jev" && row.Title=="Jev 작업")
+            {
+                // This exact identity is created by RunJevTask. Never infer from model, actor or process name.
+                worker="Jev";command="Jev 작업";
+            }
             else worker = "미확인";
         }
         var status=row.Status;
@@ -159,6 +179,7 @@ public sealed class WorkDashboardService
 
     public async Task<string> DetailsAsync(WorkActivity row)
     {
+        if(row.Source=="연속 실행기 단계 기록") return row.ResultSummary+"\n"+row.NextCheckpoint;
         if (row.BridgeJobId is not null && _bridgeDetail is not null)
             return BridgeDetail(await _bridgeDetail(row.BridgeJobId, CancellationToken.None));
         if (row.DetailPath is null) return row.Evidence;
@@ -199,6 +220,39 @@ public sealed class WorkDashboardService
             Error = SafeText(string.Join("\n", errors)), ResultSummary = SafeText("체크포인트 결과 기록: " + Text(j,"status","unknown") + " · 실제 AI 업무 완료 별도 확인 필요"), DetailPath = path, LivenessKnown = false };
     }
 
+    private static IReadOnlyList<WorkActivity> ReadContinuousSteps(string path)
+    {
+        using var doc=ReadJson(path);var root=doc.RootElement;
+        SafePath(path,Text(root,"approved_root"));
+        var plan=Text(root,"plan_id");var hash=Text(root,"plan_sha256");
+        var rows=new List<WorkActivity>();
+        foreach(var step in root.GetProperty("steps").EnumerateObject().Take(1000))
+        {
+            var value=step.Value;var state=Text(value,"status","unknown");var execution=plan+"/"+step.Name;
+            var exit=value.TryGetProperty("returncode",out var code)&&code.ValueKind==JsonValueKind.Number&&code.TryGetInt32(out var number)?(int?)number:null;
+            var hasReceipt=value.TryGetProperty("aiReceipt",out var receipt)&&receipt.ValueKind==JsonValueKind.Object;
+            var identity=hasReceipt && plan.Length>0 && hash.Length==64 && hash.All(Uri.IsHexDigit)
+                && Text(receipt,"planId")==plan && Text(receipt,"stepId")==step.Name && Text(receipt,"planSha256")==hash;
+            var ai=identity ? ReadAIReceipt(value,execution,state,exit) : (State:"unknown",Summary:hasReceipt?"AI 업무 완료 미확인 · 체크포인트 실행 식별자 불일치":"AI 완료 영수증 없음");
+            var adapter=identity ? Text(receipt,"adapter") : "";
+            var worker=adapter switch {"codex-jsonl-v1"=>"Codex JSONL","wrapper-json-v1"=>"등록 AI wrapper",_=>"연속 실행기"};
+            rows.Add(new WorkActivity {
+                Id="manager-step:"+JsonSerializer.Serialize(new[]{Path.GetFullPath(path),plan,step.Name}),
+                Project=SafeText(Text(root,"project","미확인")),ProjectId=Text(root,"project"),
+                Source="연속 실행기 단계 기록",Title=SafeText(step.Name),Worker=worker,WorkerKind=worker,
+                ExecutionId=SafeText(execution),SessionId=SafeText(plan),RequestedModel=identity?SafeText(Text(receipt,"requestedModel")):"",
+                CommandSummary=SafeText(step.Name),ProcessStatus=state,AICompletionState=ai.State,
+                Status=hasReceipt&&state is "succeeded" or "completed" ? ai.State : state,
+                Stage=SafeText("시도 "+Text(value,"attempts","미확인")+" · "+state),
+                ResultSummary=SafeText("프로세스: "+state+" · 종료 코드: "+Text(value,"returncode","미확인")+"\n"+ai.Summary),
+                UpdatedAt=Timestamp(value,"finished_at")??Timestamp(value,"started_at")??Timestamp(root,"updated_at"),
+                Evidence="저장된 단계 기록 · 현재 프로세스 생존 미확인",LivenessKnown=false,
+                NextCheckpoint="", DetailPath=null
+            });
+        }
+        return rows;
+    }
+
     public static WorkActivity ReadLocalJob(string path, Func<string, bool> owns)
     {
         using var doc = ReadJson(path); var j = doc.RootElement; var program = Text(j, "ProgramId");
@@ -206,7 +260,8 @@ public sealed class WorkDashboardService
         var exit=j.TryGetProperty("ExitCode",out var code) && code.ValueKind==JsonValueKind.Number && code.TryGetInt32(out var number)?(int?)number:null;
         var ai=ReadAIReceipt(j,Text(j,"Id"),state,exit);
         return new() { Id = "local:" + Text(j, "Id", path), Project = SafeText(Text(j, "ProjectId", "미확인")), ProjectId = Text(j,"ProjectId"), ProgramId = program,
-            Worker = "관제탑 등록 프로그램",
+            Worker = "관제탑 등록 프로그램", ExecutionId=Text(j,"Id"),SessionId=Text(j,"Id"),
+            RequestedModel=j.TryGetProperty("aiReceipt",out var receipt)?SafeText(Text(receipt,"requestedModel")):"",
             Source = "관제탑 소유 실행 기록", Title = SafeText(Text(j, "Command", "등록 작업")), Status = ai.State=="failed"?"failed":state,
             ProcessStatus=state,AICompletionState=ai.State,
             Stage = Text(j, "ExitCode") is { Length: > 0 } recordedExit ? "exit " + recordedExit : state,
@@ -250,13 +305,38 @@ public sealed class WorkDashboardService
         var work = ArrayText(j, "workDone"); var next = ArrayText(j, "nextActions");
         var checks = j.TryGetProperty("verification", out var v) && v.ValueKind == JsonValueKind.Array
             ? string.Join("\n", v.EnumerateArray().Take(12).Select(x => Text(x, "result") + " · " + Text(x, "name", Text(x, "summary")))) : "검증 기록 없음";
-        return new() { Id = "exchange:" + parsed.ProjectId + ":" + parsed.ActorId + ":" + parsed.RecordId, Project = SafeText(parsed.ProjectId), ProjectId = parsed.ProjectId,
+        // Official helper identity is project + actor + record. Sessions may change during handover.
+        return new() { Id = "exchange:"+parsed.ProjectId+":"+parsed.ActorId+":"+parsed.RecordId, Project = SafeText(parsed.ProjectId), ProjectId = parsed.ProjectId,
+            RecordFingerprint=Fingerprint(j),
+            ActorId=SafeText(parsed.ActorId), SessionId=SafeText(parsed.SessionId),WorkerKind="기록 담당자",
+            RequestSource=SafeText(parsed.RequestSource),ResponseSource=SafeText(parsed.ResponseSource),
+            CommandSummary=SafeText(parsed.RequestSummary),ResponseSummary=SafeText(parsed.ResponseSummary),
             Worker = SafeText(Text(j, "actorId", "기록 담당자")), Source = "명령·답변 task_exchange 기록", Title = SafeText(Text(j, "title")),
             Status = Text(j, "status", "unknown"), Stage = "revision " + revision.ToString("D8"), UpdatedAt = Timestamp(j, "updatedAt"),
             Evidence = "작성자가 남긴 최신 작업 기록 · 자동 채팅 감시/현재 실행 생존 확인이 아님",
             RecentLog = SafeText(work), NextCheckpoint = SafeText(next + "\n검증: " + checks), Error = SafeText(ArrayText(j, "blockers")),
             ResultSummary = SafeText("작성자 보고: " + parsed.StateLabel + "\n검증: " + checks),
             DetailPath = path, IsManagementRecord = parsed.ProjectId == "Control-Tower", Revision = parsed.Revision };
+    }
+
+    private static string Fingerprint(JsonElement root)
+    {
+        // Canonical metadata comparison only; no body/hash is written, logged or shown.
+        using var bytes=new MemoryStream();
+        using(var writer=new Utf8JsonWriter(bytes))
+        {
+            void Write(JsonElement item)
+            {
+                if(item.ValueKind==JsonValueKind.Object)
+                {
+                    writer.WriteStartObject();foreach(var field in item.EnumerateObject().OrderBy(p=>p.Name,StringComparer.Ordinal)) {writer.WritePropertyName(field.Name);Write(field.Value);}writer.WriteEndObject();
+                }
+                else if(item.ValueKind==JsonValueKind.Array) {writer.WriteStartArray();foreach(var value in item.EnumerateArray())Write(value);writer.WriteEndArray();}
+                else item.WriteTo(writer);
+            }
+            Write(root);
+        }
+        return Convert.ToHexString(SHA256.HashData(bytes.ToArray()));
     }
 
     public static string BridgeDetail(string raw)

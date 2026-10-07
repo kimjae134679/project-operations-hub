@@ -84,11 +84,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             RegisterContinuousPath = path =>
             {
+                if(IsManualControl)return _workDashboardService.RegisterContinuousSource(path,IsReadOnlyView,true);
                 if(BlockOperation())return false;
-                var full=WorkDashboardService.SafePath(path); _=WorkDashboardService.ReadContinuous(full);
-                if(_workDashboardService.ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return true;
-                if(_workDashboardService.ContinuousPaths.Count>=40) throw new InvalidDataException("상태 파일 연결은 최대 40개입니다.");
-                _workDashboardService.ContinuousPaths.Add(full); _settings.ContinuousStatePaths=_workDashboardService.ContinuousPaths.ToList(); SaveSettings();
+                if(!_workDashboardService.RegisterContinuousSource(path,IsReadOnlyView,false))return false;
+                _settings.ContinuousStatePaths=_workDashboardService.ContinuousPaths.ToList(); SaveSettings();
                 return true;
             }
         };
@@ -149,8 +148,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string ToolEvidenceSummary=>$"근거 연결 {Statuses.Count(s=>s.HasUsageEvidence)} / 등록 {Statuses.Count} · 설치 ≠ 실제 사용";
     public string ToolSearch { get => _toolSearch; set { if (SetProperty(ref _toolSearch,value)) OnPropertyChanged(nameof(FilteredToolStatuses)); } }
     public IReadOnlyList<ToolStatusViewModel> UserFacingStatuses => Statuses.Where(s => s.IsUserFacing).ToArray();
-    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => UserFacingStatuses.Where(s => (s.HasUsageEvidence || ShowOtherTools || !string.IsNullOrWhiteSpace(ToolSearch))
-        && Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel,s.UsageEvidence)).ToArray();
+    public static IReadOnlyList<ToolStatusViewModel> SelectKnownTools(IEnumerable<ToolStatusViewModel> statuses,IReadOnlySet<string> knownInstallations,bool showOther)
+        =>statuses.Where(s=>s.IsUserFacing && (showOther || s.HasUsageEvidence || knownInstallations.Contains(s.Id) || s.Kind is StatusKind.Ready or StatusKind.Running)).ToArray();
+    private static IReadOnlySet<string> KnownToolInstallations()
+    {
+        // Existing allowlisted installation contracts only, never authentication or process probes.
+        var ids=new HashSet<string>(StringComparer.Ordinal);
+        if(File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"npm","node_modules","jev-router","package.json")))ids.Add("jev");
+        if(EnvironmentProbe.FindCommand("codex") is not null)ids.Add("codex");
+        if(EnvironmentProbe.FindCommand("gh") is not null)ids.Add("github-cli");
+        return ids;
+    }
+    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => SelectKnownTools(UserFacingStatuses,KnownToolInstallations(),ShowOtherTools || !string.IsNullOrWhiteSpace(ToolSearch))
+        .Where(s=>Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel,s.UsageEvidence)).ToArray();
     private void RefreshToolEvidence()
     {
         // Only explicit task/command identities, not installation probes or actor-name guesses.
@@ -163,7 +173,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 "n8n"=>new[]{"n8n","n8n local bridge"},"aider"=>new[]{"Aider"},"hyperframes"=>new[]{"HyperFrames"},
                 "voicestudio"=>new[]{"VoiceStudio"},"zonos2"=>new[]{"Zonos2"},_=>Array.Empty<string>()
             };
-            var record=WorkDashboard.Activities.FirstOrDefault(r=>r.Source!="작업 연결 없음" && workerNames.Contains(r.Worker,StringComparer.OrdinalIgnoreCase));
+            var record=WorkDashboard.Activities.FirstOrDefault(r=>!r.IsConversation && r.Source!="작업 연결 없음"
+                && (workerNames.Contains(r.WorkerKind,StringComparer.Ordinal)||workerNames.Contains(r.Worker,StringComparer.Ordinal) && r.Source is "로컬 GET 상태" or "ProjectBridge GET"));
             string? evidence=record is null?null:$"등록 작업 기록: {record.Project} · {record.Title} · {record.UpdatedLabel} · 현재 생존/실사용 성공은 별도 확인";
             if(evidence is null)
             {
@@ -232,6 +243,17 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         set { if (_settings.DarkMode == value) return; _settings.DarkMode = value; ThemeService.Apply(value); SaveSettings(); OnPropertyChanged(); OnPropertyChanged(nameof(ThemeSwitchLabel)); }
     }
     public string ThemeSwitchLabel => DarkMode ? "밝은 화면" : "어두운 화면";
+    public static IReadOnlyList<CommunicationProjectTarget> CurrentCommunicationTargets(IEnumerable<ProjectItem> projects,CatalogDefinition catalog)
+    {
+        static string Full(string path) {try{return Path.IsPathFullyQualified(path)?Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar):"";}catch(ArgumentException){return "";}}
+        return projects.Select(p=>
+        {
+            var path=Full(p.Path);
+            CatalogProject[] registered=path.Length==0?[]:catalog.Projects.Where(c=>Full(c.Path).Equals(path,StringComparison.OrdinalIgnoreCase)).Take(2).ToArray();
+            var communication=registered.Length==1?CommunicationIdForCatalog(registered[0].Id):registered.Length>1?null:CommunicationIdForCatalog(p.Id);
+            return new CommunicationProjectTarget(p.Id,p.DisplayName,communication);
+        }).ToArray();
+    }
     public ProjectItem? SelectedProject
     {
         get => _selectedProject;
@@ -240,6 +262,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (!SetProperty(ref _selectedProject, value)) return;
             SelectedProgram = value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
+            WorkDashboard.SetProjectContext(value?.Id??"",value?.DisplayName??"");
             ProgramSearch = "";
             OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults));
         }
@@ -324,6 +347,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
             CatalogRefreshed?.Invoke(this, EventArgs.Empty);
             _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
+            WorkDashboard.SetProjectContext(SelectedProject?.Id??"",SelectedProject?.DisplayName??"");
+            SetCurrentCommunicationProjects(CurrentCommunicationTargets(Projects,_catalog));
             RefreshToolEvidence();
             _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
                 Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
