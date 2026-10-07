@@ -84,11 +84,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             RegisterContinuousPath = path =>
             {
-                if(BlockOperation())return;
+                if(BlockOperation())return false;
                 var full=WorkDashboardService.SafePath(path); _=WorkDashboardService.ReadContinuous(full);
-                if(_workDashboardService.ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return;
+                if(_workDashboardService.ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return true;
                 if(_workDashboardService.ContinuousPaths.Count>=40) throw new InvalidDataException("상태 파일 연결은 최대 40개입니다.");
                 _workDashboardService.ContinuousPaths.Add(full); _settings.ContinuousStatePaths=_workDashboardService.ContinuousPaths.ToList(); SaveSettings();
+                return true;
             }
         };
         ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),_workDashboardService.DetailsAsync) { ManagementOnly=true };
