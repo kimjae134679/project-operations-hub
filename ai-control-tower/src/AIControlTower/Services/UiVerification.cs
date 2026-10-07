@@ -53,13 +53,23 @@ public static class UiVerification
         vm.ProjectSearch = ""; vm.ProgramSearch = "";
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         var tabs = Walk(window).OfType<TabControl>().First();
-        tabs.SelectedIndex = 1;
+        var beforePcWindows=Application.Current.Windows.Count;
+        vm.PcConnection.OpenJobsCommand.Execute(null);
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        if(tabs.SelectedItem!=window.FindName("PcConnectionTab") || Application.Current.Windows.Count!=beforePcWindows)
+            throw new InvalidOperationException("Shared PC jobs opened a separate window instead of the inline workspace.");
+        window.Width=1060;window.Height=720;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        CheckVisibleControl(window,"PcJobsHost");
+        Capture(window,Path.Combine(outputDirectory,"pc-jobs-inline-compact.png"));
+        window.Width=1460;window.Height=920;
+        tabs.SelectedItem = window.FindName("ToolsTab");
         if (consolidateRemote) { await vm.ConsolidateRemoteStartupAsync(); await vm.EnsureRemoteRunningAsync(); }
         await vm.RefreshAsync();
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         Capture(window, Path.Combine(outputDirectory, "connections.png"));
         await vm.SyncCommunicationAsync(true);
-        tabs.SelectedIndex = 2;
+        tabs.SelectedItem = window.FindName("NoticeTab");
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         if (vm.Notices.Count == 0) throw new InvalidOperationException("Actual notices did not load.");
         vm.SelectedNotice = vm.Notices.FirstOrDefault(n => n.Notice.Id == "N-0005") ?? vm.Notices.First();
@@ -68,9 +78,21 @@ public static class UiVerification
         window.Width = 1060; window.Height = 720;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         CheckVisibleControl(window, "NoticeBody");
+        var noticeSummary = (FrameworkElement)window.FindName("ReceiptSummaryPanel");
+        if (!noticeSummary.IsVisible || noticeSummary.ActualHeight > 120) throw new InvalidOperationException("Notice receipts consume the reading page instead of a compact summary.");
+        var receiptWindow = new NoticeReceiptsWindow(vm) { Owner = window };
+        try
+        {
+            VerificationDisplay.Show(receiptWindow); await receiptWindow.Dispatcher.InvokeAsync(receiptWindow.UpdateLayout, DispatcherPriority.Render);
+            Capture(receiptWindow, Path.Combine(outputDirectory, "notice-receipts.png"));
+            vm.NoticeReceiptFilter = "대기";
+            await receiptWindow.Dispatcher.InvokeAsync(receiptWindow.UpdateLayout, DispatcherPriority.Render);
+            Capture(receiptWindow, Path.Combine(outputDirectory, "notice-receipts-waiting.png"));
+        }
+        finally { vm.NoticeReceiptFilter = "전체"; receiptWindow.Close(); }
         Capture(window, Path.Combine(outputDirectory, "notices-compact.png"));
         window.Width = 1460; window.Height = 920;
-        tabs.SelectedIndex = 3;
+        tabs.SelectedItem = window.FindName("CommunicationTab");
         vm.SelectedInbox = vm.InboxItems.FirstOrDefault(i => i.Exchange is not null) ?? vm.SelectedInbox;
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
         Capture(window, Path.Combine(outputDirectory, "communication.png"));
@@ -81,6 +103,8 @@ public static class UiVerification
         CheckVisibleControl(window, "InboxList");
         CheckVisibleControl(window, "ArticleScroll");
         var articleReader=(RichTextBox)window.FindName("InboxBody");
+        if (vm.Entries.Count == 0 || vm.SelectedEntry is null) throw new InvalidOperationException("Actual post contents were not separated into selectable entries.");
+        var entryNavigationChecks = await VerifyEntryNavigation(window,vm);
         if(articleReader.FontSize<16 || articleReader.Document.Blocks.Count==0) throw new InvalidOperationException("Article reader is empty or too small.");
         await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.ApplicationIdle);
         var compactArticleEnd=await VerifyArticleEnd(window,vm,outputDirectory,"compact");
@@ -107,7 +131,7 @@ public static class UiVerification
         ((Button)window.FindName("ArticleExpandButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         var articleReadingChecks=new { FontSize=articleReader.FontSize,LineHeight=articleReader.Document.LineHeight,Before=articleBefore,After=articleAfter,Restored=articleRestored,ExpandedWidth=expandedWidth,CompactEnd=compactArticleEnd,ExpandedEnd=expandedArticleEnd };
         window.Width = 1460; window.Height = 920;
-        tabs.SelectedIndex = 4;
+        tabs.SelectedItem = window.FindName("ServerTab");
         await vm.RefreshServerAsync(true);
         await vm.RefreshRosterAsync();
         await window.Dispatcher.InvokeAsync(window.UpdateLayout, DispatcherPriority.Render);
@@ -166,7 +190,7 @@ public static class UiVerification
             var guide=new ProjectGuideWindow(entry.DisplayName,entry.Path) { Owner=window };
             try
             {
-                guide.Show(); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
+                VerificationDisplay.Show(guide); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
                 if(!guide.GuideLoaded) throw new InvalidOperationException("Project guide missing: "+entry.DisplayName);
                 guideChecks.Add(new { entry.DisplayName,guide.GuideLoaded,guide.GuideFilePath });
                 if(entry.Id=="audiobook") Capture(guide,Path.Combine(outputDirectory,"audiobook-guide.png"));
@@ -176,7 +200,7 @@ public static class UiVerification
         var serverGuide=new ProjectGuideWindow("멀티의 신 서버",vm.ServerRootPath) { Owner=window };
         try
         {
-            serverGuide.Show(); await serverGuide.Dispatcher.InvokeAsync(serverGuide.UpdateLayout,DispatcherPriority.Render);
+            VerificationDisplay.Show(serverGuide); await serverGuide.Dispatcher.InvokeAsync(serverGuide.UpdateLayout,DispatcherPriority.Render);
             if(!serverGuide.GuideLoaded) throw new InvalidOperationException("Operational server guide missing.");
             guideChecks.Add(new { DisplayName="멀티의 신 서버",serverGuide.GuideLoaded,serverGuide.GuideFilePath });
         }
@@ -186,13 +210,13 @@ public static class UiVerification
             var guide=new ProjectGuideWindow(toolName,Path.Combine(@"D:\A_KJ\AI\Applications",toolName)) { Owner=window };
             try
             {
-                guide.Show(); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
+                VerificationDisplay.Show(guide); await guide.Dispatcher.InvokeAsync(guide.UpdateLayout,DispatcherPriority.Render);
                 if(!guide.GuideLoaded) throw new InvalidOperationException("Tool guide missing: "+toolName);
                 guideChecks.Add(new { DisplayName=toolName,guide.GuideLoaded,guide.GuideFilePath });
             }
             finally { guide.Close(); }
         }
-        if(vm.Statuses.Count!=11 || !vm.Statuses.Any(s=>s.Id=="desktop-commander") || !vm.Statuses.Any(s=>s.Id=="jev"))
+        if(vm.Statuses.Count!=12 || !vm.Statuses.Any(s=>s.Id=="desktop-commander") || !vm.Statuses.Any(s=>s.Id=="jev"))
             throw new InvalidOperationException("Registered tools were hidden or dropped.");
         var catalogRefresh = await VerifyCatalogRefresh(window, vm);
         var summary = new
@@ -208,6 +232,9 @@ public static class UiVerification
             ThemeChecks = themeChecks,
             GuideChecks = guideChecks,
             ArticleReadingChecks = articleReadingChecks,
+            EntryNavigationChecks = entryNavigationChecks,
+            ManualRefreshControlsRemoved = VerifyNoManualRefresh(window),
+            SharedPcJobsInline = true,
             CatalogRefresh = catalogRefresh,
             KeyColors = new { Text = ThemeColor(window, "TextBrush"), Canvas = ThemeColor(window, "CanvasBrush"), Surface = ThemeColor(window, "SurfaceBrush") },
             ValidationState = program?.Status,
@@ -232,7 +259,7 @@ public static class UiVerification
         var reader=(RichTextBox)window.FindName("InboxBody");
         var scroll=(ScrollViewer)window.FindName("ArticleScroll");
         var text=new System.Windows.Documents.TextRange(reader.Document.ContentStart,reader.Document.ContentEnd).Text.Trim();
-        var source=System.Text.RegularExpressions.Regex.Replace(vm.SelectedInbox?.ReadableBody ?? "",@"(?s)<!--.*?-->","");
+        var source=System.Text.RegularExpressions.Regex.Replace(vm.SelectedArticleBody,@"(?s)<!--.*?-->","");
         var lastLine=source.Replace("\r","").Split('\n').LastOrDefault(line=>!string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("```"))?.Trim() ?? "";
         lastLine=System.Text.RegularExpressions.Regex.Replace(lastLine,@"\[([^\]]+)\]\([^)]+\)","$1").Replace("**","").Replace("`","");
         if(lastLine.StartsWith("#"))lastLine=lastLine.TrimStart('#').Trim();
@@ -289,19 +316,41 @@ public static class UiVerification
     private static async Task<object> VerifyRosterActivity(MainWindow window,MainViewModel vm,string output)
     {
         var icon=(TextBlock)window.FindName("RosterSpinner");
-        await vm.RefreshRosterAsync();
-        await Task.Delay((int)RefreshMotion.GetDurationMilliseconds(icon)+80);
-        if(Math.Abs(((RotateTransform)icon.RenderTransform).Angle)>0.01 || vm.IsRefreshingRosterManually)
-            throw new InvalidOperationException("Automatic polling started the manual refresh animation.");
-        var request=vm.RefreshRosterAsync(true);
-        var manualObserved=vm.IsRefreshingRosterManually;
+        var request=vm.RefreshRosterAsync();
+        var activityObserved=vm.IsUpdatingRoster;
         await Task.Delay(120);
         var angle=((RotateTransform)icon.RenderTransform).Angle;
         Capture(window,Path.Combine(output,"server-updating.png"));
         await request;
-        if(!manualObserved || (!vm.ReduceMotion && SystemParameters.ClientAreaAnimation && angle<=0))
-            throw new InvalidOperationException("Manual refresh indicator did not turn smoothly.");
-        return new { AutomaticMotionQuiet=true,ManualRequestObserved=manualObserved,ManualAngle=angle,PollIntervalSeconds=vm.RosterRefreshSeconds,TurnMilliseconds=vm.RefreshTurnMilliseconds };
+        return new { AutomaticRequestObserved=activityObserved,ActivityAngle=angle,ContinuousClock=true,PollIntervalSeconds=vm.RosterRefreshSeconds,TurnMilliseconds=RefreshMotion.GetDurationMilliseconds(icon) };
+    }
+    private static async Task<object> VerifyEntryNavigation(MainWindow window,MainViewModel vm)
+    {
+        var original=vm.SelectedEntry; var count=vm.Entries.Count;
+        vm.SelectedEntry=vm.Entries.First();
+        if(vm.PreviousEntryCommand.CanExecute(null)) throw new InvalidOperationException("First entry permits backward navigation.");
+        if(count>1)
+        {
+            vm.NextEntryCommand.Execute(null);
+            if(vm.SelectedEntry!=vm.Entries[1]) throw new InvalidOperationException("Next entry does not select the adjacent actual post component.");
+        }
+        vm.SelectedEntry=vm.Entries.Last();
+        if(vm.NextEntryCommand.CanExecute(null)) throw new InvalidOperationException("Last entry permits forward navigation.");
+        vm.SelectedEntry=original;
+        await window.Dispatcher.InvokeAsync(window.UpdateLayout,DispatcherPriority.Render);
+        return new { ActualEntryCount=count,FirstBoundary=true,LastBoundary=true,AdjacentNavigation=count>1,vm.EntryPositionLabel };
+    }
+    private static bool VerifyNoManualRefresh(MainWindow window)
+    {
+        foreach(var button in Walk(window).OfType<Button>())
+        {
+            var text=button.Content as string ?? "";
+            if(text.Contains("새로고침") || text is "지금 확인" or "새 글 확인" or "지금 동기화" or "연결 상태 확인")
+                throw new InvalidOperationException("Manual refresh control remains visible: "+text);
+        }
+        if(window.FindName("RosterRefreshSelector") is not null || window.FindName("RefreshSpeedSelector") is not null)
+            throw new InvalidOperationException("Polling settings remain in user workflow.");
+        return true;
     }
     private static string ThemeColor(MainWindow window, string key) =>
         (window.FindResource(key) as SolidColorBrush)?.Color.ToString()

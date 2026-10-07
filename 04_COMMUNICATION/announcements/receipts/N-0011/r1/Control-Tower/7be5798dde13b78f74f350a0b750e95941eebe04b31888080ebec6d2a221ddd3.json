@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0011",
+  "revision": 1,
+  "contentSha256": "a2eb1f76d12558fc9fcfe59e5ca6228030f679fb99aa40d8aabc13b3df52e2c4",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "manager-20261007",
+  "checkedAt": "2026-10-06T19:06:15.917833+00:00",
+  "applicationStatus": "pending",
+  "note": "실제 읽고 Jev로컬금지폐기/바탕화면보존/추가결제Astra외부게시제외/기존작업보존을 현재작업에 적용했다. 코드검증·배포·타담당자실제읽음은 아직 완료가 아니다.",
+  "evidence": []
+}

@@ -14,3 +14,4 @@ public sealed class GitHubCliStatusProvider : CommandStatusProvider
         return Status(Id, "GitHub CLI", kind, kind == StatusKind.Ready ? "로그인 상태를 확인했습니다." : "로그인 상태가 없거나 토큰이 유효하지 않습니다.");
     }
 }
+

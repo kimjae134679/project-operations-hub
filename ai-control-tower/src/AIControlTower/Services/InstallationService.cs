@@ -60,7 +60,7 @@ public sealed class InstallationService
         var target = Path.Combine(destination, "AIControlTower.exe");
         if (!Path.GetFullPath(sourceExecutable).Equals(Path.GetFullPath(target), StringComparison.OrdinalIgnoreCase)) File.Copy(sourceExecutable, target, true);
         using var key = Registry.CurrentUser.CreateSubKey(RunKeyPath, true);
-        key.SetValue(RunValueName, "\"" + target + "\"");
+        key.SetValue(RunValueName, "\"" + target + "\" --background");
         var migrationDetail = new RemoteBridgeService(new ProcessRunner()).ConsolidateStartup(Environment.GetFolderPath(Environment.SpecialFolder.Startup), ControlTowerSettings.DataDirectory, target);
         RemoteSupervisor.SetEnabled(true);
         return new InstallationResult(true, destination, "설치 및 현재 사용자 자동 시작 등록을 완료했습니다. " + migrationDetail);

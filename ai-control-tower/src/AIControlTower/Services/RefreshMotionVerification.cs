@@ -31,12 +31,23 @@ public static class RefreshMotionVerification
             await Task.Delay((int)RefreshMotion.GetDurationMilliseconds(icon)+150);
             var completed = ((RotateTransform)icon.RenderTransform).Angle;
             if (Math.Abs(completed) > 0.01) throw new InvalidOperationException("Refresh did not return naturally to idle.");
+            // Sample through a complete wrap to catch per-turn pauses, reversals and frame stepping.
+            RefreshMotion.SetActive(icon, true);
+            var samples = new List<double>();
+            var speed = RefreshMotion.GetDurationMilliseconds(icon);
+            for (var i = 0; i < 18; i++)
+            {
+                await Task.Delay((int)(speed / 12));
+                samples.Add(((RotateTransform)icon.RenderTransform).Angle);
+            }
+            var deltas = samples.Zip(samples.Skip(1), (a,b) => (b-a+360)%360).ToArray();
+            if (deltas.Any(d => d < 8 || d > 85)) throw new InvalidOperationException("Continuous clock lost smooth forward motion across a turn.");
             RefreshMotion.SetActive(icon, true);
             await Task.Delay(90);
             RefreshMotion.SetReduceMotion(icon, true);
             var reduced = ((RotateTransform)icon.RenderTransform).Angle;
             if (reduced != 0) throw new InvalidOperationException("Reduce motion preference did not stop refresh animation.");
-            return new { MotionDisabledByWindows = false, OneTurnVerified = true, AngleBeforeRequestEnd = before, AngleAfterRequestEnd = after, IdleAngle = completed, ReducedMotionAngle = reduced };
+            return new { MotionDisabledByWindows = false, OneTurnVerified = true, ContinuousClockVerified = true, AngleBeforeRequestEnd = before, AngleAfterRequestEnd = after, IdleAngle = completed, ReducedMotionAngle = reduced, MinimumSampleAdvance = deltas.Min(), MaximumSampleAdvance = deltas.Max() };
         }
         finally
         {

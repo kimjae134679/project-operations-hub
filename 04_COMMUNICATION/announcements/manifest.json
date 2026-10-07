@@ -270,6 +270,18 @@
       "required": true,
       "active": true,
       "contentSha256": "64c9a52d2e8345722dcf68fb06b2be6caa3a2867294e66c6e8485e9498c76415"
+    },
+    {
+      "id": "N-0011",
+      "revision": 1,
+      "title": "승인된 연속 작업과 보존·권한 경계",
+      "path": "notices/N-0011.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "a2eb1f76d12558fc9fcfe59e5ca6228030f679fb99aa40d8aabc13b3df52e2c4"
     }
   ]
 }

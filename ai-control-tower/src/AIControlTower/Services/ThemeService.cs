@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace AIControlTower.Services;
 
@@ -25,6 +27,11 @@ public static class ThemeService
     // Neutral surfaces; blue-violet is reserved for emphasis and focus.
     internal static Dictionary<string, string> Palette(bool dark) => dark ? new()
     {
+        ["StatusRunningFace"]="#153D3A", ["StatusRunningInk"]="#9BE8D0",
+        ["StatusSuccessFace"]="#24374A", ["StatusSuccessInk"]="#C4DFFF",
+        ["StatusWarningFace"]="#46371B", ["StatusWarningInk"]="#FFD88C",
+        ["StatusErrorFace"]="#4A2530", ["StatusErrorInk"]="#FFC3CE",
+        ["StatusNeutralFace"]="#303440", ["StatusNeutralInk"]="#D9DEEB",
         ["CanvasBrush"]="#15171D",
         ["SurfaceBrush"]="#1D2028",
         ["RaisedBrush"]="#262A35",
@@ -55,9 +62,16 @@ public static class ThemeService
         ["DisabledBrush"]="#252A35",
         ["DisabledInkBrush"]="#AAB4C8",
         ["ButtonFootBrush"]="#1D2028",
-        ["HighlightBrush"]="#00FFFFFF"
+        ["HighlightBrush"]="#00FFFFFF",
+        ["ButtonHoverBrush"]="#2B3040", ["ButtonPressedBrush"]="#313954",
+        ["PrimaryHoverBrush"]="#4957B4", ["PrimaryPressedBrush"]="#404CA0"
     } : new()
     {
+        ["StatusRunningFace"]="#E0F3EB", ["StatusRunningInk"]="#16644E",
+        ["StatusSuccessFace"]="#E5EFFA", ["StatusSuccessInk"]="#285682",
+        ["StatusWarningFace"]="#FFF0CC", ["StatusWarningInk"]="#7B5310",
+        ["StatusErrorFace"]="#FCE5E9", ["StatusErrorInk"]="#A12643",
+        ["StatusNeutralFace"]="#E9ECF2", ["StatusNeutralInk"]="#515C70",
         ["CanvasBrush"]="#F2F4F8",
         ["SurfaceBrush"]="#FFFFFF",
         ["RaisedBrush"]="#EBEEF4",
@@ -88,7 +102,9 @@ public static class ThemeService
         ["DisabledBrush"]="#E6E9EF",
         ["DisabledInkBrush"]="#596378",
         ["ButtonFootBrush"]="#FFFFFF",
-        ["HighlightBrush"]="#00FFFFFF"
+        ["HighlightBrush"]="#00FFFFFF",
+        ["ButtonHoverBrush"]="#EEF1F8", ["ButtonPressedBrush"]="#E2E7FA",
+        ["PrimaryHoverBrush"]="#3E4DAA", ["PrimaryPressedBrush"]="#34418F"
     };
 
     // Keep the existing brush keys, with identical stops for flat surfaces.
@@ -112,3 +128,15 @@ public static class ThemeService
         ["HeroFace"]=["#F4F5FB","#F4F5FB"]
     };
 }
+
+/// <summary>Only replace WPF's built-in unwrapped string selection; preserve caller presentation.</summary>
+public sealed class ComboStringTemplateConverter : IMultiValueConverter
+{
+    public DataTemplate WrappedTemplate { get; set; } = null!;
+    public object? Convert(object[] values, Type targetType, object parameter, CultureInfo culture) =>
+        values.Length == 5 && values[1] is null && values[2] is null && values[3] is string &&
+        (values[4] is null || values[4] is string { Length: 0 }) ? WrappedTemplate : values[0];
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException("Selection presentation is one-way.");
+}
+

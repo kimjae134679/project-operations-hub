@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using AIControlTower.Models;
@@ -15,26 +15,88 @@ public partial class MainWindow : Window
     private readonly MainViewModel _viewModel;
     private readonly InstallationService _installationService = new();
     private JevControlWindow? _jevWindow;
+    private NoticeReceiptsWindow? _receiptWindow;
+    private readonly PcJobsPanel _pcJobsPanel;
     private ListBox? _activeProgramList;
     private Task? _initializeTask;
     private double _catalogOffset;
     private readonly Dictionary<string, bool> _expandedFunctions = new();
+    private bool _paneWidthsInitialized,_restoringReaderOrigin;
+    private double _expandedLogHeight=140;
+    private ReaderOrigin? _readerOrigin;
+    private SystemTrayService? _tray;
+    private bool _trayExitRequested,_sessionEnding;
+    private DateTimeOffset _lastRuntimeStatus;
+    private sealed record ReaderOrigin(TabItem Tab,WorkspaceReaderSelection Selection,
+        (ScrollViewer View,double Vertical,double Horizontal)[] Scrolls,(Expander View,bool Expanded)[] Groups);
 
-    public MainWindow(ControlTowerSettings? settings = null)
+    public MainWindow(ControlTowerSettings? settings = null) : this(settings,null) { }
+    public MainWindow(ControlTowerSettings? settings, StartupPolicy? startupPolicy)
     {
-        _viewModel = new(settings);
+        _viewModel = new(settings,true,JobManager.RecoverInterruptedRuns,startupPolicy,null);
         ThemeService.Apply(_viewModel.DarkMode);
         InitializeComponent();
         DataContext = _viewModel;
+        if(_viewModel.IsManualControl)Title=$"통합 관제탑 · {_viewModel.ApplicationVersionLabel}";
+        else if(_viewModel.IsReadOnlyView)Title=$"통합 관제탑 · {_viewModel.ApplicationVersionLabel} · 로컬 조회 (외부 실행/공유 보류)";
+        _viewModel.Documents.Opened+=(_,_)=>WorkspaceTabs.SelectedItem=DocumentReaderTab;
+        _viewModel.Documents.Opening+=(_,_)=>CaptureReaderOrigin();
+        _viewModel.Documents.ReturnRequested+=(_,_)=>RestoreReaderOrigin();
+        _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
+        if(_viewModel.IsManualControl)_viewModel.PcConnection.PropertyChanged+=(_,e)=>SaveManualRuntimeStatus(force:e.PropertyName==nameof(PcConnectionViewModel.Diagnostics));
+        PcJobsHost.Content = _pcJobsPanel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
         SourceInitialized += (_, _) => ApplyTitlebarTheme();
-        Loaded += async (_, _) => await InitializeAsync();
+        Loaded += async (_, _) => { EnsureSelectedTabVisible(WorkspaceTabs);StartOwnedTray();await InitializeAsync(); };
         SizeChanged += (_, _) => ApplyResponsiveLayout();
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.DarkMode)) ApplyTitlebarTheme(); };
         _viewModel.CatalogRefreshing += (_, _) => CaptureCatalogView();
         _viewModel.CatalogRefreshed += (_, _) => Dispatcher.BeginInvoke(RestoreCatalogView, System.Windows.Threading.DispatcherPriority.Loaded);
-        Closed += (_, _) => _viewModel.Dispose();
+        Closing += HandleWindowClosing;
+        Closed += (_, _) => { _tray?.Dispose();_viewModel.Dispose(); };
+    }
+    private void StartOwnedTray()
+    {
+        if(!_viewModel.IsManualControl || _tray is not null)return;
+        _tray=new SystemTrayService();
+        _tray.AvailabilityChanged+=(_,_)=>{if(!_tray.IsAvailable&&!IsVisible&&!_sessionEnding)Show();SaveManualRuntimeStatus();};
+        _tray.TryStart(()=>{Show();if(WindowState==WindowState.Minimized)WindowState=WindowState.Normal;Activate();},RequestTrayExit);
+        SaveManualRuntimeStatus();
+    }
+    private void SaveManualRuntimeStatus(bool force=false)
+    {
+        if(!_viewModel.IsManualControl || _sessionEnding)return;
+        var now=DateTimeOffset.UtcNow;if(!force&&now-_lastRuntimeStatus<TimeSpan.FromSeconds(1))return;
+        try
+        {
+            const string root=@"D:\A_KJ\AI\ControlTowerData\manual-control";
+            Directory.CreateDirectory(root);
+            File.WriteAllText(Path.Combine(root,"manual-control-status.json"),System.Text.Json.JsonSerializer.Serialize(new
+            { schemaVersion=1,mode="manual-control",processId=Environment.ProcessId,version=typeof(MainWindow).Assembly.GetName().Version?.ToString(),
+              updatedAt=now,trayRegistered=_tray?.IsAvailable==true,pcConnected=_viewModel.PcConnection.IsConnected,
+              autoReconnectSuppressed=_viewModel.PcConnection.AutoReconnectSuppressed,ownedJobsBusy=_viewModel.IsBusy,
+              pcStatus=_viewModel.PcConnection.Diagnostics }));
+            _lastRuntimeStatus=now;
+        }
+        catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){ }
+    }
+    public void PrepareSessionEnding() => _sessionEnding=true;
+    private void HandleWindowClosing(object? sender,System.ComponentModel.CancelEventArgs e)
+    {
+        if(!_viewModel.IsManualControl)return;
+        var decision=BackgroundLifetimePolicy.EvaluateClose(_tray?.IsAvailable==true,_trayExitRequested,_viewModel.IsBusy,_sessionEnding);
+        if(decision==WindowCloseAction.Exit)return;
+        e.Cancel=true;
+        if(decision==WindowCloseAction.HideToTray)Hide();
+        else { _trayExitRequested=false;if(!IsVisible)Show(); }
+    }
+    private void RequestTrayExit()
+    {
+        _trayExitRequested=true;
+        if(_viewModel.IsBusy){_trayExitRequested=false;Show();return;}
+        Close();
+        if(_trayExitRequested)Application.Current.Shutdown();
     }
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
@@ -44,6 +106,20 @@ public partial class MainWindow : Window
         DwmSetWindowAttribute(new WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int));
     }
     private void Theme_Click(object sender, RoutedEventArgs e) => _viewModel.DarkMode = !_viewModel.DarkMode;
+    private void LightTheme_Click(object sender,RoutedEventArgs e)=>_viewModel.DarkMode=false;
+    private void DarkTheme_Click(object sender,RoutedEventArgs e)=>_viewModel.DarkMode=true;
+    public static void EnsureSelectedTabVisible(TabControl tabs)
+    {
+        tabs.UpdateLayout();
+        if(tabs.SelectedItem is not TabItem selected)return;
+        var scroll=Descendants(tabs).OfType<ScrollViewer>().FirstOrDefault(s=>s.Name=="TabHeaderScroll");
+        if(scroll is null)return;
+        FrameworkElement viewport=Descendants(scroll).OfType<ScrollContentPresenter>().FirstOrDefault()??(FrameworkElement)scroll;
+        if(viewport.ActualWidth<=0 || !viewport.IsAncestorOf(selected))return;
+        var bounds=selected.TransformToAncestor(viewport).TransformBounds(new Rect(selected.RenderSize));
+        var delta=bounds.Right>viewport.ActualWidth?bounds.Right-viewport.ActualWidth+2:bounds.Left<0?bounds.Left-2:0;
+        if(delta!=0)scroll.ScrollToHorizontalOffset(Math.Max(0,scroll.HorizontalOffset+delta));
+    }
 
     private static IEnumerable<DependencyObject> Descendants(DependencyObject element)
     {
@@ -72,8 +148,48 @@ public partial class MainWindow : Window
         ApplyResponsiveLayout();
         if (!SystemParameters.ClientAreaAnimation) _viewModel.ReduceMotion = true;
         FadeIn(WorkspaceContent);
+        if(_viewModel.IsManualControl){ await _viewModel.InitializeManualAsync(); return; }
+        await _viewModel.StartupMode.InitializeAsync(
+            _viewModel.DiscoverAsync,
+            async()=>{await _viewModel.RefreshAsync();await _viewModel.RefreshWorkDashboardAsync();await _viewModel.SyncCommunicationAsync(true);},
+            InitializeOperationalAsync);
+    }
+    private void CaptureReaderOrigin()
+    {
+        if(_restoringReaderOrigin || WorkspaceTabs.SelectedItem is not TabItem tab || tab==DocumentReaderTab)return;
+        var root=tab.Content as DependencyObject;
+        var children=root is null?Array.Empty<DependencyObject>():Descendants(root).ToArray();
+        _readerOrigin=new(tab,WorkspaceReaderSelection.Capture(_viewModel),
+            children.OfType<ScrollViewer>().Select(s=>(s,s.VerticalOffset,s.HorizontalOffset)).ToArray(),
+            children.OfType<Expander>().Select(e=>(e,e.IsExpanded)).ToArray());
+        _viewModel.Documents.CanReturnToOrigin=true;
+    }
+    private void RestoreReaderOrigin()
+    {
+        if(_readerOrigin is not { } state)return;
+        _restoringReaderOrigin=true;
+        try
+        {
+            state.Selection.Restore(_viewModel);
+            WorkspaceTabs.SelectedItem=state.Tab;
+            Dispatcher.BeginInvoke(()=>
+            {
+                foreach(var group in state.Groups)group.View.SetCurrentValue(Expander.IsExpandedProperty,group.Expanded);
+                foreach(var scroll in state.Scrolls){scroll.View.ScrollToVerticalOffset(scroll.Vertical);scroll.View.ScrollToHorizontalOffset(scroll.Horizontal);}
+                SynchronizeProgramSelections();
+            },System.Windows.Threading.DispatcherPriority.Loaded);
+        }
+        finally {_restoringReaderOrigin=false;}
+    }
+    private void Log_Expanded(object sender,RoutedEventArgs e)
+    { if(JobLogRow is null)return;JobLogRow.MinHeight=65;JobLogRow.Height=new GridLength(_expandedLogHeight); }
+    private void Log_Collapsed(object sender,RoutedEventArgs e)
+    { if(JobLogRow is null)return;if(JobLogRow.Height.IsAbsolute)_expandedLogHeight=JobLogRow.Height.Value;JobLogRow.MinHeight=0;JobLogRow.Height=GridLength.Auto; }
+    private async Task InitializeOperationalAsync()
+    {
         await _viewModel.DiscoverAsync();
         await _viewModel.RefreshAsync();
+        await _viewModel.RefreshWorkDashboardAsync();
         await _viewModel.RefreshRosterAsync(); await _viewModel.RefreshServerAsync(true);
         if (_viewModel.AutoCommunication) await _viewModel.SyncCommunicationAsync(true);
     }
@@ -86,8 +202,12 @@ public partial class MainWindow : Window
         ContentShell.Margin = new Thickness(narrow ? 12 : 16);
         PageHeader.Margin = new Thickness(0, 0, 0, compact ? 8 : 14);
         WorkspaceContent.Margin = new Thickness(0, compact ? 16 : 20, 0, 0);
-        CatalogColumn.Width = new GridLength(narrow ? 230 : 264);
-        InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
+        if(!_paneWidthsInitialized)
+        {
+            CatalogColumn.Width = new GridLength(narrow ? 230 : 264);
+            InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
+            _paneWidthsInitialized=true;
+        }
         ProjectHeader.Padding = compact ? new Thickness(18,10,18,6) : new Thickness(narrow ? 18 : 24);
         ProjectCategory.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
         ProjectHeaderBody.Margin = new Thickness(0,0,7,compact ? 2 : 18);
@@ -95,8 +215,7 @@ public partial class MainWindow : Window
         ProjectTitle.FontSize = narrow ? 27 : 32;
         ProjectDescription.MaxHeight = compact ? 44 : 60;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
-        JobLogList.Height = compact ? 65 : 100;
-        ReceiptList.MaxHeight = compact ? 80 : 130;
+
         LogPanel.Margin = new Thickness(0, compact ? 8 : 14, 0, 0);
         var hideMetadata = compact && _viewModel.HasSelectedCommands;
         ProgramInspector.Padding = new Thickness(compact ? 14 : 20);
@@ -164,22 +283,30 @@ public partial class MainWindow : Window
     private void WorkspaceTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.OriginalSource != sender || WorkspaceContent is null) return;
+        Dispatcher.BeginInvoke(()=>EnsureSelectedTabVisible(WorkspaceTabs),System.Windows.Threading.DispatcherPriority.Loaded);
+        if(_restoringReaderOrigin)return;
         FadeIn(WorkspaceContent);
+        if (CommunicationTab.IsSelected) _viewModel.MarkCommunicationViewed();
+        if (WorkDashboardTab.IsSelected || ManagementProcessTab.IsSelected) _ = _viewModel.RefreshWorkDashboardAsync();
     }
 
-    private bool _articleExpanded;
-    private void ToggleArticleWidth_Click(object sender, RoutedEventArgs e)
+    public void ShowPcJobs()
     {
-        _articleExpanded = !_articleExpanded;
-        ArticleListPanel.Visibility = _articleExpanded ? Visibility.Collapsed : Visibility.Visible;
-        ArticleListColumn.Width = new GridLength(_articleExpanded ? 0 : 320);
-        ArticleGapColumn.Width = new GridLength(_articleExpanded ? 0 : 18);
-        ArticleExpandButton.Content = _articleExpanded ? "목록 함께 보기" : "본문 넓게";
+        WorkspaceTabs.SelectedItem = PcConnectionTab;
+        if (!VerificationDisplay.Quiet) _pcJobsPanel.FocusJobs();
     }
-    private void OpenProjectGuide_Click(object sender, RoutedEventArgs e)
+    private void OpenNoticeReceipts_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.NoticeReceiptFilter = (sender as FrameworkElement)?.Tag as string ?? "전체";
+        if (_receiptWindow is { IsLoaded: true }) { _receiptWindow.Activate(); return; }
+        _receiptWindow = new NoticeReceiptsWindow(_viewModel) { Owner = this };
+        _receiptWindow.Closed += (_,_) => _receiptWindow = null;
+        _receiptWindow.Show();
+    }
+    private async void OpenProjectGuide_Click(object sender, RoutedEventArgs e)
     {
         if (_viewModel.SelectedProject is { } project)
-            new ProjectGuideWindow(project.DisplayName, project.Path) { Owner = this }.Show();
+            await _viewModel.Documents.OpenAsync(project.Path,Path.Combine(project.Path,"프로젝트_사용안내.md"),project.DisplayName);
     }
     private void OpenTool_Click(object sender, RoutedEventArgs e)
     {
@@ -191,13 +318,14 @@ public partial class MainWindow : Window
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await _viewModel.RefreshAsync();
     private async void CommunicationSync_Click(object sender, RoutedEventArgs e) => await _viewModel.SyncCommunicationAsync(true);
     private async void RefreshServer_Click(object sender, RoutedEventArgs e) { await _viewModel.RefreshRosterAsync(true); await _viewModel.RefreshServerAsync(true); }
-    private void OpenServerGuide_Click(object sender,RoutedEventArgs e) => new ProjectGuideWindow("멀티의 신 서버",_viewModel.ServerRootPath) { Owner=this }.Show();
+    private async void OpenServerGuide_Click(object sender,RoutedEventArgs e) => await _viewModel.Documents.OpenAsync(_viewModel.ServerRootPath,Path.Combine(_viewModel.ServerRootPath,"프로젝트_사용안내.md"),"멀티의 신 서버");
     private void OpenServerFolder_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerFolder();
     private void OpenServerMailbox_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerMailbox();
     private void OpenServerSource_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(false);
     private void OpenServerRelease_Click(object sender, RoutedEventArgs e) => _viewModel.OpenServerRepository(true);
     private async void LinkServerFolder_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var dialog = new OpenFolderDialog { Title = "실제로 실행하는 멀티의 신 서버 폴더 선택" };
         if (dialog.ShowDialog(this) != true) return;
         _viewModel.ServerRootPath = dialog.FolderName;
@@ -208,6 +336,7 @@ public partial class MainWindow : Window
     private void OpenCollectedFile_Click(object sender, RoutedEventArgs e) => _viewModel.OpenCollectedFile();
     private async void LinkCommunicationProject_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var project = _viewModel.SelectedCommunicationProject;
         if (project is null) return;
         var dialog = new OpenFolderDialog { Title = project.Name + "의 주 작업 폴더 선택", Multiselect = false };
@@ -221,6 +350,7 @@ public partial class MainWindow : Window
     private async void EnsureRemote_Click(object sender, RoutedEventArgs e) => await _viewModel.EnsureRemoteRunningAsync();
     private async void StopRemote_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         if (MessageBox.Show(this, "원격 연결을 끄면 연결된 AI의 PC 작업도 끊깁니다. 이번 로그인 동안은 자동 복구를 멈추고, 다음 로그인에는 다시 켭니다.", "원격 연결 중지", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
             await _viewModel.StopRemoteRunningAsync();
     }
@@ -251,6 +381,8 @@ public partial class MainWindow : Window
 
     private void Jev_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockRegisteredOperation())return;
+        _viewModel.PrepareJevSession();
         if (_jevWindow is { IsLoaded: true }) { _jevWindow.Activate(); return; }
         _jevWindow = new JevControlWindow(_viewModel) { Owner = this };
         _jevWindow.Closed += (_, _) => _jevWindow = null;
@@ -259,6 +391,7 @@ public partial class MainWindow : Window
 
     private async void Install_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var result = await _installationService.InstallAsync(Environment.ProcessPath ?? string.Empty, CancellationToken.None);
         MessageBox.Show(this, result.Detail + Environment.NewLine + result.InstallPath, "관제탑 설치", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }
@@ -279,6 +412,7 @@ public partial class MainWindow : Window
 
     private async void Uninstall_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var path = ResolveInstallPath();
         if (MessageBox.Show(this, "관리 화면의 자동 시작을 제거합니다.\n원격 연결·자동 복구·프로젝트 자료와 실행 파일은 유지합니다.\n\n" + path, "관제탑 제거", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK) return;
         var result = await _installationService.UninstallAsync(path, CancellationToken.None);
@@ -287,6 +421,7 @@ public partial class MainWindow : Window
 
     private async void Restore_Click(object sender, RoutedEventArgs e)
     {
+        if(_viewModel.BlockOperation())return;
         var result = await _installationService.RestoreDesktopCommanderStartupAsync(ResolveInstallPath(), CancellationToken.None);
         MessageBox.Show(this, result.Detail, "공유 연결 복구", MessageBoxButton.OK, result.Success ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }

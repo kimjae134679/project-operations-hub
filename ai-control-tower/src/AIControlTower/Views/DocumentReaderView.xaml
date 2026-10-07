@@ -1,0 +1,36 @@
+<UserControl x:Class="AIControlTower.Views.DocumentReaderView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ AutomationProperties.Name="통합 문서 읽기">
+ <Grid>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <StackPanel Margin="0,0,0,12">
+   <WrapPanel Margin="0,0,0,8">
+    <Button Content="이전 문서" Click="Back_Click" IsEnabled="{Binding CanGoBack}" Margin="0,0,6,6" AutomationProperties.Name="이전 안내 문서로 돌아가기"/>
+    <Button Content="다음 문서" Click="Forward_Click" IsEnabled="{Binding CanGoForward}" Margin="0,0,6,6" AutomationProperties.Name="다음 안내 문서로 이동"/>
+    <Button Content="원래 화면으로" Click="Return_Click" IsEnabled="{Binding CanReturnToOrigin}" Margin="0,0,6,6" AutomationProperties.Name="안내를 열었던 화면으로 돌아가기"/>
+   </WrapPanel>
+   <TextBlock Text="{Binding Title}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+   <TextBox Text="{Binding FilePath,Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="0" Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,0" AutomationProperties.Name="현재 문서 경로"/>
+   <TextBlock Text="{Binding Error}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,0"/>
+  </StackPanel>
+  <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+   <TextBox Text="{Binding SearchText,UpdateSourceTrigger=PropertyChanged}" Width="210" Margin="0,0,8,6" AutomationProperties.Name="문서 본문 검색" ToolTip="본문 검색 · 결과 선택 시 원문 위치로 이동"/>
+   <Button Content="이전 결과" Click="Previous_Click" Margin="0,0,6,6"/>
+   <Button Content="다음 결과" Click="Next_Click" Margin="0,0,12,6"/>
+   <CheckBox Content="원문 보기" IsChecked="{Binding ShowRaw}" Margin="0,8,12,6"/>
+   <CheckBox Content="원문 줄바꿈" IsChecked="{Binding WrapText}" Margin="0,8,12,6"/>
+  </WrapPanel>
+  <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
+   <Grid>
+    <RichTextBox x:Name="FormattedBody" IsReadOnly="True" IsDocumentEnabled="False" BorderThickness="0" Background="Transparent" VerticalScrollBarVisibility="Auto" FontSize="16" AutomationProperties.Name="문서 읽기 본문">
+     <RichTextBox.Style><Style TargetType="RichTextBox"><Style.Triggers><DataTrigger Binding="{Binding ShowRaw}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></RichTextBox.Style>
+    </RichTextBox>
+    <TextBox x:Name="RawBody" Text="{Binding RawText,Mode=OneWay}" IsReadOnly="True" AcceptsReturn="True" BorderThickness="0" Background="Transparent" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas, Malgun Gothic" FontSize="14" AutomationProperties.Name="문서 원문 선택 복사">
+     <TextBox.Style><Style TargetType="TextBox"><Setter Property="TextWrapping" Value="Wrap"/><Style.Triggers><DataTrigger Binding="{Binding ShowRaw}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger><DataTrigger Binding="{Binding WrapText}" Value="False"><Setter Property="TextWrapping" Value="NoWrap"/></DataTrigger></Style.Triggers></Style></TextBox.Style>
+    </TextBox>
+   </Grid>
+  </Border>
+  <TextBlock Grid.Row="3" Text="{Binding SearchSummary}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,0" FontSize="12"/>
+ </Grid>
+</UserControl>

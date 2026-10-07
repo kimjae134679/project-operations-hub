@@ -1,16 +1,26 @@
-﻿using System.Windows;
+using System.Windows;
 namespace AIControlTower;
 public partial class App : Application
 {
+    public static bool ShouldActivateExistingInstance(IEnumerable<string> arguments)
+    {
+        var args=arguments.ToArray();
+        if(Services.StartupPolicy.TryCreate(args,out var policy) && policy.NoActivateExisting)return false;
+        return !args.Contains("--background", StringComparer.Ordinal) && !Services.StartupPolicy.RequestsLocalView(args);
+    }
     private Mutex? _instance;
     private EventWaitHandle? _activate;
     private RegisteredWaitHandle? _listener;
     private bool _owns;
     private CancellationTokenSource? _remoteLifetime;
+    private CancellationTokenSource? _recordPublishLifetime;
+    private Task? _recordPublishTask;
     private System.Windows.Interop.HwndSource? _shutdownWindow;
     protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
     {
         e.Cancel = false;
+        if(MainWindow is MainWindow window)window.PrepareSessionEnding();
+        _recordPublishLifetime?.Cancel();
         _remoteLifetime?.Cancel();
         base.OnSessionEnding(e);
     }
@@ -77,15 +87,60 @@ public partial class App : Application
         catch (OperationCanceledException) { }
         finally { await Dispatcher.InvokeAsync(() => Shutdown()); }
     }
+    private bool TryStartRecordPublishing(StartupEventArgs e)
+    {
+        if(!Services.RegisteredRecordPublishing.RequestsOnce(e.Args))return false;
+        // Fail-closed dedicated headless entry: never falls through settings/mutex/GUI/remote initialization.
+        ShutdownMode=ShutdownMode.OnExplicitShutdown;
+        if(e.Args.Length!=2||e.Args[0]!="--publish-records-once") {Services.RegisteredRecordPublishing.WriteConsoleOutcome(new{Status="invalid_request",ExitCode=2});Shutdown(2);return true;}
+        _recordPublishLifetime=new CancellationTokenSource();
+        _recordPublishTask=RunRecordPublishingAsync(e.Args,_recordPublishLifetime.Token);
+        return true;
+    }
+    private async Task RunRecordPublishingAsync(string[] args,CancellationToken ct)
+    {
+        var code=1;
+        try{code=await Task.Run(()=>new Services.RegisteredRecordPublishing().RunOnceAsync(args,ct),ct);}
+        catch(OperationCanceledException){}
+        catch(Exception){}
+        finally{await Dispatcher.InvokeAsync(()=>Shutdown(code));}
+    }
     protected override void OnStartup(StartupEventArgs e)
     {
+        if(TryStartRecordPublishing(e))return;
+        if(!Services.StartupPolicy.TryCreate(e.Args,out var policy)){Shutdown(2);return;}
+        if(policy.IsManualControl)ShutdownMode=ShutdownMode.OnExplicitShutdown;
+        var workFixture = Array.IndexOf(e.Args,"--verify-work-dashboard");
+        if(workFixture>=0)
+        {
+            // Standalone in-memory control rendering: no settings, mutex activation,
+            // MainWindow, process execution, communication or remote initialization.
+            ShutdownMode=ShutdownMode.OnExplicitShutdown;
+            base.OnStartup(e);
+            _=Dispatcher.InvokeAsync(async () =>
+            {
+                var code=0;
+                try
+                {
+                    if(workFixture+1>=e.Args.Length)throw new ArgumentException("검증 출력 경로가 필요합니다.");
+                    await Services.WorkDashboardVerification.RunAsync(e.Args[workFixture+1]);
+                }
+                catch(Exception ex) { code=1; Console.Error.WriteLine(Services.ProcessRunner.Sanitize(ex.ToString())); }
+                finally { Shutdown(code); }
+            });
+            return;
+        }
         if (StartRemoteSupervisor(e)) return;
-        _instance = new Mutex(false, @"Local\AIControlTower.Application");
-        _activate = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\AIControlTower.Activate");
+        var verification = e.Args.Contains("--verify-ui");
+        var identity = verification ? "Verification." + Environment.ProcessId : policy.InstanceIdentity;
+        // LocalView has a separate identity and never signals/listens to the operating GUI.
+        _instance = new Mutex(false, @"Local\AIControlTower." + identity);
+        _activate = new EventWaitHandle(false, EventResetMode.AutoReset, verification ? @"Local\AIControlTower.Verification.Activate." + Environment.ProcessId : policy.ActivationEvent);
         try { _owns = _instance.WaitOne(0); } catch (AbandonedMutexException) { _owns = true; }
-        if (!_owns) { _activate.Set(); Shutdown(); return; }
+        if (!_owns) { if (ShouldActivateExistingInstance(e.Args)) _activate.Set(); Shutdown(); return; }
         base.OnStartup(e);
-        var settings = Services.ControlTowerSettings.Load();
+        var settings = policy.IsLocalView || policy.IsManualControl ? Services.ControlTowerSettings.LoadReadOnly() : Services.ControlTowerSettings.Load();
+        if(policy.IsManualControl)settings.TransientDataDirectory=@"D:\A_KJ\AI\ControlTowerData\manual-control";
         if (e.Args.Contains("--verify-ui")) settings.IsTemporary = true;
         var communicationRoot = Array.IndexOf(e.Args, "--communication-hub");
         if (communicationRoot >= 0 && communicationRoot + 1 < e.Args.Length)
@@ -93,13 +148,18 @@ public partial class App : Application
             settings.CommunicationHubPath = Path.GetFullPath(e.Args[communicationRoot + 1]);
             if (e.Args.Contains("--verify-ui")) settings.AutoPublishCommunication = false;
         }
-        MainWindow = new MainWindow(settings);
+        MainWindow = new MainWindow(settings,policy);
+        if (!policy.IsLocalView)
         _listener = ThreadPool.RegisterWaitForSingleObject(_activate, (_, _) => Dispatcher.InvokeAsync(() =>
         {
             if (MainWindow.WindowState == WindowState.Minimized) MainWindow.WindowState = WindowState.Normal;
             MainWindow.Show(); MainWindow.Activate();
         }), null, Timeout.Infinite, false);
-        MainWindow.Show();
+        Services.VerificationDisplay.Quiet = e.Args.Contains("--verify-ui-hidden");
+        if (e.Args.Contains("--background") && !e.Args.Contains("--verify-ui"))
+            _ = ((MainWindow)MainWindow).InitializeAsync();
+        else
+            Services.VerificationDisplay.Show(MainWindow);
         var capture = Array.IndexOf(e.Args, "--verify-ui");
         if (capture >= 0 && capture + 1 < e.Args.Length)
         {
@@ -117,6 +177,7 @@ public partial class App : Application
     }
     protected override void OnExit(ExitEventArgs e)
     {
+        _recordPublishLifetime?.Cancel(); _recordPublishLifetime?.Dispose();
         _remoteLifetime?.Cancel(); _shutdownWindow?.Dispose(); _remoteLifetime?.Dispose();
         _listener?.Unregister(null); _activate?.Dispose();
         if (_owns) _instance?.ReleaseMutex();

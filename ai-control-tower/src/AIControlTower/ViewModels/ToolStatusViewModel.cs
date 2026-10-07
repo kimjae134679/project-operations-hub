@@ -5,11 +5,28 @@ namespace AIControlTower.ViewModels;
 public sealed class ToolStatusViewModel : ObservableObject
 {
     private ToolStatus _status;
+    private string _usageEvidence="사용 근거 없음 · 설치/프로세스 존재만으로 사용·성공을 판단하지 않습니다.";
+    private bool _hasUsageEvidence;
     public ToolStatusViewModel(ToolStatus status) => _status = status;
     public string Id => _status.Id;
-    public string RawName => _status.DisplayName;
+    public string RawName => Id switch
+    {
+        "project-bridge"=>"ProjectBridge","desktop-commander"=>"Remote Desktop Commander","jev"=>"Jev Router",
+        "codex"=>"Codex","github-cli"=>"GitHub CLI","n8n"=>"n8n local bridge","ai-ops-runner"=>"GitHub Actions · MultiGod-PC",
+        "delivery-chain"=>"GPT → Jev 전달","aider"=>"Aider","hyperframes"=>"HyperFrames","voicestudio"=>"VoiceStudio","zonos2"=>"Zonos2",
+        _=>_status.DisplayName
+    };
+    public bool HasUsageEvidence=>_hasUsageEvidence;
+    public string UsageEvidence=>_usageEvidence;
+    public void SetUsageEvidence(string? evidence)
+    {
+        _hasUsageEvidence=!string.IsNullOrWhiteSpace(evidence);
+        _usageEvidence=_hasUsageEvidence?evidence!:"사용 근거 없음 · 설치/프로세스 존재만으로 사용·성공을 판단하지 않습니다.";
+        OnPropertyChanged(nameof(HasUsageEvidence));OnPropertyChanged(nameof(UsageEvidence));
+    }
     public string DisplayName => RawName switch
     {
+        "ProjectBridge" => "ProjectBridge · 공용 PC 작업",
         "Remote Desktop Commander" => "Remote Desktop Commander · PC 원격 연결",
         "Jev Router" => "Jev Router · AI 작업 분배",
         "Codex" => "Codex · AI 코드 작업",
@@ -27,6 +44,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     public bool IsUserFacing => true;
     public string ActionLabel => Id switch
     {
+        "project-bridge" => "공용 PC 작업",
         "desktop-commander" => "원격 연결 화면",
         "jev" => "Jev 작업 전달",
         "n8n" => "자동화 화면",
@@ -35,6 +53,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     };
     public string Category => Id switch
     {
+        "project-bridge" => "PC 연결",
         "desktop-commander" => "PC 연결",
         "jev" or "codex" or "aider" => "AI 작업",
         "github-cli" => "저장소",
@@ -45,6 +64,7 @@ public sealed class ToolStatusViewModel : ObservableObject
     };
     public string Purpose => RawName switch
     {
+        "ProjectBridge" => "여러 도구와 프로젝트가 같은 PC 연결에서 파일·빌드·명령·화면 작업을 나눠 처리합니다.",
         "Remote Desktop Commander" => "AI가 이 PC에서 작업할 수 있게 연결합니다. 현재 연결을 공유해 사용합니다.",
         "Jev Router" => "작업에 맞는 AI 모델을 고르는 선택 도구입니다. 실제 작업 왕복은 아직 확인하지 않았습니다.",
         "Codex" => "프로젝트 코드를 읽고 고치는 AI 작업 도구입니다.",

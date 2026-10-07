@@ -1,0 +1,35 @@
+{
+  "version": "3.0.0",
+  "date": "2026-10-06",
+  "developmentWindowsTests": {
+    "passed": 80,
+    "failures": 0,
+    "seconds": 13.926
+  },
+  "nativeFrameworkBuilds": [
+    "BridgeLauncher.cs WinExe",
+    "DesktopAutomation.cs WinExe x86 and x64"
+  ],
+  "desktopPipeRegression": "CREATE_NO_WINDOW with redirected UTF8 stdin/stdout; native window_list structured response verified",
+  "actualUserPCv3Installed": false,
+  "actualUserPCFullRoundtripVerified": false,
+  "notes": [
+    "Inherited Windows JSON DELETE-sharing failures and false liveness after process exit were corrected with bounded atomic replacement retries, unique temporary names, and kernel wait-state liveness checks. Deterministic regressions pass.",
+    "Native background launcher never shows its own window and accepts shutdown query without stopping a cancelled session. Tests use installation-home mutex scope and wait for owned worker exit.",
+    "Project and issuer workspaces, logs and per-job journals are separate; legacy published jobs and legacy detached tickets retain compatibility without replay.",
+    "Installed Runtime layout is verified by the isolated hidden-native launcher test. Root config/state and legacy active ticket paths remain unchanged; checked legacy source files are removed only by known release hash, and unknown changes are preserved.",
+    "Detached start_process acceptance is immutable; local status and get_job project actual owned process phases and outcomes, count detached live jobs without double-counting scheduler threads, and refuse cross-issuer ticket access. Real success/exit7 failure and terminal phase regressions pass. Runner children use Windows SW_HIDE plus CREATE_NO_WINDOW.",
+    "Historical active detached owners remain counted and prioritized after150 newer records. Read-only phase caching and rotating polls are capped at100 owned ticket probes per status, with unknown owners marked starting until checked. A130-owner budget/rotation regression passes.",
+    "Repeated native --background and --resume invocations do not reveal the existing window. Installer startup function is tested in an isolated PowerShell fixture with task commands replaced: resume flags clear before initial registered-task launch; task-start failure/no task uses hidden native resume. Actual Task Scheduler supervision requires user-PC verification. Installer native process WQL Name value is quoted.",
+    "Native fallback job rows now use actual states: starting/running/started blue, queued amber, completed green, failed/timed_out/interrupted red, stopped neutral; unknown state is neutral confirmation-needed. Full native compile and79-test suite pass.",
+    "Installer now stages its own trusted source before pre-mutation tests. SourceDirectory binds the copied installer to actual file execution by SHA; standalone file uses the actual invoked installer, inline network uses the pinned commit installer URL. Regression invokes only the startup-function leaf test from copied payload, without recursive full suites. Both source and complete isolated80-test stage pass.",
+    "User PC v3 installation and full remote roundtrip remain separate verification steps."
+  ],
+  "validatedAt": "2026-10-06T16:08:05.043631+00:00",
+  "isolatedInstallerStageTests": {
+    "passed": 80,
+    "failures": 0,
+    "seconds": 14.474,
+    "payload": "18 SHA-verified files plus exact installer source and manifest"
+  }
+}

@@ -215,41 +215,122 @@ def validate_task(value):
         raise ValueError("기록이 수집 한도 1MiB를 넘습니다.")
     return value
 
-def load_task(path):
-    if path.stat().st_size > MAX_RECORD_BYTES:
+def _task_pairs(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("기록 JSON의 중복 필드는 허용하지 않습니다.")
+        result[key] = value
+    return result
+
+
+def _load_task_bytes(path):
+    path = Path(path)
+    for item in (path, *path.parents):
+        if item.is_symlink() or (item.exists() and getattr(item.lstat(), "st_file_attributes", 0) & 0x400):
+            raise ValueError("연결 파일·폴더의 기록은 조회하지 않습니다.")
+    with path.open("rb") as stream:
+        data = stream.read(MAX_RECORD_BYTES + 1)
+    if len(data) > MAX_RECORD_BYTES:
         raise ValueError("기록 입력이 1MiB를 넘습니다.")
-    return validate_task(read_json(path))
+    def invalid_constant(_):
+        raise ValueError("유효하지 않은 JSON 숫자입니다.")
+    value = json.loads(data.decode("utf-8-sig"), object_pairs_hook=_task_pairs, parse_constant=invalid_constant)
+    return validate_task(value), data
+
+
+def load_task(path):
+    return _load_task_bytes(path)[0]
+
 
 def task_key(value):
     return (value["projectId"], value["actorId"], value["recordId"])
 
-def write_task(root, value):
-    validate_task(value)
-    project, _ = board(root)
-    if value["projectId"] != project:
-        raise ValueError("기록 projectId가 이 소통함의 실제 프로젝트 ID와 다릅니다.")
+
+def _task_filename(value):
+    return "task-" + sha(json.dumps(task_key(value), ensure_ascii=False)) + "-r" + str(value["revision"]) + ".json"
+
+
+def _task_history(root, project, actor, record_id):
+    task_text(actor, "actorId")
+    if len(actor) > 200:
+        raise ValueError("actorId: 200자를 넘을 수 없습니다.")
+    for name, value in (("projectId", project), ("recordId", record_id)):
+        if not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,119}", value):
+            raise ValueError(name + ": 정확한 본인 기록 식별자가 필요합니다.")
+    actual_project, _ = board(root)
+    if project != actual_project:
+        raise ValueError("조회 projectId가 소통함의 실제 프로젝트 ID와 다릅니다.")
     folder = safe(root, "보낼자료")
+    requested_key = (project, actor, record_id)
+    requested_prefix = "task-" + sha(json.dumps(requested_key, ensure_ascii=False)) + "-r"
     previous = []
     if folder.exists():
         for path in folder.glob("task-*-r*.json"):
+            path = safe(root, "보낼자료/" + path.name)
             old = load_task(path)
-            if task_key(old) == task_key(value):
-                previous.append(old)
+            # Preserve unrelated valid legacy filenames. A requested payload key OR its
+            # canonical filename prefix remains in scope, so forged owners cannot hide.
+            if task_key(old) != requested_key and not path.name.startswith(requested_prefix):
+                continue
+            if old["projectId"] != actual_project or task_key(old) != requested_key or path.name != _task_filename(old):
+                raise ValueError("기록 파일명과 실제 작성자·프로젝트·버전이 일치하지 않습니다.")
+            previous.append((path, old))
+    previous.sort(key=lambda item: item[1]["revision"])
+    for (_, older), (_, newer) in zip(previous, previous[1:]):
+        if newer["revision"] != older["revision"] + 1:
+            raise ValueError("기록 이력이 누락되거나 충돌했습니다.")
+        if newer["receivedAt"] != older["receivedAt"] or newer["request"] != older["request"]:
+            raise ValueError("기록 이력의 받은 명령·수신 시각이 변경됐습니다.")
+        if task_time(newer["updatedAt"], "updatedAt") < task_time(older["updatedAt"], "updatedAt"):
+            raise ValueError("기록 이력의 갱신 시각이 역전됐습니다.")
+    return previous
+
+
+def _task_result(path, expected, status):
+    stored, data = _load_task_bytes(path)
+    if stored != expected:
+        raise ValueError("기록이 조회 중 변경됐습니다. 업무를 재실행하지 말고 이력을 확인하세요.")
+    return {"status": status, "projectId": stored["projectId"], "actorId": stored["actorId"],
+            "recordId": stored["recordId"], "revision": stored["revision"], "taskStatus": stored["status"],
+            "updatedAt": stored["updatedAt"], "path": str(path),
+            "contentSha256": hashlib.sha256(data).hexdigest(), "scope": "local_record"}
+
+
+def latest_task(root, *, project, actor, record_id):
+    previous = _task_history(root, project, actor, record_id)
+    if not previous:
+        return {"status": "not_found", "projectId": project, "actorId": actor,
+                "recordId": record_id, "scope": "local_record"}
+    path, value = previous[-1]
+    result = _task_result(path, value, "found")
+    if _task_history(root, project, actor, record_id) != previous:
+        raise ValueError("최신 기록이 조회 중 변경됐습니다. 다시 조회하고 업무는 재실행하지 마세요.")
+    return result
+
+
+def record_task(root, value):
+    validate_task(value)
+    previous = _task_history(root, *task_key(value))
+    for path, old in previous:
+        if old["revision"] == value["revision"]:
+            if old != value:
+                raise ValueError("같은 버전의 내용이 다릅니다. 기존 기록을 덮어쓰지 않습니다.")
+            return _task_result(path, value, "already_stored")
     if previous:
-        latest = max(previous, key=lambda item: item["revision"])
+        latest = previous[-1][1]
         if value["revision"] != latest["revision"] + 1:
             raise ValueError("기존 최신 revision 다음 번호로 기록하세요. 원본은 덮어쓰지 않습니다.")
         if value["receivedAt"] != latest["receivedAt"] or value["request"] != latest["request"]:
             raise ValueError("받은 명령·수신 시각은 유지하세요. 새 명령은 새 recordId로 적습니다.")
         if task_time(value["updatedAt"], "updatedAt") < task_time(latest["updatedAt"], "updatedAt"):
             raise ValueError("기존 최신 기록보다 updatedAt이 빠릅니다.")
-    filename = "task-" + sha(json.dumps(task_key(value), ensure_ascii=False)) + "-r" + str(value["revision"]) + ".json"
-    relative = "보낼자료/" + filename
+    relative = "보낼자료/" + _task_filename(value)
     destination = safe(root, relative)
     destination.parent.mkdir(parents=True, exist_ok=True)
     safe(root, relative)
-    # Publish a complete file atomically while refusing revision collisions.
     handle, temporary = tempfile.mkstemp(prefix=".writing-task-", suffix=".tmp", dir=destination.parent)
+    status = "stored"
     try:
         with os.fdopen(handle, "w", encoding="utf-8", newline="\n") as stream:
             json.dump(value, stream, ensure_ascii=False, indent=2)
@@ -257,11 +338,24 @@ def write_task(root, value):
             stream.flush()
             os.fsync(stream.fileno())
         safe(root, relative)
-        os.link(temporary, destination)
+        try:
+            os.link(temporary, destination)
+        except FileExistsError:
+            # A concurrent identical publication is already saved, not permission to retry work.
+            previous = _task_history(root, *task_key(value))
+            if not any(path == destination and old == value for path, old in previous):
+                raise ValueError("동시 기록 내용이 충돌했습니다. 업무를 재실행하지 않습니다.")
+            status = "already_stored"
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
-    return destination
+    return _task_result(destination, value, status)
+
+
+def write_task(root, value):
+    # Keep the existing Path-returning Python API; CLI uses explicit storage status.
+    return Path(record_task(root, value)["path"])
+
 
 def render_task(value):
     print(value["title"] + " · " + TASK_LABELS[value["status"]])
@@ -300,13 +394,19 @@ def main(argv=None):
     for command in ("record", "validate", "render"):
         task = commands.add_parser(command)
         task.add_argument("--input", required=True, help="task_exchange JSON 경로")
+    lookup = commands.add_parser("latest", help="본인 기록의 최신 로컬 버전·해시 조회 (쓰기 없음)")
+    for name in ("project", "actor", "record-id"):
+        lookup.add_argument("--" + name, required=True)
     args = parser.parse_args(argv)
     try:
+        if args.command == "latest":
+            result = latest_task(Path(args.root).resolve(), project=args.project, actor=args.actor, record_id=args.record_id)
+            print(json.dumps(result, ensure_ascii=False))
+            return 0 if result["status"] == "found" else 3
         if args.command in {"record", "validate", "render"}:
             value = load_task(Path(args.input))
             if args.command == "record":
-                print(write_task(Path(args.root).resolve(), value))
-                print("본인 명령·답변 기록을 작성했습니다. 수집·중앙 공유 여부는 앱에서 별도로 확인하세요.")
+                print(json.dumps(record_task(Path(args.root).resolve(), value), ensure_ascii=False))
             elif args.command == "render":
                 render_task(value)
             else:
@@ -323,6 +423,9 @@ def main(argv=None):
             ack(root, args)
         return 0
     except (ValueError, OSError, UnicodeError, KeyError, TypeError) as error:
+        if args.command == "latest":
+            print(json.dumps({"status": "held", "scope": "local_record",
+                              "error": "기록 검증 실패 또는 조회 중 변경. 업무를 재실행하지 않고 이력을 확인하세요."}, ensure_ascii=False))
         print("공지 기록 대기: " + str(error), file=sys.stderr)
         return 1
 

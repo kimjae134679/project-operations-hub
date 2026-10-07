@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0010",
+  "revision": 1,
+  "contentSha256": "64c9a52d2e8345722dcf68fb06b2be6caa3a2867294e66c6e8485e9498c76415",
+  "projectId": "Control-Tower",
+  "actorId": "/root",
+  "sessionId": "manager-20261007",
+  "checkedAt": "2026-10-06T19:06:15.864412+00:00",
+  "applicationStatus": "pending",
+  "note": "실제 읽고 체크포인트 및30분 후속 실행을 등록했다. 기존6.1지원거부/0.160.1확인/명시5.5probe성공을 기록했다. 연속실행기 구현·배포 및 실제 지원범위 검증 중이다.",
+  "evidence": []
+}
