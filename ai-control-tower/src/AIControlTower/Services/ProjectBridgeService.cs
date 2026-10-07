@@ -7,7 +7,31 @@ namespace AIControlTower.Services;
 
 public sealed record PcJobSnapshot(string Id, string Title, string Project, string Tool, string State, string Action = "");
 public sealed record PcConnectionSnapshot(bool Installed, bool Connected, bool RelayConnected, string Device,
-    string Stage, string Detail, string RelayCode, int ActiveJobs, int ParallelLimit, IReadOnlyList<PcJobSnapshot> Jobs);
+    string Stage, string Detail, string RelayCode, int ActiveJobs, int ParallelLimit, IReadOnlyList<PcJobSnapshot> Jobs)
+{
+    public string StatusReasonCode { get; init; } = "unknown";
+}
+
+// Only allowlisted metadata may be persisted. Never add raw errors, body, endpoint or device data.
+public sealed record PcConnectionDiagnostics(string Stage = "unknown", string ReasonCode = "unknown",
+    DateTimeOffset? AttemptStartedAtUtc = null, DateTimeOffset? AttemptCompletedAtUtc = null,
+    long ElapsedMilliseconds = 0, bool InFlight = false, DateTimeOffset? NextRetryAtUtc = null,
+    DateTimeOffset? LastSuccessAtUtc = null)
+{
+    internal static string SafeStage(string stage) => stage switch
+    {
+        "connected" or "running" or "stopped" or "disconnected" or "paused" or "offline" or "stale" or
+        "permission_denied" or "error" or "cancelled" or "not_installed" or "upgrade_required" => stage,
+        _ => "unknown"
+    };
+    internal static string SafeReason(string reason) => reason switch
+    {
+        "status_confirmed" or "stale_status" or "invalid_status_timestamp" or "timeout" or "permission_denied" or
+        "endpoint_unavailable" or "http_error" or "transport_error" or "invalid_json" or "invalid_status" or
+        "invalid_metadata" or "io_error" or "cancelled" or "unexpected_error" => reason,
+        _ => "unknown"
+    };
+}
 
 public sealed class ProjectBridgeService : IDisposable
 {
@@ -67,18 +91,30 @@ public sealed class ProjectBridgeService : IDisposable
         {
             using var doc=await RequestAsync(HttpMethod.Get,"v1/status",null,ct);var j=doc.RootElement;
             var now=DateTimeOffset.UtcNow;
-            var fresh=DateTimeOffset.TryParse(Text(j,"updatedAt"),out var at)&&now-at<TimeSpan.FromSeconds(30)&&at<now.AddMinutes(1);
+            var parsed=DateTimeOffset.TryParse(Text(j,"updatedAt"),out var at);
+            var fresh=parsed&&now-at<TimeSpan.FromSeconds(30)&&at<now.AddMinutes(1);
             var stage=Text(j,"stage","unknown");var jobs=new List<PcJobSnapshot>();
             if(j.TryGetProperty("jobs",out var rows)&&rows.ValueKind==JsonValueKind.Array)
                 foreach(var row in rows.EnumerateArray().Take(200))jobs.Add(new(Text(row,"id"),Text(row,"title",ActionName(Text(row,"action"))),Text(row,"projectId"),Text(row,"toolId","ProjectBridge"),Text(row,"state","unknown"),Text(row,"action")));
             return new(installed,fresh&&Flag(j,"localReady")&&stage is not("stopped" or "disconnected" or "paused"),fresh&&Flag(j,"relayConnected"),Text(j,"deviceId","기기 미확인"),fresh?stage:"stale",
-                fresh?"기존 인증 API 응답 확인 · 연결 상태와 작업을 조회합니다. 설정/설치/원격 프로세스는 변경하지 않습니다.":"API 응답 시각이 오래되었습니다. 제한된 간격으로 상태만 다시 확인합니다.",Text(j,"relayCode"),Number(j,"activeJobCount",0),Math.Clamp(Number(j,"parallelLimit",4),1,8),jobs);
+                fresh?"기존 인증 API 응답 확인 · 연결 상태와 작업을 조회합니다. 설정/설치/원격 프로세스는 변경하지 않습니다.":"API 응답 시각이 오래되었습니다. 제한된 간격으로 상태만 다시 확인합니다.",Text(j,"relayCode"),Number(j,"activeJobCount",0),Math.Clamp(Number(j,"parallelLimit",4),1,8),jobs)
+                {StatusReasonCode=fresh?"status_confirmed":parsed?"stale_status":"invalid_status_timestamp"};
         }
-        catch(OperationCanceledException){ct.ThrowIfCancellationRequested();return new(installed,false,false,"기기 미확인","offline","PC 상태 조회 시간 초과 · 기존 연결 실행기에 복구를 맡기고 상태만 다시 확인합니다.","",0,4,[]);}
+        catch(OperationCanceledException){ct.ThrowIfCancellationRequested();return new(installed,false,false,"기기 미확인","offline","PC 상태 조회 시간 초과 · 기존 연결 실행기에 복구를 맡기고 상태만 다시 확인합니다.","",0,4,[]) {StatusReasonCode="timeout"};}
         catch(Exception e) when(e is IOException or HttpRequestException or JsonException or UnauthorizedAccessException or InvalidOperationException)
         {
             var denied=e is UnauthorizedAccessException||e is HttpRequestException{StatusCode:System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.Unauthorized};
-            return new(installed,false,false,"기기 미확인",denied?"permission_denied":"offline",denied?"PC 로컬 API 권한 거부 · 자동 재시도/복구 중지 · 인증은 별도로 확인해야 합니다.":"기존 PC API 응답 없음 · 설치/설정 변경이나 새 실행기 시작 없이 제한된 간격으로 조회합니다.","",0,4,[]);
+            return new(installed,false,false,"기기 미확인",denied?"permission_denied":"offline",denied?"PC 로컬 API 권한 거부 · 자동 재시도/복구 중지 · 인증은 별도로 확인해야 합니다.":"기존 PC API 응답 없음 · 설치/설정 변경이나 새 실행기 시작 없이 제한된 간격으로 조회합니다.","",0,4,[])
+                {StatusReasonCode=denied?"permission_denied":e switch
+                {
+                    FileNotFoundException or DirectoryNotFoundException => "endpoint_unavailable",
+                    HttpRequestException{StatusCode:not null} => "http_error",
+                    HttpRequestException => "transport_error",
+                    JsonException => "invalid_json",
+                    InvalidDataException => "invalid_metadata",
+                    IOException => "io_error",
+                    _ => "invalid_status"
+                }};
         }
     }
     public async Task ControlApiOnlyAsync(string action,CancellationToken ct)

@@ -2,18 +2,29 @@
 
 현재 사용자 직접 지시까지 반영한 작업 목록입니다(2026-10-07 KST). 기능 계획, 소스 구현, 검사 통과, 배포 준비, 운영 설치, 실제 사용 완료는 별개입니다. 이 문서는 완료표나 다른 담당자의 읽음 확인을 대신하지 않습니다. 최신 진행은 본인 task_exchange와 해당 프로젝트의 실제 상태를 확인합니다.
 
+## 최신 사용자 제약 · 기반 먼저
+
+사용자는 외출로 직접 확인할 수 없습니다. 이번 허브 작업은 화면 읽기·스크린샷·UIAutomation·마우스/키보드·창 조작 없이 코드·로그·검사로 판단합니다. 원격 실행·연속 작업·기록/수집 기반을 먼저 마무리하고 Threads 수익화·Voice의 새 제작 작업은 그 뒤에 진행합니다. 아래 기존 P4 성과와 이미 실행 중인 생성 작업·원본·dirty는 보존하며 중복 시작하거나 중지하지 않습니다.
+
+중단 전에 받은 명령·이미 전달한 답변·실제 결과·남은 일·소유 작업 ID를 본인 task_exchange에 남깁니다. 로컬 저장, 앱 수집, 중앙 Git 공유는 별개이며 미공유 기록은 미공유로 표시합니다. 저장 여부가 불명확하면 본인 최신 revision·hash를 조회하고 업무를 다시 실행하지 않습니다. 전체 채팅 자동 백업으로 표현하지 않습니다.
+
 ## 최신 체크포인트 · 실제 검증과 아직 남은 일
 
-아래 현재 상태가 이전 시점의 미완료 표현보다 우선합니다. 지난 검사·실행 증거는 아래 이력에 보존하며, 격리 검증을 모든 프로젝트의 업무 완료로 확대하지 않습니다.
+아래 현재 상태가 이전 시점의 미완료 표현보다 우선합니다. 지난 검사·실행 증거는 아래 이력에 보존하며, 격리 검증을 모든 프로젝트의 업무 완료로 확대하지 않습니다. 최신 소스는 **0.9.4**이며 현재 운영 앱은 **0.9.3 PID 16092** 그대로입니다. 0.9.4는 운영 활성화하지 않았습니다.
 
 | 구분 | 이번에 확인한 상태 | 남은 경계 |
 |---|---|---|
-| P1 · 0.9.3 수동운영 앱 | manual-control PID 16092의 PC 연결·tray 등록 true 유지 | live UI·사용자 조작 시험은 별도; 모든 외부 실행기의 진행이 확인됐다는 뜻이 아님 |
+| P1 · 0.9.4 소스 검증 | .NET 471 PASS/0 FAIL, Python scripts 68 PASS/0 FAIL(22.859초); 경계 검사 17개에 수정 전 반례 2개 포함 | Window.Show 휠 검사 3개 미실행; live UI·0.9.4 운영 활성화·사용자 조작 검증은 아님 |
+| P1 · 현재 수동운영 앱 | 기존 0.9.3 manual-control PID 16092 유지 | 새 소스의 기능을 현재 앱에 적용했다고 표시하지 않음 |
+| P2 · 로컬 수집 연결 | collect-only를 앱 소스에 연결 | 현재 운영 0.9.3에는 미반영; 로컬 수집·중앙 공유·공지 본인 확인은 각각 별도 |
+| P3 · 중단 대비 기록 | 실제 latest found r1 및 동일 내용 재등록 already_stored 각각 exit 0; 바이트·mtime·속성 불변, 본인 r2 저장 | 업무 재실행 0; 전체 대화 자동 백업·중앙 공유 성공은 아님 |
 | P2 · 게임 조회 연결 | 지원된 V33 start-only 경로 1회 실행 후 TCP 29000·29001, roster 및 앱 service healthy 실제 확인 | copy/stop/firewall 변경 0; 사용자 휴대폰 플레이는 미검증 |
 | P2 · 보호된 운영 갱신·중앙 공유 | 보호 Bridge config 설치와 clone Git locks 막힘은 유지 | 운영 설치 재시도·속성/ACL 변경·lock 삭제로 우회하지 않음; 중앙 공유 성공으로 표시하지 않음 |
 | P3 · 격리 연속 실행 | 실제 Jev `gpt-6.1-sol` 1회·tool 0 → 결정적 validator → dependent finalizer 성공; 동일 승인 계획 재실행에서도 전 단계 attempts 1·산출물 hash 불변 | AI 응답은 adapter 호스트가 저장; 실제 프로젝트 업무·전체 자율운영·앱 버튼을 통한 동일 업무 실행 검증과는 별개 |
 | P4 · VoiceAudiobook | 18/128 ready, 기존 제작 진행 중; ‘윽’ regex 격리 검사 10 PASS | live 미적용, 중복 생성하지 않음; 청취·품질 및 전체 제작 완료 미확인 |
 | P4 · Threads | D 평가 67건 실제 보존 복원·conflict 0 | C 원본 hash 불변·제작 버전/점수 그대로 보존·private backup 검증; 외부 게시/GUI 사용 완료는 아님 |
+
+최신 코드 검증 근거: `foundation-continuity-full-green2.trx`, Python `full-green.log`. 기록 복구 실제 검증: `checks/continuity-record-recovery-actual-green.json`. 과거 검사 수는 당시 이력으로 보존합니다.
 
 P3 fake 검사 18개(Node 14 + Python 4)와 위 실제 실행은 별도 증거입니다. 실제 typed receipt는 process exit 0·terminal/report 관측·fresh artifact 검증 성공입니다. 계획 hash는 `6682eaa97ef7c49984a799a086c2a1610511e0f22d602447723125bd4ae1e38f`, 산출물 SHA-256은 `cef011964f492a3e92d5a13a61f142b8350aa7318e316933eba4fd8bb39750ca`입니다. 입력 14,010 / 출력 44 토큰을 관측했지만 절감률은 산정하지 않았습니다. 증거 위치: `checks/jev-task-chain-20261007-1000/workspace/state/state.json`, `report-provenance.json`, `validation.json`, `final-summary.json`.
 

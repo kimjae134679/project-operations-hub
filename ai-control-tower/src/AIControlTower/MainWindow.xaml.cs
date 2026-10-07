@@ -43,7 +43,7 @@ public partial class MainWindow : Window
         _viewModel.Documents.Opening+=(_,_)=>CaptureReaderOrigin();
         _viewModel.Documents.ReturnRequested+=(_,_)=>RestoreReaderOrigin();
         _pcJobsPanel = new PcJobsPanel(_viewModel.PcConnection,_viewModel);
-        if(_viewModel.IsManualControl)_viewModel.PcConnection.PropertyChanged+=(_,_)=>SaveManualRuntimeStatus();
+        if(_viewModel.IsManualControl)_viewModel.PcConnection.PropertyChanged+=(_,e)=>SaveManualRuntimeStatus(force:e.PropertyName==nameof(PcConnectionViewModel.Diagnostics));
         PcJobsHost.Content = _pcJobsPanel;
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
         SourceInitialized += (_, _) => ApplyTitlebarTheme();
@@ -64,10 +64,10 @@ public partial class MainWindow : Window
         _tray.TryStart(()=>{Show();if(WindowState==WindowState.Minimized)WindowState=WindowState.Normal;Activate();},RequestTrayExit);
         SaveManualRuntimeStatus();
     }
-    private void SaveManualRuntimeStatus()
+    private void SaveManualRuntimeStatus(bool force=false)
     {
         if(!_viewModel.IsManualControl || _sessionEnding)return;
-        var now=DateTimeOffset.UtcNow;if(now-_lastRuntimeStatus<TimeSpan.FromSeconds(1))return;
+        var now=DateTimeOffset.UtcNow;if(!force&&now-_lastRuntimeStatus<TimeSpan.FromSeconds(1))return;
         try
         {
             const string root=@"D:\A_KJ\AI\ControlTowerData\manual-control";
@@ -75,7 +75,8 @@ public partial class MainWindow : Window
             File.WriteAllText(Path.Combine(root,"manual-control-status.json"),System.Text.Json.JsonSerializer.Serialize(new
             { schemaVersion=1,mode="manual-control",processId=Environment.ProcessId,version=typeof(MainWindow).Assembly.GetName().Version?.ToString(),
               updatedAt=now,trayRegistered=_tray?.IsAvailable==true,pcConnected=_viewModel.PcConnection.IsConnected,
-              autoReconnectSuppressed=_viewModel.PcConnection.AutoReconnectSuppressed,ownedJobsBusy=_viewModel.IsBusy }));
+              autoReconnectSuppressed=_viewModel.PcConnection.AutoReconnectSuppressed,ownedJobsBusy=_viewModel.IsBusy,
+              pcStatus=_viewModel.PcConnection.Diagnostics }));
             _lastRuntimeStatus=now;
         }
         catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){ }

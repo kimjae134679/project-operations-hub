@@ -1,6 +1,10 @@
 <Window x:Class="AIControlTower.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:services="clr-namespace:AIControlTower.Services" xmlns:views="clr-namespace:AIControlTower.Views" Style="{StaticResource {x:Type Window}}" Title="내 프로젝트 · 컨트롤타워" Width="1460" Height="920" MinWidth="1060" MinHeight="720" WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="ProjectFolder_Drop">
  <Window.Resources>
 
+  <!-- TabPanel subtracts container margins when allocating header slots. Keep spacing on
+       the surrounding header bar so each tab's complete border fits its layout clip. -->
+  <Style x:Key="WorkspaceTabItem" TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}"><Setter Property="Margin" Value="0"/></Style>
+
   <Style x:Key="ProjectRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
    <Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}"/><Setter Property="Padding" Value="13,13"/><Setter Property="Margin" Value="1,2,1,9"/><Setter Property="Foreground" Value="{DynamicResource RailTextBrush}"/>
    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem">
@@ -38,7 +42,7 @@
    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Border Width="30" Height="30" CornerRadius="7" Background="{DynamicResource ActionFace}" BorderBrush="{DynamicResource RimBrush}" BorderThickness="1" Margin="0,0,10,0"><Path Data="M 0 0 L 12 0 L 12 5 L 0 5 Z M 0 8 L 5 8 L 5 19 L 0 19 Z M 8 8 L 12 8 L 12 19 L 8 19 Z" Fill="{DynamicResource AccentInkBrush}" Width="12" Height="19" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><TextBlock x:Name="PageTitle" Text="컨트롤타워" FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"/></StackPanel>
    <WrapPanel x:Name="ThemeControls" Grid.Column="1" MaxWidth="620" VerticalAlignment="Center"><Button x:Name="LightThemeButton" Content="밝게" Tag="light" Click="LightTheme_Click" Style="{StaticResource ThemeChoiceButton}" Margin="0,0,6,0" AutomationProperties.Name="밝은 화면 적용"/><Button x:Name="DarkThemeButton" Content="어둡게" Tag="dark" Click="DarkTheme_Click" Style="{StaticResource ThemeChoiceButton}" Margin="0,0,12,0" AutomationProperties.Name="어두운 화면 적용"/><TextBlock Text="{Binding ViewModeLabel}" MaxWidth="400" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" FontSize="12"/></WrapPanel>
   </Grid>
-  <TabControl x:Name="WorkspaceTabs" Grid.Row="1" SelectionChanged="WorkspaceTabs_SelectionChanged">
+   <TabControl x:Name="WorkspaceTabs" Grid.Row="1" ItemContainerStyle="{StaticResource WorkspaceTabItem}" SelectionChanged="WorkspaceTabs_SelectionChanged">
    <TabItem Header="내 프로젝트" x:Name="ProjectsTab" IsSelected="True">
     <Grid x:Name="WorkspaceContent" Margin="0,16,0,0"><Grid.ColumnDefinitions><ColumnDefinition x:Name="CatalogColumn" Width="238" MinWidth="190" MaxWidth="450"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*" MinWidth="540"/></Grid.ColumnDefinitions>
      <Border x:Name="ProjectRail" Background="{DynamicResource RailMaterial}" CornerRadius="14" Padding="14,20"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
@@ -135,6 +139,16 @@
      </Grid>
     </Grid>
    </TabItem>
+   <TabControl.Template>
+    <ControlTemplate TargetType="TabControl">
+     <Grid SnapsToDevicePixels="True" UseLayoutRounding="True"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+      <Border x:Name="WorkspaceHeaderBar" Background="{DynamicResource RaisedBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="10" Padding="6" Margin="0,0,0,8">
+       <TabPanel x:Name="HeaderPanel" IsItemsHost="True" SnapsToDevicePixels="True" UseLayoutRounding="True"/>
+      </Border>
+      <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="1" TextElement.Foreground="{DynamicResource TextBrush}" TextElement.FontWeight="Normal" ContentSource="SelectedContent"/>
+     </Grid>
+    </ControlTemplate>
+   </TabControl.Template>
   </TabControl>
   <Grid Grid.Row="2" Margin="0,12,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding Message}" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextTrimming="CharacterEllipsis" ToolTip="{Binding Message}" MaxHeight="20"/><StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16,0,0,0" ToolTip="{Binding ApplicationSourceLabel}"><TextBlock Text="{Binding ApplicationVersionLabel}" FontWeight="SemiBold" FontSize="12" Margin="0,0,8,0"/><TextBlock Text="실행 파일 출처 보기" FontSize="12" Foreground="{DynamicResource MutedBrush}"/></StackPanel></Grid>
  </Grid>

@@ -39,6 +39,7 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     private bool _desiredConnected=true, _permissionBlocked;private int _retryFailures;
     public bool AutoReconnectSuppressed => !_desiredConnected || _permissionBlocked;
     public DateTimeOffset NextRetryAt { get; private set; } = DateTimeOffset.MinValue;
+    public PcConnectionDiagnostics Diagnostics { get; private set; } = new();
     public PcConnectionSnapshot Snapshot => _snapshot with { Jobs=Array.AsReadOnly(_snapshot.Jobs.ToArray()) };
     public PcConnectionViewModel(ProjectBridgeService? service = null, Func<string,string,string,Task>? openDocument = null) : this(service,openDocument,false) { }
     public PcConnectionViewModel(ProjectBridgeService? service, Func<string,string,string,Task>? openDocument, bool readOnly)
@@ -72,6 +73,9 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     {
         if(IsReadOnly){Notify();return;}
         if (!await _gate.WaitAsync(0)) return;
+        var started=DateTimeOffset.UtcNow;var elapsed=System.Diagnostics.Stopwatch.StartNew();var cancelled=false;var unexpected=false;
+        Diagnostics=Diagnostics with {AttemptStartedAtUtc=started,AttemptCompletedAtUtc=null,ElapsedMilliseconds=0,InFlight=true};
+        OnPropertyChanged(nameof(Diagnostics));
         try
         {
             _snapshot = _manualControl?await _service.CheckApiOnlyAsync(_lifetime.Token):await _service.CheckAsync(_lifetime.Token);
@@ -86,8 +90,18 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
             }
             Notify();
         }
-        catch(OperationCanceledException) { }
-        finally { _gate.Release(); }
+        catch(OperationCanceledException) { cancelled=true; }
+        catch { unexpected=true;throw; }
+        finally
+        {
+            var finished=DateTimeOffset.UtcNow;elapsed.Stop();
+            var reason=cancelled?"cancelled":unexpected?"unexpected_error":PcConnectionDiagnostics.SafeReason(_snapshot.StatusReasonCode);
+            Diagnostics=Diagnostics with {Stage=cancelled?"cancelled":unexpected?"error":PcConnectionDiagnostics.SafeStage(_snapshot.Stage),
+                ReasonCode=reason,AttemptCompletedAtUtc=finished,ElapsedMilliseconds=Math.Clamp(elapsed.ElapsedMilliseconds,0,86_400_000),InFlight=false,
+                NextRetryAtUtc=NextRetryAt==DateTimeOffset.MinValue?null:NextRetryAt,
+                LastSuccessAtUtc=reason=="status_confirmed"?finished:Diagnostics.LastSuccessAtUtc};
+            _gate.Release();OnPropertyChanged(nameof(Diagnostics));
+        }
     }
     public async Task MaintainConnectionAsync(DateTimeOffset now)
     {
@@ -114,7 +128,7 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
             {_permissionBlocked=true;_error="PC 로컬 API 권한 거부 · 자동 재시도/복구를 중지했습니다.";}
             else{_retryFailures=Math.Min(5,_retryFailures+1);NextRetryAt=now.AddSeconds(Math.Min(30,Math.Pow(2,_retryFailures)));_error="연결 유지 응답을 확인하지 못했습니다. 기존 실행기는 변경하지 않고 제한된 간격으로 다시 확인합니다.";}
         }
-        finally{_operations.Release();Notify();}
+        finally{Diagnostics=Diagnostics with {NextRetryAtUtc=NextRetryAt==DateTimeOffset.MinValue?null:NextRetryAt};_operations.Release();OnPropertyChanged(nameof(Diagnostics));Notify();}
     }
     private async Task RunAsync(Func<Task> action)
     {

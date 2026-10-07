@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import io
+import os
 import project_notice as helper
 
 def sample():
@@ -21,7 +22,7 @@ def sample():
 
 class TaskRecordTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory(prefix="communication-record-test-")
+        self.temporary = tempfile.TemporaryDirectory(prefix="communication-record-test-", dir=os.environ.get("TASK_RECORD_TEST_ROOT"))
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name) / "_통합소통"
         folder = self.root / "받은공지"
@@ -44,8 +45,11 @@ class TaskRecordTests(unittest.TestCase):
         value = sample()
         first = helper.write_task(self.root, helper.validate_task(value))
         original = first.read_bytes()
+        self.assertEqual(first, helper.write_task(self.root, value))
+        conflicting = copy.deepcopy(value)
+        conflicting["response"]["summary"] = "다른 내용"
         with self.assertRaises(ValueError):
-            helper.write_task(self.root, value)
+            helper.write_task(self.root, conflicting)
         value = copy.deepcopy(value)
         value["revision"] = 2
         value["response"]["summary"] = "진행 답변을 전달함"

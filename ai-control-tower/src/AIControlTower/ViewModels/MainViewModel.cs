@@ -118,6 +118,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if(IsManualControl)
             {
                 await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
+                _ = StartManualCollection();
                 if(!_disposed&&DateTime.UtcNow-_lastManualDashboardRefresh>=TimeSpan.FromSeconds(5))
                 {_lastManualDashboardRefresh=DateTime.UtcNow;await RefreshWorkDashboardAsync();}
             }

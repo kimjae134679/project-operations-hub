@@ -99,7 +99,9 @@ public sealed class NavigationPresentationTests
     [Fact] public void MainTabsUseNamedIdentityAndRequestedTaskFirstOrder()
     {
         var source=XDocument.Load(Source("MainWindow.xaml"));var tabs=source.Descendants().First(e=>e.Name.LocalName=="TabControl");
-        var names=tabs.Elements().Select(e=>(string?)e.Attribute(XName.Get("Name","http://schemas.microsoft.com/winfx/2006/xaml"))).ToArray();
+        // XAML property elements configure the control; they are not navigable tabs.
+        Assert.All(tabs.Elements(),e=>Assert.True(e.Name.LocalName is "TabItem" or "TabControl.Template"));
+        var names=tabs.Elements(tabs.Name.Namespace+"TabItem").Select(e=>(string?)e.Attribute(XName.Get("Name","http://schemas.microsoft.com/winfx/2006/xaml"))).ToArray();
         Assert.Equal(new[]{"ProjectsTab","WorkDashboardTab","ManagementProcessTab","PcConnectionTab","CommunicationTab","NoticeTab","DocumentReaderTab","ToolsTab","ServerTab"},names);
         var body=File.ReadAllText(Source("MainWindow.xaml.cs"));Assert.Contains("RestoreReaderOrigin",body);Assert.Contains("_restoringReaderOrigin",body);
     }

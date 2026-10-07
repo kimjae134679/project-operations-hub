@@ -198,7 +198,21 @@ class ContinuousManagerTests(unittest.TestCase):
         p2['max_run_seconds'] = 0.2
         self.state = self.root / 'watchdog-private'
         self.assertEqual(1, self.run_plan(p2))
-        self.assertEqual('timed_out', self.snapshot()['steps']['a']['status'])
+        value = self.snapshot()['steps']['a']
+        events = [json.loads(line) for line in (self.state / 'events.private.jsonl').read_text().splitlines()]
+        event_names = [row['event'] for row in events]
+        self.assertFalse((self.state / 'stop.request.json').exists())
+        if value['status'] == 'blocked':
+            # The 0.2s run budget includes durable prelaunch checkpoint/event I/O.
+            self.assertEqual('stop requested or run watchdog expired', value['reason'])
+            self.assertEqual(0, value['attempts'])
+            self.assertNotIn('step_started', event_names)
+            self.assertNotIn('child_started', event_names)
+        else:
+            self.assertEqual('timed_out', value['status'])
+            self.assertEqual(1, value['attempts'])
+            self.assertIn('step_started', event_names)
+            self.assertEqual(1, sum(row['event'] == 'child_started' and row.get('step') == 'a' for row in events))
 
     def test_windows_job_kills_child_when_owner_crashes(self):
         if sys.platform != 'win32':

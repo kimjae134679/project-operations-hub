@@ -121,6 +121,10 @@ public sealed partial class MainViewModel
     private readonly CommunicationService _communication = new();
     private readonly CommunicationGitService _communicationGit = new();
     private readonly SemaphoreSlim _communicationLock = new(1,1);
+    private readonly ManualCommunicationCollection _manualCollection=new(TimeSpan.FromMinutes(5),TimeSpan.FromMinutes(3),()=>DateTimeOffset.UtcNow);
+    private Task _manualCollectionTask=Task.CompletedTask;
+    private string _manualCollectionStatus="로컬 수집 대기 · 중앙 공유 없음";
+    public string ManualCollectionStatus {get=>_manualCollectionStatus;private set=>SetProperty(ref _manualCollectionStatus,value);}
     private DateTime _lastCommunication = DateTime.MinValue, _lastCommunicationNetwork = DateTime.MinValue;
     private CommunicationSnapshot? _communicationSnapshot;
     private NoticeRow? _selectedNotice;
@@ -146,7 +150,15 @@ public sealed partial class MainViewModel
     public bool OnlyUnread { get => _onlyUnread; set { if(SetProperty(ref _onlyUnread,value)) FilterInbox(); } }
     public ObservableCollection<CommunicationEntryRow> Entries { get; } = [];
     public CommunicationEntryRow? SelectedEntry { get => _selectedEntry; set { if(SetProperty(ref _selectedEntry,value)) { if(!_selectingInternally) MarkCommunicationViewed(); NotifyEntrySelection(); } } }
-    public string SelectedBody => SelectedEntry?.Body ?? SelectedInbox?.ReadableBody ?? "";
+    public string SelectedBody
+    {
+        get
+        {
+            var body=SelectedEntry?.Body ?? SelectedInbox?.ReadableBody ?? "";
+            return ManualCommunicationCollection.IsCollectedPath(SelectedEntry?.SourcePath) || ManualCommunicationCollection.IsCollectedPath(SelectedInbox?.Path)
+                ? ManualCommunicationCollection.SafeDisplayBody(body) : body;
+        }
+    }
     public string SelectedArticleBody => SelectedBody;
     public string SelectedRawBody => SelectedInbox?.Exchange is not null ? SelectedInbox.Body : SelectedEntry?.Body ?? SelectedInbox?.Body ?? "";
     public string EntryPositionLabel => SelectedEntry is null ? "" : $"{Entries.IndexOf(SelectedEntry)+1} / {Entries.Count}";
@@ -282,12 +294,13 @@ public sealed partial class MainViewModel
     }
     public CommunicationProjectRow? SelectedCommunicationProject { get => _selectedCommunicationProject; set { if (SetProperty(ref _selectedCommunicationProject,value) && SelectedProjectOnly && !_rebuildingCommunication) FilterInbox(); } }
     private string NameFor(string id) => id=="Shared-Communication" ? "공용 소통방" : _communicationNames.GetValueOrDefault(id,id);
+    public static string? CommunicationIdForCatalog(string id)=>id switch
+    {"phonelol-current"=>"PhoneLOL","audiobook"=>"Mushoku-Audiobook","video-downloader"=>"Video-Downloader","project-operations-hub"=>"Control-Tower","Threads"=>"Threads",_=>null};
     public IReadOnlyList<CommunicationTarget> GetCommunicationTargets()
     {
         var targets = new Dictionary<string,CommunicationTarget>(StringComparer.Ordinal);
-        var ids = new Dictionary<string,string> { ["phonelol-current"]="PhoneLOL", ["audiobook"]="Mushoku-Audiobook", ["video-downloader"]="Video-Downloader", ["project-operations-hub"]="Control-Tower" };
         foreach(var entry in _catalog.Projects)
-            if(ids.TryGetValue(entry.Id,out var id) && Directory.Exists(entry.Path)) targets[id]=new(id,entry.Path,entry.Name);
+            if(CommunicationIdForCatalog(entry.Id) is {} id && Directory.Exists(entry.Path)) targets[id]=new(id,entry.Path,entry.Name);
         if (Directory.Exists(ServerRootPath)) targets["PhoneLOL-Server"] = new("PhoneLOL-Server",ServerRootPath,"멀티의 신 서버");
         foreach(var pair in _settings.CommunicationFolders)
             targets[pair.Key]=new(pair.Key,pair.Value,NameFor(pair.Key));
@@ -302,6 +315,8 @@ public sealed partial class MainViewModel
     public void OpenCommunicationFolder() => OpenExisting(SelectedCommunicationProject?.Root is { Length:>0 } root ? Path.Combine(root,"_통합소통") : null);
     public void OpenCollectedFile()
     {
+        if(ManualCommunicationCollection.IsCollectedPath(SelectedEntry?.SourcePath) || ManualCommunicationCollection.IsCollectedPath(SelectedInbox?.Path))
+        {CommunicationMessage="로컬 수집 자료는 앱 본문·원문에서 확인합니다. 출처 경로는 실행하거나 임의로 열지 않습니다.";return;}
         var relative=SelectedEntry?.SourcePath;
         if(string.IsNullOrWhiteSpace(relative)) { OpenExisting(SelectedInbox?.Path); return; }
         var anchor=relative.IndexOf("#original=",StringComparison.Ordinal);
@@ -313,6 +328,24 @@ public sealed partial class MainViewModel
     }
     public async Task SyncCommunicationAsync(bool force=false)
     {
+        if(IsManualControl)
+        {
+            if(_disposed || !await _communicationLock.WaitAsync(0))return;
+            try
+            {
+                var local=await _communication.ReadOnlyAsync(CommunicationHubPath,_lifetime.Token);
+                if(_disposed||_lifetime.IsCancellationRequested)return;
+                if(!local.Errors.Any(e=>e.Code=="manifest_invalid"))ReadCommunicationNames(Path.Combine(CommunicationHubPath,"04_COMMUNICATION","announcements","manifest.json"));
+                ApplyCommunicationSnapshot(_manualCollection.Latest is {} cached?ManualCommunicationCollection.Merge(local,cached):local);
+                CentralSyncMessage=ManualCollectionStatus;
+            }
+            catch(OperationCanceledException){}
+            catch(Exception){CentralSyncMessage=CommunicationMessage="로컬 조회 보류 · 기존 자료는 변경하지 않았습니다. 중앙 공유 없음";}
+            finally{_communicationLock.Release();}
+            // Startup and manual refresh must not await an 82-second collection operation.
+            _ = StartManualCollection(force);
+            return;
+        }
         if(IsReadOnlyView)
         {
             if(_disposed || !await _communicationLock.WaitAsync(0))return;
@@ -359,6 +392,50 @@ public sealed partial class MainViewModel
         catch(OperationCanceledException) { }
         catch(Exception ex) { CommunicationMessage="소통 동기화 대기 · " + ProcessRunner.Sanitize(ex.Message); }
         finally { IsCommunicating=false; _communicationLock.Release(); }
+    }
+    /// <summary>Tracked, exception-observed background operation; timers never await collection I/O.</summary>
+    public Task StartManualCollection(bool force=false)
+    {
+        if(!IsManualControl||_disposed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
+        if(!_manualCollectionTask.IsCompleted)return _manualCollectionTask;
+        try
+        {
+            var targets=GetCommunicationTargets().ToArray();var boardRoot=CommunicationHubPath;
+            _manualCollectionTask=RunManualCollectionAsync(force,boardRoot,targets,_lifetime.Token);
+        }
+        catch(Exception){ManualCollectionStatus=CentralSyncMessage="로컬 수집 등록 보류 · 기존 자료 보존 · 중앙 공유 없음";}
+        return _manualCollectionTask;
+    }
+    private async Task RunManualCollectionAsync(bool force,string boardRoot,IReadOnlyList<CommunicationTarget> targets,CancellationToken ct)
+    {
+        try
+        {
+            IsCommunicating=true;ManualCollectionStatus="로컬 자료 수집 중 · 중앙 공유 없음";CentralSyncMessage=ManualCollectionStatus;
+            var refreshed=await _manualCollection.RefreshAsync(true,force,
+                token=>_communication.CollectOnlyAsync(boardRoot,targets,ManualCommunicationCollection.SinkRoot,token),ct).ConfigureAwait(false);
+            if(_disposed||ct.IsCancellationRequested)return;
+            await _dispatcher.InvokeAsync(()=>
+            {
+                if(_disposed||ct.IsCancellationRequested)return;
+                if(refreshed.Status=="completed"&&refreshed.Collection is {} result)
+                {
+                    var existing=_communicationSnapshot??new CommunicationSnapshot([],[],[],[],[],result.CollectedAt,[]);
+                    ApplyCommunicationSnapshot(ManualCommunicationCollection.Merge(existing,result));
+                    ManualCollectionStatus=$"로컬 수집 {result.Records.Count}개 · 보류 {result.Errors.Count}개 · 중앙 공유 없음";
+                }
+                else if(refreshed.Status=="blocked")ManualCollectionStatus="로컬 수집 보류 · 마지막 정상 자료 유지 · 중앙 공유 없음";
+                else if(refreshed.Status=="inflight")ManualCollectionStatus="로컬 자료 수집 중 · 중복 실행 없음 · 중앙 공유 없음";
+                else if(refreshed.Collection is {} cached)ManualCollectionStatus=$"로컬 수집 {cached.Records.Count}개 보관 · 다음 자동 수집 대기 · 중앙 공유 없음";
+                else ManualCollectionStatus="로컬 수집 대기 · 중앙 공유 없음";
+                CentralSyncMessage=ManualCollectionStatus;IsCommunicating=_manualCollection.IsRunning;
+            });
+        }
+        catch(OperationCanceledException){}
+        catch(Exception)
+        {
+            if(_disposed||ct.IsCancellationRequested)return;
+            try{await _dispatcher.InvokeAsync(()=>{if(!_disposed){ManualCollectionStatus=CentralSyncMessage="로컬 수집 보류 · 기존 자료 보존 · 중앙 공유 없음";IsCommunicating=_manualCollection.IsRunning;}});}catch(Exception){}
+        }
     }
     internal void ApplyCommunicationSnapshot(CommunicationSnapshot snapshot)
     {
