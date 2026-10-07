@@ -1,8 +1,10 @@
 # 정확한 버전으로 안전하게 전환하기
 
-`scripts/switch_control_version.ps1`은 정확히 승인된 기존 **0.9.6/0.9.7**의 종료를 확인한 뒤, 별도 폴더의 **0.9.7 manual-control**을 한 번 실행하는 코드 전용 도우미입니다. 검증된 종료 IPC 기능이 없는 기존 빌드는 정상 사용자 종료를 기다립니다. 검증된 IPC 기능이 등록된 빌드만 정확한 기존 EXE의 headless 종료 요청을 사용하며 강제 종료는 하지 않습니다.
+`scripts/switch_control_version.ps1`은 정확히 승인된 legacy **0.9.6** 또는 **0.9.7 이상** 현재본의 종료를 확인한 뒤, 별도 폴더의 검증된 manual-control을 한 번 실행하는 코드 전용 도우미입니다. 검증된 종료 IPC 기능이 없는 기존 빌드는 정상 사용자 종료를 기다립니다. 검증된 IPC 기능이 등록된 빌드만 정확한 기존 EXE의 headless 종료 요청을 사용하며 강제 종료는 하지 않습니다.
 
 ## 최신 검증 · 2026-10-07
+
+다음 **0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다.** 버전은 ASCII 정규형 3부분(각 0~65535·선행 0/부호/공백/접미사 없음), 정확한 버전 폴더와 숫자 순서로 검증합니다. 대상은 0.9.7 이상이며 현재보다 낮을 수 없고, 모든 nonlegacy 현재본은 고정 descriptor 신원까지 확인합니다. 명시 AI 항목 오류는 후속 성공으로 지우지 않으며 일반 도구 nonzero는 회복 가능한 오류로 구분합니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)**, **scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)**입니다. 근거는 `full-handoff-net-final.log/trx`, `full-handoff-scripts-final.log`입니다. 신규 패키지 신원·등록·전체 자동 버전 교체 운영 성공은 아직 확정하지 않습니다.
 
 앞선 **scripts 102 PASS / 0 FAIL(89.035초, 실행기 34개 포함)**의 근거는 `automatic-exit-scripts-C2-final-102.log`입니다. 환경·외부 EOF focused 4 PASS(6.217초), 앱 .NET 624 PASS/0 FAIL도 이번 운영 전환 후 재실행한 검사가 아닙니다. C1 앱의 아래 등록 소스·SHA·바이트와 C2 helper 바이트/해시는 불변입니다.
 
@@ -24,8 +26,8 @@
 
 필수 입력은 현재 EXE의 정확한 경로와 승인된 SHA-256, 대상 `VersionRoot`와 버전·소스 커밋·SHA-256, 명시적으로 준비한 상태 JSON 경로입니다.
 
-- 현재 EXE: `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.6-*\AIControlTower.exe` 또는 `0.9.7-*\AIControlTower.exe`. `ExpectedCurrentVersion/ExpectedCurrentSourceCommit/ExpectedCurrentSha256`이 실제 메타데이터·바이트와 일치해야 합니다. 0.9.6 기본값은 기존 승인된 `0.9.6+84840a130d8a3fb6911b50fe528ab3709e1c76e1`과 SHA-256에 계속 고정됩니다. 현재 0.9.7은 같은 폴더의 고정 `DEPLOYMENT.json` 신원 필드까지 일치해야 합니다. 현재 실행본의 과거 실행기 descriptor 만료는 현재 신원 부정의 근거가 아니며, 대상 실행 descriptor 만료 검사는 유지합니다.
-- 대상: 같은 `versions`의 직접 하위 `0.9.7-*` 폴더입니다. 기존 폴더와 같을 수 없습니다. 같은 버전의 다른 소스 커밋은 정확한 요청·패키지 검증을 거쳐 선택할 수 있습니다.
+- 현재 EXE: `D:\A_KJ\AI\Applications\AIControlTower\versions\<ExpectedCurrentVersion>-<tag>\AIControlTower.exe`의 정확한 직접 하위 패키지입니다. 정규형 버전은 고정 legacy 0.9.6 또는 0.9.7 이상이며 `ExpectedCurrentVersion/ExpectedCurrentSourceCommit/ExpectedCurrentSha256`이 실제 메타데이터·바이트와 일치해야 합니다. 0.9.6 기본값은 기존 승인된 `0.9.6+84840a130d8a3fb6911b50fe528ab3709e1c76e1`과 SHA-256에 계속 고정됩니다. 모든 nonlegacy 현재본은 같은 폴더의 고정 `DEPLOYMENT.json` 신원 필드까지 일치해야 합니다. 현재 실행본의 과거 실행기 descriptor 만료는 현재 신원 부정의 근거가 아니며, 대상 실행 descriptor 만료 검사는 유지합니다.
+- 대상: 같은 `versions`의 직접 하위 `<ExpectedVersion>-<tag>` 폴더입니다(tag는 ASCII 영숫자·`_`·`-`). 정규형 0.9.7 이상이며 현재보다 낮은 버전·같은 폴더는 거부합니다. 같은 버전의 다른 소스 커밋은 정확한 요청·패키지 검증을 거쳐 선택할 수 있습니다.
 - 실행기는 대상 폴더의 `start_manual_control.ps1`만 사용합니다. 호출 때마다 reparse 경계와 승인된 실행기 SHA-256을 확인합니다. 다른 스크립트나 실행 파일, 검사 fixture를 CLI로 지정할 수 없습니다.
 - 실행기 승인 SHA-256: `a608ac3553310edf211f2ee311a14dca84d4e5a416db02f3f503a04464652730`.
 - 상태 파일은 `D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks` 또는 `D:\A_KJ\AI\ControlTowerData\version-replacement` 하위의 JSON만 허용합니다. 부모 폴더는 호출자가 미리 준비합니다. 경로 전체의 reparse를 거부합니다.

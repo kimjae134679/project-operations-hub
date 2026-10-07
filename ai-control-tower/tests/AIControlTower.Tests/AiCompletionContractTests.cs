@@ -59,6 +59,44 @@ public sealed class AiCompletionContractTests
         Assert.Equal("failed", receipt.GetProperty("status").GetString());
         Assert.DoesNotContain("SECRET_REPORT_BODY", receipt.ToString());
     }
+    [Theory]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"error\",\"message\":\"SECRET_ITEM_ERROR\"}}", false)]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"error\",\"message\":\"SECRET_ITEM_ERROR\"}}", true)]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"mcp_tool_call\",\"status\":\"failed\",\"error\":{\"message\":\"SECRET_ITEM_ERROR\"}}}", false)]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"mcp_tool_call\",\"status\":\"failed\",\"error\":{\"message\":\"SECRET_ITEM_ERROR\"}}}", true)]
+    [InlineData("{\"type\":\"item.updated\",\"item\":{\"type\":\"mcp_tool_call\",\"error\":{\"message\":\"SECRET_ITEM_ERROR\"}}}", false)]
+    [InlineData("{\"type\":\"item.updated\",\"item\":{\"type\":\"mcp_tool_call\",\"error\":{\"message\":\"SECRET_ITEM_ERROR\"}}}", true)]
+    public void ExplicitItemErrorWinsBeforeOrAfterSuccessfulCompletion(string line, bool afterCompletion)
+    {
+        // Pure evaluator fixture: no directories, files, processes or model calls are created.
+        var evaluator = Evaluator(root: @"D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks\jev-item-error-tests");
+        if (afterCompletion) Success(evaluator);
+        Observe(evaluator, line);
+        if (!afterCompletion) Success(evaluator);
+        var receipt = Complete(evaluator);
+        Assert.Equal("failed", receipt.GetProperty("status").GetString());
+        Assert.Equal("ai_failed", receipt.GetProperty("failureCode").GetString());
+        Assert.True(receipt.GetProperty("terminalObserved").GetBoolean());
+        Assert.True(receipt.GetProperty("reportObserved").GetBoolean());
+        Assert.Equal(0, receipt.GetProperty("processExitCode").GetInt32());
+        Assert.DoesNotContain("SECRET_ITEM_ERROR", receipt.ToString());
+        Assert.DoesNotContain("SECRET_REPORT_BODY", receipt.ToString());
+    }
+    [Theory]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"command_execution\",\"status\":\"failed\",\"exit_code\":17}}")]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"mcp_tool_call\",\"status\":\"completed\",\"error\":null}}")]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"command_execution\",\"status\":\"completed\",\"exit_code\":0}}")]
+    [InlineData("{\"type\":\"item.completed\",\"item\":{\"type\":\"reasoning\",\"text\":\"PRIVATE_REASONING\"}}")]
+    public void RecoverableToolResultOrNormalItemDoesNotOverrideSuccessfulAiCompletion(string line)
+    {
+        var evaluator = Evaluator(root: @"D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks\jev-item-error-tests");
+        Observe(evaluator, line); Success(evaluator);
+        var receipt = Complete(evaluator);
+        Assert.Equal("succeeded", receipt.GetProperty("status").GetString());
+        Assert.Equal(JsonValueKind.Null, receipt.GetProperty("failureCode").ValueKind);
+        Assert.DoesNotContain("PRIVATE_REASONING", receipt.ToString());
+        Assert.DoesNotContain("SECRET_REPORT_BODY", receipt.ToString());
+    }
     [Fact]
     public void TypedSuccessReceiptCarriesOnlyBoundIdentityAndEvidence()
     {

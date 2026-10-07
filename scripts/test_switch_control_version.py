@@ -26,6 +26,105 @@ foreach($node in $ast.EndBlock.Statements){
     }
 }
 $case=$args[1]
+if($case.StartsWith('version_validator_')){
+    # Real AST validator and real capability table; only filesystem identity
+    # boundaries are replaced. No process, IPC or guard is invoked by this matrix.
+    $script:validationTrace=[Collections.Generic.List[string]]::new()
+    function Assert-SwitchNoReparse([string]$Path){$script:validationTrace.Add('reparse')}
+    function Get-SwitchFileIdentity([string]$Path){
+        $script:validationTrace.Add('identity')
+        return [pscustomobject]@{Version=$script:vr.ExpectedCurrentVersion;FileVersion=($script:vr.ExpectedCurrentVersion+'.0');ProductVersion=($script:vr.ExpectedCurrentVersion+'+'+$script:vr.ExpectedCurrentSourceCommit);Hash=$script:vr.ExpectedCurrentSha256}
+    }
+    function Get-SwitchCurrentDeployment($Request){
+        $script:validationTrace.Add('descriptor')
+        if($script:descriptorChange -eq 'missing'){throw 'fixture_missing_descriptor'}
+        $descriptor=[pscustomobject]@{version=$Request.ExpectedCurrentVersion;sourceCommit=$Request.ExpectedCurrentSourceCommit;fileSha256=$Request.ExpectedCurrentSha256;fileVersion=($Request.ExpectedCurrentVersion+'.0');productVersion=($Request.ExpectedCurrentVersion+'+'+$Request.ExpectedCurrentSourceCommit)}
+        if($script:descriptorChange){$descriptor.($script:descriptorChange)='mismatch'}
+        return $descriptor
+    }
+    $candidates=@()
+    switch($case){
+        'version_validator_positive' {
+            $candidates=@(
+                @{name='next_target';current='0.9.7';target='0.9.8'},
+                @{name='future_current';current='0.9.8';target='0.9.9'},
+                @{name='same_version_distinct';current='0.9.8';target='0.9.8'},
+                @{name='numeric_minor';current='0.9.8';target='0.10.0'},
+                @{name='numeric_major';current='0.10.0';target='1.0.0'},
+                @{name='max_components';current='0.9.7';target='65535.65535.65535'}
+            )
+        }
+        'version_validator_strict' {
+            $invalid=@('','0.9','0.9.8.0','00.9.8','0.09.8','0.9.08','+0.9.8','-1.0.0',' 0.9.8','0.9.8 ',"0.9.8`n",'0.9.8-beta','0.9.8+abc','65536.0.0','0.65536.0','0.9.65536','999999999999999999999.9.8',([string][char]0x0660+'.9.8'))
+            foreach($side in @('current','target')){
+                for($i=0;$i -lt $invalid.Count;$i++){
+                    $row=@{name=($side+'_'+$i);current='0.9.7';target='0.9.8'}
+                    $row[$side]=$invalid[$i];$candidates+=,$row
+                }
+            }
+        }
+        'version_validator_identity' {
+            $candidates=@(
+                @{name='target_prefix';current='0.9.7';target='0.9.8';change='target_prefix'},
+                @{name='current_prefix';current='0.9.8';target='0.9.9';change='current_prefix'},
+                @{name='downgrade_patch';current='0.9.8';target='0.9.7'},
+                @{name='downgrade_minor';current='0.10.0';target='0.9.99'},
+                @{name='downgrade_major';current='1.0.0';target='0.99.99'},
+                @{name='same_root';current='0.9.8';target='0.9.8';change='same_root'},
+                @{name='nested_root';current='0.9.7';target='0.9.8';change='nested_root'},
+                @{name='outside_root';current='0.9.7';target='0.9.8';change='outside_root'},
+                @{name='current_floor';current='0.9.5';target='0.9.8'}
+            )
+            foreach($field in @('missing','version','sourceCommit','fileSha256','fileVersion','productVersion')){
+                $candidates+=,@{name=('descriptor_'+$field);current='0.9.8';target='0.9.9';descriptor=$field}
+            }
+        }
+        'version_validator_legacy' {
+            $candidates=@(
+                @{name='legacy_pin';current='0.9.6';target='0.9.8'},
+                @{name='legacy_bad_hash';current='0.9.6';target='0.9.8';change='legacy_bad_hash'},
+                @{name='legacy_bad_commit';current='0.9.6';target='0.9.8';change='legacy_bad_commit'},
+                @{name='target_floor';current='0.9.6';target='0.9.6'},
+                @{name='unknown_future_capability';current='0.9.8';target='0.9.9'}
+            )
+        }
+        default {throw 'invalid_fixture_case'}
+    }
+    $results=[ordered]@{}
+    $versions='D:\A_KJ\AI\Applications\AIControlTower\versions'
+    foreach($candidate in $candidates){
+        $script:validationTrace.Clear()
+        $script:descriptorChange=if($candidate.ContainsKey('descriptor')){$candidate.descriptor}else{''}
+        $script:vr=[pscustomobject]@{
+            CurrentExecutable=($versions+'\'+$candidate.current+'-unit-old\AIControlTower.exe');ExpectedCurrentVersion=$candidate.current
+            ExpectedCurrentSourceCommit=('f'*40);ExpectedCurrentSha256=('e'*64);CurrentMode='manual-control'
+            VersionRoot=($versions+'\'+$candidate.target+'-unit-new');ExpectedVersion=$candidate.target
+            ExpectedSourceCommit=('b'*40);ExpectedSha256=('c'*64)
+            ExpectedGuardSha256='a608ac3553310edf211f2ee311a14dca84d4e5a416db02f3f503a04464652730'
+            StatusPath=Join-Path $args[2] 'status.json';WaitSeconds=30;PollSeconds=1;CheckOnly=$false
+        }
+        if($candidate.current -eq '0.9.6'){
+            $script:vr.ExpectedCurrentSourceCommit='84840a130d8a3fb6911b50fe528ab3709e1c76e1'
+            $script:vr.ExpectedCurrentSha256='2fbc5b312f114cbc60a064cf5caa167251e3ac63bb226522c5a33fa18a82443d'
+        }
+        if($candidate.ContainsKey('change')){
+            switch($candidate.change){
+                'target_prefix' {$script:vr.VersionRoot=$versions+'\0.9.7-unit-new'}
+                'current_prefix' {$script:vr.CurrentExecutable=$versions+'\0.9.7-unit-old\AIControlTower.exe'}
+                'same_root' {$script:vr.VersionRoot=[IO.Path]::GetDirectoryName($script:vr.CurrentExecutable)}
+                'nested_root' {$script:vr.VersionRoot=$versions+'\nested\0.9.8-unit-new'}
+                'outside_root' {$script:vr.VersionRoot='C:\unapproved\0.9.8-unit-new'}
+                'legacy_bad_hash' {$script:vr.ExpectedCurrentSha256='e'*64}
+                'legacy_bad_commit' {$script:vr.ExpectedCurrentSourceCommit='f'*40}
+            }
+        }
+        $allowed=$false
+        try{Assert-SwitchRequest $script:vr;$allowed=$true}catch{}
+        $results[$candidate.name]=[pscustomobject]@{allowed=$allowed;trace=@($script:validationTrace.ToArray());capable=(Test-SwitchExitCapability $script:vr)}
+    }
+    $results | ConvertTo-Json -Depth 5 -Compress
+    return
+}
 if($case -eq 'capability_actual_table'){
     # The real AST-loaded function runs before any orchestration mock is defined.
     # This is a pure identity-table query: no file, process or IPC boundary runs.
@@ -444,6 +543,48 @@ class SwitchControlVersionTests(unittest.TestCase):
         self.assertEqual({'exact': True, 'wrong_version': False,
                           'wrong_source': False, 'wrong_sha': False,
                           'legacy_475': False}, out)
+
+    def test_future_version_validator_accepts_canonical_numeric_handoffs(self):
+        out = self.run_case('version_validator_positive')
+        self.assertEqual(6, len(out))
+        for name, value in out.items():
+            with self.subTest(case=name):
+                self.assertTrue(value['allowed'], value)
+                self.assertEqual(1, value['trace'].count('descriptor'))
+                self.assertFalse(value['capable'], value)
+
+    def test_future_version_validator_rejects_noncanonical_versions_before_io(self):
+        out = self.run_case('version_validator_strict')
+        self.assertEqual(36, len(out))
+        for name, value in out.items():
+            with self.subTest(case=name):
+                self.assertFalse(value['allowed'], value)
+                self.assertEqual([], value['trace'])
+                self.assertFalse(value['capable'], value)
+
+    def test_future_version_validator_enforces_path_order_and_current_descriptor(self):
+        out = self.run_case('version_validator_identity')
+        self.assertEqual(15, len(out))
+        for name, value in out.items():
+            with self.subTest(case=name):
+                self.assertFalse(value['allowed'], value)
+                if name.startswith('descriptor_'):
+                    self.assertEqual(1, value['trace'].count('descriptor'))
+                else:
+                    self.assertEqual([], value['trace'])
+                self.assertFalse(value['capable'], value)
+
+    def test_future_version_validator_preserves_legacy_pin_and_unknown_capability(self):
+        out = self.run_case('version_validator_legacy')
+        for name in ('legacy_pin', 'unknown_future_capability'):
+            self.assertTrue(out[name]['allowed'], out[name])
+            self.assertFalse(out[name]['capable'], out[name])
+        self.assertNotIn('descriptor', out['legacy_pin']['trace'])
+        self.assertEqual(1, out['unknown_future_capability']['trace'].count('descriptor'))
+        for name in ('legacy_bad_hash', 'legacy_bad_commit', 'target_floor'):
+            self.assertFalse(out[name]['allowed'], out[name])
+            self.assertEqual([], out[name]['trace'])
+            self.assertFalse(out[name]['capable'], out[name])
 
     def test_current_097_requires_exact_fixed_deployment_evidence(self):
         out = self.run_case('ipc_bad_old_descriptor')

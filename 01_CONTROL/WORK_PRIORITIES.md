@@ -1,5 +1,7 @@
 ## 최신 운영 확인 · 2026-10-07 · 첫 전환과 유휴 정상 종료 검증
 
+다음 **0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다.** 교체 실행기는 선행 0 없는 ASCII 숫자 3부분(각 0~65535)·버전별 정확한 폴더·다운그레이드 거부·모든 nonlegacy 현재 descriptor 검증을 유지하도록 확장했습니다. 명시 AI 항목 오류는 이후 성공에도 오류 상태를 유지하고, 일반 도구의 nonzero 종료는 회복 가능한 오류로 구분합니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)**, **scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)**입니다(`full-handoff-net-final.log/trx`, `full-handoff-scripts-final.log`). 신규 패키지 신원·capability·실제 전체 자동 교체는 아직 확정하지 않습니다.
+
 이 구역이 아래 이전 준비·배포 이력보다 우선합니다. 현재 실행 앱은 **0.9.7 autoexit manual-control PID 9552 / 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`**입니다(생성 16:48:14.613517 KST). 루트 담당자가 새 상태의 트레이 등록·PC 연결 true, ownedJobsBusy false와 endpoint PID 9552 신원을 확인했습니다. root 원격 supervisor PID 5996은 그대로 보존했습니다. 실제 화면 사용·프로젝트 업무 전체 완료를 뜻하지 않습니다.
 
 사용자가 트레이 종료를 확인했고 종료 IPC 미지원 `475a0fc` PID 37456의 실제 종료 후 검증 helper로 C1 PID 25136을 실행하여 첫 전환을 완료했습니다. 이어 정확한 C1 headless client PID 22216의 `--request-manual-exit`가 `graceful_exit_accepted/0`·빈 stderr를 반환했고 원래 PID 25136의 실제 종료를 확인했습니다. 고정 guard CheckOnly 0 및 명시 재시작 0으로 현재 PID 9552를 실행했습니다. **유휴 상태의 정상 CLI 종료 → 동일 패키지 guard 재시작을 한 번 확인한 것**이며, capable 기존본 → 다른 새 패키지의 helper 전체 자동 교체나 운영 busy drain을 검증한 것은 아닙니다. X는 트레이 동작을 유지하고 강제 종료·창 제어·구버전 CLI 탐색은 하지 않았습니다.

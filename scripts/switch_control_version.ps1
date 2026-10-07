@@ -59,14 +59,25 @@ function Test-SwitchExitCapability($Request) {
     }
     return $false
 }
+function Get-SwitchCanonicalVersion([string]$Value) {
+    # Match the actual three numeric FileVersion components, not arbitrary CLI
+    # text, prerelease aliases or culture-dependent numeric forms.
+    if ($Value -notmatch '\A(?:0|[1-9][0-9]{0,4})\.(?:0|[1-9][0-9]{0,4})\.(?:0|[1-9][0-9]{0,4})\z') { throw 'invalid_request' }
+    foreach ($part in $Value.Split('.')) {
+        if ([int]$part -gt 65535) { throw 'invalid_request' }
+    }
+    return [Version]::Parse($Value)
+}
 function Assert-SwitchRequest($Request) {
     $versions = 'D:\A_KJ\AI\Applications\AIControlTower\versions'
     $checks = 'D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks'
     $data = 'D:\A_KJ\AI\ControlTowerData\version-replacement'
     $approvedOldHash = '2fbc5b312f114cbc60a064cf5caa167251e3ac63bb226522c5a33fa18a82443d'
     $approvedGuardHash = 'a608ac3553310edf211f2ee311a14dca84d4e5a416db02f3f503a04464652730'
-    if ($Request.CurrentMode -notin @('application','manual-control') -or $Request.ExpectedVersion -cne '0.9.7' -or
-        $Request.ExpectedCurrentVersion -notin @('0.9.6','0.9.7') -or $Request.ExpectedCurrentSha256 -notmatch '^[a-fA-F0-9]{64}$' -or
+    $currentVersion = Get-SwitchCanonicalVersion $Request.ExpectedCurrentVersion
+    $targetVersion = Get-SwitchCanonicalVersion $Request.ExpectedVersion
+    if ($Request.CurrentMode -notin @('application','manual-control') -or $targetVersion -lt [Version]'0.9.7' -or $targetVersion -lt $currentVersion -or
+        ($Request.ExpectedCurrentVersion -cne '0.9.6' -and $currentVersion -lt [Version]'0.9.7') -or $Request.ExpectedCurrentSha256 -notmatch '^[a-fA-F0-9]{64}$' -or
         $Request.ExpectedCurrentSourceCommit -notmatch '^[a-fA-F0-9]{40}$' -or
         ($Request.ExpectedCurrentVersion -eq '0.9.6' -and ($Request.ExpectedCurrentSha256 -ine $approvedOldHash -or $Request.ExpectedCurrentSourceCommit -cne '84840a130d8a3fb6911b50fe528ab3709e1c76e1')) -or
         $Request.ExpectedGuardSha256 -ine $approvedGuardHash -or $Request.ExpectedSourceCommit -notmatch '^[a-fA-F0-9]{40}$' -or
@@ -75,10 +86,11 @@ function Assert-SwitchRequest($Request) {
     $old = [IO.Path]::GetFullPath($Request.CurrentExecutable)
     $root = [IO.Path]::GetFullPath($Request.VersionRoot).TrimEnd('\')
     $oldRoot = [IO.Path]::GetDirectoryName($old)
-    $oldRootPattern = '^'+[regex]::Escape($Request.ExpectedCurrentVersion)+'-[a-zA-Z0-9_-]+$'
+    $oldRootPattern = '\A'+[regex]::Escape($Request.ExpectedCurrentVersion)+'-[a-zA-Z0-9_-]+\z'
+    $targetRootPattern = '\A'+[regex]::Escape($Request.ExpectedVersion)+'-[a-zA-Z0-9_-]+\z'
     if ([IO.Path]::GetDirectoryName($oldRoot) -ine $versions -or [IO.Path]::GetFileName($oldRoot) -notmatch $oldRootPattern -or
         [IO.Path]::GetFileName($old) -ine 'AIControlTower.exe' -or [IO.Path]::GetDirectoryName($root) -ine $versions -or
-        [IO.Path]::GetFileName($root) -notmatch '^0\.9\.7-[a-zA-Z0-9_-]+$' -or $oldRoot -ieq $root) { throw 'invalid_request' }
+        [IO.Path]::GetFileName($root) -notmatch $targetRootPattern -or $oldRoot -ieq $root) { throw 'invalid_request' }
     $status = [IO.Path]::GetFullPath($Request.StatusPath)
     if ([IO.Path]::GetExtension($status) -ine '.json' -or
         !($status.StartsWith($checks+'\',[StringComparison]::OrdinalIgnoreCase) -or $status.StartsWith($data+'\',[StringComparison]::OrdinalIgnoreCase))) { throw 'invalid_status_path' }
@@ -94,7 +106,7 @@ function Assert-SwitchRequest($Request) {
     $Request.CurrentExecutable = $old
     $Request.VersionRoot = $root
     $Request.StatusPath = $status
-    if ($Request.ExpectedCurrentVersion -eq '0.9.7') {
+    if ($Request.ExpectedCurrentVersion -cne '0.9.6') {
         $descriptor = Get-SwitchCurrentDeployment $Request
         if ($descriptor.version -cne $Request.ExpectedCurrentVersion -or $descriptor.sourceCommit -ine $Request.ExpectedCurrentSourceCommit -or
             $descriptor.fileSha256 -ine $identity.Hash -or $descriptor.fileVersion -cne $identity.FileVersion -or $descriptor.productVersion -cne $identity.ProductVersion) { throw 'current_descriptor_mismatch' }

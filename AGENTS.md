@@ -130,6 +130,8 @@
 
 ## 최신 자동 교체 경계 · 2026-10-07
 
+다음 0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다. 실행기 버전은 ASCII 정규형 숫자 3부분(각 0~65535, 선행 0 없음)에 바인딩하고 다운그레이드를 거부하며 모든 nonlegacy 현재 descriptor를 확인합니다. legacy096 pin·정확 capability 튜플·guard·프로세스 신원·기한 계약은 유지합니다. 명시 AI 항목 오류는 후속 성공으로 지우지 않는 sticky 오류이며 일반 도구 nonzero는 회복 가능한 도구 오류입니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 .NET 634 PASS/0 FAIL(49초, Window 3개 제외), scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)입니다. 신규 패키지·실제 전체 자동 버전 교체 성공은 아직 주장하지 않습니다.
+
 현재 운영본은 0.9.7 autoexit manual-control PID 9552/source `5b0f3296d259ce03882e16eba1d8f93604af570f`, 생성 16:48:14.613517 KST입니다. 루트 담당자가 fresh 상태의 trayRegistered/pcConnected true·ownedJobsBusy false와 endpoint PID 신원을 확인했고 root supervisor PID 5996은 그대로 보존했습니다. 사용자 트레이 종료 확인 후 legacy PID 37456 실제 종료 → 검증 helper의 C1 PID 25136 실행으로 첫 전환을 완료했습니다. 정확 C1 headless client PID 22216의 `graceful_exit_accepted/0`·빈 stderr → 원래 PID 25136 실제 종료 → 고정 guard CheckOnly 0·명시 재시작 0 → PID 9552를 확인했습니다. 이것은 **유휴 CLI 정상 종료와 동일 패키지 guard 재시작 1회**이며 capable 기존본 → 다른 새 패키지의 helper 전체 자동 교체·운영 busy drain 검증은 아닙니다. X는 트레이를 유지합니다. 강제 종료·창 제어·구버전 CLI 탐색은 하지 않았으며 불명확한 전송·응답·신원은 계속 재요청 없이 보류합니다.
 
 별도 `0.9.7-20261007-autoexit` 패키지와 고정 capability 등록은 그대로입니다. 앱 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`; C1 앱·C2 helper 바이트/해시는 변경하지 않았습니다. 앞선 비운영 순수 검사 0·owner 없는 요청 `unsupported/4`·추가 인수 `invalid_request/2`를 이번 운영 정상 종료 증거와 구분합니다.
