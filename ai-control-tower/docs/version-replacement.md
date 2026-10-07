@@ -2,6 +2,14 @@
 
 `scripts/switch_control_version.ps1`은 정확히 승인된 기존 **0.9.6/0.9.7**의 종료를 확인한 뒤, 별도 폴더의 **0.9.7 manual-control**을 한 번 실행하는 코드 전용 도우미입니다. 검증된 종료 IPC 기능이 없는 기존 빌드는 정상 사용자 종료를 기다립니다. 검증된 IPC 기능이 등록된 빌드만 정확한 기존 EXE의 headless 종료 요청을 사용하며 강제 종료는 하지 않습니다.
 
+## 최신 검증 · 2026-10-07
+
+최신 **scripts 102 PASS / 0 FAIL(89.035초, 실행기 34개 포함)**이며 근거는 `automatic-exit-scripts-C2-final-102.log`입니다. 환경·외부 EOF focused 4개도 PASS(6.217초), 앱 .NET 검사는 624 PASS/0 FAIL입니다. C1 앱의 아래 등록 소스·SHA·바이트는 불변이며 현재 `475a0fc` 운영본은 첫 교체 때 사용자 트레이 종료가 필요합니다. 실제 운영 자동 종료·교체 성공을 확인한 것은 아닙니다.
+
+종료 client는 검증된 **기존** D 패키지의 `bundle-extract`·`runtime-temp` 디렉터리를 reparse 검사한 뒤 `DOTNET_BUNDLE_EXTRACT_BASE_DIR`·`TEMP`·`TMP`를 자식 환경에 고정합니다. Python harness는 소유 D 출력 파일과 정확한 부모 프로세스 종료 대기로 상속 자식 EOF를 기다리지 않습니다. 기존 내부 20초·외부 35초 제한과 elapsed 검사는 유지합니다.
+
+이전 전체 98개 검사는 두 번 외부 35초 timeout으로 각각 97 PASS/1 ERROR(95.932초·126.665초)였습니다. 변경 없는 deadline 단독 검사는 PASS(25.864초), private 추적은 reader 20,065ms·부모 종료 20.615초·capture EOF 25.900초를 구분했습니다. 상속 capture EOF 지연은 확인했지만 두 전체 실행의 추가 지연 원인이 모두 증명된 것은 아닙니다.
+
 ## 기존 창의 종료 방식
 
 - 인수 없는 일반 실행(`-CurrentMode application`, 기본값): 실행 중인 작업이 모두 끝난 것을 확인하고 기존 창의 **X**로 정상 종료합니다.
@@ -24,7 +32,9 @@
 
 ## 검증된 종료 IPC 빌드만 자동 요청
 
-소스의 `Test-SwitchExitCapability`는 **버전·소스 커밋·SHA-256 고정 allowlist**만 검사합니다. 초기 목록은 비어 있으며 루트 담당자가 실제 IPC 빌드를 검증한 뒤 정확한 튜플을 등록합니다. 운영 CLI로 capability를 등록하거나 임의 bool로 지원을 주장할 수 없습니다. 목록에 없는 빌드는 기존 방식대로 종료를 기다립니다.
+소스의 `Test-SwitchExitCapability`는 **버전·소스 커밋·SHA-256 고정 allowlist**만 검사합니다. 루트 담당자가 실제 IPC 빌드를 검증한 뒤 아래 정확한 튜플을 등록했습니다. 운영 CLI로 capability를 등록하거나 임의 bool로 지원을 주장할 수 없습니다. 목록에 없는 빌드는 기존 방식대로 종료를 기다립니다.
+
+등록된 C1 패키지: 버전 `0.9.7`, 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`, ProductVersion `0.9.7+5b0f3296d259ce03882e16eba1d8f93604af570f`, FileVersion `0.9.7.0`, 크기 135,902,087바이트입니다. 루트의 `automatic-exit-C1-exact-proof.json`은 정확한 self-contained EXE의 pure fixture 성공(Windows·설정·MainViewModel·자식 프로세스·동기화·중지 없이), owner 없는 headless 요청 `unsupported/4`, 추가 인수 `invalid_request/2`, 단일 JSON stdout·빈 stderr를 확인했습니다. **이 증거는 실제 운영 앱의 종료나 교체 성공을 뜻하지 않습니다.** 현재 `475a0fc` 운영본은 목록 밖으로 남아 첫 지원본 교체에는 사용자 트레이 종료가 필요합니다.
 
 목록에 등록된 manual-control 빌드만 **기존 EXE 자체 + 단일 `--request-manual-exit` 인수**를 호출합니다. 새 대상 EXE를 기존 서버의 client로 사용하지 않습니다. 응답의 schemaVersion=1·status/동일 reason·exitCode·native 종료 코드가 일치해야 합니다. `graceful_exit_accepted/0`은 요청 수락일 뿐 실제 종료가 아닙니다. 이후 원래 PID/생성 시각/경로의 실제 종료를 확인하며 종료 요청을 반복하지 않습니다.
 

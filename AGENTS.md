@@ -130,4 +130,8 @@
 
 ## 최신 자동 교체 경계 · 2026-10-07
 
-현재 확인한 운영본은 0.9.7 manual-control PID 37456/source `475a0fc`이며 트레이·PC 연결 true, root supervisor PID 5996 보존입니다. 이 실행본은 종료 IPC 미지원이므로 첫 지원본 교체는 작업 종료 후 사용자 트레이 종료를 기다립니다(X는 트레이). 구버전의 알 수 없는 CLI 인수를 실행해 지원을 탐색하지 않습니다. 이후 실제 빌드의 버전·소스·SHA가 고정 capability 목록에 등록된 경우만 정확한 기존 EXE의 headless 종료 요청을 사용하며, 작업·쓰기 정리와 수락 뒤 원래 프로세스의 실제 종료를 확인하고 대상 재검증 후 한 번 실행합니다. 불명확한 전송·응답·신원은 보류하며 재요청·강제 종료·다른 프로세스 종료로 우회하지 않습니다. 종료 IPC 소스는 준비됐고 최신 fresh 검사 .NET 624개/scripts 97개 모두 통과했지만, 새 IPC 패키지/소스 커밋·SHA·capability 등록/자동 종료 운영 확인은 아직 대기입니다. 보호 Bridge config와 중앙 clone locks는 그대로이며 PR #31은 draft·미병합, receipt review는 disabled/unmanaged입니다. 과거 이력보다 실제 최신 앱·패키지·검사 근거를 우선하고 운영 성공을 추측하지 않습니다.
+현재 확인한 운영본은 0.9.7 manual-control PID 37456/source `475a0fc`이며 트레이·PC 연결 true, root supervisor PID 5996 보존입니다. 이 실행본은 종료 IPC 미지원이므로 첫 지원본 교체는 작업 종료 후 사용자 트레이 종료를 기다립니다(X는 트레이). 구버전의 알 수 없는 CLI 인수를 실행해 지원을 탐색하지 않습니다. 이후 실제 빌드의 버전·소스·SHA가 고정 capability 목록에 등록된 경우만 정확한 기존 EXE의 headless 종료 요청을 사용하며, 작업·쓰기 정리와 수락 뒤 원래 프로세스의 실제 종료를 확인하고 대상 재검증 후 한 번 실행합니다. 불명확한 전송·응답·신원은 보류하며 재요청·강제 종료·다른 프로세스 종료로 우회하지 않습니다.
+
+별도 `0.9.7-20261007-autoexit` 패키지 검증과 고정 capability 등록은 완료됐습니다. 앱 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`; 정확 EXE의 비운영 순수 검사 0, 서버 정보 없는 요청 `unsupported/4`, 추가 인수 `invalid_request/2`를 확인했습니다. C1 앱 바이트는 변경하지 않았으며 실제 자동 종료·교체 운영 성공은 미확인입니다.
+
+최신 .NET 624 PASS/0 FAIL, scripts 102 PASS/0 FAIL(89.035초, 실행기 34개 포함), 환경·외부 EOF focused 4 PASS(6.217초)입니다. 종료 client의 압축 해제·TEMP/TMP를 검증된 기존 D 패키지 폴더에 고정했고 Python harness는 D 출력 파일과 정확한 부모 종료만 기다립니다. 이전 전체 98개 두 번은 외부 35초 timeout으로 각각 97 PASS/1 ERROR(95.932초·126.665초); 동일 deadline 단독 검사는 변경 없이 PASS(25.864초)였습니다. private 추적에서 상속 capture EOF 지연은 확인했지만 전체 실행 추가 지연의 원인은 전부 입증되지 않았습니다. 보호 Bridge config와 중앙 clone locks는 그대로이며 PR #31은 draft·미병합, receipt review는 disabled/unmanaged입니다. 과거 이력보다 실제 최신 앱·패키지·검사 근거를 우선하고 운영 성공을 추측하지 않습니다.

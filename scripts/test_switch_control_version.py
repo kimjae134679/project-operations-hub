@@ -26,6 +26,26 @@ foreach($node in $ast.EndBlock.Statements){
     }
 }
 $case=$args[1]
+if($case -eq 'capability_actual_table'){
+    # The real AST-loaded function runs before any orchestration mock is defined.
+    # This is a pure identity-table query: no file, process or IPC boundary runs.
+    $commit='5b0f3296d259ce03882e16eba1d8f93604af570f'
+    $hash='2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f'
+    $cases=@(
+        @{name='exact';version='0.9.7';commit=$commit;hash=$hash},
+        @{name='wrong_version';version='0.9.6';commit=$commit;hash=$hash},
+        @{name='wrong_source';version='0.9.7';commit=('0'*40);hash=$hash},
+        @{name='wrong_sha';version='0.9.7';commit=$commit;hash=('0'*64)},
+        @{name='legacy_475';version='0.9.7';commit='475a0fcd6f9ec3f27d35f79cb1b90b7b5831b0a7';hash='128475e91b2ff8a7f6cb1f4e34fa26353d625eedff61c462151d071fa01458cc'}
+    )
+    $results=[ordered]@{}
+    foreach($candidate in $cases){
+        $request=[pscustomobject]@{ExpectedCurrentVersion=$candidate.version;ExpectedCurrentSourceCommit=$candidate.commit;ExpectedCurrentSha256=$candidate.hash}
+        $results[$candidate.name]=Test-SwitchExitCapability $request
+    }
+    $results | ConvertTo-Json -Compress
+    return
+}
 $script:trace=[Collections.Generic.List[string]]::new()
 $script:step=0;$script:clock=[DateTimeOffset]::Parse('2026-10-07T00:00:00Z')
 $script:statuses=[Collections.Generic.List[object]]::new()
@@ -124,20 +144,36 @@ if($case.StartsWith('ipc_')){
     $old=Join-Path $versions '0.9.7-20261007\AIControlTower.exe'
     $r.CurrentExecutable=$old;$r.ExpectedCurrentVersion='0.9.7';$r.ExpectedCurrentSourceCommit='f'*40;$r.ExpectedCurrentSha256='e'*64
 }
-if($case -eq 'ipc_client_boundary'){
+if($case -in @('ipc_client_boundary','ipc_client_env_missing','ipc_client_env_reparse')){
     $real=$ast.EndBlock.Statements | Where-Object {$_ -is [Management.Automation.Language.FunctionDefinitionAst] -and $_.Name -eq 'Invoke-SwitchExitClient'}
     . ([scriptblock]::Create($real.Extent.Text))
     function Assert-SwitchRequest($Request){}
-    $r.CurrentExecutable=Join-Path $args[2] 'only-owned-client.exe'
+    $oldRoot=Join-Path $args[2] 'old-runtime'
+    [IO.Directory]::CreateDirectory($oldRoot)|Out-Null
+    [IO.Directory]::CreateDirectory((Join-Path $oldRoot 'bundle-extract'))|Out-Null
+    if($case -ne 'ipc_client_env_missing'){[IO.Directory]::CreateDirectory((Join-Path $oldRoot 'runtime-temp'))|Out-Null}
+    $r.CurrentExecutable=Join-Path $oldRoot 'only-owned-client.exe'
+    $r.VersionRoot=Join-Path $args[2] 'target-runtime'
+    $originalBundle=$env:DOTNET_BUNDLE_EXTRACT_BASE_DIR;$originalTemp=$env:TEMP;$originalTmp=$env:TMP
+    $env:DOTNET_BUNDLE_EXTRACT_BASE_DIR='C:\unapproved-inherited-bundle'
+    $env:TEMP='C:\unapproved-inherited-temp';$env:TMP='C:\unapproved-inherited-tmp'
+    function Assert-SwitchNoReparse([string]$Path){
+        if($case -eq 'ipc_client_env_reparse' -and $Path -eq (Join-Path $oldRoot 'runtime-temp')){throw 'fixture_reparse_rejected'}
+    }
     $script:boundary=$null;$script:boundaryCalls=0
     function Read-SwitchChildProtocol($Start){
         $script:boundaryCalls++
-        $script:boundary=[pscustomobject]@{file=$Start.FileName;arguments=$Start.Arguments;workingDirectory=$Start.WorkingDirectory;redirectOut=$Start.RedirectStandardOutput;redirectError=$Start.RedirectStandardError;shell=$Start.UseShellExecute;noWindow=$Start.CreateNoWindow;windowStyle=$Start.WindowStyle.ToString()}
+        $script:boundary=[pscustomobject]@{file=$Start.FileName;arguments=$Start.Arguments;workingDirectory=$Start.WorkingDirectory;redirectOut=$Start.RedirectStandardOutput;redirectError=$Start.RedirectStandardError;shell=$Start.UseShellExecute;noWindow=$Start.CreateNoWindow;windowStyle=$Start.WindowStyle.ToString();bundle=$Start.EnvironmentVariables['DOTNET_BUNDLE_EXTRACT_BASE_DIR'];temp=$Start.EnvironmentVariables['TEMP'];tmp=$Start.EnvironmentVariables['TMP']}
         return [pscustomobject]@{schemaVersion=1;status='graceful_exit_accepted';reason='graceful_exit_accepted';exitCode=0;NativeExitCode=0}
     }
-    $reply=Invoke-SwitchExitClient $r ((Get-SwitchMonotonicSeconds)+25)
-    $short=Invoke-SwitchExitClient $r ((Get-SwitchMonotonicSeconds)+19)
-    [pscustomobject]@{reply=$reply;short=$short;boundary=$script:boundary;calls=$script:boundaryCalls}|ConvertTo-Json -Depth 5 -Compress
+    $reply=$null;$short=$null;$failed=$false
+    try {
+        try{$reply=Invoke-SwitchExitClient $r ((Get-SwitchMonotonicSeconds)+25)}catch{$failed=$true}
+        if($case -eq 'ipc_client_boundary'){$short=Invoke-SwitchExitClient $r ((Get-SwitchMonotonicSeconds)+19)}
+    } finally {
+        $env:DOTNET_BUNDLE_EXTRACT_BASE_DIR=$originalBundle;$env:TEMP=$originalTemp;$env:TMP=$originalTmp
+    }
+    [pscustomobject]@{reply=$reply;short=$short;boundary=$script:boundary;calls=$script:boundaryCalls;failed=$failed;oldRoot=$oldRoot;targetRoot=$r.VersionRoot}|ConvertTo-Json -Depth 5 -Compress
     exit 0
 }
 if($case -eq 'real_file_hash'){
@@ -194,15 +230,23 @@ class SwitchControlVersionTests(unittest.TestCase):
         temp = self.root / 'temp'
         temp.mkdir(exist_ok=True)
         environment = dict(os.environ, TEMP=str(temp), TMP=str(temp))
-        child = subprocess.run(['powershell.exe', '-NoLogo', '-NoProfile', '-NonInteractive',
-                                '-File', str(self.harness),
-                                str(SCRIPT), case, str(self.root)],
-                               capture_output=True, text=True,
-                               timeout=35 if case == 'guard_silent_inherited_pipe' else 20,
-                               env=environment)
-        self.assertEqual(0, child.returncode, child.stderr)
-        self.assertEqual('', child.stderr)
-        return json.loads(child.stdout)
+        stdout_path = self.root / (case + '-harness-stdout.log')
+        stderr_path = self.root / (case + '-harness-stderr.log')
+        # Files have no EOF dependency on inherited descendant pipe handles.
+        # subprocess.run waits for this exact harness parent; keep its original
+        # external timeout and the existing natural descendant cleanup policy.
+        with stdout_path.open('wb') as stdout, stderr_path.open('wb') as stderr:
+            child = subprocess.run(['powershell.exe', '-NoLogo', '-NoProfile', '-NonInteractive',
+                                    '-File', str(self.harness),
+                                    str(SCRIPT), case, str(self.root)],
+                                   stdout=stdout, stderr=stderr,
+                                   timeout=35 if case == 'guard_silent_inherited_pipe' else 20,
+                                   env=environment)
+        output = stdout_path.read_text(encoding='utf-8')
+        error = stderr_path.read_text(encoding='utf-8')
+        self.assertEqual(0, child.returncode, error)
+        self.assertEqual('', error)
+        return json.loads(output)
 
     def create_inherited_pipe_fixture(self, case):
         ready = self.root / (case + '-ready.txt')
@@ -346,6 +390,15 @@ class SwitchControlVersionTests(unittest.TestCase):
         self.assertEqual('started', out['response']['status'])
         self.assertFalse(out['descendantFinished'], out)
 
+    def test_python_harness_observes_parent_exit_before_inherited_descendant_eof(self):
+        out = self.run_case('guard_pipe_stdout')
+        parent_exit = self.root / 'guard_pipe_stdout-parent-exit.txt'
+        elapsed_after_parent_exit = time.time() - parent_exit.stat().st_mtime
+        self.assertEqual('started', out['response']['status'])
+        self.assertLess(elapsed_after_parent_exit, 3.0,
+                        'The Python harness waited for the unrelated descendant EOF after its exact parent exited.')
+        self.assertFalse((self.root / 'guard_pipe_stdout-done.txt').exists())
+
     def test_guard_json_result_does_not_wait_for_descendant_stderr_eof(self):
         out = self.run_case('guard_pipe_stderr')
         self.assertEqual('started', out['response']['status'])
@@ -385,6 +438,12 @@ class SwitchControlVersionTests(unittest.TestCase):
         out = self.run_case('ipc_legacy')
         self.assertEqual('started', out['result']['status'])
         self.assertEqual([], self.ipc_calls(out))
+
+    def test_actual_capability_table_admits_only_verified_c1_identity(self):
+        out = self.run_case('capability_actual_table')
+        self.assertEqual({'exact': True, 'wrong_version': False,
+                          'wrong_source': False, 'wrong_sha': False,
+                          'legacy_475': False}, out)
 
     def test_current_097_requires_exact_fixed_deployment_evidence(self):
         out = self.run_case('ipc_bad_old_descriptor')
@@ -454,14 +513,41 @@ class SwitchControlVersionTests(unittest.TestCase):
         self.assertEqual('held_timeout', out['short']['status'])
         self.assertEqual(1, out['calls'])
         boundary = out['boundary']
-        self.assertEqual(str(self.root / 'only-owned-client.exe'), boundary['file'])
+        self.assertEqual(str(self.root / 'old-runtime' / 'only-owned-client.exe'), boundary['file'])
         self.assertEqual('--request-manual-exit', boundary['arguments'])
-        self.assertEqual(str(self.root), boundary['workingDirectory'])
+        self.assertEqual(str(self.root / 'old-runtime'), boundary['workingDirectory'])
         self.assertTrue(boundary['redirectOut'])
         self.assertTrue(boundary['redirectError'])
         self.assertFalse(boundary['shell'])
         self.assertTrue(boundary['noWindow'])
         self.assertEqual('Hidden', boundary['windowStyle'])
+
+    def test_exit_client_overrides_hostile_inherited_environment_with_verified_old_root(self):
+        out = self.run_case('ipc_client_boundary')
+        self.assertFalse(out['failed'])
+        self.assertEqual(1, out['calls'])
+        boundary = out['boundary']
+        old = self.root / 'old-runtime'
+        self.assertEqual(str(old / 'bundle-extract'), boundary['bundle'])
+        self.assertEqual(str(old / 'runtime-temp'), boundary['temp'])
+        self.assertEqual(str(old / 'runtime-temp'), boundary['tmp'])
+        self.assertNotEqual(str(Path(out['targetRoot']) / 'bundle-extract'), boundary['bundle'])
+        self.assertNotEqual(str(Path(out['targetRoot']) / 'runtime-temp'), boundary['temp'])
+
+    def test_missing_old_runtime_directory_rejects_before_exit_client_boundary(self):
+        out = self.run_case('ipc_client_env_missing')
+        self.assertTrue(out['failed'])
+        self.assertEqual(0, out['calls'])
+        self.assertIsNone(out['boundary'])
+        self.assertTrue((self.root / 'old-runtime' / 'bundle-extract').is_dir())
+        self.assertFalse((self.root / 'old-runtime' / 'runtime-temp').exists())
+
+    def test_reparse_old_runtime_directory_rejects_before_exit_client_boundary(self):
+        out = self.run_case('ipc_client_env_reparse')
+        self.assertTrue(out['failed'])
+        self.assertEqual(0, out['calls'])
+        self.assertIsNone(out['boundary'])
+        self.assertTrue((self.root / 'old-runtime' / 'runtime-temp').is_dir())
 
 
 if __name__ == '__main__':

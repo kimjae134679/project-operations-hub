@@ -50,7 +50,9 @@ function Get-SwitchCurrentDeployment($Request) {
 function Test-SwitchExitCapability($Request) {
     # Positive build tuples only. Root registers verified IPC-capable package
     # bytes here after build verification; no runtime CLI capability override.
-    $knownCapableBuilds = @()
+    $knownCapableBuilds = @(
+        [pscustomobject]@{Version='0.9.7';SourceCommit='5b0f3296d259ce03882e16eba1d8f93604af570f';Sha256='2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f'}
+    )
     foreach ($build in $knownCapableBuilds) {
         if ($Request.ExpectedCurrentVersion -ceq $build.Version -and $Request.ExpectedCurrentSourceCommit -ieq $build.SourceCommit -and
             $Request.ExpectedCurrentSha256 -ieq $build.Sha256) { return $true }
@@ -232,13 +234,25 @@ function Invoke-SwitchExitClient($Request,[double]$Deadline) {
     if ($Deadline-(Get-SwitchMonotonicSeconds) -lt 20) {
         return [pscustomobject]@{schemaVersion=1;status='held_timeout';reason='held_timeout';exitCode=3;NativeExitCode=3}
     }
+    # Single-file extraction happens before managed headless entry. Bind only
+    # the already-verified OLD package; never inherit a helper's C temp paths.
+    $oldRoot = [IO.Path]::GetDirectoryName($Request.CurrentExecutable)
+    $bundleRoot = Join-Path $oldRoot 'bundle-extract'
+    $tempRoot = Join-Path $oldRoot 'runtime-temp'
+    foreach ($directory in @($bundleRoot,$tempRoot)) {
+        Assert-SwitchNoReparse $directory
+        if (!(Get-Item -LiteralPath $directory -Force).PSIsContainer) { throw 'invalid_runtime_directory' }
+    }
     $start = New-Object Diagnostics.ProcessStartInfo
     $start.FileName = $Request.CurrentExecutable
     $start.Arguments = '--request-manual-exit'
-    $start.WorkingDirectory = [IO.Path]::GetDirectoryName($Request.CurrentExecutable)
+    $start.WorkingDirectory = $oldRoot
     $start.UseShellExecute = $false;$start.CreateNoWindow = $true
     $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
     $start.RedirectStandardOutput = $true;$start.RedirectStandardError = $true
+    $start.EnvironmentVariables['DOTNET_BUNDLE_EXTRACT_BASE_DIR'] = $bundleRoot
+    $start.EnvironmentVariables['TEMP'] = $tempRoot
+    $start.EnvironmentVariables['TMP'] = $tempRoot
     return (Read-SwitchChildProtocol $start)
 }
 function Assert-SwitchExitReply($Reply) {

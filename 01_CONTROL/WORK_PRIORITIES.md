@@ -4,7 +4,11 @@
 
 현재 `475a0fc` 앱에는 종료 IPC가 없으므로 다음 IPC 지원본으로의 첫 교체에는 작업이 끝난 뒤 **트레이 → 종료**가 한 번 필요합니다. X는 트레이로 보내는 동작을 유지합니다. 이후 정확한 버전·소스·SHA가 검증되어 capability 목록에 등록된 빌드만 기존 EXE의 종료 요청을 사용합니다. 작업·쓰기 정리 → 수락 → 원래 프로세스 실제 종료 확인 → 대상 재검증·한 번 실행 순서이며, 수락만으로 종료를 단정하거나 강제 종료하지 않습니다. 구버전에 알 수 없는 CLI 인수를 보내 지원 여부를 탐색하지 않습니다.
 
-종료 IPC 소스와 교체 실행기 연결은 준비됐습니다. 최신 fresh 검사는 **scripts 97 PASS / 0 FAIL**(실행기 29개 포함), **.NET 624 PASS / 0 FAIL**입니다(`automatic-exit-full-final.trx`). 새 IPC 패키지의 소스 커밋·SHA·capability 등록과 실제 자동 종료 운영 확인은 아직 확정하지 않았습니다. 보호 Bridge 설정/운영 업그레이드와 중앙 clone Git lock은 그대로이며 우회·복구 완료로 표시하지 않습니다. PR #31은 draft·미병합, receipt review는 disabled/unmanaged입니다.
+별도 `0.9.7-20261007-autoexit` 패키지는 준비·검증했고 정확한 capability 튜플을 등록했습니다. 앱 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`입니다. 정확한 EXE의 비운영 순수 검사 0, 서버 정보 없는 종료 요청 `unsupported/4`, 추가 인수 `invalid_request/2`를 확인했으나 실제 자동 종료·교체 운영 성공은 미확인입니다.
+
+최신 검증은 **.NET 624 PASS / 0 FAIL**, **scripts 102 PASS / 0 FAIL(89.035초, 실행기 34개 포함)**입니다(`automatic-exit-scripts-C2-final-102.log`). 환경·외부 EOF focused 4개도 PASS(6.217초)입니다. 종료 client의 압축 해제·TEMP/TMP를 검증된 기존 D 패키지 폴더에 고정했고, Python harness는 D 출력 파일과 정확한 부모 종료 대기로 자식 상속 EOF를 기다리지 않습니다. C1 앱 바이트·소스·SHA는 그대로이며 실제 자동 종료 운영 확인은 별개입니다.
+
+이전 검증 이력: 전체 98개 검사는 두 번 외부 35초 timeout으로 각각 97 PASS/1 ERROR(95.932초·126.665초)였습니다. 변경 없는 deadline 단독 검사는 PASS(25.864초); private 추적은 내부 reader 약 20초 반환과 외부 capture EOF 지연을 구분했습니다. 두 전체 실행의 추가 지연 원인이 모두 증명된 것은 아닙니다. 보호 Bridge 설정/운영 업그레이드와 중앙 clone Git lock은 그대로이며 우회·복구 완료로 표시하지 않습니다. PR #31은 draft·미병합, receipt review는 disabled/unmanaged입니다.
 
 ## 이전 준비 기록 · 자동 교체와 독립 병렬 실행
 
