@@ -129,6 +129,36 @@ if($case.StartsWith('version_validator_')){
     $results | ConvertTo-Json -Depth 5 -Compress
     return
 }
+if($case -eq 'capability_actual_098_scoped_table'){
+    # Actual scoped GUI tuple verified by the owned idle exit/guard roundtrip.
+    # Query the real allowlist before mocks; never exercise live IPC or launch.
+    $commit='5e79fa1db693982a876187c455d06369b4762511'
+    $hash='606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a'
+    $recordsCommit='8630f1bac112ded73cce20883309fc9dfaae7ee4'
+    $recordsHash='4d0601c700dd12c7e217bd52f3e994b0ab51fa26bfff6c86d1ef04805daf05c9'
+    $managedCommit='c4f9669fcc287dcb47d74c97dd1f3661e621b488'
+    $managedHash='484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b'
+    $cases=@(
+        @{name='exact_scoped_098';version='0.9.8';commit=$commit;hash=$hash},
+        @{name='wrong_version';version='0.9.7';commit=$commit;hash=$hash},
+        @{name='wrong_source';version='0.9.8';commit=('0'*40);hash=$hash},
+        @{name='wrong_sha';version='0.9.8';commit=$commit;hash=('0'*64)},
+        @{name='scoped_source_records_sha';version='0.9.8';commit=$commit;hash=$recordsHash},
+        @{name='records_source_scoped_sha';version='0.9.8';commit=$recordsCommit;hash=$hash},
+        @{name='scoped_source_managed_sha';version='0.9.8';commit=$commit;hash=$managedHash},
+        @{name='managed_source_scoped_sha';version='0.9.8';commit=$managedCommit;hash=$hash},
+        @{name='records_098_preserved';version='0.9.8';commit=$recordsCommit;hash=$recordsHash},
+        @{name='managed_098_preserved';version='0.9.8';commit=$managedCommit;hash=$managedHash},
+        @{name='c1_preserved';version='0.9.7';commit='5b0f3296d259ce03882e16eba1d8f93604af570f';hash='2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f'}
+    )
+    $results=[ordered]@{}
+    foreach($candidate in $cases){
+        $request=[pscustomobject]@{ExpectedCurrentVersion=$candidate.version;ExpectedCurrentSourceCommit=$candidate.commit;ExpectedCurrentSha256=$candidate.hash}
+        $results[$candidate.name]=Test-SwitchExitCapability $request
+    }
+    $results | ConvertTo-Json -Compress
+    return
+}
 if($case -eq 'capability_actual_098_records_table'){
     # Actual published tuple verified by the owned idle exit/guard roundtrip.
     # Pure real-table query only: no file, process, IPC or launcher boundary runs.
@@ -845,6 +875,15 @@ class SwitchControlVersionTests(unittest.TestCase):
             self.finish_gated_cleanup_fixture(owned, child, gate)
         self.assertIsInstance(failure, AssertionError, 'held cleanup must report an explicit owned-fixture deadline failure')
         self.assertEqual(before, retained, 'held cleanup partially removed evidence before file release')
+
+    def test_actual_capability_table_admits_verified_098_scoped_only_as_exact_tuple(self):
+        out = self.run_case('capability_actual_098_scoped_table')
+        self.assertEqual({'exact_scoped_098': True, 'wrong_version': False,
+                          'wrong_source': False, 'wrong_sha': False,
+                          'scoped_source_records_sha': False, 'records_source_scoped_sha': False,
+                          'scoped_source_managed_sha': False, 'managed_source_scoped_sha': False,
+                          'records_098_preserved': True, 'managed_098_preserved': True,
+                          'c1_preserved': True}, out)
 
     def test_actual_capability_table_admits_verified_098_records_only_as_exact_tuple(self):
         out = self.run_case('capability_actual_098_records_table')
