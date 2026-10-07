@@ -149,3 +149,11 @@ helper PID 37016/1회/종료 코드 0으로 C1 PID 9552 소멸 → 별도 0.9.8 
 최종 scripts 119 PASS/0 FAIL(119.066초, 종료 코드 0, 실행기 41개), 앱 C# 추가 변경 없는 .NET 634 PASS/0 FAIL(49초, Window 3개 제외)입니다. 직전 117개/118.331초의 teardown 1 ERROR, cleanup RED 2 FAIL(16.568초) → GREEN 5 PASS(15.034초)를 보존합니다. 기존 8초 소유 파일 release barrier는 프로세스 종료 증거가 아니며 production deadline은 변경하지 않았습니다. Python CLI RED 6 FAIL/4 PASS(15.112초) → GREEN 10 PASS(14.896초), DAG 차단·replay 1·privacy 0은 소스 CLI 검증이며 기존 Bridge 3.0 운영 설치 변경이 아닙니다. 정규형 버전·다운그레이드 거부·nonlegacy descriptor·고정 capability/guard·PID/birth·기한·미확인 무재시도 계약과 sticky 명시 AI 오류/회복 가능한 일반 도구 nonzero 구분은 유지합니다.
 
 root supervisor PID 5996 보존, Bridge PID 5140/v3 localReady·relayConnected true/parallel 4(08:39:30Z), 별도 Remote pong(08:39:27Z)을 확인했습니다. 보호 config·중앙 Git locks·실제 여러 Jev 모델 완료·모든 GPT 자동 연결은 미완료입니다. PR #31 draft·미병합, review disabled/unmanaged, 예약 PAUSED입니다.
+
+## 최신 운영 확인 · 2026-10-07 19:14 KST
+
+앞선 PID/소스 표시는 당시 이력입니다. 현재 scoped 0.9.8 운영 앱은 source `5e79fa1db693982a876187c455d06369b4762511`, PID 21936이며 정확한 EXE SHA는 `606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a`입니다. 지원 helper의 다른 패키지 전환 및 exact 새 EXE의 유휴 정상 종료/guard 재시작을 확인했고 root5996/Bridge5140의 생성 신원을 보존했습니다. 새 앱이 별도 publisher CLI 없이 45개 구조 기록을 draft PR34로 자동 공유했습니다. PR34는 미병합이고 CentralShared/공지 ACK는 false이며 명령/답변 원문은 로컬에 유지합니다.
+
+부모 .NET654 PASS/0 FAIL(8초, Window.Show3 제외), 교체 helper43 PASS/0 FAIL(82.630초/native0)입니다. 현재 빌드의 실제 지원 종료 왕복 이후 helper source `73a15134bf1b0856b6fd21a3f110f254f457f6a3`/SHA `3ee433b0d8c7fdb5987299fc77aedb2d4fe7112242f834b5db6d720f1eddf125`를 별도 등록했습니다. 앱 EXE는 helper 변경으로 재빌드하지 않았습니다. root 최신 실행 입구는 scoped fixed guard로 연결하되 wrapper 재실행은 하지 않았습니다. 실행 descriptor의 UTC 만료를 보존하며 임의 연장하지 않습니다.
+
+타 프로젝트 일반 수집 오류가 다른 publisher를 막던 경계만 정확한 project ID로 격리했고 본인/전역 오류 및 manifest/collection 차단은 유지합니다. 원격 본체 protected config 설치와 실제 중앙 clone 잠금은 미해결·무변경이며 운영 busy drain/전체 GPT-Jev 대화 연결/실제 여러 모델 완료는 아직 미검증입니다. 예약 PAUSED, receipt review disabled/unmanaged, 런타임 Engram 미등록으로 agent memory 호출0을 유지합니다. 자세한 원본/실행/기록 경계는 `ai-control-tower/docs/project-record-publishing.md`와 최신 본인 task_exchange를 확인합니다.

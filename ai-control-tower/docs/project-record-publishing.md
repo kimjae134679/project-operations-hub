@@ -1,6 +1,18 @@
 # 프로젝트 기록 공유
 
-## 2026-10-07 · 현재 실행과 이번 기록 공유 수정
+## 최신 확인 · 2026-10-07 운영 교체와 앱 자동 metadata 게시
+
+현재 운영 앱은 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-scoped`의 **0.9.8 / PID 21936**이며 endpoint birth ticks는 `639269645633576474`, fresh tray·PC 연결은 true입니다. 앱에 포함된 소스는 `5e79fa1db693982a876187c455d06369b4762511`, exe SHA-256은 `606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a`입니다. 아래 c4f9669 운영·이번 수정 GUI 미반영·publisher 미활성 표시는 이전 시점의 이력이며 이 최신 확인이 우선합니다.
+
+- **실제 전환:** helper PID 15356/native 0으로 기존 PID 29456 종료 → 새 PID 31888 실행을 확인했습니다. 이어 새 앱의 유휴 종료 client PID 21328 수락 0·PID 31888 실제 종료 → guard PID 11384 재시작 0 → 현재 PID 21936을 확인했습니다. 원본은 `D:\A_KJ\AI\ControlTowerData\version-replacement\20261007-publisher-scope\FULL_HANDOFF.json`과 같은 폴더의 `NEW_IDLE_ROUNDTRIP.json`입니다. 운영 busy drain 완료 증거는 아닙니다.
+- **앱 자동 게시:** 일회 전용 CLI가 아니라 운영 앱의 등록 publisher가 허브 metadata batch `6a162996…`를 `pr_open`으로 기록하고 [draft PR #34](https://github.com/kimjae134679/project-operations-hub/pull/34)를 만들었습니다. 실제 API 대조 결과 head `9d02ee8be7804c6b41d897438fb1e776a075a727`, **45 ADDED·삭제 0**, metadata only·draft·MERGEABLE·미병합입니다. 같은 증거 폴더의 `AUTOMATIC_PUBLICATION.json`에 자동 게시 확인을 보존했습니다. 과거 #33의 CLI 성공과 구분하며 변경 batch의 기존 PR 자동 재사용 구현을 뜻하지 않습니다.
+- **오류 격리:** 프로젝트별 records와 errors를 같은 정확한 ordinal ID로 선택합니다. 타 프로젝트의 일반 수집 오류가 정상 허브 게시를 막던 문제를 고쳤고, 본인 프로젝트 오류·ProjectId null 전역 오류·`manifest_invalid`/`collection_blocked` 차단은 유지합니다. real `PrepareExports` 반례 RED 2 FAIL → publisher/registered GREEN 56 PASS, 신규 10사례 재검사 PASS입니다. 원본 기록·parser·보호 경로는 바꾸지 않았습니다.
+- **검사:** 부모 fresh .NET **654 PASS/0 FAIL**(8초), 최종 교체 실행기 **43 PASS/0 FAIL**(82.630초, native 0)입니다. helper 소스 `73a15134bf1b0856b6fd21a3f110f254f457f6a3`는 commit/push했고 패키지 helper SHA-256 `3ee433b0d8c7fdb5987299fc77aedb2d4fe7112242f834b5db6d720f1eddf125`를 대조했습니다. 운영 앱의 5e79fa1/SHA606d81c0/PID21936은 그대로입니다. 실제 앱 전환·자동 게시 증거와 코드 검사를 구분합니다.
+- **고정 실행 입구:** `START_LATEST_VIEW.cmd`는 scoped 패키지의 `START_THIS_VERSION.vbs`와 fixed guard 경로에 연결했습니다. 백업·readback·hash 증거는 같은 폴더의 `ENTRY_UPDATE.json`입니다. 실행 중인 앱의 중복 실행을 피하려고 wrapper를 다시 실행하지 않았으며 실제 정상 재시작 증거는 위 exact guard 왕복입니다. descriptor의 `expiresAtUtc=2026-10-08T06:07:57.4661913+00:00`는 그대로 보존했습니다. 이는 향후 실행의 유효기한이지 현재 앱 자동 종료 시각이 아닙니다. 앞선 CheckOnly 거절 후 루트 소유 JSON 처리에 `DateKind String`을 적용해 동일 UTC 만료 instant를 유지했으며 기한 갱신·guard 우회·보호 운영 경로 변경은 하지 않았습니다.
+
+원본 명령·답변과 자유 본문은 로컬에 남기며 **CentralShared=false / CreatesAcknowledgement=false / 자동 merge 없음**입니다. 보호 Bridge 운영 설치·실제 중앙 clone/locks는 미해결·무변경이고 전체 GPT/Jev 자동 연결·실제 여러 모델 완료·운영 busy drain은 확인하지 않았습니다. 아래 이전 기록은 삭제하지 않습니다.
+
+## 이전 확인 · 2026-10-07 18:36 이전 실행과 기록 공유 수정
 
 현재 운영 앱은 **0.9.8**(app source c4f9669)이며, 아래 0.9.3/0.9.5/0.9.6·미활성 표시는 해당 시점의 이력입니다. 이번 수정 소스는 GitHub 업로드를 한 담당 경로로 처리합니다. 기존 중앙 communication clone 복구와 별개인 명시 등록 metadata publisher를 사용하며, 원본 명령/답변은 로컬에 유지합니다. 공개 GitHub에는 구조 상태 기록만 내보냅니다.
 
