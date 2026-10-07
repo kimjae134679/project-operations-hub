@@ -11,7 +11,7 @@ if($MyInvocation.MyCommand -is [System.Management.Automation.ExternalScriptInfo]
 $installMutex=New-Object -TypeName System.Threading.Mutex -ArgumentList @($false,'Local\ProjectBridge_Install')
 try{$hasInstallLock=$installMutex.WaitOne(0)}catch [System.Threading.AbandonedMutexException]{$hasInstallLock=$true}
 if(!$hasInstallLock){ $installMutex.Dispose();throw 'Another ProjectBridge install is running' }
-$installTouched=$false;$installationCommitted=$false;$backup=$null;$priorFlags=@{}
+$installTouched=$false;$installationCommitted=$false;$backup=$null;$priorFlags=@{};$configPlan=$null
 function Assert-ExistingConfigWritable([string]$Path){
  # Request the access the later config update needs without writing, creating,
  # truncating, changing permissions, or stopping an existing bridge.
@@ -20,16 +20,123 @@ function Assert-ExistingConfigWritable([string]$Path){
  try{
   $item=Get-Item -LiteralPath $Path -Force
   if($item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'Existing config is not a regular file'}
-  # Open access alone does not prove the later WriteAllText create/truncate
-  # operation will succeed. Refuse Hidden/System without changing attributes.
-  $blockingAttributes=$item.Attributes -band ([IO.FileAttributes]::Hidden -bor [IO.FileAttributes]::System)
-  if($blockingAttributes -ne 0){throw ('config_writealltext_attribute_conflict_before_install: '+$blockingAttributes.ToString())}
+  # Hidden/System are supported by the staged existing-file writer. ReadOnly
+  # and ordinary access/sharing denials remain fail-closed; never clear bits.
+  if(($item.Attributes -band [IO.FileAttributes]::ReadOnly) -ne 0){throw 'Existing config is read-only'}
   $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read)
  }catch{
-  if($_.Exception.Message.StartsWith('config_writealltext_attribute_conflict_before_install:',[StringComparison]::Ordinal)){throw}
   throw 'config_not_writable_before_install'
  }
  finally{if($stream){$stream.Dispose()}}
+}
+function Get-ConfigSnapshot([string]$Path,[IO.Stream]$Stream=$null){
+ if(!(Test-Path -LiteralPath $Path)){return [pscustomobject]@{Exists=$false;Bytes=$null;Attributes=$null;Acl=$null}}
+ $item=Get-Item -LiteralPath $Path -Force
+ if($item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'config_not_regular_file'}
+ $sections=[Security.AccessControl.AccessControlSections]::Access -bor [Security.AccessControl.AccessControlSections]::Owner -bor [Security.AccessControl.AccessControlSections]::Group
+ if($Stream){
+  $memory=New-Object IO.MemoryStream
+  try{$Stream.Position=0;$Stream.CopyTo($memory);$bytes=$memory.ToArray()}finally{$memory.Dispose()}
+ }else{$bytes=[IO.File]::ReadAllBytes($Path)}
+ return [pscustomobject]@{Exists=$true;Bytes=[Convert]::ToBase64String($bytes);Attributes=[int]$item.Attributes;Acl=[IO.File]::GetAccessControl($Path,$sections).GetSecurityDescriptorSddlForm($sections)}
+}
+function ConvertTo-ConfigBytes($Config){
+ # Avoid silently stringifying unknown nested user fields at the former depth12.
+ # Reject unsupported nesting rather than publishing a lossy configuration.
+ function Assert-ConfigDepth($Value,[int]$Depth){
+  if($null -eq $Value -or $Value -is [string] -or $Value -is [ValueType]){return}
+  if($Depth -gt 90){throw 'config_nesting_not_supported'}
+  if($Value -is [Collections.IDictionary]){foreach($key in $Value.Keys){Assert-ConfigDepth $Value[$key] ($Depth+1)}}
+  elseif($Value -is [Collections.IEnumerable]){foreach($entry in $Value){Assert-ConfigDepth $entry ($Depth+1)}}
+  else{foreach($property in $Value.PSObject.Properties){Assert-ConfigDepth $property.Value ($Depth+1)}}
+ }
+ Assert-ConfigDepth $Config 0
+ return ,((New-Object Text.UTF8Encoding($false)).GetBytes(($Config|ConvertTo-Json -Depth 100)))
+}
+function New-ConfigWritePlan([string]$Path,[byte[]]$Bytes,$ExpectedBefore=$null){
+ Assert-ExistingConfigWritable $Path
+ $before=Get-ConfigSnapshot $Path
+ if($ExpectedBefore -and ($before.Exists -ne $ExpectedBefore.Exists -or $before.Bytes -cne $ExpectedBefore.Bytes -or $before.Attributes -ne $ExpectedBefore.Attributes -or $before.Acl -cne $ExpectedBefore.Acl)){throw 'config_changed_since_read'}
+ # A fresh installation can prepare serialized bytes without creating its
+ # directory or config. Commit later uses CreateNew and never overwrites a file
+ # that appeared after the initial absent snapshot.
+ if(!$before.Exists){return [pscustomobject]@{Path=$Path;Stage=$null;Backup=$null;Before=$before;Expected=[Convert]::ToBase64String($Bytes);Committed=$false}}
+ $parent=Split-Path -Parent ([IO.Path]::GetFullPath($Path))
+ $parentInfo=Get-Item -LiteralPath $parent -Force
+ if(!$parentInfo.PSIsContainer -or ($parentInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'config_parent_not_regular_directory'}
+ $token=[Guid]::NewGuid().ToString('N')
+ $staged=Join-Path $parent ('.config-stage-'+$token+'.json')
+ $saved=Join-Path $parent ('.config-backup-'+$token+'.json')
+ # Copy into a new name, never overwrite a protected destination or edit ACLs.
+ if($before.Exists){
+  [IO.File]::Copy($Path,$saved,$false)
+  $savedInfo=Get-ConfigSnapshot $saved
+  if($savedInfo.Bytes -cne $before.Bytes -or $savedInfo.Attributes -ne $before.Attributes -or $savedInfo.Acl -cne $before.Acl){throw 'config_backup_changed_during_staging'}
+  [IO.File]::Copy($Path,$staged,$false)
+ }
+ $mode=if($before.Exists){[IO.FileMode]::Open}else{[IO.FileMode]::CreateNew}
+ $stream=[IO.File]::Open($staged,$mode,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+ try{$stream.Write($Bytes,0,$Bytes.Length);$stream.SetLength($Bytes.Length);$stream.Flush($true)}finally{$stream.Dispose()}
+ $stagedInfo=Get-ConfigSnapshot $staged
+ if($before.Exists -and ($before.Attributes -ne $stagedInfo.Attributes -or $before.Acl -cne $stagedInfo.Acl)){throw 'config_staging_metadata_mismatch'}
+ return [pscustomobject]@{Path=$Path;Stage=$staged;Backup=$saved;Before=$before;Expected=[Convert]::ToBase64String($Bytes);Committed=$false}
+}
+function Complete-ConfigWritePlan($Plan){
+ Assert-ExistingConfigWritable $Plan.Path
+ if($Plan.Stage){
+  $stageInfo=Get-ConfigSnapshot $Plan.Stage
+  if($stageInfo.Bytes -cne $Plan.Expected -or ($stageInfo.Attributes -ne $Plan.Before.Attributes -or $stageInfo.Acl -cne $Plan.Before.Acl)){throw 'config_staged_content_changed'}
+ }
+ $parent=Split-Path -Parent ([IO.Path]::GetFullPath($Plan.Path))
+ while($parent){
+  $parentInfo=Get-Item -LiteralPath $parent -Force
+  if(!$parentInfo.PSIsContainer -or ($parentInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw 'config_parent_not_regular_directory'}
+  $next=Split-Path -Parent $parent;if($next -eq $parent){break};$parent=$next
+ }
+ # Hold ordinary granted ReadWrite access, denying writes/deletion by peers.
+ # Unlike File.Replace, this preserves the exact security descriptor flags.
+ # This is NOT crash-atomic: a hard process/power failure requires the retained
+ # original backup and explicit repair. No alternate-access retry is attempted.
+ $mode=if($Plan.Before.Exists){[IO.FileMode]::Open}else{[IO.FileMode]::CreateNew}
+ $stream=[IO.File]::Open($Plan.Path,$mode,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read)
+ try{
+  if($Plan.Before.Exists){
+   $current=Get-ConfigSnapshot $Plan.Path $stream
+   if($current.Bytes -cne $Plan.Before.Bytes -or $current.Attributes -ne $Plan.Before.Attributes -or $current.Acl -cne $Plan.Before.Acl){throw 'config_changed_since_staging'}
+  }
+  $bytes=[Convert]::FromBase64String($Plan.Expected)
+  try{
+   $stream.Position=0;$stream.Write($bytes,0,$bytes.Length);$stream.SetLength($bytes.Length);$stream.Flush($true)
+   $after=Get-ConfigSnapshot $Plan.Path $stream
+   if($after.Bytes -cne $Plan.Expected -or ($Plan.Before.Exists -and ($after.Attributes -ne $Plan.Before.Attributes -or $after.Acl -cne $Plan.Before.Acl))){throw 'config_commit_verification_failed'}
+   $Plan.Committed=$true
+  }catch{
+   # Only restore through this already-granted handle; retain both staging and
+   # backup files if restoration fails. Never claim success after a write error.
+   if($Plan.Before.Exists){
+    $original=[Convert]::FromBase64String($Plan.Before.Bytes)
+    try{
+     $stream.Position=0;$stream.Write($original,0,$original.Length);$stream.SetLength($original.Length);$stream.Flush($true)
+     $restored=Get-ConfigSnapshot $Plan.Path $stream
+     if($restored.Bytes -cne $Plan.Before.Bytes -or $restored.Attributes -ne $Plan.Before.Attributes -or $restored.Acl -cne $Plan.Before.Acl){throw 'config_restore_verification_failed'}
+    }
+    catch{throw 'config_write_failed_restore_failed_backup_retained'}
+   }
+   throw
+  }
+ }finally{$stream.Dispose()}
+ # Only the successfully consumed private staging copy is disposable. Retain
+ # original backups for hard termination recovery and all failure evidence.
+ if($Plan.Stage){[IO.File]::Delete($Plan.Stage)}
+}
+function Restore-ConfigBackup([string]$Path,[string]$BackupPath){
+ # Restoration uses the same checked metadata-compatible transaction, not a
+ # blind Copy-Item -Force against an existing hidden configuration.
+ $saved=Get-ConfigSnapshot $BackupPath
+ if(!$saved.Exists){throw 'config_backup_missing'}
+ $restore=New-ConfigWritePlan $Path ([Convert]::FromBase64String($saved.Bytes))
+ if($restore.Before.Exists -and ($restore.Before.Attributes -ne $saved.Attributes -or $restore.Before.Acl -cne $saved.Acl)){throw 'config_rollback_metadata_changed'}
+ Complete-ConfigWritePlan $restore
 }
 function Invoke-HiddenTool([string]$File,[string[]]$Arguments,[string]$WorkingDirectory){
  $info=New-Object Diagnostics.ProcessStartInfo
@@ -82,7 +189,7 @@ $runtimePath=Join-Path $target 'Runtime'
 $statePath=Join-Path $target 'state'
 $configPath=Join-Path $target 'config.json'
 $exePath=Join-Path $target $exeName
-$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py','tests/test_file_crud.py','tests/test_mcp_control.py','tests/test_installer_preflight.py')
+$allowed=@('bridge_worker.py','BridgeLauncher.cs','DesktopAutomation.cs','universal_worker.py','universal_actions.py','process_runner.py','local_api.py','bridge_mcp.py','README.md','UNIVERSAL_PROTOCOL.md',$guideName,'tests/test_bridge.py','tests/test_universal_worker.py','tests/test_universal_actions.py','tests/test_desktop_helper_source.py','tests/test_shared_scheduler.py','tests/test_github_client.py','tests/test_local_api.py','tests/test_file_crud.py','tests/test_mcp_control.py','tests/test_installer_preflight.py','tests/test_installer_config_writer.py')
 foreach($hash in $ApprovedBundleSha256){if($hash -notmatch '^[a-f0-9]{64}$'){throw 'Invalid approved bundle hash'}}
 $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $stage=Join-Path $tempRoot ('ProjectBridge3_'+[Guid]::NewGuid().ToString('N'))
@@ -167,9 +274,9 @@ try {
    if($existingShortcut.TargetPath -ne $exePath -or $existingShortcut.Arguments -ne '--background'){throw 'Unowned startup shortcut preserved'}
   }
  }
- $cfg=@{}
- if(Test-Path -LiteralPath $configPath){
-  $old=Get-Content -LiteralPath $configPath -Raw -Encoding UTF8|ConvertFrom-Json
+ $cfg=@{};$configOriginal=Get-ConfigSnapshot $configPath
+ if($configOriginal.Exists){
+  $old=([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($configOriginal.Bytes)).TrimStart([char]0xfeff))|ConvertFrom-Json
   foreach($property in $old.PSObject.Properties){$cfg[$property.Name]=$property.Value}
  }
  if(!$cfg.deviceId){$cfg.deviceId='KJW-'+[Guid]::NewGuid().ToString('N').Substring(0,12)}
@@ -217,6 +324,8 @@ try {
  foreach($name in @('stop.flag','disconnected.flag','stopped_logon.txt')){
   $flag=Join-Path $statePath $name;$priorFlags[$name]=if(Test-Path -LiteralPath $flag){[IO.File]::ReadAllText($flag)}else{$null}
  }
+ # Stage all config bytes and validate copied metadata before pausing any service.
+ $configPlan=New-ConfigWritePlan $configPath (ConvertTo-ConfigBytes $cfg) $configOriginal
  $installTouched=$true
  [IO.File]::WriteAllText((Join-Path $statePath 'stop.flag'),'installation pause')
  $ticketPath=Join-Path $statePath 'launcher_child.json';$child=$null
@@ -244,7 +353,7 @@ try {
   foreach($name in $destinations.Keys){
    $destination=Join-Path $target $destinations[$name];New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)|Out-Null;Copy-Item -LiteralPath (Join-Path $stage $name) -Destination $destination -Force
   }
-  [IO.File]::WriteAllText($configPath,($cfg|ConvertTo-Json -Depth 12),(New-Object Text.UTF8Encoding($false)))
+  Complete-ConfigWritePlan $configPlan
  }catch{
   throw
  }
@@ -278,7 +387,8 @@ try {
  }
  # Remaining owned metadata is hidden, with its path unchanged. Do not delete
  # a compiled legacy helper without a verified executable hash.
- $hide=@($runtimePath,$statePath,$configPath)
+ $hide=@($runtimePath,$statePath)
+ if($configPlan -and !$configPlan.Before.Exists){$hide+=@($configPath)}
  if(Test-Path -LiteralPath $priorManifest){$hide+=@($priorManifest)}
  if($priorUiHelper -eq (Join-Path $target 'DesktopAutomation.exe') -and (Test-Path -LiteralPath $priorUiHelper)){$hide+=@($priorUiHelper)}
  $legacyTests=Join-Path $target 'tests'
@@ -303,8 +413,10 @@ try {
   foreach($saved in @(Get-ChildItem -LiteralPath $backup -File -Recurse -Force)){
    $relative=$saved.FullName.Substring($backup.Length).TrimStart('\');$restore=[IO.Path]::GetFullPath((Join-Path $target $relative))
    if(!$restore.StartsWith(($target+'\'),[StringComparison]::OrdinalIgnoreCase)){throw 'Backup path outside install root'}
+   if($relative -eq 'config.json'){continue}
    Copy-Item -LiteralPath $saved.FullName -Destination $restore -Force -ErrorAction SilentlyContinue
   }
+  if($configPlan -and $configPlan.Committed -and $configPlan.Before.Exists){Restore-ConfigBackup $configPath $configPlan.Backup}
   foreach($name in $priorFlags.Keys){
    $flag=Join-Path $statePath $name
    if($null -eq $priorFlags[$name]){Remove-Item -LiteralPath $flag -ErrorAction SilentlyContinue}else{[IO.File]::WriteAllText($flag,[string]$priorFlags[$name])}

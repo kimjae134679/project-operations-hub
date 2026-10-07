@@ -9,7 +9,6 @@ import unittest
 
 INSTALLER = Path(__file__).resolve().parents[1] / 'install.ps1'
 FIXTURE_BASE = Path(r'D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks\installer-preflight-tests')
-CONFLICT = 'config_writealltext_attribute_conflict_before_install'
 
 
 class InstallerPreflightTests(unittest.TestCase):
@@ -56,21 +55,18 @@ $report=@{success=$success;error=$errorMessage;exceptionType=$exceptionType;hRes
         self.assertEqual(report['before'], report['after'], 'Guard changed bytes, attributes or ACL')
         return report
 
-    def assert_conflict(self, attributes, *reasons):
+    def assert_supported(self, attributes):
         report = self.run_guard(attributes)
-        self.assertFalse(report['success'], 'Hidden/System config must fail closed before installation')
-        self.assertIn(CONFLICT, report['error'])
-        for reason in reasons:
-            self.assertIn(reason, report['error'])
+        self.assertTrue(report['success'], report['error'])
 
-    def test_hidden_existing_config_is_rejected_without_modification(self):
-        self.assert_conflict(2 | 32, 'Hidden')
+    def test_hidden_existing_config_is_supported_without_modification(self):
+        self.assert_supported(2 | 32)
 
-    def test_system_existing_config_is_rejected_without_modification(self):
-        self.assert_conflict(4 | 32, 'System')
+    def test_system_existing_config_is_supported_without_modification(self):
+        self.assert_supported(4 | 32)
 
-    def test_hidden_system_existing_config_is_rejected_without_modification(self):
-        self.assert_conflict(2 | 4 | 32, 'Hidden', 'System')
+    def test_hidden_system_existing_config_is_supported_without_modification(self):
+        self.assert_supported(2 | 4 | 32)
 
     def test_normal_config_preflight_succeeds_without_writing(self):
         self.assertTrue(self.run_guard(128)['success'])
@@ -94,10 +90,8 @@ $report=@{success=$success;error=$errorMessage;exceptionType=$exceptionType;hRes
         self.assertLess(last, text.index('$installTouched=$true'))
         self.assertLess(last, text.index("[IO.File]::WriteAllText((Join-Path $statePath 'stop.flag')"))
         self.assertLess(last, text.index('Stop-Process -Id'))
-        body = text.split('function Assert-ExistingConfigWritable(', 1)[1].split('function Invoke-HiddenTool(', 1)[0]
-        self.assertIn(CONFLICT, body)
-        self.assertLess(body.index('[IO.FileAttributes]::Hidden'), body.index('[IO.File]::Open('))
-        self.assertIn('[IO.FileAttributes]::System', body)
+        body = text.split('function Assert-ExistingConfigWritable(', 1)[1].split('function Get-ConfigSnapshot(', 1)[0]
+        self.assertIn('[IO.FileAttributes]::ReadOnly', body)
         for forbidden in ['WriteAllText(', '.Write(', '.SetLength(', 'SetAttributes(', 'Set-Acl', 'Start-Process', 'Stop-Process']:
             self.assertNotIn(forbidden, body)
 

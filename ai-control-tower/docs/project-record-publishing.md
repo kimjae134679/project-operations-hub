@@ -1,5 +1,15 @@
 # 프로젝트 기록 공유
 
+## 2026-10-07 · 현재 실행과 이번 기록 공유 수정
+
+현재 운영 앱은 **0.9.8**(app source c4f9669)이며, 아래 0.9.3/0.9.5/0.9.6·미활성 표시는 해당 시점의 이력입니다. 이번 수정 소스는 GitHub 업로드를 한 담당 경로로 처리합니다. 기존 중앙 communication clone 복구와 별개인 명시 등록 metadata publisher를 사용하며, 원본 명령/답변은 로컬에 유지합니다. 공개 GitHub에는 구조 상태 기록만 내보냅니다.
+
+전체 과거 revision 수를 100개 새 쓰기 제한과 혼동하던 문제를 수정했습니다. 모든 이력을 검증하고 원격의 같은 경로는 정확한 blob으로 대조한 뒤 **새 경로만 최대 100개**를 한 번에 게시합니다. 100개 초과·충돌·결과 불명은 보류하며 일부 기록을 버리거나 제한을 늘리지 않습니다. 프로젝트 단위 배타적 lease가 서로 다른 batch의 중복 업로더도 막습니다. 로컬 수집/metadata branch·draft PR/중앙 원문 공유/공지 읽음은 별개입니다.
+
+focused RED 7 FAIL/18 PASS 및 invalid-registration side effect RED 1 FAIL 후 publisher/registered **46 PASS/0 FAIL**를 확인했습니다. 부모 fresh .NET code-only **642 PASS/0 FAIL**(실제 Window 검사 3개 제외), release code-only **121 PASS/0 FAIL**(Desktop helper 모듈 전체 제외)를 확인했습니다. 최초 부모 release 검사 5ERROR는 긴 시험 D TEMP 경로의 native MAX_PATH 오류였고, 짧은 소유 D TEMP의 같은 소스로 재검사하여 통과했습니다. 실제 일회 GitHub 결과는 아래에 추가하며, 기존 0.9.8 GUI가 이번 수정으로 자동 교체된 것은 아닙니다. 원본 프로젝트 dirty, 실제 중앙 clone/잠금, 보호 Bridge 설정과 원격은 변경하지 않습니다. receipt-driven review disabled/unmanaged, 예약 PAUSED를 유지합니다.
+
+### 이전 배포·게시 이력
+
 **현재 상태: 0.9.6 스테이징 완료·운영 미적용(activated=false).** 아래 0.9.5 일회 headless 공유 이력은 당시 실제 확인입니다. 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish/스테이징은 완료했지만 운영 미적용입니다(source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false). 현재 0.9.3 PID 16092의 PC/tray true와 기존 원격을 유지합니다. 이전 0.9.4 스테이징은 당시 이력입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
 
 ## 최신 사용자 지시 · main 병합 절차 진행(완료 미확인)
