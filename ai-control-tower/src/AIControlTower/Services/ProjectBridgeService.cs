@@ -37,10 +37,13 @@ public sealed class ProjectBridgeService : IDisposable
 {
     public const string DefaultHome = @"D:\A_KJ\AI\Applications\ProjectBridge";
     private readonly HttpClient _client;
+    private readonly Action<ProcessStartInfo> _startBridge;
     public string Home { get; }
     public string Executable => Path.Combine(Home, "프로젝트연결.exe");
     public ProjectBridgeService(string? home = null, HttpClient? client = null)
-    { Home = home ?? DefaultHome; _client = client ?? new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false}) { Timeout = TimeSpan.FromSeconds(3) }; }
+        : this(home,client,null) { }
+    public ProjectBridgeService(string? home,HttpClient? client,Action<ProcessStartInfo>? startBridge)
+    { Home = home ?? DefaultHome; _client = client ?? new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false}) { Timeout = TimeSpan.FromSeconds(3) }; _startBridge=startBridge??(info=>Process.Start(info)?.Dispose()); }
     internal static string Text(JsonElement j, string key, string fallback = "") => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? fallback : fallback;
     private static bool Flag(JsonElement j, string key) => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.True;
     private static int Number(JsonElement j, string key, int fallback) => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out var n) ? n : fallback;
@@ -127,6 +130,18 @@ public sealed class ProjectBridgeService : IDisposable
         if(action is not("resume" or "pause" or "stop"))throw new ArgumentException("알 수 없는 연결 동작");
         using var response=await RequestAsync(HttpMethod.Post,"v1/control",new{action},ct);
         if(!Flag(response.RootElement,"accepted"))throw new IOException("PC 연결 제어 승인 응답이 없습니다.");
+    }
+    /// <summary>Explicit user resume only; no installer, configuration, authentication or elevation changes.</summary>
+    public async Task ResumeExistingAsync(CancellationToken ct)
+    {
+        try {await ControlApiOnlyAsync("resume",ct);return;}
+        catch(Exception e) when((e is FileNotFoundException or DirectoryNotFoundException)&&!File.Exists(Path.Combine(Home,"state","local_endpoint.json")) || e is HttpRequestException{StatusCode:null} || e is TaskCanceledException && !ct.IsCancellationRequested) { }
+        ct.ThrowIfCancellationRequested();
+        for(var item=Executable;!string.IsNullOrEmpty(item);item=Path.GetDirectoryName(item))
+            if((File.Exists(item)||Directory.Exists(item))&&(File.GetAttributes(item)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("PC 연결 실행 경로를 확인하세요.");
+        if(!File.Exists(Executable))throw new FileNotFoundException("PC 연결 프로그램이 없습니다. 설치·복구를 눌러 주세요.");
+        var info=new ProcessStartInfo(Executable){WorkingDirectory=Home,UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden};
+        info.ArgumentList.Add("--resume");info.ArgumentList.Add("--background");_startBridge(info);
     }
     public async Task<PcConnectionSnapshot> CheckAsync(CancellationToken ct)
     {
@@ -216,9 +231,18 @@ public sealed class ProjectBridgeService : IDisposable
             var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync(); await process.WaitForExitAsync();
             var output = ProcessRunner.Sanitize((await stdout) + "\n" + (await stderr));
             Directory.CreateDirectory(ControlTowerSettings.DataDirectory); await File.WriteAllTextAsync(Path.Combine(ControlTowerSettings.DataDirectory, "projectbridge-install.log"), output);
-            if (process.ExitCode != 0) throw new IOException("PC 연결 설치가 완료되지 않았습니다. 설치 기록을 확인하세요.");
+            if (process.ExitCode != 0) throw new IOException(InstallationFailureMessage(output));
         }
         finally { if (Directory.Exists(stage)) Directory.Delete(stage, true); }
+    }
+    // Never surface installer stdout/stderr in the GUI; recognize only fixed reason codes.
+    public static string InstallationFailureMessage(string output)
+    {
+        if(output.Contains("config_not_writable_before_install",StringComparison.Ordinal))return "설정 파일에 필요한 쓰기 권한이 없어 설치를 보류했습니다. 권한·인증·기존 연결은 강제로 변경하지 않았습니다. (config_not_writable_before_install)";
+        if(output.Contains("config_changed_since_",StringComparison.Ordinal)||output.Contains("config_staged_content_changed",StringComparison.Ordinal))return "설정이 다른 작업에서 변경되어 설치를 보류했습니다. 기존 기록과 백업을 확인하세요. (config_changed)";
+        if(output.Contains("hash mismatch",StringComparison.OrdinalIgnoreCase)||output.Contains("Unsupported release manifest",StringComparison.Ordinal))return "설치 자료의 무결성 검증이 실패하여 교체를 보류했습니다. (release_validation_failed)";
+        if(output.Contains("Bridge release tests failed",StringComparison.Ordinal)||output.Contains("Native bridge compile failed",StringComparison.Ordinal))return "설치 자료의 빌드·검사가 실패하여 교체를 보류했습니다. (release_checks_failed)";
+        return "PC 연결 설치가 완료되지 않았습니다. 설치 기록과 보존된 백업을 확인하세요. (installation_failed)";
     }
     public static string ActionName(string action) => action switch { "capabilities" => "PC 기능 확인", "list_dir" => "폴더 확인", "read_file" => "파일 읽기", "write_file" => "파일 수정", "run_command" => "명령 실행", "start_process" => "장기 작업", "process_status" => "진행 확인", "stop_process" => "작업 중지", "ui_control" => "화면 조작", _ => "PC 작업" };
     public void Dispose() => _client.Dispose();

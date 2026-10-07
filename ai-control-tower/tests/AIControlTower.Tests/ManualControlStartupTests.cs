@@ -67,7 +67,7 @@ public sealed class ManualControlStartupTests
     [Fact] public async Task ManualAutoStartGetsStatusAndDoesNotResumeAlreadyConnectedWorker()
     {
         var (vm,handler,_)=Fixture();using(vm)
-        {await Maintain(vm,DateTimeOffset.UtcNow);Assert.True(vm.IsConnected);Assert.False(vm.IsReadOnly);Assert.Equal(new[]{"GET /v1/status"},handler.Requests);Assert.False(vm.InstallCommand.CanExecute(null));Assert.True(vm.PauseCommand.CanExecute(null));}
+        {await Maintain(vm,DateTimeOffset.UtcNow);Assert.True(vm.IsConnected);Assert.False(vm.IsReadOnly);Assert.Equal(new[]{"GET /v1/status"},handler.Requests);Assert.True(vm.InstallCommand.CanExecute(null));Assert.True(vm.PauseCommand.CanExecute(null));}
     }
     [Fact] public async Task PausedFreshWorkerResumesThroughAuthenticatedApiOnly()
     {
