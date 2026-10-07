@@ -374,6 +374,7 @@ public sealed partial class MainViewModel
     }
     public async Task SyncCommunicationAsync(bool force=false)
     {
+        if(ManualAdmissionClosed)return;
         if(IsManualControl)
         {
             if(_disposed || !await _communicationLock.WaitAsync(0))return;
@@ -442,7 +443,7 @@ public sealed partial class MainViewModel
     /// <summary>Tracked, exception-observed background operation; timers never await collection I/O.</summary>
     public Task StartManualCollection(bool force=false)
     {
-        if(!IsManualControl||_disposed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
+        if(!IsManualControl||_disposed||ManualAdmissionClosed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
         if(!_manualCollectionTask.IsCompleted)return _manualCollectionTask;
         try
         {
@@ -486,7 +487,7 @@ public sealed partial class MainViewModel
     }
     public Task StartRegisteredRecordPublishing(CommunicationCollectionResult result)
     {
-        if(!IsManualControl||_disposed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
+        if(!IsManualControl||_disposed||ManualAdmissionClosed||_lifetime.IsCancellationRequested)return Task.CompletedTask;
         if(!_recordPublicationTask.IsCompleted)return _recordPublicationTask;
         _recordPublicationTask=RunRegisteredRecordPublishingAsync(result,_lifetime.Token);
         return _recordPublicationTask;

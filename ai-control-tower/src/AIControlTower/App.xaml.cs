@@ -16,6 +16,7 @@ public partial class App : Application
     private CancellationTokenSource? _recordPublishLifetime;
     private Task? _recordPublishTask;
     private System.Windows.Interop.HwndSource? _shutdownWindow;
+    private Services.OwnedManualExitEndpoint? _manualExitEndpoint;
     protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
     {
         e.Cancel = false;
@@ -105,8 +106,37 @@ public partial class App : Application
         catch(Exception){}
         finally{await Dispatcher.InvokeAsync(()=>Shutdown(code));}
     }
+    private bool TryStartManualExit(StartupEventArgs e)
+    {
+        if(!Services.OwnedManualExitProtocol.RequestsExit(e.Args))return false;
+        // Fixed, dedicated headless action: no settings, mutex activation, window or remote initialization.
+        ShutdownMode=ShutdownMode.OnExplicitShutdown;
+        if(!Services.OwnedManualExitProtocol.AcceptsArguments(e.Args))
+        {Services.OwnedManualExitProtocol.WriteOutcome("invalid_request");Shutdown(2);return true;}
+        _=RunManualExitClientAsync();return true;
+    }
+    private async Task RunManualExitClientAsync()
+    {
+        var status=Services.OwnedManualExitProtocol.IsProductionHost(Environment.ProcessPath??"",AppContext.BaseDirectory)
+            ?await Services.OwnedManualExitEndpoint.RequestAsync(Services.OwnedManualExitProtocol.DescriptorPath):"unsupported";
+        Services.OwnedManualExitProtocol.WriteOutcome(status);
+        await Dispatcher.InvokeAsync(()=>Shutdown(Services.OwnedManualExitProtocol.ExitCode(status)));
+    }
+    private async Task StartOwnedManualExitEndpointAsync(MainWindow window)
+    {
+        // Dedicated version executable only: a shared dotnet/testhost host cannot authenticate a managed peer.
+        if(!Services.OwnedManualExitProtocol.IsProductionHost(Environment.ProcessPath??"",AppContext.BaseDirectory))return;
+        try
+        {
+            _manualExitEndpoint=await Services.OwnedManualExitEndpoint.StartAsync(Services.OwnedManualExitProtocol.DescriptorPath,
+                async()=>await await Dispatcher.InvokeAsync(window.RequestOwnedManualExitAsync),
+                ()=>Dispatcher.BeginInvoke(window.CompleteOwnedManualExit));
+        }
+        catch(Exception){} // Unsupported owner channel never falls back to process/window control.
+    }
     protected override void OnStartup(StartupEventArgs e)
     {
+        if(TryStartManualExit(e))return;
         if(TryStartRecordPublishing(e))return;
         if(!Services.StartupPolicy.TryCreate(e.Args,out var policy)){Shutdown(2);return;}
         if(policy.IsManualControl)ShutdownMode=ShutdownMode.OnExplicitShutdown;
@@ -149,6 +179,7 @@ public partial class App : Application
             if (e.Args.Contains("--verify-ui")) settings.AutoPublishCommunication = false;
         }
         MainWindow = new MainWindow(settings,policy);
+        if(policy.IsManualControl)_=StartOwnedManualExitEndpointAsync((MainWindow)MainWindow);
         if (!policy.IsLocalView)
         _listener = ThreadPool.RegisterWaitForSingleObject(_activate, (_, _) => Dispatcher.InvokeAsync(() =>
         {
@@ -177,6 +208,7 @@ public partial class App : Application
     }
     protected override void OnExit(ExitEventArgs e)
     {
+        _manualExitEndpoint?.Dispose();
         _recordPublishLifetime?.Cancel(); _recordPublishLifetime?.Dispose();
         _remoteLifetime?.Cancel(); _shutdownWindow?.Dispose(); _remoteLifetime?.Dispose();
         _listener?.Unregister(null); _activate?.Dispose();

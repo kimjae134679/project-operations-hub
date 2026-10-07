@@ -82,6 +82,14 @@ public partial class MainWindow : Window
         catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){ }
     }
     public void PrepareSessionEnding() => _sessionEnding=true;
+    public Task<string> RequestOwnedManualExitAsync() => _viewModel.RequestManualExitAsync(_initializeTask ?? Task.CompletedTask);
+    public void CompleteOwnedManualExit()
+    {
+        // Only invoked after the authenticated response is flushed and actual work is drained.
+        if(!_viewModel.IsManualControl || !_viewModel.ManualExitFrozen)return;
+        _trayExitRequested=true;
+        Application.Current.Shutdown();
+    }
     private void HandleWindowClosing(object? sender,System.ComponentModel.CancelEventArgs e)
     {
         if(!_viewModel.IsManualControl)return;
@@ -91,12 +99,10 @@ public partial class MainWindow : Window
         if(decision==WindowCloseAction.HideToTray)Hide();
         else { _trayExitRequested=false;if(!IsVisible)Show(); }
     }
-    private void RequestTrayExit()
+    private async void RequestTrayExit()
     {
-        _trayExitRequested=true;
-        if(_viewModel.IsBusy){_trayExitRequested=false;Show();return;}
-        Close();
-        if(_trayExitRequested)Application.Current.Shutdown();
+        if(await RequestOwnedManualExitAsync()=="accepted")CompleteOwnedManualExit();
+        else {_trayExitRequested=false;Show();}
     }
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
@@ -142,7 +148,7 @@ public partial class MainWindow : Window
         Descendants(ProjectList).OfType<ScrollViewer>().FirstOrDefault()?.ScrollToVerticalOffset(_catalogOffset);
     }
 
-    public Task InitializeAsync() => _initializeTask ??= InitializeCoreAsync();
+    public Task InitializeAsync() => _viewModel.ManualExitFrozen ? Task.CompletedTask : _initializeTask ??= InitializeCoreAsync();
 
     private async Task InitializeCoreAsync()
     {

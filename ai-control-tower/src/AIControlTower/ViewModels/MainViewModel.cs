@@ -37,7 +37,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public bool CanMutate => !IsReadOnlyView;
     public string ViewModeLabel => IsManualControl ? "연결 자동 유지 · 등록 작업 수동 실행 · 설정/Git/설치 자동 변경 없음" : IsReadOnlyView ? "로컬 조회 · 외부 연결/실행/공유는 중지 · 표시 시각 ≠ 생존" : "자동으로 최신 상태 유지";
     public bool BlockRegisteredOperation()
-    { if(CanRunRegisteredTasks)return false;return BlockOperation(); }
+    { if(ManualAdmissionClosed){Message="안전 종료 확인 중 · 새 등록 작업 보류";return true;}if(CanRunRegisteredTasks)return false;return BlockOperation(); }
     public bool BlockOperation()
     { if(!IsReadOnlyView)return false; Message="로컬 조회 · 외부 연결/실행/공유 보류 · 기존 파일과 작업은 변경하지 않습니다."; return true; }
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
@@ -80,7 +80,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             _workDashboardService.ContinuousPaths.Add(WorkDashboardService.FoundationState);
         PcConnection = new(pcService,(root,path,title) => Documents.OpenAsync(root,path,title),IsReadOnlyView,IsManualControl);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath, [], _settings.CommunicationFolders.Values);
-        WorkDashboard = new(_workDashboardService.ReadAsync,_workDashboardService.DetailsAsync,_jobs.IsRunning,_jobs.Stop)
+        WorkDashboard = new(ReadOwnedDashboardAsync,ReadOwnedDetailsAsync,_jobs.IsRunning,_jobs.Stop)
         {
             RegisterContinuousPath = path =>
             {
@@ -91,7 +91,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 return true;
             }
         };
-        ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),_workDashboardService.DetailsAsync) { ManagementOnly=true };
+        ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),ReadOwnedDetailsAsync) { ManagementOnly=true };
         if(!IsReadOnlyView)_settings.AutoCommunication = true;
         InitializeCommunication();
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
@@ -111,10 +111,20 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
         _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(RosterRefreshSeconds) };
-        _serverLiveTimer.Tick += async (_, _) => {await RefreshRosterAsync();if(IsManualControl)await RefreshServerAsync();};
+        _serverLiveTimer.Tick += async (_, _) =>
+        {
+            if(ManualAdmissionClosed)return;
+            _manualTimerCycles++;
+            try{await RefreshRosterAsync();if(IsManualControl)await RefreshServerAsync();}
+            finally{_manualTimerCycles--;}
+        };
         _pcLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
         _pcLiveTimer.Tick += async (_, _) =>
         {
+            if(ManualAdmissionClosed)return;
+            _manualTimerCycles++;
+            try
+            {
             if(IsManualControl)
             {
                 await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
@@ -123,6 +133,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 {_lastManualDashboardRefresh=DateTime.UtcNow;await RefreshWorkDashboardAsync();}
             }
             else await PcConnection.PollAsync();
+            }
+            finally{_manualTimerCycles--;}
         };
         if (enablePolling && !IsReadOnlyView)
         {
@@ -135,7 +147,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task InitializeManualAsync()
     {
-        if(!IsManualControl || _disposed)return;
+        if(!IsManualControl || _disposed || ManualAdmissionClosed)return;
         await DiscoverAsync();await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
         await RefreshAsync();await RefreshWorkDashboardAsync();await SyncCommunicationAsync(true);
         await RefreshRosterAsync(true);await RefreshServerAsync(true);
@@ -312,7 +324,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string ActivitySummary => IsReadOnlyView && !IsManualControl ? "로컬 저장 기록 조회 · 실제 작업/프로세스 생존 미확인" : IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
     public async Task RefreshWorkDashboardAsync()
     {
-        if(_disposed)return;
+        if(_disposed || ManualAdmissionClosed)return;
         _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
             Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
@@ -323,7 +335,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task DiscoverAsync()
     {
-        if (_disposed || !await _discoveryLock.WaitAsync(0)) return;
+        if (_disposed || ManualAdmissionClosed || !await _discoveryLock.WaitAsync(0)) return;
         try
         {
             if (!Directory.Exists(RootPath)) { Message = "탐색 폴더가 없습니다. 실제 프로젝트 루트를 선택하세요."; return; }
@@ -370,7 +382,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 }
                 _watcher.Created += Mark; _watcher.Deleted += Mark; _watcher.Renamed += (_, e) => Mark(null, e); _watcher.Changed += Mark;
                 _watcher.Error += (_, _) => _needsDiscovery = true;
-                _watcher.EnableRaisingEvents = true;
+                _watcher.EnableRaisingEvents = !ManualAdmissionClosed;
             }
             SaveSettings();
             OnPropertyChanged(nameof(ProjectsCount)); OnPropertyChanged(nameof(ProgramsCount));
@@ -392,6 +404,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task RefreshAsync()
     {
+        if(ManualAdmissionClosed)return;
         if(IsManualControl)
         {
             await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);

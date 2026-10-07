@@ -1,6 +1,8 @@
 param(
     [string]$CurrentExecutable,
     [string]$ExpectedCurrentSha256,
+    [string]$ExpectedCurrentVersion = '0.9.6',
+    [string]$ExpectedCurrentSourceCommit = '84840a130d8a3fb6911b50fe528ab3709e1c76e1',
     [string]$CurrentMode = 'application',
     [string]$VersionRoot,
     [string]$ExpectedVersion = '0.9.7',
@@ -35,8 +37,25 @@ function Get-SwitchFileIdentity([string]$Path) {
     return [pscustomobject]@{
         Version = ('{0}.{1}.{2}' -f $info.FileMajorPart,$info.FileMinorPart,$info.FileBuildPart)
         ProductVersion = $info.ProductVersion
+        FileVersion = $info.FileVersion
         Hash = Get-SwitchSha256 $Path
     }
+}
+function Get-SwitchCurrentDeployment($Request) {
+    $path = Join-Path ([IO.Path]::GetDirectoryName($Request.CurrentExecutable)) 'DEPLOYMENT.json'
+    Assert-SwitchNoReparse $path
+    if ((Get-Item -LiteralPath $path).Length -gt 16384) { throw 'invalid_current_descriptor' }
+    return ([IO.File]::ReadAllText($path) | ConvertFrom-Json)
+}
+function Test-SwitchExitCapability($Request) {
+    # Positive build tuples only. Root registers verified IPC-capable package
+    # bytes here after build verification; no runtime CLI capability override.
+    $knownCapableBuilds = @()
+    foreach ($build in $knownCapableBuilds) {
+        if ($Request.ExpectedCurrentVersion -ceq $build.Version -and $Request.ExpectedCurrentSourceCommit -ieq $build.SourceCommit -and
+            $Request.ExpectedCurrentSha256 -ieq $build.Sha256) { return $true }
+    }
+    return $false
 }
 function Assert-SwitchRequest($Request) {
     $versions = 'D:\A_KJ\AI\Applications\AIControlTower\versions'
@@ -44,14 +63,18 @@ function Assert-SwitchRequest($Request) {
     $data = 'D:\A_KJ\AI\ControlTowerData\version-replacement'
     $approvedOldHash = '2fbc5b312f114cbc60a064cf5caa167251e3ac63bb226522c5a33fa18a82443d'
     $approvedGuardHash = 'a608ac3553310edf211f2ee311a14dca84d4e5a416db02f3f503a04464652730'
-    if ($Request.CurrentMode -notin @('application','manual-control') -or $Request.ExpectedVersion -cne '0.9.7' -or $Request.ExpectedCurrentSha256 -ine $approvedOldHash -or
+    if ($Request.CurrentMode -notin @('application','manual-control') -or $Request.ExpectedVersion -cne '0.9.7' -or
+        $Request.ExpectedCurrentVersion -notin @('0.9.6','0.9.7') -or $Request.ExpectedCurrentSha256 -notmatch '^[a-fA-F0-9]{64}$' -or
+        $Request.ExpectedCurrentSourceCommit -notmatch '^[a-fA-F0-9]{40}$' -or
+        ($Request.ExpectedCurrentVersion -eq '0.9.6' -and ($Request.ExpectedCurrentSha256 -ine $approvedOldHash -or $Request.ExpectedCurrentSourceCommit -cne '84840a130d8a3fb6911b50fe528ab3709e1c76e1')) -or
         $Request.ExpectedGuardSha256 -ine $approvedGuardHash -or $Request.ExpectedSourceCommit -notmatch '^[a-fA-F0-9]{40}$' -or
         $Request.ExpectedSha256 -notmatch '^[a-fA-F0-9]{64}$' -or $Request.WaitSeconds -lt 1 -or $Request.WaitSeconds -gt 1800 -or
         $Request.PollSeconds -lt 1 -or $Request.PollSeconds -gt 30) { throw 'invalid_request' }
     $old = [IO.Path]::GetFullPath($Request.CurrentExecutable)
     $root = [IO.Path]::GetFullPath($Request.VersionRoot).TrimEnd('\')
     $oldRoot = [IO.Path]::GetDirectoryName($old)
-    if ([IO.Path]::GetDirectoryName($oldRoot) -ine $versions -or [IO.Path]::GetFileName($oldRoot) -notmatch '^0\.9\.6-[a-zA-Z0-9_-]+$' -or
+    $oldRootPattern = '^'+[regex]::Escape($Request.ExpectedCurrentVersion)+'-[a-zA-Z0-9_-]+$'
+    if ([IO.Path]::GetDirectoryName($oldRoot) -ine $versions -or [IO.Path]::GetFileName($oldRoot) -notmatch $oldRootPattern -or
         [IO.Path]::GetFileName($old) -ine 'AIControlTower.exe' -or [IO.Path]::GetDirectoryName($root) -ine $versions -or
         [IO.Path]::GetFileName($root) -notmatch '^0\.9\.7-[a-zA-Z0-9_-]+$' -or $oldRoot -ieq $root) { throw 'invalid_request' }
     $status = [IO.Path]::GetFullPath($Request.StatusPath)
@@ -64,11 +87,18 @@ function Assert-SwitchRequest($Request) {
     Assert-SwitchNoReparse $root
     Assert-SwitchNoReparse (Join-Path $root 'start_manual_control.ps1')
     $identity = Get-SwitchFileIdentity $old
-    if ($identity.Version -cne '0.9.6' -or $identity.ProductVersion -cne '0.9.6+84840a130d8a3fb6911b50fe528ab3709e1c76e1' -or
+    if ($identity.Version -cne $Request.ExpectedCurrentVersion -or $identity.ProductVersion -cne ($Request.ExpectedCurrentVersion+'+'+$Request.ExpectedCurrentSourceCommit) -or
         $identity.Hash -ine $Request.ExpectedCurrentSha256) { throw 'old_executable_mismatch' }
     $Request.CurrentExecutable = $old
     $Request.VersionRoot = $root
     $Request.StatusPath = $status
+    if ($Request.ExpectedCurrentVersion -eq '0.9.7') {
+        $descriptor = Get-SwitchCurrentDeployment $Request
+        if ($descriptor.version -cne $Request.ExpectedCurrentVersion -or $descriptor.sourceCommit -ine $Request.ExpectedCurrentSourceCommit -or
+            $descriptor.fileSha256 -ine $identity.Hash -or $descriptor.fileVersion -cne $identity.FileVersion -or $descriptor.productVersion -cne $identity.ProductVersion) { throw 'current_descriptor_mismatch' }
+        # An already-running old package may have an expired launch descriptor;
+        # only identity fields apply here. Target launch expiry remains enforced.
+    }
 }
 function Open-SwitchLease {
     $mutex = New-Object Threading.Mutex($false, 'Local\AIControlTower.ManualControl.VersionSwitch')
@@ -82,6 +112,7 @@ function Close-SwitchLease($Lease) {
     if ($null -ne $Lease) { try { $Lease.Mutex.ReleaseMutex() } finally { $Lease.Mutex.Dispose() } }
 }
 function Get-SwitchClock { return [DateTimeOffset]::UtcNow }
+function Get-SwitchMonotonicSeconds { return [double][Diagnostics.Stopwatch]::GetTimestamp()/[double][Diagnostics.Stopwatch]::Frequency }
 function Wait-SwitchPoll([int]$Seconds) { Start-Sleep -Seconds $Seconds }
 function Get-SwitchSessionId { return [Diagnostics.Process]::GetCurrentProcess().SessionId }
 function Get-SwitchProcesses { return @(Get-CimInstance -ClassName Win32_Process -Filter "Name='AIControlTower.exe'" -OperationTimeoutSec 5) }
@@ -109,10 +140,75 @@ function Get-SwitchProcessState($Rows,$Request,$Original) {
         $current.Path -ine $Original.Path -or $current.Session -ne $Original.Session)) { return [pscustomobject]@{Allowed=$false;Reason='old_instance_changed';Old=$null} }
     return [pscustomobject]@{Allowed=$true;Reason='known';Old=$current}
 }
+function Get-SwitchGuardRemainingMilliseconds($Watch) {
+    return [int][Math]::Max(0,20000-$Watch.ElapsedMilliseconds)
+}
+function Read-SwitchGuardLine($Reader,$Watch) {
+    $buffer = New-Object char[] 1024
+    $text = New-Object Text.StringBuilder
+    while ($true) {
+        $read = $Reader.ReadAsync($buffer,0,$buffer.Length)
+        $remaining = Get-SwitchGuardRemainingMilliseconds $Watch
+        if ($remaining -le 0 -or !$read.Wait($remaining)) { throw 'guard_completion_unknown' }
+        $count = $read.GetAwaiter().GetResult()
+        if ($count -eq 0) { throw 'invalid_guard_result' }
+        if ($text.Length+$count -gt 16384) { throw 'invalid_guard_result' }
+        $null = $text.Append($buffer,0,$count)
+        $value = $text.ToString()
+        $newline = $value.IndexOf("`n")
+        if ($newline -ge 0) {
+            return [pscustomobject]@{Line=$value.Substring(0,$newline).TrimEnd("`r");Tail=$value.Substring($newline+1);Characters=$value.Length}
+        }
+    }
+}
+function New-SwitchGuardTail($Reader,[int]$Characters=0) {
+    $buffer = New-Object char[] 1024
+    return [pscustomobject]@{Reader=$Reader;Buffer=$buffer;Read=$Reader.ReadAsync($buffer,0,$buffer.Length);Characters=$Characters;Ended=$false}
+}
+function Read-SwitchGuardTail($Capture,$Watch,[int]$ProbeMilliseconds=0) {
+    while (!$Capture.Ended) {
+        $remaining = Get-SwitchGuardRemainingMilliseconds $Watch
+        if ($remaining -le 0) { throw 'guard_completion_unknown' }
+        $probe = [Math]::Min($ProbeMilliseconds,$remaining)
+        # A pending read after the guard exits may belong to its descendant's
+        # inherited pipe. Available bytes are checked; EOF is never required.
+        if (!$Capture.Read.Wait($probe)) { return }
+        $count = $Capture.Read.GetAwaiter().GetResult()
+        if ($count -eq 0) { $Capture.Ended=$true;return }
+        $Capture.Characters += $count
+        if ($Capture.Characters -gt 16384 -or ![string]::IsNullOrWhiteSpace([string]::new($Capture.Buffer,0,$count))) { throw 'invalid_guard_result' }
+        $Capture.Read = $Capture.Reader.ReadAsync($Capture.Buffer,0,$Capture.Buffer.Length)
+    }
+}
+function Read-SwitchChildProtocol($Start) {
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    $child = [Diagnostics.Process]::Start($Start)
+    if ($null -eq $child) { throw 'child_start_failed' }
+    try {
+        $errorCapture = New-SwitchGuardTail $child.StandardError
+        $frame = Read-SwitchGuardLine $child.StandardOutput $watch
+        if (![string]::IsNullOrWhiteSpace($frame.Tail)) { throw 'invalid_guard_result' }
+        $outputCapture = New-SwitchGuardTail $child.StandardOutput $frame.Characters
+        $result = $frame.Line | ConvertFrom-Json
+        if ($result -isnot [pscustomobject]) { throw 'invalid_guard_result' }
+        while (!$child.WaitForExit(0)) {
+            Read-SwitchGuardTail $errorCapture $watch
+            Read-SwitchGuardTail $outputCapture $watch
+            $remaining = Get-SwitchGuardRemainingMilliseconds $watch
+            if ($remaining -le 0) { throw 'guard_completion_unknown' }
+            $null = $child.WaitForExit([Math]::Min(50,$remaining))
+        }
+        Read-SwitchGuardTail $errorCapture $watch 100
+        Read-SwitchGuardTail $outputCapture $watch 100
+        $result | Add-Member -NotePropertyName NativeExitCode -NotePropertyValue $child.ExitCode
+        return $result
+    } finally { $child.Dispose() }
+}
 function Invoke-SwitchGuard($Request,[bool]$CheckOnly) {
     # Fixed side-by-side guard only. No caller-selectable executable, script or fixture override.
     $guard = Join-Path $Request.VersionRoot 'start_manual_control.ps1'
     Assert-SwitchNoReparse $guard
+    if ((Get-Item -LiteralPath $guard).Length -gt 16384) { throw 'guard_changed' }
     if ((Get-SwitchSha256 $guard) -ine $Request.ExpectedGuardSha256) { throw 'guard_changed' }
     $start = New-Object Diagnostics.ProcessStartInfo
     $start.FileName = Join-Path ([Environment]::GetFolderPath('Windows')) 'System32\WindowsPowerShell\v1.0\powershell.exe'
@@ -123,20 +219,33 @@ function Invoke-SwitchGuard($Request,[bool]$CheckOnly) {
     $start.RedirectStandardError = $true
     $start.Arguments = '-NoLogo -NoProfile -NonInteractive -File "'+$guard+'" -VersionRoot "'+$Request.VersionRoot+'" -ExpectedVersion '+$Request.ExpectedVersion+' -ExpectedSourceCommit '+$Request.ExpectedSourceCommit+' -ExpectedSha256 '+$Request.ExpectedSha256
     if ($CheckOnly) { $start.Arguments += ' -CheckOnly' }
-    $child = [Diagnostics.Process]::Start($start)
-    if ($null -eq $child) { throw 'guard_start_failed' }
-    try {
-        $output = $child.StandardOutput.ReadToEndAsync()
-        $errorOutput = $child.StandardError.ReadToEndAsync()
-        if (!$child.WaitForExit(20000)) { throw 'guard_completion_unknown' }
-        $text = $output.GetAwaiter().GetResult()
-        $errors = $errorOutput.GetAwaiter().GetResult()
-        if (![string]::IsNullOrWhiteSpace($errors) -or $text.Length -gt 16384) { throw 'invalid_guard_result' }
-        $result = $text | ConvertFrom-Json
-        if ($result.status -notin @('verified','held','started') -or $result.started -isnot [bool]) { throw 'invalid_guard_result' }
-        $result | Add-Member -NotePropertyName ExitCode -NotePropertyValue $child.ExitCode
-        return $result
-    } finally { $child.Dispose() }
+    $result = Read-SwitchChildProtocol $start
+    if ($result.status -notin @('verified','held','started') -or $result.started -isnot [bool]) { throw 'invalid_guard_result' }
+    $result | Add-Member -NotePropertyName ExitCode -NotePropertyValue $result.NativeExitCode
+    return $result
+}
+function Invoke-SwitchExitClient($Request,[double]$Deadline) {
+    if ($Request.CurrentMode -ne 'manual-control' -or !(Test-SwitchExitCapability $Request)) { throw 'exit_capability_unverified' }
+    Assert-SwitchRequest $Request
+    # Keep the fixed reader budget unchanged. Never start an exit client when
+    # fewer than its full 20 seconds remain in the common replacement deadline.
+    if ($Deadline-(Get-SwitchMonotonicSeconds) -lt 20) {
+        return [pscustomobject]@{schemaVersion=1;status='held_timeout';reason='held_timeout';exitCode=3;NativeExitCode=3}
+    }
+    $start = New-Object Diagnostics.ProcessStartInfo
+    $start.FileName = $Request.CurrentExecutable
+    $start.Arguments = '--request-manual-exit'
+    $start.WorkingDirectory = [IO.Path]::GetDirectoryName($Request.CurrentExecutable)
+    $start.UseShellExecute = $false;$start.CreateNoWindow = $true
+    $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+    $start.RedirectStandardOutput = $true;$start.RedirectStandardError = $true
+    return (Read-SwitchChildProtocol $start)
+}
+function Assert-SwitchExitReply($Reply) {
+    $codes = @{graceful_exit_accepted=0;invalid_request=2;held_jobs=3;held_timeout=3;held_unknown=3;held_request_pending=3;pending_writes=3;unsupported=4;identity_rejected=5;outcome_unknown=6}
+    if ($Reply.schemaVersion -ne 1 -or ($Reply.schemaVersion -isnot [int] -and $Reply.schemaVersion -isnot [long]) -or $Reply.status -isnot [string] -or
+        !($codes.Keys -ccontains $Reply.status) -or $Reply.reason -cne $Reply.status -or ($Reply.exitCode -isnot [int] -and $Reply.exitCode -isnot [long]) -or
+        $Reply.exitCode -ne $codes[$Reply.status] -or $Reply.NativeExitCode -ne $Reply.exitCode) { throw 'invalid_exit_reply' }
 }
 function New-SwitchOutcome([string]$Status,[string]$Reason,[bool]$RequiresUserExit=$false) {
     $started = if ($Status -eq 'outcome_unknown') { $null } else { $Status -eq 'started' }
@@ -155,6 +264,7 @@ function Invoke-ControlVersionSwitch($Request) {
     $valid = $false
     $launchAttempted = $false
     $observedLaunch = $false
+    $exitAttempted = $false
     try {
         Assert-SwitchRequest $Request
         $valid = $true
@@ -171,7 +281,7 @@ function Invoke-ControlVersionSwitch($Request) {
             Write-SwitchStatus $Request $result
             return $result
         }
-        $deadline = (Get-SwitchClock).AddSeconds($Request.WaitSeconds)
+        $deadline = (Get-SwitchMonotonicSeconds)+$Request.WaitSeconds
         $initial = Get-SwitchProcessState @(Get-SwitchProcesses) $Request $null
         if (!$initial.Allowed) {
             $result = New-SwitchOutcome 'held' $initial.Reason
@@ -180,15 +290,38 @@ function Invoke-ControlVersionSwitch($Request) {
         }
         $original = $initial.Old
         $state = $initial
+        $requestExit = $Request.CurrentMode -eq 'manual-control' -and (Test-SwitchExitCapability $Request)
+        $exitAccepted = $false
         $exitReason = if ($Request.CurrentMode -eq 'manual-control') { 'manual_exit_required' } else { 'application_exit_required' }
         if ($null -ne $original) { Write-SwitchStatus $Request (New-SwitchOutcome 'waiting' $exitReason $true) }
         while ($null -ne $state.Old) {
-            if ((Get-SwitchClock) -ge $deadline) {
+            if ((Get-SwitchMonotonicSeconds) -ge $deadline) {
                 $result = New-SwitchOutcome 'held' ('wait_timeout_'+$exitReason) $true
                 Write-SwitchStatus $Request $result
                 return $result
             }
-            $remaining = [Math]::Max(1,[int][Math]::Ceiling(($deadline-(Get-SwitchClock)).TotalSeconds))
+            if ($requestExit -and !$exitAccepted) {
+                # Rebind the same live instance before every clean retry.
+                $state = Get-SwitchProcessState @(Get-SwitchProcesses) $Request $original
+                if (!$state.Allowed) { $result=New-SwitchOutcome 'held' $state.Reason;Write-SwitchStatus $Request $result;return $result }
+                if ($null -eq $state.Old) { break }
+                $exitAttempted = $true
+                $reply = Invoke-SwitchExitClient $Request $deadline
+                Assert-SwitchExitReply $reply
+                switch ($reply.status) {
+                    'graceful_exit_accepted' {$exitAccepted=$true}
+                    'unsupported' {$requestExit=$false;$exitAttempted=$false}
+                    'outcome_unknown' {$result=New-SwitchOutcome 'outcome_unknown' 'manual_exit_outcome_unknown_no_retry';Write-SwitchStatus $Request $result;return $result}
+                    {$_ -in @('held_jobs','held_timeout','pending_writes')} {$exitAttempted=$false}
+                    default {$result=New-SwitchOutcome 'held' ('manual_exit_'+$reply.status+'_no_retry');Write-SwitchStatus $Request $result;return $result}
+                }
+            }
+            if ((Get-SwitchMonotonicSeconds) -ge $deadline) {
+                $result = New-SwitchOutcome 'held' ('wait_timeout_'+$exitReason) $true
+                Write-SwitchStatus $Request $result
+                return $result
+            }
+            $remaining = [Math]::Max(1,[int][Math]::Ceiling($deadline-(Get-SwitchMonotonicSeconds)))
             Wait-SwitchPoll ([Math]::Min($Request.PollSeconds,$remaining))
             $state = Get-SwitchProcessState @(Get-SwitchProcesses) $Request $original
             if (!$state.Allowed) {
@@ -197,7 +330,8 @@ function Invoke-ControlVersionSwitch($Request) {
                 return $result
             }
         }
-        if ((Get-SwitchClock) -ge $deadline) {
+        $exitAttempted=$false
+        if ((Get-SwitchMonotonicSeconds) -ge $deadline) {
             $result = New-SwitchOutcome 'held' 'wait_deadline_elapsed_no_launch'
             Write-SwitchStatus $Request $result
             return $result
@@ -221,7 +355,7 @@ function Invoke-ControlVersionSwitch($Request) {
     } catch {
         # Never expose exception bodies, paths, process command lines or configuration.
         $result = if ($observedLaunch) { New-SwitchOutcome 'started' 'launch_requested_status_write_failed' }
-            elseif ($launchAttempted) { New-SwitchOutcome 'outcome_unknown' 'launch_outcome_unknown_no_retry' }
+            elseif ($launchAttempted -or $exitAttempted) { New-SwitchOutcome 'outcome_unknown' 'request_outcome_unknown_no_retry' }
             else { New-SwitchOutcome 'held' $(if($valid){'replacement_verification_failed_no_retry'}else{'invalid_request'}) }
         if ($valid -and $null -ne $lease) { try { Write-SwitchStatus $Request $result } catch {} }
         return $result
@@ -230,6 +364,7 @@ function Invoke-ControlVersionSwitch($Request) {
 
 $request = [pscustomobject]@{
     CurrentExecutable=$CurrentExecutable;ExpectedCurrentSha256=$ExpectedCurrentSha256;CurrentMode=$CurrentMode
+    ExpectedCurrentVersion=$ExpectedCurrentVersion;ExpectedCurrentSourceCommit=$ExpectedCurrentSourceCommit
     VersionRoot=$VersionRoot;ExpectedVersion=$ExpectedVersion;ExpectedSourceCommit=$ExpectedSourceCommit
     ExpectedSha256=$ExpectedSha256;ExpectedGuardSha256=$ExpectedGuardSha256;StatusPath=$StatusPath
     WaitSeconds=$WaitSeconds;PollSeconds=$PollSeconds;CheckOnly=[bool]$CheckOnly
