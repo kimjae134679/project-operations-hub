@@ -2,57 +2,79 @@
   "schemaVersion": 1,
   "recordType": "task_exchange",
   "recordId": "video-downloader-ui-20261007",
-  "revision": 1,
+  "revision": 2,
   "title": "영상다운로더 UI 마무리와 페이지 열기·삭제 구분",
   "projectId": "Video-Downloader",
   "actorId": "Codex-VideoDownloader",
   "sessionId": "android-ui-20261007",
   "receivedAt": "2026-10-07T10:33:00+09:00",
-  "updatedAt": "2026-10-07T01:39:11.825Z",
+  "updatedAt": "2026-10-07T01:50:35.863Z",
   "request": {
     "summary": "전체 UI 개편·애니메이션, 목록만 삭제/저장 파일 삭제 구분, 입력 직후 페이지 열기와 항목 페이지 열기, MP4 우선 및 해상도 옵션 제거",
     "details": "통합소통 디자인 공지 참고, 기존 APK를 다듬어 설치파일까지 완료",
     "source": "현재 ChatGPT 사용자 요청"
   },
   "response": {
-    "summary": "현재 UI·입력·삭제 분리 구현을 사용자에게 전달, 검증과 APK 빌드 진행 중",
-    "source": "실제 진행 답변"
+    "summary": "실제 다운로드·파일 삭제·브라우저 검사 통과 및 APK 1.1.0 배포 중임을 전달하고, 이전 버전 서명 차이에 대한 목록 백업·재설치 방법을 안내함. 최종 링크 답변 대기.",
+    "source": "현재 작업의 실제 진행 답변"
   },
-  "status": "in_progress",
+  "status": "completed",
   "workDone": [
     "최신 중앙 AGENTS·USER_POLICIES·N-0002·N-0010·디자인 참고 및 도구선택 지침을 읽음",
     "목록 중심 레이아웃·녹색 포인트·명암 대비·SVG 하단 메뉴·팝업과 전환 애니메이션 구현",
     "링크 입력창 페이지 열기, 목록/항목 페이지 열기, MP4/최고화질 기본 처리",
     "목록 삭제와 실제 파일 삭제 명시 선택 분리, 진행 중 삭제 차단",
-    "기존 링크를 입력창에서 즉시 다운로드할 때 중복 항목도 시작하도록 보완"
+    "기존 링크를 입력창에서 즉시 다운로드할 때 중복 항목도 시작하도록 보완",
+    "네이티브 브라우저·시스템바·저장된 테마 팔레트 정합성 보완",
+    "브라우저 페이지 이동 후 이전 미디어 콜백 차단, 파일 삭제 동의 중 화면 종료 시 잠금 해제",
+    "대기 중 삭제 차단, 입력창 일반 도메인 자동 https 처리",
+    "APK 1.1.0 배포와 SHA256 일치 확인, 에뮬레이터 및 light/dark 캡처 확인"
   ],
   "verification": [
     {
-      "name": "JavaScript syntax",
+      "name": "APK compile, unit tests, Android lint",
       "result": "pass",
       "evidence": [
-        "node --check assets/app.js, qa/ui.spec.js"
+        "https://github.com/kimjae134679/project-operations-hub/actions/runs/37558502055"
       ]
     },
     {
-      "name": "로컬 UI 실행",
-      "result": "blocked",
+      "name": "18 responsive UI cases",
+      "result": "pass",
       "evidence": [
-        "npm registry network denied EACCES; CI에서 실행 예정"
+        "360/412/800px; light/dark; browser input; automatic format; deletion choices; duplicates; long text; reduced motion; keyboard height; 44px button minimum",
+        "dist/qa/screenshots/"
       ]
     },
     {
-      "name": "Android build and native QA",
-      "result": "pending",
+      "name": "Android 35 native engine and file flows",
+      "result": "pass",
       "evidence": [
-        "GitHub Actions"
+        "dist/qa/native.txt",
+        "MP4/HLS/DASH/short duration/collision/cancel-resume/recovery/list-only-file-preservation/physical deletion retains link/untouched file/direct browser/no privileged website bridge"
+      ]
+    },
+    {
+      "name": "Release asset SHA256",
+      "result": "pass",
+      "evidence": [
+        "51b4750c64a4ce47158e9dea220fbb303b2becd3be39fdf95d95060291968516  VideoDownloader-1.1.0-arm64-v8a.apk",
+        "0190ce18499b44bd317f8220d52b96184843d98f910a92f3ebb1bd71100f7ead  VideoDownloader-1.1.0-armeabi-v7a.apk",
+        "dist/SHA256SUMS.txt"
+      ]
+    },
+    {
+      "name": "Galaxy S22 physical device",
+      "result": "not_run",
+      "evidence": [
+        "Android 35 x86_64 emulator used; physical device not connected"
       ]
     }
   ],
   "nextActions": [
-    "전용 브랜치 커밋과 APK 1.1.0 빌드",
-    "실제 UI 캡처와 native 파일 삭제/브라우저/다운로드 검증",
-    "최종 릴리스 확인 및 사용자 전달"
+    "사용자에게 최종 APK 1.1.0 다운로드 링크 전달",
+    "실제 Galaxy S22 설치는 사용자 기기에서 확인",
+    "PC 관리 앱의 본인 기록 수집은 미확인"
   ],
   "blockers": [],
   "location": {
@@ -63,5 +85,7 @@
   "sharing": {
     "localRecord": true,
     "centralAppCollection": "unverified"
-  }
+  },
+  "sourceCommit": "73743071df1bd4432e990d551514277c9cfd0755",
+  "ownedRunId": 37558502055
 }
