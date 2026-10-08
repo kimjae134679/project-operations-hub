@@ -1,3 +1,13 @@
+## 현재 인수인계 — 2026-10-08
+
+사용자 최신 지시는 **표본 정리부터, 그다음 제작**입니다. 시작은157-0222이며 160/기존200큐를 재개하지 않습니다. 실제 루트 D:/AI/VoiceAudiobook, 최신 점검은 output/production_readiness_20261008/ready_gate.json과 output_checkpoint.json입니다. 표본 조직화는 완료했으나 clean-reference gate와 실제 회차 제한 생성 실행기는 미완료로 ready_to_render=false입니다.
+
+최신437분류/94평가키·정확한 버전별 폐기·동일바이트 연결을 보존했습니다. 자노바 기존 참조의 사용자 폐기를 확인했고, 아이샤 승인 VoiceDesign B 및 실바릴 기존 버전은 보존합니다. 나나호시3.62초 원본의 CPU 배경 분리 검토 WAV/MP3만 추가했으며 캐릭터 설정에 적용하지 않았습니다. 새 GPU 작업/예약/다운로드/가중치 학습 없음. 현재 UI와 사용자폴더는 다른 담당자의 최신판을 보존합니다.
+
+프로젝트 최신 [표본 우선 상태](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/SOURCE_PRODUCTION_EDITION.md)와 같은 [T-0012 댓글](../../04_COMMUNICATION/threads/T-0012-mushoku-ai-audiobook/THREAD.md)에서 진행을 이어갑니다. 아래 이전 자동화 설명은 이번 중지 해제를 허가하지 않습니다.
+
+---
+
 # 무직전생 한국어 오디오북
 
 한국어 소설을 등장인물의 대사·내면·나레이션으로 나누어 제작하고, 본문을 클릭하며 음성을 듣는 프로젝트입니다.
