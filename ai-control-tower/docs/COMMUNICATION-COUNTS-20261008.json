@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-08",
+  "baseCommit": "a1bb5c4d376a05dc62b003a510a88012d5a466e6",
+  "branch": "codex/communication-counts-20261008",
+  "scope": "Control-Tower communication list presentation and content-specific comment read interaction",
+  "operationalDeployment": false,
+  "realDataEvidence": {
+    "source": "operational local communication-hub clone, read only; source clone not combined",
+    "controlTowerInboxRecords": 144,
+    "taskExchangeRecordsIncludingRevisions": 135,
+    "latestActorAndRecordPairs": 68,
+    "latestStatuses": { "completed": 37, "in_progress": 20, "blocked": 10, "pending": 1 },
+    "placeholderFinalResponsesExcluded": 2,
+    "bodyReadAndNormalizedHashErrors": 0,
+    "t0009": { "datedEntries": 5, "explicitComments": 0 },
+    "actualViewProjection": { "sourceRecords": 145, "topics": 77, "posts": 81, "explicitComments": 0, "errors": 0 },
+    "conclusion": "Explicit comments were zero in the checked records. Existing counts were omitted from the old list XAML. No confirmed dropped-comment example was found. Task responses and revisions are distinct from comments."
+  },
+  "verification": {
+    "focusedTests": { "passed": 126, "failed": 0, "trx": "qa/communication-final-pass.trx" },
+    "releaseBuild": "source and isolated preview host succeeded; existing source nullable warnings were not changed",
+    "preview": {
+      "pass": true,
+      "sizes": ["1060x720", "700x560"],
+      "themes": ["light", "dark"],
+      "screenshots": 51,
+      "reports": 52,
+      "scenarios": ["actual read-only data", "zero comments", "three comments", "twelve comments", "missing body", "completed task", "recorded response", "response pending", "new comment", "read failure", "partial thread read failure", "600 topics"],
+      "stress": { "topics": 600, "comments": 900, "realizedRows": 3, "lastSelectedRowRealized": true },
+      "readInteraction": { "actualInlineButtonClicksInMemory": 3, "previousReadIdentitiesPreserved": 3, "newCommentsAfterAppend": 1 },
+      "nativeWindowsCreated": 0,
+      "hwndsCreated": 0,
+      "proof": "qa-preview/final/communication-ui-proof.json"
+    },
+    "preservation": {
+      "protectedSourceBytesUnchanged": true,
+      "actualReadFileSha256BeforeAndAfter": "670516b0ffd122efbcfe71ba4e53ada137bd18effa7ce144923686e35e14aef8",
+      "persistentReadWritesDuringPreview": 0,
+      "noticeAcknowledgementsDuringPreview": 0,
+      "commentWritesDuringPreview": 0,
+      "operationalProcessesStillRunning": [21420, 24020],
+      "bridgeCommands": 0,
+      "synchronizationCalls": 0,
+      "collectionCalls": 0
+    }
+  },
+  "postingRules": {
+    "existingRelatedThreadReplySupported": true,
+    "destination": "04_COMMUNICATION/threads/T-0009-ai-control-tower/THREAD.md",
+    "format": "append dated author heading with explicit 댓글: title; no separate reply file or repeated new topic",
+    "actualThreadCommentPosted": false,
+    "taskExchange": "Own actual receipt/progress/result record stored locally using the same recordId and increasing revisions; local storage does not prove central delivery."
+  },
+  "artifactPolicy": "Raw source bodies, screenshots, user read history and task exchange JSON remain local and are not committed. Evidence paths are relative to the local task workspace."
+}

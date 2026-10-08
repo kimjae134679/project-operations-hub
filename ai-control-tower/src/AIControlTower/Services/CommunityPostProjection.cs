@@ -2,6 +2,8 @@ namespace AIControlTower.Services;
 
 public sealed record CommunityCommentRow(CommunicationEntry Entry, string Body)
 {
+    public bool IsUnread { get; init; }
+    public string ReadLabel => IsUnread ? "새 댓글" : "읽음";
     public string Title => Entry.Title;
     public string Author => Entry.Author;
     public string TimeDisplay => Entry.TimeDisplay;

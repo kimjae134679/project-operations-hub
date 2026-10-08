@@ -18,6 +18,29 @@ public sealed class CommunicationServiceTests : IDisposable
     private CommunicationService Service() => new(TimeSpan.Zero);
 
     [Fact]
+    public async Task FailedMemberOfTopicKeepsUnknownCountsInsteadOfDisappearingAsZeroComments()
+    {
+        var room=Path.Combine(Hub,"04_COMMUNICATION","threads","T-1-room");
+        Directory.CreateDirectory(room);
+        var thread=Path.Combine(room,"THREAD.md");
+        File.WriteAllText(thread,"# Room\n## 2026-10-08 | User | 요청 작업\n본문");
+        var failed=Path.Combine(room,"reply.md");
+        var invalid=new byte[]{0xff,0xfe,0xff};
+        File.WriteAllBytes(failed,invalid);
+        var snapshot=await Service().ReadOnlyAsync(Hub);
+        Assert.Contains(snapshot.Errors,e=>e.Code=="thread_retry");
+        Assert.Single(snapshot.InboxItems);
+        Assert.Contains(snapshot.Errors,e=>e.SourceGroup=="04_COMMUNICATION/threads/T-1-room");
+        using var vm=new AIControlTower.ViewModels.MainViewModel(new ControlTowerSettings {IsTemporary=true,TransientReadOnly=true,CommunicationHubPath=Hub},enablePolling:false);
+        typeof(AIControlTower.ViewModels.MainViewModel).GetMethod("ApplyCommunicationSnapshot",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance)!.Invoke(vm,[snapshot]);
+        var row=Assert.Single(vm.InboxItems);
+        Assert.Contains("읽기 실패",row.GetType().GetProperty("CountLabel")!.GetValue(row)!.ToString());
+        Assert.DoesNotContain("댓글 0",row.GetType().GetProperty("CountLabel")!.GetValue(row)!.ToString());
+        Assert.Equal(invalid,File.ReadAllBytes(failed));
+        Assert.Empty(snapshot.Receipts);
+    }
+
+    [Fact]
     public async Task ExistingThreadDocumentsAppearWithoutChangingTheirSourceOrClaimingReading()
     {
         var room=Path.Combine(Hub,"04_COMMUNICATION","threads","T-1-room");

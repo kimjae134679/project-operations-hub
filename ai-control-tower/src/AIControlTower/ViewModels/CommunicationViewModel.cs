@@ -43,7 +43,7 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public override int GetHashCode() => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
     public event PropertyChangedEventHandler? PropertyChanged;
     private bool _isUnread;
-    public bool IsUnread { get => _isUnread; set { if (_isUnread == value) return; _isUnread = value; PropertyChanged?.Invoke(this,new(nameof(IsUnread))); PropertyChanged?.Invoke(this,new(nameof(Unread))); PropertyChanged?.Invoke(this,new(nameof(UnreadLabel))); } }
+    public bool IsUnread { get => _isUnread; set { if (_isUnread == value) return; _isUnread = value; PropertyChanged?.Invoke(this,new(nameof(IsUnread))); PropertyChanged?.Invoke(this,new(nameof(Unread))); PropertyChanged?.Invoke(this,new(nameof(UnreadLabel))); PropertyChanged?.Invoke(this,new(nameof(AutomationLabel))); } }
     public bool Unread => IsUnread;
     public string UnreadLabel => IsUnread ? "안 읽음" : "읽음";
     public string Identity { get; init; } = "";
@@ -53,6 +53,35 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public int RecordCount => ThreadEntries.Count(e=>!e.IsComment && e.RecordKind is "record" or "unknown");
     public int GuideCount => ThreadEntries.Count(e=>!e.IsComment && e.RecordKind=="guide");
     public int PostCount => EntryCount-CommentCount-RecordCount-GuideCount;
+    // Counts describe parsed source entries, never task revisions or inferred reply relationships.
+    public string? ContentIssue { get; init; }
+    public bool CountsKnown => ContentIssue is null && Warning is null && ThreadEntries.Count > 0;
+    public string CountLabel => CountsKnown ? $"글 {PostCount} · 댓글 {CommentCount}" : ContentIssue == "읽기 실패" ? "글·댓글 수 읽기 실패" : "글·댓글 수 미확인";
+    public string ExtraCountLabel => Exchange is not null ? $"수정 이력 {RevisionCount}" : RecordCount + GuideCount == 0 ? "" : $"답변·기록 {RecordCount} · 안내 {GuideCount}";
+    private int _unreadCommentCount;
+    public int UnreadCommentCount
+    {
+        get => _unreadCommentCount;
+        set
+        {
+            if (_unreadCommentCount == value) return;
+            _unreadCommentCount = value;
+            foreach (var name in new[] { nameof(UnreadCommentCount), nameof(HasNewComments), nameof(NewCommentLabel), nameof(AutomationLabel) }) PropertyChanged?.Invoke(this,new(name));
+        }
+    }
+    public bool HasNewComments => CountsKnown && UnreadCommentCount > 0;
+    public string NewCommentLabel => !CountsKnown ? "새 댓글 미확인" : UnreadCommentCount > 0 ? $"새 댓글 {UnreadCommentCount}" : "새 댓글 없음";
+    private bool HasRecordedResponse => Exchange is { } task && task.ResponseSource is not ("" or "unknown")
+        && !task.ResponseSummary.Contains("최종 답변 대기",StringComparison.Ordinal);
+    private bool HasExplicitRequest => Exchange is not null || ThreadEntries.Any(e => !e.IsComment && e.RecordKind == "post"
+        && Regex.IsMatch(e.Title,@"(?:^|\s|[:：·—–|])(?:요청|request)(?:\s|[:：]|$)",RegexOptions.IgnoreCase|RegexOptions.CultureInvariant));
+    public string ReplyStatusKey => !CountsKnown ? "Unknown" : Exchange?.Status == "completed" ? "Complete" : Exchange?.Status == "blocked" ? "Blocked"
+        : CommentCount > 0 || HasRecordedResponse ? "Answered" : HasExplicitRequest ? "Waiting" : "Unknown";
+    public string ReplyStateLabel => !CountsKnown ? ContentIssue == "읽기 실패" ? "! 읽기 실패" : "? 내용 미확인" : ReplyStatusKey switch
+    {
+        "Complete" => "✓ 완료 기록", "Blocked" => "! 막힘 기록", "Answered" => Exchange is not null ? "↩ 답변 기록 있음" : "↩ 답변 있는 글",
+        "Waiting" => "◷ 답변 없는 요청", _ => "? 답변 관계 미확인"
+    };
     public int RevisionCount { get; init; } = 1;
     public string TimeDisplay => Time;
     public string CommunityTimeDisplay => ThreadEntries.FirstOrDefault(e => !e.IsComment)?.TimeDisplay ?? Time;
@@ -65,7 +94,7 @@ public sealed record InboxRow(string Project, string Title, string Preview, stri
     public string RevisionLabel => Exchange is { } record ? $"기록 {record.Revision} · {record.ActorId}" : "";
     public string Author { get; init; } = "";
     public string ReadableBody => CommunicationArticle.Read(Body,Exchange);
-    public string AutomationLabel => $"{Project} · {Title} · {Author} · {ConversationSummary}";
+    public string AutomationLabel => $"{Project} · {Title} · {Author} · {CountLabel} · {ExtraCountLabel} · {ReplyStateLabel} · {NewCommentLabel} · {UnreadLabel}";
 }
 
 public sealed class CommunicationEntryRow(CommunicationEntry entry, bool unread) : ObservableObject
@@ -107,7 +136,7 @@ public sealed partial class MainViewModel
     public string CommunityReadPositionKey => SelectedInbox is null ? "" : SelectedInbox.Identity + "/" + CommunicationService.ContentHash(_selectedCommunityBody + string.Join("/", CommunityComments.Select(c => c.Entry.ContentHash)));
     public string CommunityAuthorLabel => SelectedInbox?.Author ?? "";
     public string CommunityTimeLabel => SelectedInbox?.ThreadEntries.FirstOrDefault(e => !e.IsComment)?.TimeDisplay ?? "";
-    public string CommunityCommentCountLabel => $"댓글 {CommunityComments.Count}";
+    public string CommunityCommentCountLabel => SelectedInbox is null ? "댓글 수 미확인" : !SelectedInbox.CountsKnown ? SelectedInbox.CountLabel : $"댓글 {CommunityComments.Count}";
     public string CurrentProjectCheckSummary => $"{NoticeProjectRows.Count(r => r.IsChecked)} / {NoticeProjectRows.Count(r => r.IsApplicable)} 프로젝트 확인";
     public void SetCurrentCommunicationProjects(IReadOnlyList<CommunicationProjectTarget> projects)
     {
@@ -129,12 +158,13 @@ public sealed partial class MainViewModel
     {
         var article = CommunityPostProjection.Project(SelectedInbox?.ThreadEntries ?? [], ManualCommunicationCollection.IsCollectedPath(SelectedInbox?.Path));
         _selectedCommunityBody = article.Body;
-        for (var i = 0; i < article.Comments.Count; i++)
+        var comments = article.Comments.Select(c=>c with {IsUnread=_communicationReadStore.IsUnread(c.Entry.Identity,c.Entry.ContentHash)}).ToArray();
+        for (var i = 0; i < comments.Length; i++)
         {
-            if (i < CommunityComments.Count && CommunityComments[i] == article.Comments[i]) continue;
-            if (i < CommunityComments.Count) CommunityComments[i] = article.Comments[i]; else CommunityComments.Add(article.Comments[i]);
+            if (i < CommunityComments.Count && CommunityComments[i] == comments[i]) continue;
+            if (i < CommunityComments.Count) CommunityComments[i] = comments[i]; else CommunityComments.Add(comments[i]);
         }
-        while (CommunityComments.Count > article.Comments.Count) CommunityComments.RemoveAt(CommunityComments.Count - 1);
+        while (CommunityComments.Count > comments.Length) CommunityComments.RemoveAt(CommunityComments.Count - 1);
         OnPropertyChanged(nameof(SelectedCommunityBody));
         OnPropertyChanged(nameof(CommunityAuthorLabel)); OnPropertyChanged(nameof(CommunityTimeLabel));
         OnPropertyChanged(nameof(CommunityCommentCountLabel)); OnPropertyChanged(nameof(CommunityReadPositionKey));
@@ -226,7 +256,22 @@ public sealed partial class MainViewModel
     public bool ShowCommunicationHistory { get => _showHistory; set { if (SetProperty(ref _showHistory, value)) FilterInbox(); } }
     public int UnreadPostCount => _allInboxRows.GroupBy(r=>r.Identity).Count(g=>g.OrderByDescending(r=>r.Exchange?.Revision??0).First().IsUnread);
     public string InboxCountLabel => $"{InboxItems.Count}개 표시 · 안 읽음 {UnreadPostCount}개 · 전체 {_allInboxRows.Select(r=>r.Identity).Distinct().Count()}개";
-    public string InboxEmptyLabel => _allInboxRows.Count == 0 ? "아직 전달된 자료가 없습니다" : "조건에 맞는 기록이 없습니다";
+    private bool CommunicationCountsIncomplete => _communicationSnapshot?.Errors.Any() == true || InboxItems.Any(r => !r.CountsKnown);
+    public string CommunityListSummary
+    {
+        get
+        {
+            if (_communicationSnapshot is null) return "조회 전 · 글·댓글 수 미확인";
+            if (_communicationSnapshot.Errors.Any(e=>e.Code=="manifest_invalid")) return "읽기 실패 · 이전 조회 자료 · 글·댓글 수 미확인";
+            var topics = InboxItems.GroupBy(r=>r.Identity).Select(g=>g.OrderByDescending(r=>r.Exchange?.Revision??0).First()).ToArray();
+            var known = topics.Where(r=>r.CountsKnown).ToArray();
+            if (CommunicationCountsIncomplete && known.Length == 0) return $"주제 {topics.Length} · 글·댓글 수 미확인" + (_communicationSnapshot.Errors.Any() ? " · 읽기 실패" : "");
+            return $"주제 {topics.Length} · {(CommunicationCountsIncomplete ? "확인된 " : "")}글 {known.Sum(r=>r.PostCount)} · 댓글 {known.Sum(r=>r.CommentCount)}"
+                + (CommunicationCountsIncomplete ? " · 일부 읽기 실패/미확인" : "");
+        }
+    }
+    public string InboxEmptyLabel => _communicationSnapshot is null ? "소통 자료 조회 전" : _allInboxRows.Count == 0
+        ? CommunicationCountsIncomplete ? "소통 자료 읽기 실패 · 글·댓글 수 미확인" : "아직 전달된 자료가 없습니다" : "조건에 맞는 기록이 없습니다";
     private void FilterInbox()
     {
         var selected = SelectedInbox;
@@ -257,7 +302,7 @@ public sealed partial class MainViewModel
         SelectedInbox = visible.FirstOrDefault(r => r.Path == selected?.Path || r.Identity == selected?.Identity) ?? visible.FirstOrDefault();
         _selectingInternally = false;
         NotifyEntrySelection();
-        OnPropertyChanged(nameof(NoInboxItems)); OnPropertyChanged(nameof(InboxCountLabel)); OnPropertyChanged(nameof(InboxEmptyLabel));
+        OnPropertyChanged(nameof(NoInboxItems)); OnPropertyChanged(nameof(InboxCountLabel)); OnPropertyChanged(nameof(InboxEmptyLabel)); OnPropertyChanged(nameof(CommunityListSummary));
     }
     public ObservableCollection<NoticeRow> Notices { get; } = [];
     public ObservableCollection<CommunicationProjectRow> CommunicationProjects { get; } = [];
@@ -315,7 +360,28 @@ public sealed partial class MainViewModel
         if (SelectedEntry is null || SelectedInbox is null) return;
         _communicationReadStore.MarkRead(SelectedEntry.Entry.Identity,SelectedEntry.Entry.ContentHash);
         SelectedEntry.IsUnread = false;
-        foreach(var row in _allInboxRows.Where(r=>r.Identity==SelectedInbox.Identity)) row.IsUnread = row.ThreadEntries.Any(e=>_communicationReadStore.IsUnread(e.Identity,e.ContentHash));
+        foreach(var row in _allInboxRows.Where(r=>r.Identity==SelectedInbox.Identity))
+        {
+            row.IsUnread = row.ThreadEntries.Any(e=>_communicationReadStore.IsUnread(e.Identity,e.ContentHash));
+            row.UnreadCommentCount = row.ThreadEntries.Count(e=>e.IsComment && _communicationReadStore.IsUnread(e.Identity,e.ContentHash));
+        }
+        OnPropertyChanged(nameof(InboxCountLabel)); OnPropertyChanged(nameof(UnreadPostCount));
+        UpdateCommunityArticle();
+    }
+    public void MarkCommunityCommentViewed(CommunityCommentRow comment)
+    {
+        // Only the current comment's exact content can be acknowledged; stale UI rows and
+        // unrelated topics cannot create read records. Local-view uses the existing memory store.
+        var entry=SelectedInbox?.ThreadEntries.FirstOrDefault(e=>e.IsComment && e.Identity==comment.Entry.Identity && e.ContentHash==comment.Entry.ContentHash);
+        if(entry is null) return;
+        _communicationReadStore.MarkRead(entry.Identity,entry.ContentHash);
+        foreach(var visible in Entries.Where(e=>e.Entry.Identity==entry.Identity && e.Entry.ContentHash==entry.ContentHash)) visible.IsUnread=false;
+        foreach(var row in _allInboxRows.Where(r=>r.Identity==SelectedInbox!.Identity))
+        {
+            row.IsUnread=row.ThreadEntries.Any(e=>_communicationReadStore.IsUnread(e.Identity,e.ContentHash));
+            row.UnreadCommentCount=row.ThreadEntries.Count(e=>e.IsComment && _communicationReadStore.IsUnread(e.Identity,e.ContentHash));
+        }
+        UpdateCommunityArticle();
         OnPropertyChanged(nameof(InboxCountLabel)); OnPropertyChanged(nameof(UnreadPostCount));
     }
     private void MoveEntry(int direction)
@@ -468,11 +534,14 @@ public sealed partial class MainViewModel
     {
         if(snapshot.Errors.Any(e=>e.Code=="manifest_invalid"))
         {
+            // Retain the previous content, but never retain its claim of complete counts.
+            _communicationSnapshot = snapshot;
             _communicationViewFingerprint="";
             CommunicationErrors.Clear();
             foreach(var error in snapshot.Errors) CommunicationErrors.Add(error.Message);
             CommunicationMessage="공지 읽기 재시도 대기 · 마지막 정상 내용을 유지합니다.";
             CentralSyncMessage=CommunicationMessage;
+            OnPropertyChanged(nameof(CommunityListSummary)); OnPropertyChanged(nameof(InboxEmptyLabel));
             return;
         }
         _communicationSnapshot=snapshot;
@@ -491,8 +560,8 @@ public sealed partial class MainViewModel
             snapshot.Notices,
             Receipts = snapshot.Receipts.Where(r=>r.IsCurrent).Select(r=>r.Receipt),
             Projects = snapshot.ProjectStates.Select(p=>new {p.ProjectId,p.RootPath,p.State,p.DeliveredCount}),
-            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath,i.SourceName,i.CollectedAt,i.Title,i.Preview,i.ThreadGroup,i.IsStandaloneThreadRecord}),
-            snapshot.Errors, Names = _communicationNames, Actors = _communicationActorNames
+            Items = snapshot.InboxItems.Select(i=>new {i.ProjectId,i.ContentSha256,i.CentralPath,i.SourceName,i.CollectedAt,i.Title,i.Preview,i.ThreadGroup,i.IsStandaloneThreadRecord,HasBody=i.Body is not null}),
+            Errors = snapshot.Errors.Select(e=>new {e.ProjectId,e.Code,e.Message,e.SourceGroup}), Names = _communicationNames, Actors = _communicationActorNames
         });
         OnPropertyChanged(nameof(CommunicationCheckedAt));
         if (fingerprint == _communicationViewFingerprint) return;
@@ -560,16 +629,20 @@ public sealed partial class MainViewModel
             var time = (exchange?.UpdatedAt ?? item.CollectedAt).ToOffset(TimeSpan.FromHours(9)).ToString("MM/dd HH:mm") + " KST";
             IReadOnlyList<CommunicationEntry> entries = exchange is null
                 ? threadSources is null
-                    ? CommunicationThreadParser.Parse(body,identity,item.Title,author,time,item.SourceName,item.CentralPath,item.IsStandaloneThreadRecord)
-                    : threadSources.SelectMany(source=>CommunicationThreadParser.Parse(source.Body??"",identity+"/source/"+source.SourceName,source.Title,"","",source.SourceName,source.CentralPath,source.IsStandaloneThreadRecord)).ToArray()
+                    ? item.Body is null ? [] : CommunicationThreadParser.Parse(body,identity,item.Title,author,time,item.SourceName,item.CentralPath,item.IsStandaloneThreadRecord)
+                    : threadSources.Where(source=>source.Body is not null).SelectMany(source=>CommunicationThreadParser.Parse(source.Body!,identity+"/source/"+source.SourceName,source.Title,"","",source.SourceName,source.CentralPath,source.IsStandaloneThreadRecord)).ToArray()
                 : new[]{ new CommunicationEntry(identity+"/post",exchange.Title,author,time,CommunicationArticle.Read(body,exchange),item.ContentSha256) {SourceName=item.SourceName,SourcePath=item.CentralPath} };
             if(exchange is null) author = string.Join(", ",entries.Select(e=>e.Author).Distinct().Take(3));
             if(item.IsThread)time="자료 수정 · "+time;
             var row = new InboxRow(NameFor(item.ProjectId), exchange?.Title ?? item.Title,
                 exchange?.RequestSummary ?? item.Preview, body, Path.Combine(CommunicationHubPath,item.CentralPath),
                 time)
-                { ProjectId = item.ProjectId, Exchange = exchange, Warning = warning, Author = author, Identity = identity, ThreadEntries = entries, IsUnread = entries.Any(e=>_communicationReadStore.IsUnread(e.Identity,e.ContentHash)), RevisionCount = exchange is null ? 1 : revisionCounts[(exchange.ProjectId,exchange.ActorId,exchange.RecordId)] };
-            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning && previous.Author == row.Author && previous.RevisionCount == row.RevisionCount && previous.ThreadEntries.SequenceEqual(entries))
+                { ProjectId = item.ProjectId, Exchange = exchange, Warning = warning, ContentIssue = item.ThreadGroup.Length>0 && snapshot.Errors.Any(e=>e.SourceGroup==item.ThreadGroup)
+                        ? "읽기 실패" : item.Body is null || threadSources?.Any(s=>s.Body is null)==true
+                        ? snapshot.Errors.Any(e=>e.Code is "thread_retry" or "central_inbox_invalid" && (e.ProjectId is null || e.ProjectId==item.ProjectId)) ? "읽기 실패" : "내용 미확인" : null,
+                    Author = author, Identity = identity, ThreadEntries = entries, IsUnread = entries.Any(e=>_communicationReadStore.IsUnread(e.Identity,e.ContentHash)),
+                    UnreadCommentCount = entries.Count(e=>e.IsComment && _communicationReadStore.IsUnread(e.Identity,e.ContentHash)), RevisionCount = exchange is null ? 1 : revisionCounts[(exchange.ProjectId,exchange.ActorId,exchange.RecordId)] };
+            if (existingInboxRows.TryGetValue(row.Path, out var previous) && previous.Body == row.Body && previous.Time == row.Time && previous.Project == row.Project && previous.Title == row.Title && previous.Preview == row.Preview && previous.ProjectId == row.ProjectId && previous.Warning == warning && previous.ContentIssue == row.ContentIssue && previous.Author == row.Author && previous.RevisionCount == row.RevisionCount && previous.ThreadEntries.SequenceEqual(entries))
                 row = previous;
             _allInboxRows.Add(row);
         }
