@@ -386,7 +386,7 @@
               "commands": [
                 {
                   "name": "게시글 평가",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.18\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.19\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only"
                   ],
@@ -424,7 +424,7 @@
               "commands": [
                 {
                   "name": "보류 글 보기",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.18\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.19\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only",
                     "--review-status=held"
@@ -433,7 +433,7 @@
                 },
                 {
                   "name": "탈락 글 보기",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.18\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.19\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only",
                     "--review-status=rejected"
