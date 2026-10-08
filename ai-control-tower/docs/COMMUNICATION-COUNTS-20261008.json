@@ -49,7 +49,10 @@
     "existingRelatedThreadReplySupported": true,
     "destination": "04_COMMUNICATION/threads/T-0009-ai-control-tower/THREAD.md",
     "format": "append dated author heading with explicit 댓글: title; no separate reply file or repeated new topic",
-    "actualThreadCommentPosted": false,
+    "actualThreadCommentPosted": true,
+    "postingScope": "authorized actual Codex result reply appended on work branch; main and operational central clone unchanged",
+    "followupBoundaryTests": { "passed": 146, "failed": 0, "trx": "qa/reply-preview-tests.trx", "filter": "StartupPolicy|LocalView|Communication|CommunityPost|NoticeProject" },
+    "replyVerification": { "beforePosts": 5, "beforeComments": 0, "afterPosts": 5, "afterComments": 1, "newComments": 1, "previousEntryIdentitiesAndHashesPreserved": true, "originalBytesPreservedAsPrefix": true, "originalBytes": 13665, "screenshots": 52, "reports": 53, "proof": "qa-preview/reply/communication-ui-proof.json" },
     "taskExchange": "Own actual receipt/progress/result record stored locally using the same recordId and increasing revisions; local storage does not prove central delivery."
   },
   "artifactPolicy": "Raw source bodies, screenshots, user read history and task exchange JSON remain local and are not committed. Evidence paths are relative to the local task workspace."

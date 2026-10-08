@@ -20,7 +20,9 @@ using AIControlTower.Views;
 internal static class Program
 {
     private const string AllowedOutput = @"C:\Users\user\Documents\Codex\2026-10-08\task-7\qa-preview";
-    private const string Hub = @"D:\A_KJ\AI\ControlTowerData\communication-hub";
+    private const string OperationalHub = @"D:\A_KJ\AI\ControlTowerData\communication-hub";
+    private const string BranchHub = @"C:\Users\user\Documents\Codex\2026-10-08\task-7\communication-source";
+    private static string Hub = OperationalHub;
     private static readonly DateTimeOffset FixtureTime = DateTimeOffset.Parse("2026-10-08T10:00:00Z");
     private static readonly MethodInfo Apply = typeof(MainViewModel).GetMethod("ApplyCommunicationSnapshot", BindingFlags.Instance | BindingFlags.NonPublic)
         ?? throw new MissingMethodException("ApplyCommunicationSnapshot");
@@ -29,6 +31,13 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.Length > 2) return 2;
+        if (args.Length == 2)
+        {
+            var requestedHub = Path.GetFullPath(args[1]).TrimEnd(Path.DirectorySeparatorChar);
+            if (!requestedHub.Equals(BranchHub, StringComparison.OrdinalIgnoreCase)) return 2;
+            Hub = requestedHub;
+        }
         var output = Path.GetFullPath(args.Length == 0 ? AllowedOutput : args[0]).TrimEnd(Path.DirectorySeparatorChar);
         if (!output.Equals(AllowedOutput, StringComparison.OrdinalIgnoreCase)
             && !output.StartsWith(AllowedOutput + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return 2;
@@ -58,7 +67,28 @@ internal static class Program
                     var row = vm.InboxItems.FirstOrDefault(r => r.Identity.Contains("T-0009-ai-control-tower", StringComparison.Ordinal))
                         ?? vm.InboxItems.First(r => r.Exchange is null);
                     vm.SelectedInbox = row;
+                    if (Hub.Equals(BranchHub, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var baselinePath = Path.Combine(output, "t0009-before-reply.md");
+                        var baseline = CommunicationThreadParser.Parse(File.ReadAllText(baselinePath).Replace("\r\n", "\n"),
+                            row.Identity + "/source/" + row.ThreadEntries[0].SourceName, row.Title,
+                            sourceName: row.ThreadEntries[0].SourceName, sourcePath: row.ThreadEntries[0].SourcePath);
+                        Check(baseline.Count == 5 && baseline.All(e => !e.IsComment), "Unexpected original T-0009 baseline");
+                        Check(row.PostCount == 5 && row.CommentCount == 1 && row.UnreadCommentCount == 1, "Real result reply count did not increase exactly once");
+                        Check(baseline.All(old => row.ThreadEntries.Any(current => current.Identity == old.Identity && current.ContentHash == old.ContentHash)), "Previous post identities/content hashes changed");
+                        var reply = row.ThreadEntries.Single(e => e.IsComment);
+                        Check(reply.Author == "Codex (communication-counts-20261008 작업 담당)" && reply.Body.Contains("운영 배포는 수행하지 않았습니다", StringComparison.Ordinal), "Real reply author/deployment boundary missing");
+                        reports.Add(new { Scenario = "Real authorized T-0009 result reply", BeforePosts = 5, BeforeComments = 0,
+                            AfterPosts = row.PostCount, AfterComments = row.CommentCount, NewComments = row.UnreadCommentCount,
+                            PreviousIdentitiesAndContentHashesPreserved = true, Author = reply.Author });
+                    }
                     await CaptureMatrix(view, vm, output, "actual-hub", reports);
+                    if (Hub.Equals(BranchHub, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var reader = (ScrollViewer)view.FindName("ArticleReader");
+                        reader.ScrollToEnd(); await Flush(); Layout(view, 700, 560);
+                        Capture(view, 700, 560, Path.Combine(output, "actual-result-reply-bottom-700-dark.png"));
+                    }
                     reports.Add(new { Source = "actual read-only hub", ScopedSourceRecords = scoped.InboxItems.Count,
                         DisplayedTopics = vm.InboxItems.Count, vm.CommunityListSummary, Errors = actual.Errors.Select(e => new { e.Code, e.Message }).ToArray(),
                         Selected = row.Title, row.CountLabel, row.ExtraCountLabel, row.ReplyStateLabel });
@@ -190,7 +220,7 @@ internal static class Program
                 Check(SourcesEqual(protectedBefore, ProtectSources()), "Protected THREAD/user-read bytes or existence changed during QA");
                 File.WriteAllText(Path.Combine(output, "communication-ui-proof.json"), JsonSerializer.Serialize(new
                 {
-                    Pass = true, ApplicationType = app.GetType().FullName,
+                    Pass = true, ApplicationType = app.GetType().FullName, ReadOnlyHub = Hub,
                     Rendering = "CommunicationWorkspaceView measured/arranged into RenderTargetBitmap; no Window, no HWND, no Show",
                     NativeWindowsCreated = 0, NativeWindowsShown = 0, AllHwndsZero = true,
                     OperationalDeployment = false, PollingEnabled = false,
