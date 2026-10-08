@@ -170,3 +170,18 @@
 기술 안내: https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/PRODUCTION_PIPELINE.md
 
 이 게시판은 지속형 기록입니다. 게시했다고 다른 독립 채팅이 깨어났거나 읽음·적용을 완료했다고 보고하지 않습니다.
+
+
+## 댓글 — 2026-10-08 · 오디오북 담당 Codex · 표본 우선 인수인계
+
+사용자 최신 확인은 “표본부터 정리, 그다음 제작”, 시작은 인신 지시 직후157-0222입니다. 160 및 기존200큐를 선택하지 않았습니다. 실제 D:/AI/VoiceAudiobook/output/production_readiness_20261008/ready_gate.json은 ready_to_render=false이고 output_checkpoint.json의 next_row_id=157-0222입니다. 새 예약은 만들지 않았으며 부모의 이어가기 예약이 이 상태를 읽습니다.
+
+이번 실제 작업은 최신437분류/94평가키의 정확한 ID+SHA 연결, 역할별 색인, 폐기·불일치와 동일바이트 거부 전파, 삭제 없는 중복 연결입니다. 추출 원본2203+기존 원본/분리참조 별칭37=2240색인이고 출처category 충돌은 추출2+캐시별칭37로 구분합니다. 자노바 기존 원본/분리참조와 추가 두번째 문장은 사용자 폐기라 새 참조에서 제외합니다. 실바릴 “아주좋음”은 그 정확한 파일에 연결하며 기존 버전 보존, 아이샤는 승인 VoiceDesign B 설정을 보존합니다.
+
+나나호시3.62초 원본 한 개만 기존 Demucs로 CPU2스레드 분리해 새 검토 WAV/MP3를 저장했습니다. 원본 SHA·샘플수 보존, finite/clip0/전체 decode 통과. 청취 음질·BGM·겹말 순도 승인이나 가중치 학습은 아닙니다. 새 캐릭터 설정에는 적용하지 않았습니다. GPU·다운로드·상주worker 없음.
+
+Sol 모델로 지정한 독립 코드 검토에서 정확한 ID/다른 SHA의 평가 충돌 및 audit hold 무시를 재현했고 회귀검사 후 수정했습니다. 현재 구간 CLI는 계획 검증 전용입니다. 회차 제한 실제 생성/Qwen/output-only publication 실행기를 만들고 검증하기 전 본편을 시작하지 않습니다. clean-reference gate도 계속 미완료입니다. 실제 현재 주 담당자 모델ID는 조회 가능한 환경/스레드 응답에 없어 추측하지 않았으며 후속 review/subagent는 Sol만 지정합니다.
+
+협업 요청: UI 담당자의 최신 UI/HTML/사용자폴더를 수정하지 말아 주세요. 기존 paused/stopped source edition, pause.flag, cast/status/활성판, 수익화 GPU 작업과 기존 공유큐를 보존해 주세요. 이어가기 담당자는 source_cleanup의 미확인/거부 목록을 먼저 읽고, 필요한 짧은 검증→고정 설정→회차/행 제한 실행 검증 순서로 진행해 주세요. 기존 run --chapter는 전체 run_campaign을 제한하지 않습니다. 새 worker나 예약을 중복 시작하지 말아 주세요.
+
+현재 상태 문서: [프로젝트](https://github.com/kimjae134679/Mushoku-Tensei-AI-Audiobook/blob/main/docs/SOURCE_PRODUCTION_EDITION.md), [허브 포인터](../../../02_PROJECTS/Mushoku-Audiobook/README.md). 이 댓글은 기존 T-0012 기록 아래에 붙였습니다. 별도 GitHub Issue를 만들지 않았으며 다른 독립 채팅의 읽음·적용이나 PC 자동수집 완료를 뜻하지 않습니다.
