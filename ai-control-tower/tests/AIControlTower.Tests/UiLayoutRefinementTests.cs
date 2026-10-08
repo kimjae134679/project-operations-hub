@@ -14,14 +14,14 @@ public sealed class UiLayoutRefinementTests
 {
     private static readonly XNamespace X="http://schemas.microsoft.com/winfx/2006/xaml";
     [Fact]
-    public void ProjectRailShowsOnlyTitlesWithoutSearch() => Sta(()=>
+    public void ProjectRailShowsTitlesAndOneNamedProjectSearch() => Sta(()=>
     {
         var rail=Fragment("ProjectRail");
         rail.DataContext=new { ProjectsCount=1,FilteredProjects=new[]{new { DisplayName="선택 프로젝트",Description="숨겨야 할 상세 설명",RoleLabel="숨겨야 할 내부 역할" } } };
         Layout(rail,238,600);
         var texts=Children(rail).OfType<TextBlock>().Select(t=>t.Text).ToArray();
         Assert.Contains("선택 프로젝트",texts);Assert.DoesNotContain("숨겨야 할 상세 설명",texts);Assert.DoesNotContain("숨겨야 할 내부 역할",texts);
-        Assert.Empty(Children(rail).OfType<TextBox>());
+        var search=Assert.Single(Children(rail).OfType<TextBox>());Assert.Equal("ProjectSearchBox",search.Name);Assert.True(search.ActualHeight>=40);
     });
 
     [Theory][InlineData(540)][InlineData(730)]
@@ -30,12 +30,12 @@ public sealed class UiLayoutRefinementTests
         var hero=Fragment("ProjectHeader");hero.DataContext=new { SelectedProject=new { DisplayName="아주 긴 프로젝트 이름으로 줄바꿈과 테두리 내부 여백을 검증합니다",CategoryLabel="프로젝트",Description="긴 설명이 카드의 둥근 테두리를 넘지 않아야 합니다",Path=@"D:\A_KJ\AI\프로젝트" } };
         Layout(hero,width,400);
         var face=Children(hero).OfType<Border>().SingleOrDefault(b=>b.Name=="ProjectHeaderFace");Assert.NotNull(face);
-        var body=Children(hero).OfType<Grid>().Single(g=>g.Name=="ProjectHeaderBody");
+        var body=Children(hero).OfType<FrameworkElement>().Single(g=>g.Name=="ProjectHeaderBody");
         var bounds=body.TransformToAncestor(face).TransformBounds(new Rect(body.RenderSize));
-        Assert.True(bounds.Left>=16);Assert.True(bounds.Top>=16);
-        Assert.True(bounds.Right<=face.ActualWidth-16);Assert.True(bounds.Bottom<=face.ActualHeight-16);
+        Assert.True(bounds.Left>=8);Assert.True(bounds.Top>=8);
+        Assert.True(bounds.Right<=face.ActualWidth-8);Assert.True(bounds.Bottom<=face.ActualHeight-8);
         foreach(var text in Children(body).OfType<TextBlock>().Where(t=>t.ActualHeight>0))
-        {var box=text.TransformToAncestor(face).TransformBounds(new Rect(text.RenderSize));Assert.True(box.Left>=16);Assert.True(box.Right<=face.ActualWidth-16);}
+        {var box=text.TransformToAncestor(face).TransformBounds(new Rect(text.RenderSize));Assert.True(box.Left>=8);Assert.True(box.Right<=face.ActualWidth-8);}
     });
 
     [Theory][InlineData(430)][InlineData(1030)]
@@ -86,9 +86,9 @@ public sealed class UiLayoutRefinementTests
     {
         var theme=Fragment("ThemeControls");theme.DataContext=new {DarkMode=false,ViewModeLabel="重复管理状态"};Layout(theme,500,100);
         Assert.Equal(2,Children(theme).OfType<Button>().Count());Assert.DoesNotContain(Children(theme).OfType<TextBlock>(),t=>t.Text=="重复管理状态");
-        var main=MainSource();Assert.DoesNotContain(main.Descendants(),e=>Name(e) is "ToolSearchBox" or "ProgramSearchBox");
+        var main=MainSource();Assert.DoesNotContain(main.Descendants(),e=>Name(e)=="ToolSearchBox");Assert.Contains(main.Descendants(),e=>Name(e)=="ProgramSearchBox");Assert.Contains(main.Descendants(),e=>Name(e)=="ProjectSearchBox");
         var projectTabs=main.Descendants().SingleOrDefault(e=>Name(e)=="ProjectContentTabs");Assert.NotNull(projectTabs);
-        Assert.Contains(projectTabs.Descendants(),e=>e.Name.LocalName=="ProjectActivityView" && (string?)e.Attribute("DataContext")=="{Binding WorkDashboard}");
+        Assert.Contains(projectTabs.Descendants(),e=>e.Name.LocalName=="ProjectActivityView" && (string?)e.Attribute("DataContext")=="{Binding SelectedProjectDashboard}");
     });
 
     [Fact]

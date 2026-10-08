@@ -53,4 +53,14 @@ public partial class WorkDashboardView : UserControl
         if(DataContext is not WorkDashboardViewModel {CanStopOwned:true} vm)return;
         if(MessageBox.Show(Window.GetWindow(this),"현재 관제탑이 소유한 이 작업만 중지할까요? 다른 프로젝트·외부 콘솔·원격 연결은 중지하지 않습니다.","선택 작업 중지",MessageBoxButton.OKCancel,MessageBoxImage.Warning)==MessageBoxResult.OK)vm.StopSelectedOwned();
     }
+    private void ClearFilters_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not WorkDashboardViewModel model) return;
+        model.Search = ""; model.ProjectFilterId = ""; model.StatusFilterKey = ""; model.WorkerFilterKey = "";
+    }
+    private void WorkSelection_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        // Filtering can clear the list's selection; it must not discard the record being read.
+        if (DataContext is WorkDashboardViewModel model && e.AddedItems.Count > 0 && e.AddedItems[0] is Models.WorkActivity selected) model.Selected = selected;
+    }
 }

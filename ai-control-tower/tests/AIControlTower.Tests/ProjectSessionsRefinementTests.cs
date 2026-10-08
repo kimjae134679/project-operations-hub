@@ -36,7 +36,7 @@ public sealed class ProjectSessionsRefinementTests
         Assert.Equal(2,rows.Length);Assert.Contains(rows,r=>Value(r,"ResponseSummary")=="최신");Assert.DoesNotContain(rows,r=>Value(r,"ResponseSummary")=="이전");
         Assert.Equal("handover",Value(rows.Single(r=>Value(r,"ResponseSummary")=="최신"),"SessionId"));
         var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<WorkActivity>>(rows));
-        Method(vm.GetType(),"SetProjectContext").Invoke(vm,["p","프로젝트"]);vm.ApplySnapshot(rows);vm.Selected=rows[0];
+        vm.SetProjectContext("p","프로젝트");vm.ApplySnapshot(rows);vm.Selected=rows[0];
         vm.ApplySnapshot(rows.Select(r=>r with {Stage="변경"}).ToArray());Assert.Equal(rows[0].Id,vm.Selected?.Id);
     }
     [Fact] public async Task ConflictingSessionContentAtSameOfficialIdentityRevisionIsNotTwoValidRecords()
@@ -51,9 +51,9 @@ public sealed class ProjectSessionsRefinementTests
         var root=Fixture();var record=WorkDashboardService.ReadExchange(Write(root,"record.json",Exchange("one",1)))!;
         var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<WorkActivity>>([]));
         vm.ApplySnapshot([record,new(){Id="local:a",ProjectId="p",Source="관제탑 소유 실행 기록",WorkerKind="Codex"},new(){Id="local:b",ProjectId="other",Source="관제탑 소유 실행 기록"}]);
-        Method(vm.GetType(),"SetProjectContext").Invoke(vm,["p","프로젝트"]);
+        vm.SetProjectContext("p","프로젝트");
         Assert.Single(Rows(vm,"ProjectRecords"));Assert.Single(Rows(vm,"ProjectExecutions"));
-        Method(vm.GetType(),"SetProjectContext").Invoke(vm,["","미선택"]);Assert.Empty(Rows(vm,"ProjectRecords"));Assert.Empty(Rows(vm,"ProjectExecutions"));
+        vm.SetProjectContext("","미선택");Assert.Empty(Rows(vm,"ProjectRecords"));Assert.Empty(Rows(vm,"ProjectExecutions"));
     }
     [Fact] public async Task RegisteredContinuousStepsStayDistinctWithoutReadingPrivateOutputOrClaimingLiveness()
     {

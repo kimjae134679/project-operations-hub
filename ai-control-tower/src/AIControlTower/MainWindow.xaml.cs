@@ -51,6 +51,8 @@ public partial class MainWindow : Window
         SizeChanged += (_, _) => { ApplyResponsiveLayout();Dispatcher.BeginInvoke(()=>EnsureSelectedTabVisible(WorkspaceTabs),System.Windows.Threading.DispatcherPriority.Loaded); };
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.DarkMode)) ApplyTitlebarTheme(); };
+        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProject)) { UpdateProjectShortcuts(); QuickEntryNotice.Text = "선택 후 아래 버튼으로 결과·자료를 엽니다."; } };
+        UpdateProjectShortcuts();
         _viewModel.CatalogRefreshing += (_, _) => CaptureCatalogView();
         _viewModel.CatalogRefreshed += (_, _) => Dispatcher.BeginInvoke(RestoreCatalogView, System.Windows.Threading.DispatcherPriority.Loaded);
         Closing += HandleWindowClosing;
@@ -260,11 +262,56 @@ public partial class MainWindow : Window
     private void Projects_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.OriginalSource != sender || e.AddedItems.Count == 0 || WorkspaceContent is null) return;
+        if (e.AddedItems[0] is ProjectItem project) _viewModel.SelectedProject = project;
         _activeProgramList = null;
         FadeIn(ProjectHeader);
         FadeIn(ProgramInspector);
     }
 
+    // Navigation only; uses the catalog's existing actions and never submits work here.
+    private ProgramItem? ProjectShortcutTarget(string kind) => _viewModel.SelectedProject?.Functions
+        .SelectMany(f => f.Programs).FirstOrDefault(p => kind == "review"
+            ? p.Id.EndsWith("/review-current", StringComparison.Ordinal)
+            : p.Id.EndsWith("/current-production", StringComparison.Ordinal) || p.Id.EndsWith("/outputs", StringComparison.Ordinal));
+    private void UpdateProjectShortcuts()
+    {
+        ProjectResultShortcut.IsEnabled = ProjectShortcutTarget("result") is not null;
+        ProjectReviewShortcut.IsEnabled = ProjectShortcutTarget("review") is not null;
+        ProjectReviewShortcut.Content = ProjectReviewShortcut.IsEnabled ? "리뷰 선택" : "리뷰 미연결";
+    }
+    private void ProjectShortcut_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: string kind } || _viewModel.SelectedProject is not { } project) return;
+        if (kind == "attention")
+        {
+            var dashboard = _viewModel.SelectedProjectDashboard;
+            dashboard.ProjectFilterId = _viewModel.SelectedProjectRecordId;
+            dashboard.Search = "";
+            dashboard.WorkerFilterKey = "";
+            dashboard.StatusFilterKey = "needs-action";
+            WorkspaceTabs.SelectedItem = ReferenceEquals(dashboard, _viewModel.ManagementDashboard) ? ManagementProcessTab : WorkDashboardTab;
+            return;
+        }
+        if (kind == "recent") { ProjectContentTabs.SelectedItem = ProjectActivityTab; return; }
+        if (ProjectShortcutTarget(kind) is not { } target) return;
+        _viewModel.ProgramSearch = "";
+        _viewModel.SelectedProgram = target;
+        ProjectContentTabs.SelectedIndex = 0;
+        void Expand(DependencyObject node)
+        {
+            if (node is Expander { DataContext: FunctionItem function } group && function.Programs.Any(p => p.Id == target.Id)) group.IsExpanded = true;
+            for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(node); i++) Expand(System.Windows.Media.VisualTreeHelper.GetChild(node, i));
+        }
+        Dispatcher.BeginInvoke(() =>
+        {
+            Expand(ProjectContentTabs);
+            ProjectContentTabs.UpdateLayout();
+            var item = Descendants(ProjectContentTabs).OfType<ListBox>().Select(list => list.ItemContainerGenerator.ContainerFromItem(target)).OfType<FrameworkElement>().FirstOrDefault();
+            if (item is not null && ProgramScroll.Content is UIElement content)
+                ProgramScroll.ScrollToVerticalOffset(item.TranslatePoint(new Point(0, 0), content).Y);
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
+        QuickEntryNotice.Text = "선택한 " + target.DisplayName + " · 아래 버튼으로 열기를 선택하세요.";
+    }
     private void Programs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ListBox list || e.AddedItems.Count == 0 || e.AddedItems[0] is not ProgramItem program) return;

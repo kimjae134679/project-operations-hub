@@ -43,7 +43,12 @@ public sealed class VisualLayoutFixTests
         Assert.Equal(2,Children(view).OfType<ComboBox>().Count());
         Assert.All(Children(view).OfType<Expander>(),e=>Assert.False(e.IsExpanded));
         Assert.Null(view.FindName("WorkSearchWatermark"));Assert.Null(view.FindName("AdvancedSources"));Assert.Null(view.FindName("StatePathInput"));
-        var stop=Assert.Single(Children(view).OfType<Button>());
+        var buttons=Children(view).OfType<Button>().ToArray();Assert.Equal(2,buttons.Length);
+        var stop=Assert.Single(buttons,b=>Equals(b.Content,"선택 작업 중단"));
+        var reset=Assert.Single(buttons,b=>b.Name=="ClearWorkFilters");
+        vm.Search="없는 기록";vm.ProjectFilterId="Threads";vm.StatusFilterKey="failed";vm.WorkerFilterKey="Codex";
+        reset.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal("",vm.Search);Assert.Equal("",vm.ProjectFilterId);Assert.Equal("",vm.StatusFilterKey);Assert.Equal("",vm.WorkerFilterKey);
         Assert.Equal(Visibility.Collapsed,stop.Visibility);
         vm.Selected=new(){Id="owned",OwnedProgramId="fixture-owned"};Layout(view,1060,660);Assert.Equal(Visibility.Visible,stop.Visibility);Assert.True(stop.IsEnabled);
         vm.Selected=new(){Id="external"};Layout(view,1060,660);Assert.Equal(Visibility.Collapsed,stop.Visibility);
@@ -100,5 +105,19 @@ public sealed class VisualLayoutFixTests
     private static ResourceDictionary Resources(bool dark){var resources=(ResourceDictionary)XamlReader.Parse(ResourceElement().ToString(),new ParserContext{BaseUri=new Uri(Source("App.xaml"))});foreach(var entry in ThemeService.Palette(dark))resources[entry.Key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(entry.Value));return resources;}
     private static void Layout(FrameworkElement element,double width,double height){element.Measure(new Size(width,height));element.Arrange(new Rect(0,0,width,height));element.UpdateLayout();}
     private static IEnumerable<DependencyObject> Children(DependencyObject root){yield return root;for(var i=0;i<VisualTreeHelper.GetChildrenCount(root);i++)foreach(var child in Children(VisualTreeHelper.GetChild(root,i)))yield return child;}
+    [Theory] [InlineData(false)] [InlineData(true)]
+    public void SearchingKeepsCurrentReadingAndNewVisibleSelectionStillChangesDetails(bool dark)=>Sta(()=>
+    {
+        var view=new AIControlTower.Views.WorkDashboardView{Resources=Resources(dark)};
+        var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<AIControlTower.Models.WorkActivity>>([]));
+        var first=new AIControlTower.Models.WorkActivity{Id="first",Title="검증용 읽던 기록"};
+        var second=new AIControlTower.Models.WorkActivity{Id="second",Title="검증용 찾을 기록"};
+        vm.ApplySnapshot([first,second]);view.DataContext=vm;Layout(view,1060,660);
+        var list=Children(view).OfType<ListBox>().Single(x=>x.Name=="WorkList");
+        list.SelectedItem=first;Assert.Equal("first",vm.Selected?.Id);
+        vm.Search="찾을";Layout(view,1060,660);
+        Assert.Equal("first",vm.Selected?.Id);
+        list.SelectedItem=second;Assert.Equal("second",vm.Selected?.Id);
+    });
     private static void Sta(Action action){Exception? error=null;var t=new Thread(()=>{try{action();}catch(Exception ex){error=ex;}});t.SetApartmentState(ApartmentState.STA);t.Start();t.Join();if(error is not null)ExceptionDispatchInfo.Capture(error).Throw();}
 }

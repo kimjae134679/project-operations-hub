@@ -21,7 +21,18 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly SemaphoreSlim _projectProgressLock = new(1,1);
     private IReadOnlyList<ProjectProgressSnapshot> _projectProgressSummaries = [];
     public IReadOnlyList<ProjectProgressSnapshot> ProjectProgressSummaries => _projectProgressSummaries;
-    public ProjectProgressSnapshot SelectedProjectProgress => _projectProgressSummaries.FirstOrDefault(p=>p.ProjectId==SelectedProject?.Id && SameJevWorkspacePath(p.ProjectRoot,SelectedProject.Path))
+    // Resolve presentation identity from one exact registered root. Execution and bridge identities remain unchanged.
+    private string ProjectRecordId(ProjectItem? project)
+    {
+        if (project is null) return "";
+        var ids = _catalog.Projects.Where(p => SameJevWorkspacePath(p.Path, project.Path)).Select(p => p.Id).Distinct(StringComparer.Ordinal).ToArray();
+        return ids is [var id] ? id : project.Id;
+    }
+    public string SelectedProjectRecordId => ProjectRecordId(SelectedProject);
+    public WorkDashboardViewModel SelectedProjectDashboard => SelectedProjectRecordId == "project-operations-hub" ? ManagementDashboard : WorkDashboard;
+    private IEnumerable<string> ProjectRecordAliases(ProjectItem? project)
+        => project is null ? [] : DashboardProjectAliases.Where(pair => pair.Value == ProjectRecordId(project)).Select(pair => pair.Key).Append(project.Id);
+    public ProjectProgressSnapshot SelectedProjectProgress => _projectProgressSummaries.FirstOrDefault(p=>SelectedProject is {} selected && p.ProjectId==SelectedProjectRecordId && SameJevWorkspacePath(p.ProjectRoot,selected.Path))
         ?? ProjectProgressService.Unknown(SelectedProject,DateTimeOffset.UtcNow);
     public WorkActivity? SelectedProjectHandoff => WorkDashboard.ProjectRecords.FirstOrDefault();
     public string ProjectHandoffSummary => SelectedProjectHandoff is {} record
@@ -33,14 +44,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private void NotifyProjectProgress()
     {
         OnPropertyChanged(nameof(ProjectProgressSummaries));OnPropertyChanged(nameof(SelectedProjectProgress));
-        OnPropertyChanged(nameof(SelectedProjectHandoff));OnPropertyChanged(nameof(ProjectHandoffSummary));OnPropertyChanged(nameof(ProjectCommunicationFlowText));
+        OnPropertyChanged(nameof(SelectedProjectRecordId));OnPropertyChanged(nameof(SelectedProjectDashboard));OnPropertyChanged(nameof(SelectedProjectHandoff));OnPropertyChanged(nameof(ProjectHandoffSummary));OnPropertyChanged(nameof(ProjectCommunicationFlowText));
     }
     public async Task RefreshProjectProgressAsync()
     {
         if(_disposed || ManualAdmissionClosed || !await _projectProgressLock.WaitAsync(0))return;
         try
         {
-            var projects=Projects.Take(200).Select(p=>new ProjectItem{Id=p.Id,Name=p.Name,DisplayName=p.DisplayName,Path=p.Path}).ToArray();
+            var projects=Projects.Take(200).Select(p=>new ProjectItem{Id=ProjectRecordId(p),Name=p.Name,DisplayName=p.DisplayName,Path=p.Path}).ToArray();
             var at=DateTimeOffset.UtcNow;
             var snapshots=await Task.Run(()=>projects.Select(p=>_projectProgressService.Read(p,_catalog,at)).ToArray(),_lifetime.Token);
             if(_disposed || ManualAdmissionClosed)return;
@@ -319,7 +330,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             SelectedProgram = (sameScopeProject ? value?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id == previousProgramId) : null)
                 ?? value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
-            WorkDashboard.SetProjectContext(value?.Id??"",value?.DisplayName??"");
+            WorkDashboard.SetProjectContext(ProjectRecordId(value),value?.DisplayName??"",ProjectRecordAliases(value));
+            ManagementDashboard.SetProjectContext(ProjectRecordId(value),value?.DisplayName??"",ProjectRecordAliases(value));
             NotifyProjectProgress();
             ProgramSearch = "";
             OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults));
@@ -362,7 +374,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
             Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
         await WorkDashboard.RefreshAsync(_lifetime.Token);
-        if(!_disposed) ManagementDashboard.ApplySnapshot(WorkDashboard.Activities.ToArray());
+        if(!_disposed) ManagementDashboard.ApplySnapshotFrom(WorkDashboard);
         await RefreshProjectProgressAsync();
         RefreshToolEvidence();
     }
@@ -423,7 +435,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
             CatalogRefreshed?.Invoke(this, EventArgs.Empty);
             _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
-            WorkDashboard.SetProjectContext(SelectedProject?.Id??"",SelectedProject?.DisplayName??"");
+            WorkDashboard.SetProjectContext(SelectedProjectRecordId,SelectedProject?.DisplayName??"",ProjectRecordAliases(SelectedProject));
+            ManagementDashboard.SetProjectContext(SelectedProjectRecordId,SelectedProject?.DisplayName??"",ProjectRecordAliases(SelectedProject));
             SetCurrentCommunicationProjects(CurrentCommunicationTargets(Projects,_catalog));
             RefreshToolEvidence();
             _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
