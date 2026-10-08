@@ -363,11 +363,11 @@
       "id": "Threads",
       "name": "인스타 수익화 · 콘텐츠 제작",
       "path": "C:\\KJ\\Github\\Threads",
-      "description": "0.3.17 새 검토 회차입니다. 제작·평가·편집·원본·보류·진행을 확인합니다.",
+      "description": "0.3.18 새 검토 회차입니다. 제작·평가·편집·원본·보류·진행을 확인합니다.",
       "category": "콘텐츠 제작",
       "role": "current-development",
       "roleLabel": "현재 개발",
-      "evidencePath": "Threads-review-entrypoints-20261008-Sol r3 · 실제 경로/바로가기 확인 · 운영 앱 반영은 보류",
+      "evidencePath": "Threads-review-entrypoints-20261008-Sol r4 · 실제 경로/바로가기 확인 · 운영 앱 반영은 보류",
       "checkedAt": "2026-10-08",
       "functions": [
         {
@@ -379,14 +379,14 @@
               "name": "게시글 평가",
               "path": ".",
               "workingDirectory": ".",
-              "description": "0.3.17 새 검토 회차를 엽니다. 새 평가·메모·열람은 별도 확인하며 제작량을 평가 완료로 표시하지 않습니다.",
+              "description": "0.3.18 새 검토 회차를 엽니다. 새 평가·메모·열람은 별도 확인하며 제작량을 평가 완료로 표시하지 않습니다.",
               "kindLabel": "PC 프로그램",
               "actionLabel": "게시글 평가 열기",
               "openActionLabel": "개발 폴더 보기",
               "commands": [
                 {
                   "name": "게시글 평가",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.17\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.18\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only"
                   ],
@@ -399,7 +399,7 @@
               "name": "기존 원문 편집",
               "path": ".",
               "workingDirectory": ".",
-              "description": "등록 요청 r3의 기존 편집기 0.3.15를 엽니다. 새 제작 결과의 평가 프로그램과 버전·역할이 다릅니다.",
+              "description": "등록 요청 r4의 기존 편집기 0.3.15를 엽니다. 새 제작 결과의 평가 프로그램과 버전·역할이 다릅니다.",
               "kindLabel": "PC 프로그램",
               "actionLabel": "기존 원문 편집 열기",
               "openActionLabel": "개발 폴더 보기",
@@ -417,14 +417,14 @@
               "name": "탈락·보류",
               "path": ".",
               "workingDirectory": ".",
-              "description": "0.3.17의 보류 또는 탈락 목록을 선택해 엽니다. 보류·탈락을 완료로 바꾸지 않습니다.",
+              "description": "0.3.18의 보류 또는 탈락 목록을 선택해 엽니다. 보류·탈락을 완료로 바꾸지 않습니다.",
               "kindLabel": "PC 프로그램",
               "actionLabel": "탈락·보류 열기",
               "openActionLabel": "개발 폴더 보기",
               "commands": [
                 {
                   "name": "보류 글 보기",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.17\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.18\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only",
                     "--review-status=held"
@@ -433,7 +433,7 @@
                 },
                 {
                   "name": "탈락 글 보기",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.17\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.18\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only",
                     "--review-status=rejected"
@@ -471,7 +471,7 @@
           "id": "original-reference",
           "name": "원본 참고",
           "path": "D:\\A_KJ\\AI\\Workspace\\Threads\\review-20261008-0311-photo\\inputs",
-          "description": "r3에 명시된 기존 입력·참조 원본입니다. 새 제작물이나 검수 완료 결과와 구분합니다.",
+          "description": "r4에 명시된 기존 입력·참조 원본입니다. 새 제작물이나 검수 완료 결과와 구분합니다.",
           "roleLabel": "입력 원본"
         },
         {
