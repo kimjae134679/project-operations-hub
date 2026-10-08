@@ -430,7 +430,7 @@ public sealed class CommunicationService
             try
             {
                 var body=await ReadText(path,ct).ConfigureAwait(false);
-                if(HasSecret(body)) { Hold(errors,null,"secret_held"); continue; }
+                if(HasSecret(body)) { Hold(errors,null,"secret_held",Path.GetRelativePath(root,Path.GetDirectoryName(path)!).Replace('\\','/')); continue; }
                 var relative=Path.GetRelativePath(root,path).Replace('\\','/');
                 var title=body.Split('\n').FirstOrDefault(l=>l.StartsWith("# "))?.TrimStart('#',' ') ?? Path.GetFileName(Path.GetDirectoryName(path))!;
                 items.Add(new("Shared-Communication",ContentHash(body),relative,relative,new DateTimeOffset(File.GetLastWriteTimeUtc(path),TimeSpan.Zero))
@@ -438,7 +438,11 @@ public sealed class CommunicationService
                         ThreadGroup=Path.GetRelativePath(root,Path.GetDirectoryName(path)!).Replace('\\','/'),
                         IsStandaloneThreadRecord=!Path.GetFileName(path).Equals("THREAD.md",StringComparison.OrdinalIgnoreCase) });
             }
-            catch(Exception ex) when(IsFileError(ex)) { Hold(errors,null,"thread_retry"); }
+            catch(Exception ex) when(IsFileError(ex))
+            {
+                // A held file stays offscreen, while its topic's counts remain unavailable.
+                Hold(errors,null,"thread_retry",Path.GetRelativePath(root,Path.GetDirectoryName(path)!).Replace('\\','/'));
+            }
         }
         var receiptRoot = Inside(root, "04_COMMUNICATION/announcements/receipts");
         foreach (var path in EnumerateSafe(receiptRoot, errors, null, 10000))
@@ -603,7 +607,7 @@ public sealed class CommunicationService
     private static bool HasSecret(string text) => ContainsSensitiveText(text);
     private static StringComparer PathComparer => OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     private static bool IsFileError(Exception ex) => ex is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or KeyNotFoundException or RegexMatchTimeoutException;
-    private static void Hold(List<CommunicationIssue> errors, string? id, string code)
+    private static void Hold(List<CommunicationIssue> errors, string? id, string code, string sourceGroup = "")
     {
         var message = code switch
         {
@@ -615,7 +619,7 @@ public sealed class CommunicationService
             "file_limit" => "파일 수 제한에 도달했습니다. 나머지는 정리 후 다시 수집합니다.",
             _ => "파일이 변경 중이거나 형식·크기·경로 검증에 실패했습니다. 원본을 유지하고 다음 갱신에서 재시도합니다."
         };
-        if (!errors.Any(e => e.ProjectId == id && e.Code == code)) errors.Add(new(id, code, message));
+        if (!errors.Any(e => e.ProjectId == id && e.Code == code && e.SourceGroup == sourceGroup)) errors.Add(new(id, code, message) {SourceGroup=sourceGroup});
     }
 
     private static string ExistingRoot(string value)

@@ -35,7 +35,11 @@ public sealed record CommunicationInboxItem(string ProjectId, string ContentSha2
     [JsonIgnore] public string ThreadGroup { get; init; } = "";
     [JsonIgnore] public bool IsStandaloneThreadRecord { get; init; }
 }
-public sealed record CommunicationIssue(string? ProjectId, string Code, string Message);
+public sealed record CommunicationIssue(string? ProjectId, string Code, string Message)
+{
+    // Read projection only: scope an unavailable member without displaying or copying its body.
+    [JsonIgnore] public string SourceGroup { get; init; } = "";
+}
 public sealed record CommunicationSnapshot(IReadOnlyList<CommunicationNotice> Notices,
     IReadOnlyList<CommunicationReceiptItem> Receipts, IReadOnlyList<CommunicationProjectState> ProjectStates,
     IReadOnlyList<CommunicationInboxItem> InboxItems, IReadOnlyList<CommunicationIssue> Errors,

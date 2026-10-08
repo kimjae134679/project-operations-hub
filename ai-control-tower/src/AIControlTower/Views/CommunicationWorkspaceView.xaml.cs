@@ -63,6 +63,11 @@ public partial class CommunicationWorkspaceView : UserControl
             _rawPositions[_readingKey] = RawReader.VerticalOffset;
     }
     private void OpenCollectedFile_Click(object sender,RoutedEventArgs e) => _vm?.OpenCollectedFile();
+    private void MarkCommentRead_Click(object sender,RoutedEventArgs e)
+    {
+        if(sender is Button {DataContext: AIControlTower.Services.CommunityCommentRow comment})
+            (DataContext as MainViewModel)?.MarkCommunityCommentViewed(comment);
+    }
     private void OpenCommunicationFolder_Click(object sender,RoutedEventArgs e) => _vm?.OpenCommunicationFolder();
     private async void LinkCommunicationProject_Click(object sender,RoutedEventArgs e)
     {
