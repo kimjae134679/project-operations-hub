@@ -1,0 +1,40 @@
+{
+  "actorId": "ProjectBridge/KJW-80ea388278fd",
+  "blockers": [
+    "private_operation_requires_review"
+  ],
+  "nextActions": [
+    "비공개 실제 결과 확인"
+  ],
+  "projectId": "Mushoku-Audiobook",
+  "receivedAt": "2026-10-07T17:07:00Z",
+  "recordId": "pc-bridge-mushoku-chapter-progress-20261008-v2-watch-63",
+  "recordType": "task_exchange",
+  "request": {
+    "details": "사용자가 요청한 공용 PC 작업. 세부 내용은 비공개 경로에 보관.",
+    "source": "private_pc_bridge_queue",
+    "summary": "장기 작업 시작"
+  },
+  "response": {
+    "details": "실제 결과는 비공개 PC 작업 경로에서 확인합니다. 파일·명령·로그·화면은 공개하지 않습니다.",
+    "source": "project_bridge_operational_result",
+    "summary": "장기 작업 시작 확인 필요"
+  },
+  "revision": 1,
+  "schemaVersion": 1,
+  "sessionId": "KJW-80ea388278fd",
+  "status": "blocked",
+  "supersedes": [],
+  "title": "PC 작업 · 장기 작업 시작",
+  "updatedAt": "2026-10-08T10:19:51.134571+00:00",
+  "verification": [
+    {
+      "evidence": [
+        "private_pc_bridge_result:KJW-80ea388278fd/mushoku-chapter-progress-20261008-v2-watch-63"
+      ],
+      "name": "실제 작업 결과",
+      "result": "fail"
+    }
+  ],
+  "workDone": []
+}
