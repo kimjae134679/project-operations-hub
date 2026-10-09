@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "threads": {
-    "materialRoot": "C:\\EXAMPLE_ONLY\\Threads\\�ڷ�",
+    "materialRoot": "C:\\EXAMPLE_ONLY\\Threads\\자료",
     "reviewRoot": "C:\\EXAMPLE_ONLY\\UploadStudio"
   },
   "voice": {
     "root": "C:\\EXAMPLE_ONLY\\Voice",
-    "listener": "audiobooks/01_CURRENT/�������� ���.html"
+    "listener": "audiobooks/01_CURRENT/무직전생 듣기.html"
   },
   "projects": []
 }

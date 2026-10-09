@@ -30,7 +30,7 @@ async function read(file,max=20*1024*1024){
 async function stable(sources){for(const s of sources)if((await read(s.file)).sourceSha256!==s.sourceSha256)fail('source_changed_during_read');}
 async function guarded(empty,operation){try{return await operation();}catch(e){return {...empty,available:false,reason:e.reason||({'ENOENT':'source_missing','EACCES':'source_access_denied'}[e.code])||(e instanceof SyntaxError?'source_invalid_json':'source_invalid')};}}
 async function production(root){return guarded({generated:null,total:null},async()=>{
- const s=await read(inside(root,'06_�ڵ� ���� ���/status.json')),d=s.data;
+ const s=await read(inside(root,'06_자동 제작 결과/status.json')),d=s.data;
  if(d.schema!=='threads-auto-batch-v1')fail('production_schema');
  const rows=list(d.entries),ids=new Set();for(const r of rows){if(typeof r.id!=='string'||ids.has(r.id))fail('duplicate_production_id');ids.add(r.id);}
  await stable([s]);return {available:true,total:rows.length,generated:rows.filter(r=>r.outputFolder&&Array.isArray(r.images)&&r.images.length).length,
@@ -77,7 +77,7 @@ async function voice(config){
   let latest=null;try{latest=await read(latestFile,8192);}catch(e){if(e.code!=='ENOENT')throw e;}
   if(latest){
    const p=latest.data;if(typeof p.edition!=='string'||!/^production_[A-Za-z0-9_-]{1,100}$/.test(p.edition)||typeof p.reader!=='string')fail('voice_pointer_invalid');
-   const expected=inside(config.root,'output/'+p.edition+'/00_���۸��.html');
+   const expected=inside(config.root,'output/'+p.edition+'/00_제작목록.html');
    if(path.resolve(p.reader)!==expected)fail('voice_pointer_invalid');await safe(expected);
    const state=await read(inside(config.root,'output/'+p.edition+'/status.json'),1024*1024),d=state.data;
    if(d.registration_only!==true||!d.chapters||typeof d.chapters!=='object'||Array.isArray(d.chapters)||Object.keys(d.chapters).length>10000)fail('voice_registration_schema');

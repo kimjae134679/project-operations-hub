@@ -15,11 +15,11 @@ async function fixture(t){
  t.after(()=>fs.rm(root,{recursive:true,force:true}));
  const review=path.join(root,'review'),material=path.join(root,'material'),voice=path.join(root,'voice');
  await fs.mkdir(path.join(review,'.local','provider-delivery-log'),{recursive:true});
- await fs.mkdir(path.join(material,'06_�ڵ� ���� ���'),{recursive:true});
+ await fs.mkdir(path.join(material,'06_자동 제작 결과'),{recursive:true});
  await fs.mkdir(path.join(voice,'output','production_test'),{recursive:true});
  await fs.mkdir(path.join(voice,'audiobooks','01_CURRENT'),{recursive:true});
  const put=(file,value)=>fs.writeFile(file,JSON.stringify(value));
- const productionFile=path.join(material,'06_�ڵ� ���� ���','status.json');
+ const productionFile=path.join(material,'06_자동 제작 결과','status.json');
  await put(productionFile,{schema:'threads-auto-batch-v1',entries:[{id:'example-1',status:'generated',outputFolder:'one',images:[{sha256:'a'.repeat(64)}]},{id:'example-2',status:'needs_source',images:[]}]});
  const reviewFile=path.join(review,'.local','state.json');
  let state=importBundle(createState(),{bundle_id:'fixture',posts:[{post_id:'example-1',output_version:'v1',caption:'fixture only',source:{url:'https://example.invalid/post',label:'fixture'},images:[{asset_id:'a'.repeat(64),order:1,mime:'image/png'}]}]});
@@ -29,8 +29,8 @@ async function fixture(t){
  await put(deliveryFile,{schema:1,results:[{postId:'example-1',outputVersion:'v1',platform:'instagram',providerPostId:'provider-example',status:'scheduled',providerVerifiedAt:'2026-10-09T11:00:00Z'}],waiting:[{postId:'example-1',platform:'threads',reason:'queue_capacity'}]});
  await put(path.join(voice,'output','production_active.json'),{edition:'production_test',run_relative:'output/production_test'});
  await put(path.join(voice,'output','production_test','status.json'),{edition:'production_test',completed:1,total:2,stage:'paused',updated_at:1791459235,chapters:{'1':{status:'ready'},'2':{status:'failed'}}});
- await fs.writeFile(path.join(voice,'audiobooks','01_CURRENT','�������� ���.html'),'fixture');
- const registry={schemaVersion:1,threads:{materialRoot:material,reviewRoot:review,reviewModuleRoot:studio},voice:{root:voice,listener:'audiobooks/01_CURRENT/�������� ���.html'},projects:[]};
+ await fs.writeFile(path.join(voice,'audiobooks','01_CURRENT','무직전생 듣기.html'),'fixture');
+ const registry={schemaVersion:1,threads:{materialRoot:material,reviewRoot:review,reviewModuleRoot:studio},voice:{root:voice,listener:'audiobooks/01_CURRENT/무직전생 듣기.html'},projects:[]};
  return {root,registry,put,state,productionFile,reviewFile,deliveryFile};
 }
 test('re-reads changed producer and review files with unchanged source bytes',async t=>{
@@ -74,8 +74,8 @@ test('latest listening registration supersedes old batch counts without claiming
  const f=await fixture(t),root=f.registry.voice.root;
  const folder=path.join(root,'output','production_latest');await fs.mkdir(folder);
  await f.put(path.join(folder,'status.json'),{registration_only:true,chapters:{'157':{status:'ready'},'158':{status:'ready'}}});
- await fs.writeFile(path.join(folder,'00_���۸��.html'),'fixture');
- await f.put(path.join(root,'audiobooks','library_latest.json'),{edition:'production_latest',reader:path.join(folder,'00_���۸��.html')});
+ await fs.writeFile(path.join(folder,'00_제작목록.html'),'fixture');
+ await f.put(path.join(root,'audiobooks','library_latest.json'),{edition:'production_latest',reader:path.join(folder,'00_제작목록.html')});
  const s=await readStatus(f.registry);assert.equal(s.voice.edition,'production_latest');assert.equal(s.voice.registeredReady,2);
  assert.equal(s.voice.completed,null);assert.equal(s.voice.total,null);assert.equal(s.voice.stage,'registration_only');
  await f.put(path.join(root,'audiobooks','library_latest.json'),{edition:'production_latest',reader:path.join(f.root,'outside.html')});

@@ -5,13 +5,13 @@
     "entries": [
       {
         "id": "example-post-001",
-        "title": "[��] ��¥ ���� ����",
+        "title": "[판] 가짜 예시 제목",
         "sourceUrl": "https://example.invalid/source",
         "sourceFingerprint": "example-source-fingerprint",
         "outputSha256": "example-output-fingerprint",
         "ruleVersion": "example-rule-1",
         "reviewRound": "example-round-1",
-        "outputFolder": "���� ��/���� ���� ����",
+        "outputFolder": "예시 글/예시 제작 버전",
         "images": [
           {
             "name": "rendered/slide-001.png",
@@ -22,28 +22,28 @@
     ]
   },
   "production_plan_json": {
-    "coverTitle": "��¥ ���� ����",
-    "originalTitle": "[��] ��¥ ���� ����",
-    "displayTitle": "��¥ ���� ����",
-    "captionInputTitle": "��¥ ���� ����"
+    "coverTitle": "가짜 예시 제목",
+    "originalTitle": "[판] 가짜 예시 제목",
+    "displayTitle": "가짜 예시 제목",
+    "captionInputTitle": "가짜 예시 제목"
   },
   "publish_captions_json": {
     "schema": "threads-publish-captions-v1",
     "postId": "example-post-001",
     "outputVersion": "c53a4b89c6d3857db1486e33e6b440256aee3046ebe6f35dae3438d4f945d3b3",
     "sourceFingerprint": "example-source-fingerprint",
-    "originalTitle": "[��] ��¥ ���� ����",
+    "originalTitle": "[판] 가짜 예시 제목",
     "sourceUrl": "https://example.invalid/source",
-    "publicationTitle": "��¥ ���� ����",
+    "publicationTitle": "가짜 예시 제목",
     "platformCaptions": {
-      "instagram": "[ ��¥ ���� ���� ]\n\n���� ������ ���� ���� ������ ù �����Դϴ�.\n\n���� ������ �� ��° �����Դϴ�.\n\n���� ������ ������ �����Դϴ�.",
-      "threads": "��¥ ���� �����̸� ���� threads_title_only������ ǥ�� ������ ���� �����Դϴ�."
+      "instagram": "[ 가짜 예시 제목 ]\n\n실제 원문이 없는 형식 설명용 첫 문단입니다.\n\n형식 설명용 두 번째 문단입니다.\n\n형식 설명용 마지막 문단입니다.",
+      "threads": "가짜 예시 문안이며 현재 threads_title_only에서는 표지 제목이 최종 본문입니다."
     },
     "topicTags": [
-      "����",
-      "���"
+      "예시",
+      "계약"
     ],
-    "threadsTopicTag": "���� ���"
+    "threadsTopicTag": "예시 계약"
   },
   "review_decisions_json": {
     "schema": 1,
@@ -55,7 +55,7 @@
         "fingerprint": null,
         "decision": "unreviewed",
         "reviewedAt": null,
-        "note": "���� ������ ��¥ �޸�. ��� ������ �ƴմϴ�.",
+        "note": "형식 설명용 가짜 메모. 통과 판정이 아닙니다.",
         "noteUpdatedAt": null
       }
     ]
@@ -64,7 +64,7 @@
     "order": 1,
     "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "mime": "image/png",
-    "local_file": "C:\\EXAMPLE_ONLY\\����\\.local\\assets\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "local_file": "C:\\EXAMPLE_ONLY\\검토\\.local\\assets\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "approved_image_url": null
   },
   "provider_result_shape_only": {
