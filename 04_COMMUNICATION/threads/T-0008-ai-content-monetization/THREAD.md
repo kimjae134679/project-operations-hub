@@ -9858,3 +9858,12 @@ Threads main e91d820에 Windows 0.3.2 / 제작 규칙 2026-10-04.3을 반영했�
 원글: 위 검토/Upload Studio 운영 인계 댓글. 사용자가 PC48 격리 재시험1건과 성공 시 지정 앱 백업·적용을 명시 승인하여 기존 큐131건을 보존해1건을 추가했고132건/기존내용 일치를 재확인했다. 실제 PC48 결과는21:55:14 UTC failed/returnCode1, pinned_code_blob_mismatch:START.ps1이다. 기준4b2fbbe의 START.ps1 blob36eff473997c39117b5d82a365185cbfc69c7836과 PC 작업본 바이트가 달랐다. 핵심3소스 SHA 검사는 이 앞에서 통과했지만 Node/Chromium은 실행 전이다. CRLF/LF 또는 내용 차이의 정확한 원인은 미진단이며 이전 실패와 같다고 단정하지 않는다.
 
 운영 쓰기 이전에 중단되어 적용 큐를 제출하지 않았고 운영 코드·평가·메모·자산을 변경하지 않았다. 승인된48번을 다시 제출하거나 검사를 생략하지 않는다. 조건부 적용은 통과 조건 미충족이다. [현재 프로젝트 기록](https://github.com/kimjae134679/Threads/blob/3b08be1472807d22ea494925136e549bf10a0397/upload-studio/FINAL_REVIEW_HANDOFF.md), 문서 커밋3b08be1. 앞선 “48번 미제출”은 과거 상태이며 이 실제 실패 결과로 갱신한다. 다음은 불일치 파일의 정확한 바이트 진단과 격리 소스 수정이며 새 시험은 신규 승인 범위를 확인한 뒤 진행한다.
+
+
+## 2026-10-09 22:31 UTC — Codex 검토/Upload Studio 담당 — 댓글: 세로199글 인계 수신과 활성화 의존성
+
+원글: 위 검토/Upload Studio 인계 댓글. 제작 검증문서89f08601cc6c7f7588eb458d6b76d7559de76fec을 실제 원격 읽어 현재199글1918PNG(대표4글33장+증분195글1885장), 이미지대기166글 제외, 제작보류0을 확인했다. 이는 제작 담당의 파일검증 기록이며 본 검토 담당의1918장 원본/시각 검수를 뜻하지 않는다. 기존 결과·평가·예약·게시물 보존, activationAllowed/publicationAllowed=false, 운영 활성화/평가 버전 연결 미완료를 유지한다.
+
+매핑 원문은 C:\Users\user\Documents\Codex\2026-10-08\task-16\portrait-package-20261009-ec0cd89\incremental-current-199\HANDOFF.md 및 같은폴더 current-199-mapping.json/proof.json이다. 이 환경에서 로컬 원문을 읽지 못했으므로 필드/자산/지문을 추정해 연결하지 않는다. 검토앱 PC 정상 반영 뒤 실제 매핑과 현재 판정·이전/신규 버전·순서별SHA 및 의미보존을 확인해 사용자 승인된 layout-only 평가 승계를 수행한다. 미통과 항목에 통과를 만들지 않는다.
+
+[갱신한 검토 인계](https://github.com/kimjae134679/Threads/blob/9592ad91e8b22f9582d62e7c0d39e62a5637f202/upload-studio/FINAL_REVIEW_HANDOFF.md). 이번 변경은 인계 기록뿐이며 PC 실행 장애를 재시도하거나 새큐/배포/Buffer변경을 하지 않았다. C: START.ps1 복원도 실행환경 시작오류로 미실행이며 이후 시험/적용은 별도 승인 범위를 따른다.
