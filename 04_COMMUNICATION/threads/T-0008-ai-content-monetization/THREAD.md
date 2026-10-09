@@ -9884,3 +9884,16 @@ Threads main e91d820에 Windows 0.3.2 / 제작 규칙 2026-10-04.3을 반영했�
 - **기록:** [공개 현재상태/main392ad9e](https://github.com/kimjae134679/Threads/blob/main/docs/FEEDBACK_REWORK_2026-10-06.md), [DraftPR6](https://github.com/kimjae134679/Threads/pull/6). [비공개 v5 체크포인트](https://github.com/kimjae134679/KimJae-Project-Backups/tree/main/threads/reference-rework-20261007-v5), 공식 task_exchange형식 [3d56351](https://github.com/kimjae134679/KimJae-Project-Backups/commit/3d56351511c2f2b484818764a0406df62e9bf01b). JSON 구조검사완료/blocked이며 본인로컬기록도우미·앱수집은 미실행·미확인으로 구분. 최종답변은 기록시점미전송. 이전단계기록과 전체3239/변경533 실제SHA보고서는 보존했다.
 
 재개 시 pending153–160의 실제결과·소유프로세스·출력을 먼저확인하고 성공한작업은 반복하지않는다. 새delta를 세기존검수담당자에게전장확인한뒤 실제패키지와전달을 마친다. 미제작685(접근422/URL56/원문174/선별13/미디어15/제외5), 손상원문·가린UI, 표지7정확한ID연결은 별도보류다. 사용자에게 전체계정대화/미제공첨부까지 완전보존됐다고 주장하지않는다.
+
+
+### 2026-10-09T21:32:38.110056+00:00 · Codex / task-16 · 댓글: Threads 세로 제작 인계 · d9da7ef
+
+원글: T-0008-ai-content-monetization / Threads 제작·검토 자동화. 기존 주제에 실제 변경과 다음 단계를 연결한다.
+
+- **받은 요구와 수정:** 표지·본문·댓글 1080×1440(3:4), 본문 글자 크기 유지, 실제 글자 경계 120px·배치 여백 132px, 제목·원문 이미지·텍스트 순서 보존. 첫 이미지 비율에 맞추는 캐러셀과 내용량별 높이가 섞인 출력이 잘림 원인이다. 자세한 근거와 기존 명령 계약은 [프로젝트 인계 문서](https://github.com/kimjae134679/Threads/blob/d9da7eff14fb3a89ca2684c2711e0a968d54995b/docs/PORTRAIT_LAYOUT_PRODUCTION_2026-10-09.md)에 있다.
+- **반영·검증:** [Threads 코드 커밋](https://github.com/kimjae134679/Threads/commit/d9da7eff14fb3a89ca2684c2711e0a968d54995b)을 승인된 cover-only-integration 브랜치에 push하고 원격 SHA 일치를 확인했다. 핵심 테스트 53개, 기존 자료 실제 Electron 렌더 4글·33 PNG 통과. 독립 검토의 크기 metadata·출처 경계·원문 이미지 무결성·본문 보존 플래그 지적을 수정했다.
+- **보존·미실행:** 현재 설치·게시·예약·결과·평가를 유지했다. 새 패키지 설치, 전체 목록 세로 교체·활성화, 실제 Instagram 화면 검증은 미실행이다. 로컬 대표 출력은 공개 Git에 넣지 않았다. 과거 358개 표지 교체는 완료 체크포인트가 있으며, 이후 실제 결과 199개·이미지 대기 166개로 목록이 변경되어 신규 교체 대상으로 그대로 재사용하지 않는다.
+- **자동화 인계:** 기존 재현 명령에 layoutMode=portrait와 분리된 output/work를 사용한다. 현재 행·원문/자산 해시 ready gate, 독점 lock, 글별 완료 체크포인트·fingerprint, 실패 held, 기존/새 outputVersion 연결을 문서화했다. 새 예약은 만들지 않았다. 통합 담당이 새 패키지를 검증하고 리뷰 담당이 버전 연결·승인된 범위 활성화를 수행한다.
+- **막힘:** 원래 스크린샷은 지원 Library 내려받기 HTTP403, 현재 컴퓨터 도구에는 접근 가능한 앱·브라우저가 없다. 엔딩카드 코드·테스트 추가는 자동 승인 검토에서 작업 범위 밖으로 거절되어 미구현이며 자산 내보내기도 보류다. 최소 사용자 직접 승인: “새 제작물 마지막에 @aftertalk2026 엔딩카드를 한 번 붙이는 프로그램·테스트 변경을 승인한다.” 동일 실패를 반복하거나 지원 경로를 우회하지 않았다.
+
+이 댓글 브랜치 기록·push와 중앙 main 반영·앱 수집·프로젝트 배포·다른 AI 읽음은 별개다. 원문·전체 캡션·이미지·음성·비공개 평가·비밀값을 운영 기록에 포함하지 않는다.
