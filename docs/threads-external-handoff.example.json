@@ -1,0 +1,99 @@
+{
+  "purpose": "Documentation-only collection of existing-file examples. Do not import this wrapper or submit these synthetic records.",
+  "synthetic": true,
+  "production_status_json": {
+    "entries": [
+      {
+        "id": "example-post-001",
+        "title": "[��] ��¥ ���� ����",
+        "sourceUrl": "https://example.invalid/source",
+        "sourceFingerprint": "example-source-fingerprint",
+        "outputSha256": "example-output-fingerprint",
+        "ruleVersion": "example-rule-1",
+        "reviewRound": "example-round-1",
+        "outputFolder": "���� ��/���� ���� ����",
+        "images": [
+          {
+            "name": "rendered/slide-001.png",
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ]
+      }
+    ]
+  },
+  "production_plan_json": {
+    "coverTitle": "��¥ ���� ����",
+    "originalTitle": "[��] ��¥ ���� ����",
+    "displayTitle": "��¥ ���� ����",
+    "captionInputTitle": "��¥ ���� ����"
+  },
+  "publish_captions_json": {
+    "schema": "threads-publish-captions-v1",
+    "postId": "example-post-001",
+    "outputVersion": "c53a4b89c6d3857db1486e33e6b440256aee3046ebe6f35dae3438d4f945d3b3",
+    "sourceFingerprint": "example-source-fingerprint",
+    "originalTitle": "[��] ��¥ ���� ����",
+    "sourceUrl": "https://example.invalid/source",
+    "publicationTitle": "��¥ ���� ����",
+    "platformCaptions": {
+      "instagram": "[ ��¥ ���� ���� ]\n\n���� ������ ���� ���� ������ ù �����Դϴ�.\n\n���� ������ �� ��° �����Դϴ�.\n\n���� ������ ������ �����Դϴ�.",
+      "threads": "��¥ ���� �����̸� ���� threads_title_only������ ǥ�� ������ ���� �����Դϴ�."
+    },
+    "topicTags": [
+      "����",
+      "���"
+    ],
+    "threadsTopicTag": "���� ���"
+  },
+  "review_decisions_json": {
+    "schema": 1,
+    "revision": 1,
+    "posts": [
+      {
+        "postId": "example-post-001",
+        "outputVersion": "c53a4b89c6d3857db1486e33e6b440256aee3046ebe6f35dae3438d4f945d3b3",
+        "fingerprint": null,
+        "decision": "unreviewed",
+        "reviewedAt": null,
+        "note": "���� ������ ��¥ �޸�. ��� ������ �ƴմϴ�.",
+        "noteUpdatedAt": null
+      }
+    ]
+  },
+  "handoff_image_shape_only": {
+    "order": 1,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "mime": "image/png",
+    "local_file": "C:\\EXAMPLE_ONLY\\����\\.local\\assets\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "approved_image_url": null
+  },
+  "provider_result_shape_only": {
+    "schema": 1,
+    "postId": "example-post-001",
+    "outputVersion": "c53a4b89c6d3857db1486e33e6b440256aee3046ebe6f35dae3438d4f945d3b3",
+    "fingerprint": null,
+    "platform": "instagram",
+    "providerPostId": null,
+    "status": "error",
+    "externalUrl": null,
+    "providerVerifiedAt": null,
+    "publishedAt": null,
+    "scheduledAt": null,
+    "recordedAt": null
+  },
+  "documentation_only_ownership": {
+    "collection": "Candidate and source evidence owner",
+    "production": "Status, authored captions, original ordered image bytes owner",
+    "review": "Final review state, notes, immutable approved handoff owner",
+    "buffer": "Sole provider writer and independent per-platform result owner",
+    "integration": "Read-only registered data consumer"
+  },
+  "documentation_only_pair_requirement": "Same post ID, canonical original outputVersion and ordered original SHA-256 list for Instagram and Threads. Record partial platform failure explicitly.",
+  "documentation_only_derivative_boundary": "No derivative schema is defined here. Original-to-derived hashes, padding quantities and explicit approval link require agreement with the production and Buffer owners. Preserve original bytes and order. No crop. The 566px calculation is a historical boundary example, not the final vertical production specification.",
+  "documentation_only_content_render_versions": "Current outputVersion includes render bytes/hashes; existing schemas do not separately support content version and render version. Keep current outputVersion unchanged. Compatible owner-approved fields and validation are required before adding separate version linkage.",
+  "documentation_only_layout_approval": "The user explicitly permits carrying the previous review verdict across layout-only corrections. Preserve the original verdict and link the precise approval, unchanged content basis, old/new outputVersion and ordered old/new image hashes. Semantic or content changes still require re-review. The current generic domain does not implement this carry-over.",
+  "documentation_only_latest_work_state": "Latest instruction supersedes the temporary publishing hold: preserve existing published posts and 20 existing schedules; finish 5 immediate test posts on each platform first; query held schedules before restoring original future times while preserving provider IDs; reactivate refill automation. These are instructions, not verified provider operations. Production/review/integration improvements proceed separately. Do not silently overwrite current assets/verdicts or add a new publication blocker. Link a validated new vertical render to the previous version without deletion. Layout-only approval carry-over remains authorized; semantic changes require re-review.",
+  "documentation_only_validation": "Only productionVersion and validateProductionCaptions are exercised against the actual module. Other shapes are documentary examples with no real assets, approval or provider response.",
+  "documentation_only_instruction_history": "Previous instruction to pause new publishing/refill and hold unpublished schedules is superseded by the latest posting-first instruction. Actual historical hold state still requires provider read-back.",
+  "documentation_only_registration_config": "Public examples must use synthetic roots and role names. No private PC paths, real account/provider IDs or actor chat IDs belong in published example configuration."
+}

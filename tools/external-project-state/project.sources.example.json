@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "threads": {
+    "materialRoot": "C:\\EXAMPLE_ONLY\\Threads\\�ڷ�",
+    "reviewRoot": "C:\\EXAMPLE_ONLY\\UploadStudio"
+  },
+  "voice": {
+    "root": "C:\\EXAMPLE_ONLY\\Voice",
+    "listener": "audiobooks/01_CURRENT/�������� ���.html"
+  },
+  "projects": []
+}
