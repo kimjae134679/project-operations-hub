@@ -69,6 +69,46 @@ async function buffer(root){return guarded({instagramScheduled:null,threadsSched
   waitingPlatformTasks:list(d.waiting||[]).length,recordedAt:typeof d.recordedAt==='string'?d.recordedAt:null,
   sourceSha256:s.sourceSha256,sourceUpdatedAt:s.sourceUpdatedAt,scope:'stored provider observations; not a live queue read'};
  });}
+async function currentResults(config){return guarded({sent:null,posted:null,partiallyPosted:null},async()=>{
+ const state=await read(inside(config.reviewRoot,'.local/state.json')),d=state.data;
+ if(d.schema!==1)fail('review_schema');count(d.revision);list(d.posts);
+ const module=inside(config.reviewModuleRoot||config.reviewRoot,'review-handoff.mjs');await safe(module);
+ const {reviewHandoffProjection}=await import(pathToFileURL(module)),projection=reviewHandoffProjection(d);
+ const current=new Map(projection.review_statuses.map(r=>[r.postId,r]));
+ const directory=inside(config.reviewRoot,'.local/final-review-results');await safe(directory);
+ const names=async()=>{const entries=await fs.readdir(directory);const files=entries.filter(n=>n.endsWith('.json')).sort();if(files.length>1000)fail('result_file_limit');return files;};
+ const files=await names(),sources=[state],latest=new Map();let stale=0,totalBytes=0;
+ const time=v=>typeof v==='string'&&v.length>0&&Number.isFinite(Date.parse(v));
+ const https=v=>{try{const u=new URL(v);return u.protocol==='https:'&&!!u.hostname&&!u.username&&!u.password;}catch{return false;}};
+ for(const name of files){
+  const s=await read(inside(directory,name),1024*1024),r=s.data;sources.push(s);
+  totalBytes+=(await fs.stat(s.file)).size;if(totalBytes>20*1024*1024)fail('result_total_size');
+  if(r.schema!==1||typeof r.postId!=='string'||!r.postId||typeof r.outputVersion!=='string'||!r.outputVersion||
+   !/^[a-f0-9]{64}$/.test(r.fingerprint||'')||!['instagram','threads'].includes(r.platform)||typeof r.status!=='string'||!time(r.recordedAt))fail('current_result_schema');
+  const p=current.get(r.postId),post=d.posts.find(p=>p.post_id===r.postId);
+  if(!p?.active||p.outputVersion!==r.outputVersion||p.fingerprint!==r.fingerprint||!post.targets.includes(r.platform)){stale++;continue;}
+  const key=JSON.stringify([r.postId,r.platform]),previous=latest.get(key);
+  if(previous&&Date.parse(previous.recordedAt)===Date.parse(r.recordedAt)&&JSON.stringify(previous)!==JSON.stringify(r))fail('conflicting_current_result');
+  if(!previous||Date.parse(previous.recordedAt)<Date.parse(r.recordedAt))latest.set(key,r);
+ }
+ const rows=[...latest.values()],providerOwners=new Map();
+ for(const r of rows){if(typeof r.providerPostId==='string'&&r.providerPostId){const identity=JSON.stringify([r.platform,r.providerPostId]);
+  if(providerOwners.has(identity)&&providerOwners.get(identity)!==r.postId)fail('conflicting_current_result');providerOwners.set(identity,r.postId);
+ }}
+ const sent=rows.filter(r=>r.status==='sent'&&typeof r.providerPostId==='string'&&!!r.providerPostId&&
+  time(r.providerVerifiedAt)&&time(r.publishedAt)&&Date.parse(r.publishedAt)<=Date.parse(r.providerVerifiedAt)&&https(r.externalUrl));
+ const accepted=new Set(sent.map(r=>JSON.stringify([r.postId,r.platform])));let posted=0,partiallyPosted=0;
+ for(const p of d.posts){const targets=[...new Set(p.targets)];const completed=targets.filter(platform=>accepted.has(JSON.stringify([p.post_id,platform]))).length;
+  if(completed&&completed===targets.length)posted++;else if(completed)partiallyPosted++;
+ }
+ await stable(sources);if(JSON.stringify(files)!==JSON.stringify(await names()))fail('source_changed_during_read');
+ return {available:true,stateRevision:d.revision,sent:sent.length,posted,partiallyPosted,stale,files:files.length,
+  scheduled:rows.filter(r=>r.status==='scheduled').length,sending:rows.filter(r=>r.status==='sending').length,
+  errors:rows.filter(r=>r.status==='error').length,incompleteSent:rows.filter(r=>r.status==='sent').length-sent.length,
+  unknownStatuses:rows.filter(r=>!['draft','needs_approval','scheduled','sending','sent','error'].includes(r.status)).length,
+  recordedAt:rows.length?new Date(Math.max(...rows.map(r=>Date.parse(r.recordedAt)))).toISOString():null,
+  sourceSha256:state.sourceSha256,scope:'current-version stored results; provider verification is recorded, not independently queried'};
+ });}
 async function voice(config){
  let listenerExists=null;
  try{const file=inside(config.root,config.listener);await safe(file);listenerExists=(await fs.stat(file)).isFile();}catch(e){listenerExists=e.code==='ENOENT'?false:null;}
@@ -97,8 +137,9 @@ async function voice(config){
 }
 export async function readStatus(registry){
  if(registry.schemaVersion!==1)fail('registry_schema');
- const [produced,reviewed,delivered,listening]=await Promise.all([production(registry.threads.materialRoot),review(registry.threads),buffer(registry.threads.reviewRoot),voice(registry.voice)]);
- return {schemaVersion:1,checkedAt:new Date().toISOString(),threads:{production:produced,review:reviewed,buffer:delivered},voice:listening};
+ const [produced,reviewed,delivered,results,listening]=await Promise.all([production(registry.threads.materialRoot),review(registry.threads),buffer(registry.threads.reviewRoot),currentResults(registry.threads),voice(registry.voice)]);
+ if(reviewed.available&&results.available&&reviewed.sourceSha256!==results.sourceSha256){results.available=false;results.reason='source_changed_during_read';results.sent=results.posted=results.partiallyPosted=null;}
+ return {schemaVersion:1,checkedAt:new Date().toISOString(),threads:{production:produced,review:reviewed,buffer:delivered,currentResults:results},voice:listening};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{if(process.argv.length!==3)fail('registry_argument');const registry=await read(path.resolve(process.argv[2]),1024*1024);console.log(JSON.stringify(await readStatus(registry.data)));}

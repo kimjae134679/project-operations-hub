@@ -10,6 +10,55 @@ import {promisify} from 'node:util';
 import {readStatus} from './reader.mjs';
 const studio=process.env.TEST_STUDIO_ROOT;
 const {createState,importBundle,setFinalReview}=await import(pathToFileURL(path.join(studio,'domain.mjs')));
+const {reviewHandoffProjection}=await import(pathToFileURL(path.join(studio,'review-handoff.mjs')));
+async function deliveryFixture(t){
+ const f=await fixture(t),directory=path.join(f.registry.threads.reviewRoot,'.local','final-review-results');
+ await fs.mkdir(directory);const projected=reviewHandoffProjection(f.state).review_statuses[0];
+ const row={schema:1,postId:projected.postId,outputVersion:projected.outputVersion,fingerprint:projected.fingerprint,
+  platform:'instagram',providerPostId:'fixture-provider',status:'sent',externalUrl:'https://example.invalid/p/one',
+  providerVerifiedAt:'2026-10-09T11:01:00Z',publishedAt:'2026-10-09T11:00:00Z',scheduledAt:null,recordedAt:'2026-10-09T11:02:00Z'};
+ return {...f,directory,row};
+}
+test('canonical results require current fingerprint and retain source bytes',async t=>{
+ const f=await deliveryFixture(t);await f.put(path.join(f.directory,'current.json'),f.row);
+ await f.put(path.join(f.directory,'old.json'),{...f.row,outputVersion:'old',recordedAt:'2026-10-09T12:00:00Z'});
+ const before=await fs.readFile(f.reviewFile),s=await readStatus(f.registry);
+ assert.equal(s.threads.currentResults.sent,1);assert.equal(s.threads.currentResults.stale,1);
+ assert.equal(s.threads.currentResults.partiallyPosted,1);assert.equal(s.threads.currentResults.posted,0);
+ assert.deepEqual(await fs.readFile(f.reviewFile),before);
+ f.state.posts[0].caption='changed';f.state.revision++;await f.put(f.reviewFile,f.state);
+ assert.equal((await readStatus(f.registry)).threads.currentResults.sent,0);
+});
+test('sent without verified HTTPS link or publication time stays incomplete',async t=>{
+ const f=await deliveryFixture(t);await f.put(path.join(f.directory,'one.json'),{...f.row,externalUrl:'http://example.invalid/p/one'});
+ let r=(await readStatus(f.registry)).threads.currentResults;assert.equal(r.sent,0);assert.equal(r.incompleteSent,1);
+ await f.put(path.join(f.directory,'one.json'),{...f.row,publishedAt:null});
+ r=(await readStatus(f.registry)).threads.currentResults;assert.equal(r.sent,0);assert.equal(r.incompleteSent,1);
+});
+test('canonical histories select latest observation and all targets must be sent',async t=>{
+ const f=await deliveryFixture(t);await f.put(path.join(f.directory,'one.json'),{...f.row,status:'scheduled',recordedAt:'2026-10-09T10:00:00Z'});
+ await f.put(path.join(f.directory,'two.json'),f.row);
+ await f.put(path.join(f.directory,'three.json'),{...f.row,platform:'threads',providerPostId:'fixture-threads'});
+ const r=(await readStatus(f.registry)).threads.currentResults;assert.equal(r.sent,2);assert.equal(r.scheduled,0);
+ assert.equal(r.posted,1);assert.equal(r.partiallyPosted,0);
+ await f.put(path.join(f.directory,'four.json'),{...f.row,status:'sending',recordedAt:'2026-10-09T12:00:00Z'});
+ const after=(await readStatus(f.registry)).threads.currentResults;assert.equal(after.posted,0);assert.equal(after.partiallyPosted,1);assert.equal(after.sending,1);
+});
+test('canonical conflicting same-time observations and unsafe paths are unavailable',async t=>{
+ const f=await deliveryFixture(t);await f.put(path.join(f.directory,'one.json'),f.row);
+ await f.put(path.join(f.directory,'two.json'),{...f.row,status:'sending'});
+ let r=(await readStatus(f.registry)).threads.currentResults;assert.equal(r.available,false);assert.equal(r.reason,'conflicting_current_result');
+ await fs.unlink(path.join(f.directory,'two.json'));await fs.symlink(f.reviewFile,path.join(f.directory,'escape.json'));
+ r=(await readStatus(f.registry)).threads.currentResults;assert.equal(r.available,false);assert.equal(r.reason,'unsafe_path');
+});
+test('one provider post cannot be attributed to multiple current posts',async t=>{
+ const f=await deliveryFixture(t),second=structuredClone(f.state.posts[0]);second.post_id='example-2';
+ f.state.posts.push(second);f.state.revision++;await f.put(f.reviewFile,f.state);
+ const p=reviewHandoffProjection(f.state).review_statuses.find(r=>r.postId==='example-2');
+ await f.put(path.join(f.directory,'one.json'),f.row);
+ await f.put(path.join(f.directory,'two.json'),{...f.row,postId:p.postId,outputVersion:p.outputVersion,fingerprint:p.fingerprint});
+ const r=(await readStatus(f.registry)).threads.currentResults;assert.equal(r.available,false);assert.equal(r.reason,'conflicting_current_result');
+});
 async function fixture(t){
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'external-state-'));
  t.after(()=>fs.rm(root,{recursive:true,force:true}));

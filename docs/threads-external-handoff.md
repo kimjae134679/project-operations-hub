@@ -122,3 +122,36 @@ LocalAssets는 해시 파일 exclusive 쓰기를 하며, 바이트+metadata 두 
 - `buffer.mjs:30-49` 플랫폼별 exact input/basis; `:72-104` 중복·reservation; `:111` 이후 provider 관측과 reconciliation.
 
 운영 read-only schema 확인: `.local/final-review-decisions.json`, `.local/provider-delivery-log/verified-buffer-schedule-20261010.json`, 같은 폴더의 `explicit-title-edit-authorization-20261010.json`. 문서·예시 GitHub 링크는 부모 작업이 저장소 공개 여부 및 기존 기능 브랜치에서 검증·게시한 후 제공한다.
+
+
+## 2026-10-10 운영 기록과 최신 담당 계약
+
+이 절은 검토 담당이 최종 코드 `4b2fbbea604da37115f23c340a0e39138bd7b3e3`의 계약을 전달한 뒤 갱신했다. 검토 담당의 소유 문서는 [FINAL_REVIEW_HANDOFF.md](https://github.com/kimjae134679/Threads/blob/feature/upload-studio-offline-20261009/upload-studio/FINAL_REVIEW_HANDOFF.md), 코드 검토 진입점은 [Threads draft PR 10](https://github.com/kimjae134679/Threads/pull/10)이다. 담당이 보고한 Actions 일반 검사 37990979994, Windows 잠금 복구 37990979922, Linux Chromium 37990979875는 통과했다. 통합 담당이 이 검사를 재실행한 것은 아니다. 최신 전체 코드의 운영 PC Node+Chromium 재검증과 설치는 미완료다. 마지막 확인 운영 코드는 `ab3528cdbaeaf53d878ba0a3504fa38fe78f6350`이다. 저장소 코드와 운영 설치 버전을 구분한다.
+
+### 읽기 계약과 소유권
+
+검토 코드·판정·문안·메모·state의 작성자는 검토 담당이다. 통합 담당은 앱 틀을 유지하며 외부 등록과 상태를 읽는다. Buffer 담당만 플랫폼 전송 결과를 기록한다. 통합 쪽에서 판정이나 원본·자산·예약을 덮어쓰지 않는다.
+
+`GET /api/state`의 state revision을 읽고 `GET /api/final-review/handoff`의 현재 state_revision/handoff_id/latest를 읽은 뒤 state를 다시 읽는다. 앞뒤 revision, thin `.local/final-review-decisions.json`의 revision, handoff revision 및 현재 지문이 모두 같을 때만 최신 전달본으로 등록할 수 있다. `latest.pending=true`면 이전 고정 파일을 최신으로 쓰지 않는다. 운영 구버전에 pending 필드가 없는 경우 false로 추정하지 말고 현재 revision·handoff identity·파일을 확인한다. 고정 파일명은 `.local/final-review-handoff/handoff.<revision>.<handoffId>.json`이다. snapshot은 자동 게시 승인이 아니다. 새 코드의 자동 thin 갱신·최신 handoff 생성 보강은 아직 운영 설치 전이다. 상태 표시 reader는 handoff를 등록하거나 생성하지 않는다.
+
+제목 wrapper-only 승인은 검토 담당의 정확한 현재 판정·버전·지문 연결로 처리한다. 원래 reviewed_at/reviewed_revision과 이전 final_review를 보존하며 state의 `posts[].final_review.prior_final_review`와 `edit_approval`을 읽는다. 구버전 basis는 현재 내용으로 독립 재계산해 저장 basis 및 승인 fingerprint와 같아야 인정한다. 별도 source/safety/rights 검사를 통과로 만들지 않는다. 앞 절의 generic 승인 미지원 설명은 구 운영본 확인 시점의 제한이며, 이 최신 소유자 계약과 설치 여부를 함께 확인한다.
+
+### 정식 Buffer 결과 소비
+
+정식 입력은 `.local/final-review-results/*.json` 개별 schema1 기록이다. 필드는 `postId, outputVersion, fingerprint, platform, providerPostId, status, externalUrl, providerVerifiedAt, publishedAt, scheduledAt, recordedAt`이다. 현재 정확한 postId·outputVersion·fingerprint·선택 플랫폼에만 연결한다. 저장된 관측 이력에서 같은 글/플랫폼의 최신 recordedAt를 사용하고 같은 시각의 충돌이나 동일 플랫폼/providerPostId의 다른 글 귀속을 거절한다. 옛 날짜의 provider 요약은 과거 증거로 따로 보존한다.
+
+`scheduled/draft/sending`은 완료가 아니다. `sent` 집계에는 providerPostId, provider 재조회 확인 시각, 실제 publishedAt, 자격정보 없는 HTTPS 게시 링크가 필요하다. 통합 reader는 담당자가 저장한 근거를 검사하고 provider를 독립 재조회하지 않으므로 실제 상태의 현재성은 Buffer 담당 확인이 필요하다. 선택 플랫폼이 모두 sent면 posted/게시완료, 일부만 sent면 partially_posted/일부게시다. 원래 사용자 passed 감사기록은 보존한다. 등록 표시 값 `threads.currentResults.sent/posted/partiallyPosted`는 이 정확한 현재 버전 결과 집계이며 새 전송 권한이 아니다.
+
+레이아웃 한정 승계는 사용자가 승인했으나 제작 담당의 검증된 최종 매핑 계약은 대기 중이다. 필요한 근거는 이전 content/output 버전·지문, 별도 renderVersion/producerBuild, 원문·본문·플랫폼 문안·태그 의미 불변 증거, 순서별 기존↔새 자산 고정 참조·SHA256·MIME·크기·규격·검증 시각, layout-only 승인 사유다. 확정 전 이를 추측하여 state/판정/현재 자산을 재작성하지 않는다. 기존 원본·게시물·예약·판정을 보존하고 삭제하지 않는다. 새 렌더는 검증 후 구버전과 연결하며 의미 변경은 재검토한다. Buffer의 기존 게시·예약 작업을 통합 작업 때문에 중복 실행하거나 조용히 차단하지 않는다.
+
+### 확인한 원인, 수정, 검증과 남은 단계
+
+첫 reader는 날짜가 지정된 provider 요약만 읽어 정식 결과 폴더의 이후 관측을 표시하지 못했다. 정식 결과 소비를 추가하고 현재 버전·지문·플랫폼 대조, latest recordedAt 선택, sent 근거 검사와 플랫폼별 완료 집계를 넣었다. 과거 통과를 현재 통과로 인정하지 않으며 원문을 추측하지 않는다. 최신 Voice 듣기 등록 포인터를 우선 읽고 전체 제작 완료율로 바꾸지 않는다. 누락·잘못된 JSON·symlink·경쟁 중 source 변경은 빈 성공 값으로 바꾸지 않는다.
+
+검증 이력: 신규 소비 테스트가 처음 4개 실패했고 구현 후 통과했다. 독립 검토에서 providerID 중복 귀속 과대 집계를 재현했으며 실패 테스트를 먼저 추가하고 수정했다. 최종 Node 15/15 PASS. 앞선 desktop generic 소비/기존 catalog 보존 검사 50/50 PASS는 기존 계약 검증이며, 새 reader의 운영 화면 픽셀 검사는 아니다. UTF-8 문자열 공유에서 한글 바이트 불일치를 발견해 base64 원본 바이트로 수정했고 Git blob 해시를 대조했다. PC 실제 등록·원문·평가·판정 원본·이미지·음원·비밀값은 공개 저장소에 넣지 않았다.
+
+현재 ControlTower 0.9.18 수동 모드는 시작할 때 DiscoverAsync를 수행하고 선택된 외부 상태를 갱신한다. 일반 timer의 manifest 재탐색이 수동 모드에서 실행되지 않는다는 것을 코드에서 확인했다. 새 등록 파일이 이미 열린 앱 메모리에 들어왔는지와 실제 표시 픽셀은 미확인이다. 실행 중 앱/producer/Buffer를 재시작해 확인하지 않았다. 현재 환경의 native UI 도구는 비활성이며 이 제한은 승인 거절이나 앱 장애의 증거가 아니다. 원래 첨부 materialize 403도 자료 접근 실패로 별도 기록했다.
+
+남은 단계와 최소 조건: (1) 허용된 native UI/앱 목록 읽기 수단에서 현재 창의 새 등록 반영을 확인한다. 기존 목록 다시 읽기 한 번만 필요하다면 요청 문구는 “현재 앱의 기존 프로젝트 목록 다시 읽기 1회, 새 인증·종료·게시 변경 없음”이며 도구 비활성은 사용자 승인만으로 풀리지 않는다. (2) 검토 담당이 최신 코드의 PC 검증·운영 적용을 마친다. (3) 제작 담당이 승인된 레이아웃 불변·자산 매핑 근거를 전달한다. 추가 포괄 승인을 요구하지 않고 이미 승인된 범위에서 담당자가 구현·검증한다.
+
+재발 방지: 작성 소유자를 하나로 유지하고 읽은 revision/지문·출처 시각을 구분한다. 저장된 결과와 provider 현재 상태, code/CI와 PC 설치, 등록 파일과 실행 중 UI 반영을 각각 확인한다. 고정된 옛 파일로 현재를 추정하지 않는다. 공개 공유는 허용 목록과 바이트 검증을 통과한 코드·테스트·문서·가짜 예시만 사용한다. 다른 담당의 기록은 본인 프로젝트 링크와 요약으로 연결하고 공통 계약은 통합 담당이 관리한다.
