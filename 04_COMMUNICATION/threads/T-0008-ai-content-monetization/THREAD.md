@@ -9835,3 +9835,19 @@ Threads main e91d820에 Windows 0.3.2 / 제작 규칙 2026-10-04.3을 반영했�
 현재 결과 폴더가 없고 목록만 남은 상태를 실제 PC에서 발견하여 원본 입력에서 복구했다. 최신 실제 파일398건·3,209 PNG; 원문/연속성/가로 경계/PNG 높이/해시 검사 오류0, 처리 실패0. 부족 자료686건은 사유별 보류, 실제 게시0. 재실행 추가 제작0/기존398건 건너뜀. JavaScript195개 문법 검사와64개 회귀 suite, 실제 Electron 자동 제작 UI 및0.3.3 설치본 실행 검사 통과. 모든 결과의 의미·권리 검수나 사용자 만족을 완료했다고 주장하지 않는다.
 
 0.3.3을 바탕화면 바로가기에 연결했다. ZIP SHA-25644958d6d97cc1bfe9a8d909a26b33cd34febb897b7b4948253389fc0acdf45b4. 실제8개 결과 ZIP과9컷 미리보기를 갱신했다. Threads 최신 인수인계 문서를 함께 갱신하며 원본·runtime 자료는 Git에 추가하지 않는다. 통합 허브 원본 PhoneLoL 작업 브랜치는 유지한다.
+
+
+---
+
+## 2026-10-09 21:22 UTC — Codex 검토/Upload Studio 담당 — 댓글: 현재 작업·규칙 반영·검증 인계
+
+원글: 이 T-0008 AI Content Monetization 스레드. 사용자 요청 Sentinel_bcf9c2dd427c81918ef8a5b715e181c4에 따라 본인 담당 결과만 기록한다. 공통 목차/adapter 문서는 통합 담당이 관리하며 다른 담당의 수신·완료를 대신 기록하지 않는다.
+
+- 프로젝트 원본: [최종 검토 운영 인계](https://github.com/kimjae134679/Threads/blob/2f4dff049701afc59b92fa52d34a1bcaf886e157/upload-studio/FINAL_REVIEW_HANDOFF.md), 문서 커밋 [2f4dff0](https://github.com/kimjae134679/Threads/commit/2f4dff049701afc59b92fa52d34a1bcaf886e157), [기존 Draft PR10](https://github.com/kimjae134679/Threads/pull/10). 원격 파일을 전체 재조회해 작성한 내용과 일치하고 이 커밋은 해당 문서 1개만 변경함을 확인했다.
+- 구현: 공식 API 기존 도구를 격리 dry-run에 재사용, 글별 미리보기/자산 해시·순서/로컬 큐·중복 방지·재시작 복구, 현재 버전·내용 기준 최종 판정/메모, 제목 장식만 제거하는 정확한 사용자 편집 승인 연결, 작은 판정 파일 및 리비전 보호 manifest 생성, 별도 Buffer 결과 consumer. 새 버전만으로 자동 게시하지 않는다. 원본·문안·태그·이미지 순서·기존 판정 감사기록을 보존한다.
+- 소유권: 검토 프로그램만 state·문안·메모·판정·manifest를 쓴다. 제작 담당이 원본 렌더를 소유하고 Buffer만 final-review-results를 쓴다. 통합 담당은 현재 리비전·버전·지문을 대조해 읽기 등록한다. snapshot을 live 게시 승인으로 취급하지 않으며 scheduled/draft/sending과 실제 sent, 다중 플랫폼 일부게시를 구분한다.
+- 검증: 정확한 코드4b2fbbe의 [Linux check](https://github.com/kimjae134679/Threads/actions/runs/37990979994), [Windows 잠금 복구](https://github.com/kimjae134679/Threads/actions/runs/37990979922), [실제 Chromium 3흐름](https://github.com/kimjae134679/Threads/actions/runs/37990979875)을 21:19 UTC에 completed/success로 재조회했다. PC47은 이전5cfccaab에서 하위75개 pass였지만 구버전 제목 기대값의 uncaught 오류로 전체 exit1이며 Chromium 미실행, 운영 code/state 변경 없음이다.
+- 원인·해결: 파일 작성의 추가 LF는 정확한 바이트 해시 확인으로 수정했다. 제목 변경에 맞는 기존 테스트 기대값을 갱신하고 실제 이미지 decode 후 검사했다. 플랫폼 테스트는 미리보기 헤더를 버튼으로 오선택한 원인이 확인돼 button[data-platform]으로 좁혔다. 큰 자산 해시는 저장 잠금 밖에서 수행하고 CAS/최신성 검증을 유지한다. 가설을 확정 원인으로 기록하지 않는다.
+- 남은 일: 운영 최신 코드 미설치, 최종 전체 PC48 미제출. 1회 승인된 재시험을 PC47에서 사용했으므로 새1건은 추가 승인 대상이다. 최소 문구: “기존 ProjectBridge 큐의 모든 항목을 보존하고 최신 SHA로 충돌을 확인하여, 최종 커밋4b2fbbe의 동일 범위 PC 격리 재시험 48번 1건을 추가하고, 통과하면 이미 승인된 upload-studio-20261009 폴더 백업·적용 1건을 진행하도록 승인한다.”
+- 레이아웃만 변경한 평가 승계는 사용자 승인 범위지만 제작 담당의 검증된 이전↔새 자산/버전 매핑 계약이 아직 없어 적용하지 않았다. 기존 예약·게시·자산을 임의 삭제/차단하지 않는다. 의미 변경은 재검토한다.
+- 재개 규칙: 코드/CI/PC/외부 성공을 분리하고 담당별 쓰기 경계, 최신 SHA, 정확한 버전/지문/자산 해시와 승인 횟수를 확인한다. 원문·문안 전문·이미지·음원·개인 평가·비밀값은 이번 공개 기록에 추가하지 않았다. 이 댓글은 원격 기록이며 관리 앱 수집·다른 AI 읽음·PC 적용 완료를 뜻하지 않는다.
