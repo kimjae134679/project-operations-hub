@@ -80,3 +80,18 @@
 접속자 데이터 자동 갱신과 수동 새로고침 회전을 분리합니다. 자동 갱신은1/3/5/10초(기본3), 회전은한바퀴1/1.4/2초(기본1.4)를 선택하고 설정을 보존합니다. 배경 수집마다 본문·선택·스크롤을 초기화하지 않습니다.
 
 각 실제 프로젝트의 상세자료 지도와 사용방법 원본은 프로젝트_사용안내.md입니다. 관리 앱은 이 파일을 읽고 위치 링크·필요한이미지를 표시합니다. AI도 현재안내를 먼저 읽고 실제자료로 보완합니다. 같은안내를허브현재상태원본으로복제하지않습니다.
+
+
+## 공통 규칙 컨트롤러
+
+2026-10-10 사용자 지시: 한 통합 담당이 공통 규칙을 정하고 프로젝트별 담당에게 분배한다. 공통 권위는 기존 `project.catalog.json.controller`와 각 프로젝트 `integration`이다. 별도 master registry를 만들지 않는다. 경로 역할(source/operating/data/build/cache/backup), Git 저장소·ref·commit, 고정 계약 링크, 소유자·쓰기 범위·금지 범위·선행 의존을 여기에 등록한다. 프로젝트 `project.control.json`은 담당이 소유한 현재 실행·입출력 계약이며 catalog의 과거 commands로 덮지 않는다. 소개는 catalog, 실제 기능/제어/status는 manifest가 우선한다.
+
+기존 primary entry 하나/relatedFolders 규칙은 유지한다. 화면 목록 정리만을 위해 원본을 이동하지 않는다. 이번 사용자는 실제 운영 경로의 정착도 요청했다. 완료된 임시 입력은 담당자가 전체 SHA256/크기/경로 mapping·복구책을 검증한 뒤 기존 D 자료 영역에 복사하고 소비 참조를 전환할 수 있다. 실행 중 폴더의 강제 이동, 원본 삭제, 판정·메모·게시 이력 재작성은 하지 않는다. source 후보 미확인은 null로 남기며 날짜가 최신이라는 이유로 현재 소스라고 추측하지 않는다.
+
+`node tools/project-controller/validate.mjs --catalog project.catalog.json`은 구조만 검사한다. `--local`은 현재 경로/Git·해시·담당의 잠금/완료 증거를 읽는다. 두 명령은 상태·설정·큐를 쓰거나 서버/게시/제작/인증을 실행하지 않는다. 미등록은 pending, 불일치/미확인은 blocked, 등록만으로 complete가 되지 않는다. 완전성 분모는 해당 catalog.projects 실제 개수다. catalog 진입점과 별도 manifest 발견 수는 구분한다.
+
+프로젝트 담당의 `.local/project-controller.json`은 새로운 registry가 아니라 당시 관찰 증거다. schemaVersion=1, projectId, owner, checkedAt(UTC), sourceCommit, complete, locks[{path(프로젝트 상대경로),held}], artifacts[{role,path(역할 루트 상대경로),sha256,appliedSha256}], contracts[{reference,sha256}], 필요한 revisionBefore/revisionAfter를 기록한다. 15분 초과·소유자/commit 불일치·lock 미확인·revision 변경·적용 byte hash 불일치·임시 운영 의존은 완료로 인정하지 않는다. 줄바꿈/BOM 정규화 후 같음과 원본 바이트 같음을 구분한다. 잠금 부재만으로 프로세스 유휴를 추측하지 않으며 담당의 현재 유휴 증거가 선행한다. 증거/개인 경로/콘텐츠는 공개 Git에 올리지 않는다.
+
+분배와 금지 파일, 완료 조건은 [컨트롤러 작업 계약](../tools/project-controller/README.md)에 모았다. 공통 정의를 프로젝트 문서에 복제하지 말고 이 절과 catalog를 링크한다. 이 규칙은 프로젝트 운영 계약이며 계정 권한·승인 정책을 바꾸지 않는다.
+
+완료 검사는 catalog의 고정 sourceCommit·expectedArtifacts·lockPaths·runtimeStatus·계약 sha256/role/path와 실제 파일을 대조합니다. receipt의 자기 선언만으로 소스 적용·계약·유휴를 승인하지 않습니다. 고정 근거가 없는 프로젝트는 계속 보류합니다. Threads는 requiresRevision으로 전후 revision 일치를 요구합니다.

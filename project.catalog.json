@@ -303,7 +303,45 @@
           "description": "지금 보고 있는 관리 프로그램의 실행파일이 설치된 폴더입니다.",
           "roleLabel": "설치 위치"
         }
-      ]
+      ],
+      "integration": {
+        "status": "registered",
+        "owner": "integration",
+        "repository": "https://github.com/kimjae134679/project-operations-hub.git",
+        "sourceRef": "main",
+        "roles": {
+          "source": "D:\\A_KJ\\AI\\Projects\\project-operations-hub",
+          "operating": "D:\\A_KJ\\AI\\Applications\\AIControlTower\\versions",
+          "data": "D:\\A_KJ\\AI\\ControlTowerData",
+          "build": "D:\\A_KJ\\AI\\Workspace\\ControlTower\\ui-actions-20261008",
+          "cache": null,
+          "backup": null
+        },
+        "receipt": ".local/project-controller.json",
+        "contracts": [
+          {
+            "owner": "integration",
+            "reference": "https://github.com/kimjae134679/project-operations-hub/blob/ef70d28bde8d76cd874bc94e13699f04000c30be/01_CONTROL/PROJECT_PRESENTATION_RULES.md"
+          }
+        ],
+        "writable": [
+          "project.catalog.json",
+          "01_CONTROL/PROJECT_PRESENTATION_RULES.md",
+          "01_CONTROL/PROJECT_REGISTRY.md",
+          "tools/project-controller/",
+          "ai-control-tower/src/AIControlTower/Services/ProjectCatalogService.cs",
+          "ai-control-tower/src/AIControlTower/Services/ProjectDiscoveryService.cs",
+          "ai-control-tower/src/AIControlTower/Models/ProjectItem.cs",
+          "ai-control-tower/src/AIControlTower/Models/ExternalControl.cs"
+        ],
+        "forbidden": [
+          "other-project content/state/results",
+          "main merge",
+          "shared ProjectBridge queue",
+          "running folders/processes"
+        ],
+        "note": "Existing source entry retained; PC completion requires owner proof. Previously unpublished role paths are omitted until an approved local contract is available."
+      }
     },
     {
       "id": "stock-planned",
@@ -362,13 +400,13 @@
     {
       "id": "Threads",
       "name": "인스타 수익화 · 콘텐츠 제작",
-      "path": "C:\\KJ\\Github\\Threads",
-      "description": "현재 제작물·게시글 평가·기존 원문·보류·평가 기록을 확인합니다.",
+      "path": "D:\\A_KJ\\AI\\Projects\\Threads",
+      "description": "새 제작물 검토 앱을 켜고 끄거나 열며 기존 제작·편집 도구와 자료를 찾습니다.",
       "category": "콘텐츠 제작",
       "role": "current-development",
       "roleLabel": "현재 개발",
-      "evidencePath": "Threads-review-entrypoints-20261008-Sol r5 · 실제 경로/바로가기 확인 · 운영 앱 반영은 보류",
-      "checkedAt": "2026-10-08",
+      "evidencePath": "tools/threads-studio-control/README.md · PC project.control.json · 0.9.18 등록 실행기 검증 · 현재 창 메뉴 반영은 유휴 대기",
+      "checkedAt": "2026-10-10",
       "functions": [
         {
           "id": "review-actions",
@@ -386,7 +424,7 @@
               "commands": [
                 {
                   "name": "게시글 평가",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.19\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsProduction\\0.3.38-cover.20261009.10\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only"
                   ],
@@ -424,7 +462,7 @@
               "commands": [
                 {
                   "name": "보류 글 보기",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.19\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsProduction\\0.3.38-cover.20261009.10\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only",
                     "--review-status=held"
@@ -433,7 +471,7 @@
                 },
                 {
                   "name": "탈락 글 보기",
-                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsReview\\0.3.19\\Threads Cut Editor.exe",
+                  "fileName": "D:\\A_KJ\\AI\\Applications\\ThreadsProduction\\0.3.38-cover.20261009.10\\Threads Cut Editor.exe",
                   "arguments": [
                     "--review-only",
                     "--review-status=rejected"
@@ -481,7 +519,83 @@
           "description": "새 회차의 실제 평가·메모·열람 기록 폴더입니다. 과거 점수를 새 글의 평가로 복사하지 않습니다.",
           "roleLabel": "실제 평가 기록"
         }
-      ]
+      ],
+      "preserveManifest": true,
+      "integration": {
+        "status": "registered",
+        "owner": "threads-review",
+        "repository": "https://github.com/kimjae134679/Threads.git",
+        "roles": {
+          "source": null,
+          "operating": "D:\\A_KJ\\AI\\Workspace\\Threads\\upload-studio-20261009",
+          "data": "D:\\A_KJ\\AI\\Projects\\Threads\\자료",
+          "build": "D:\\A_KJ\\AI\\Workspace\\Threads",
+          "cache": null,
+          "backup": null
+        },
+        "receipt": ".local/project-controller.json",
+        "contracts": [
+          {
+            "owner": "threads-review",
+            "reference": "https://github.com/kimjae134679/Threads/blob/3b08be1472807d22ea494925136e549bf10a0397/upload-studio/FINAL_REVIEW_HANDOFF.md"
+          }
+        ],
+        "writable": [
+          "project.control.json",
+          ".local/project-controller.json",
+          "upload-studio/ owner source and config only"
+        ],
+        "forbidden": [
+          "Hub common catalog/rules",
+          "producer originals/outputs",
+          "Buffer results",
+          "old passed ratings reuse",
+          "posting/scheduling/auth"
+        ],
+        "dependencies": [
+          "producer verified SHA256/path mapping including checkpoint target and source_bundle",
+          "review config backup/CAS and real-path containment",
+          "fresh current code/apply proof supersedes historical PC48 failure",
+          "review owner connects new review web with existing full-content viewer; preserve notified path or provide migration mapping"
+        ],
+        "note": "Source owner must nominate one existing verified Git checkout/current PR11 tip; null means unresolved, never inferred from a dated folder. Running server stays in place until owner verifies a safe change.",
+        "requiresRevision": true
+      }
     }
-  ]
+  ],
+  "controller": {
+    "schemaVersion": 1,
+    "owner": "integration",
+    "manifestAuthority": "project.control.json",
+    "requiredRoles": [
+      "source",
+      "operating",
+      "data",
+      "build",
+      "cache",
+      "backup"
+    ],
+    "contract": "tools/project-controller/README.md",
+    "validator": "tools/project-controller/validate.mjs",
+    "completionEvidence": "project-owned .local/project-controller.json; read-only local validation; exact SHA256 bytes; locks and revision stable",
+    "rules": {
+      "singlePrimary": true,
+      "manifestCommandsWin": true,
+      "noOriginalMoveForPresentation": true,
+      "noIndependentMasterRegistry": true,
+      "ownerWritesOnly": true,
+      "preserveOriginals": true,
+      "noRuntimeRestartByValidator": true
+    },
+    "accessOrder": [
+      "github-direct",
+      "approved-projectbridge",
+      "existing-cloud-task-local",
+      "permitted-desktop-control"
+    ],
+    "disabledTools": [
+      "Desktop Commander",
+      "remote_desktop_commander"
+    ]
+  }
 }
