@@ -64,6 +64,7 @@ public sealed partial class MainViewModel
     public string ServerSummaryMessage { get => _serverSummaryMessage; private set => SetProperty(ref _serverSummaryMessage,value); }
     public async Task RefreshServerAsync(bool force = false)
     {
+        if(ManualAdmissionClosed)return;
         if(!ShouldQueryServer(StartupMode.AllowLiveQueries,_disposed)){ServerSummaryMessage="로컬 조회 · 서버/API 확인 없음 · 현재 생존 미확인";return;}
         if (_disposed || !force && DateTime.UtcNow-_lastServerCheck<TimeSpan.FromSeconds(15) || !await _serverLock.WaitAsync(0)) return;
         try
@@ -96,6 +97,7 @@ public sealed partial class MainViewModel
     public string RosterCheckedAt => _rosterCheckedAt is { } time ? "마지막 확인 " + time.LocalDateTime.ToString("HH:mm:ss") : "";
     public async Task RefreshRosterAsync(bool manual = false)
     {
+        if(ManualAdmissionClosed)return;
         if(!ShouldQueryServer(StartupMode.AllowLiveQueries,_disposed)){_rosterHealth="로컬 조회 · 접속자/API 확인 없음";OnPropertyChanged(nameof(RosterStatus));return;}
         if (_disposed) return;
         try
@@ -106,6 +108,7 @@ public sealed partial class MainViewModel
         catch(OperationCanceledException) { return; }
         try
         {
+            if(ManualAdmissionClosed)return;
             IsUpdatingRoster = true; IsRefreshingRosterManually = manual;
             var result = await _rosterMonitor.FetchAsync(_lifetime.Token);
             _rosterHealthy = result.IsHealthy;

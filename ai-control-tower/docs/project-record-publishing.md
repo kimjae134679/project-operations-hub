@@ -1,5 +1,36 @@
 # 프로젝트 기록 공유
 
+## 최신 확인 · 2026-10-07 운영 교체와 앱 자동 metadata 게시
+
+현재 운영 앱은 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-scoped`의 **0.9.8 / PID 21936**이며 endpoint birth ticks는 `639269645633576474`, fresh tray·PC 연결은 true입니다. 앱에 포함된 소스는 `5e79fa1db693982a876187c455d06369b4762511`, exe SHA-256은 `606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a`입니다. 아래 c4f9669 운영·이번 수정 GUI 미반영·publisher 미활성 표시는 이전 시점의 이력이며 이 최신 확인이 우선합니다.
+
+- **실제 전환:** helper PID 15356/native 0으로 기존 PID 29456 종료 → 새 PID 31888 실행을 확인했습니다. 이어 새 앱의 유휴 종료 client PID 21328 수락 0·PID 31888 실제 종료 → guard PID 11384 재시작 0 → 현재 PID 21936을 확인했습니다. 원본은 `D:\A_KJ\AI\ControlTowerData\version-replacement\20261007-publisher-scope\FULL_HANDOFF.json`과 같은 폴더의 `NEW_IDLE_ROUNDTRIP.json`입니다. 운영 busy drain 완료 증거는 아닙니다.
+- **앱 자동 게시:** 일회 전용 CLI가 아니라 운영 앱의 등록 publisher가 허브 metadata batch `6a162996…`를 `pr_open`으로 기록하고 [draft PR #34](https://github.com/kimjae134679/project-operations-hub/pull/34)를 만들었습니다. 실제 API 대조 결과 head `9d02ee8be7804c6b41d897438fb1e776a075a727`, **45 ADDED·삭제 0**, metadata only·draft·MERGEABLE·미병합입니다. 같은 증거 폴더의 `AUTOMATIC_PUBLICATION.json`에 자동 게시 확인을 보존했습니다. 과거 #33의 CLI 성공과 구분하며 변경 batch의 기존 PR 자동 재사용 구현을 뜻하지 않습니다.
+- **오류 격리:** 프로젝트별 records와 errors를 같은 정확한 ordinal ID로 선택합니다. 타 프로젝트의 일반 수집 오류가 정상 허브 게시를 막던 문제를 고쳤고, 본인 프로젝트 오류·ProjectId null 전역 오류·`manifest_invalid`/`collection_blocked` 차단은 유지합니다. real `PrepareExports` 반례 RED 2 FAIL → publisher/registered GREEN 56 PASS, 신규 10사례 재검사 PASS입니다. 원본 기록·parser·보호 경로는 바꾸지 않았습니다.
+- **검사:** 부모 fresh .NET **654 PASS/0 FAIL**(8초), 최종 교체 실행기 **43 PASS/0 FAIL**(82.630초, native 0)입니다. helper 소스 `73a15134bf1b0856b6fd21a3f110f254f457f6a3`는 commit/push했고 패키지 helper SHA-256 `3ee433b0d8c7fdb5987299fc77aedb2d4fe7112242f834b5db6d720f1eddf125`를 대조했습니다. 운영 앱의 5e79fa1/SHA606d81c0/PID21936은 그대로입니다. 실제 앱 전환·자동 게시 증거와 코드 검사를 구분합니다.
+- **고정 실행 입구:** `START_LATEST_VIEW.cmd`는 scoped 패키지의 `START_THIS_VERSION.vbs`와 fixed guard 경로에 연결했습니다. 백업·readback·hash 증거는 같은 폴더의 `ENTRY_UPDATE.json`입니다. 실행 중인 앱의 중복 실행을 피하려고 wrapper를 다시 실행하지 않았으며 실제 정상 재시작 증거는 위 exact guard 왕복입니다. descriptor의 `expiresAtUtc=2026-10-08T06:07:57.4661913+00:00`는 그대로 보존했습니다. 이는 향후 실행의 유효기한이지 현재 앱 자동 종료 시각이 아닙니다. 앞선 CheckOnly 거절 후 루트 소유 JSON 처리에 `DateKind String`을 적용해 동일 UTC 만료 instant를 유지했으며 기한 갱신·guard 우회·보호 운영 경로 변경은 하지 않았습니다.
+
+원본 명령·답변과 자유 본문은 로컬에 남기며 **CentralShared=false / CreatesAcknowledgement=false / 자동 merge 없음**입니다. 보호 Bridge 운영 설치·실제 중앙 clone/locks는 미해결·무변경이고 전체 GPT/Jev 자동 연결·실제 여러 모델 완료·운영 busy drain은 확인하지 않았습니다. 아래 이전 기록은 삭제하지 않습니다.
+
+## 이전 확인 · 2026-10-07 18:36 이전 실행과 기록 공유 수정
+
+현재 운영 앱은 **0.9.8**(app source c4f9669)이며, 아래 0.9.3/0.9.5/0.9.6·미활성 표시는 해당 시점의 이력입니다. 이번 수정 소스는 GitHub 업로드를 한 담당 경로로 처리합니다. 기존 중앙 communication clone 복구와 별개인 명시 등록 metadata publisher를 사용하며, 원본 명령/답변은 로컬에 유지합니다. 공개 GitHub에는 구조 상태 기록만 내보냅니다.
+
+전체 과거 revision 수를 100개 새 쓰기 제한과 혼동하던 문제를 수정했습니다. 모든 이력을 검증하고 원격의 같은 경로는 정확한 blob으로 대조한 뒤 **새 경로만 최대 100개**를 한 번에 게시합니다. 100개 초과·충돌·결과 불명은 보류하며 일부 기록을 버리거나 제한을 늘리지 않습니다. 프로젝트 단위 배타적 lease가 서로 다른 batch의 중복 업로더도 막습니다. 로컬 수집/metadata branch·draft PR/중앙 원문 공유/공지 읽음은 별개입니다.
+
+focused RED 7 FAIL/18 PASS 및 invalid-registration side effect RED 1 FAIL 후 publisher/registered **46 PASS/0 FAIL**를 확인했습니다. 부모 fresh .NET code-only **642 PASS/0 FAIL**(실제 Window 검사 3개 제외), release code-only **121 PASS/0 FAIL**(Desktop helper 모듈 전체 제외)를 확인했습니다. 최초 부모 release 검사 5ERROR는 긴 시험 D TEMP 경로의 native MAX_PATH 오류였고, 짧은 소유 D TEMP의 같은 소스로 재검사하여 통과했습니다. 실제 일회 GitHub 결과는 아래에 추가하며, 기존 0.9.8 GUI가 이번 수정으로 자동 교체된 것은 아닙니다. 원본 프로젝트 dirty, 실제 중앙 clone/잠금, 보호 Bridge 설정과 원격은 변경하지 않습니다. receipt-driven review disabled/unmanaged, 예약 PAUSED를 유지합니다.
+
+### 이번 실제 일회 업로드 · 2026-10-07 18:36 KST
+
+- 검증 소스 e9d5f45857abe3c87388b350f4a27dd6af088832의 별도 framework-dependent 전용 CLI를 빌드했습니다. 정확 exe의 창 없는 fixture는 native0/Windows0/settings·MainVMfalse/downstream·sync·stop0입니다. 기존 운영 GUI의 app source c4f9669와 구분합니다.
+- 기존 0.9.8 소유 앱을 지원된 headless IPC로 정상 종료한 뒤 등록된 허브 metadata 경로만 실행했습니다. native0, metadata **41개 추가**로 [draft PR #33](https://github.com/kimjae134679/project-operations-hub/pull/33)을 만들었습니다. head `9e56e428c1fe3c35a6a1608b37e3ce6a80a27351`, 변경 41 ADDED/삭제0, main 미병합입니다.
+- 기존 app 생성 metadata draft #27/#28/#29/#30/#32는 각각 journal/현재 head를 대조하고 모든 경로의 blob SHA가 #33 head에 동일함을 검증한 뒤 superseded로 닫았습니다. 브랜치·내용 삭제0·merge0이며 현재 허브 metadata open PR은 #33 하나입니다. 이는 자동 append 구현이 아니라 이번 명시 한정 수동 정리입니다.
+- 동일 자료 재실행도 native0·같은 batch e1cc23cf·같은 PR #33을 반환했습니다. 실제 API POST 횟수는 계측하지 않았으므로 POST0으로 주장하지 않습니다. 다른 프로젝트 게시·AI 호출·공지 확인 대필·자동 merge0입니다.
+- fixed guard로 기존 정확 0.9.8(c4f9669) 앱을 복귀했습니다. 새 PID11612/birth18:36:25.942125KST, tray/PC true를 확인했고 원격5996·Bridge5140은 동일 생존을 유지했습니다. GUI에는 이번 publisher 소스를 교체하지 않았으며 이는 일회 전용 CLI 공유입니다.
+- `CentralShared=false/CreatesAcknowledgement=false`입니다. 공개 상태 metadata 성공을 중앙 원문 clone 복구나 보호 Bridge 운영 설치로 바꾸지 않습니다. 최신 후속 로컬 checkpoint는 다음 공유 대기입니다. 본문·개인 경로·원문 명령/답변·actor/session은 업로드하지 않습니다.
+
+### 이전 배포·게시 이력
+
 **현재 상태: 0.9.6 스테이징 완료·운영 미적용(activated=false).** 아래 0.9.5 일회 headless 공유 이력은 당시 실제 확인입니다. 현재 0.9.3 앱의 반복 수집/공유는 아직 활성화하지 않았습니다. 0.9.5 publish/스테이징은 완료했지만 운영 미적용입니다(source `7c1b896e943883899a76891ec386c3321417fe43`, exe SHA-256 `908e090ddb5ce8af78b207b779730e7371b6dd2d9b74e608d7b466f6e1503729`, activated=false). 현재 0.9.3 PID 16092의 PC/tray true와 기존 원격을 유지합니다. 이전 0.9.4 스테이징은 당시 이력입니다. GUI 교체나 사용자 화면 검증 완료를 뜻하지 않습니다.
 
 ## 최신 사용자 지시 · main 병합 절차 진행(완료 미확인)

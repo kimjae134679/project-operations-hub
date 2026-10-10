@@ -18,6 +18,37 @@ public sealed class WorkDashboardViewModel : ObservableObject
     private int _selectionVersion;
     private int _detailRequestVersion;
     private string _projectFilterId = "", _workerFilterKey = "";
+    private string _currentProjectId="",_currentProjectName="";
+    private WorkActivity? _selectedRecord,_selectedExecution;
+    public string CurrentProjectName => _currentProjectName;
+    // Explicit catalog identity only; current project does not depend on legacy UI filters or actor names.
+    public IReadOnlyList<WorkActivity> ProjectRecords => Activities.Where(r=>_currentProjectId.Length>0 && r.ProjectId==_currentProjectId && r.IsConversation)
+        .OrderByDescending(r=>r.UpdatedAt).ThenByDescending(r=>r.Revision).Take(200).ToArray();
+    public IReadOnlyList<WorkActivity> ProjectExecutions => Activities.Where(r=>_currentProjectId.Length>0 && r.ProjectId==_currentProjectId && r.IsRegisteredExecution)
+        .OrderByDescending(r=>r.UpdatedAt).Take(200).ToArray();
+    public bool NoProjectRecords => ProjectRecords.Count==0;
+    public bool NoProjectExecutions => ProjectExecutions.Count==0;
+    public WorkActivity? SelectedRecord { get=>_selectedRecord;set=>SetProperty(ref _selectedRecord,value); }
+    public WorkActivity? SelectedExecution { get=>_selectedExecution;set {if(SetProperty(ref _selectedExecution,value))OnPropertyChanged(nameof(CanStopExecution));} }
+    public bool CanStopExecution => SelectedExecution?.OwnedProgramId is {} id && _owns(id);
+    public void StopSelectedExecutionOwned()
+    {
+        if(!CanStopExecution)return;
+        Selected=SelectedExecution;StopSelectedOwned();OnPropertyChanged(nameof(CanStopExecution));
+    }
+    public void SetProjectContext(string projectId,string name)
+    {
+        var changed=_currentProjectId!=projectId;
+        _currentProjectId=projectId??"";_currentProjectName=WorkDashboardService.SafeText(name??"");
+        if(changed) { _selectedRecord=null;_selectedExecution=null; }
+        NotifyProjectContext();
+    }
+    private void NotifyProjectContext()
+    {
+        _selectedRecord=ProjectRecords.FirstOrDefault(r=>r.Id==_selectedRecord?.Id)??ProjectRecords.FirstOrDefault();
+        _selectedExecution=ProjectExecutions.FirstOrDefault(r=>r.Id==_selectedExecution?.Id)??ProjectExecutions.FirstOrDefault();
+        foreach(var name in new[]{nameof(CurrentProjectName),nameof(ProjectRecords),nameof(ProjectExecutions),nameof(NoProjectRecords),nameof(NoProjectExecutions),nameof(SelectedRecord),nameof(SelectedExecution),nameof(CanStopExecution)})OnPropertyChanged(name);
+    }
     public WorkDashboardViewModel(Func<CancellationToken, Task<IReadOnlyList<WorkActivity>>> read,
         Func<WorkActivity, Task<string>>? details = null, Func<string, bool>? owns = null, Func<string, bool>? stop = null)
     { _read = read; _details = details ?? (r => Task.FromResult(r.Evidence)); _owns = owns ?? (_ => false); _stop = stop ?? (_ => false); }
@@ -86,17 +117,20 @@ public sealed class WorkDashboardViewModel : ObservableObject
         }
     }
     public bool CanStopOwned => Selected?.OwnedProgramId is { } id && _owns(id);
-    public Action<string>? RegisterContinuousPath { get; set; }
+    public Func<string, bool>? RegisterContinuousPath { get; set; }
     public string SourcePathInput { get; set; } = "";
     public event EventHandler? SnapshotApplying;
     public event EventHandler? SnapshotApplied;
     public async Task RefreshAsync(CancellationToken ct = default)
+        => _ = await RefreshCoreAsync(ct);
+    private enum RefreshOutcome { Completed, Inflight, Cancelled, Failed }
+    private async Task<RefreshOutcome> RefreshCoreAsync(CancellationToken ct)
     {
-        try { if (!await _gate.WaitAsync(0, ct)) return; }
-        catch (OperationCanceledException) { return; }
-        try { IsRefreshing = true; ApplySnapshot(await _read(ct)); Message = $"{(IsFixture ? "검증용 가짜 자료 · 실제 실행 아님" : "실제 기록 조회")} · {DateTime.Now:HH:mm:ss} · {Activities.Count}개"; }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) { Message = "조회 실패 · " + WorkDashboardService.SafeText(ex.Message); }
+        try { if (!await _gate.WaitAsync(0, ct)) return RefreshOutcome.Inflight; }
+        catch (OperationCanceledException) { return RefreshOutcome.Cancelled; }
+        try { IsRefreshing = true; ApplySnapshot(await _read(ct)); Message = $"{(IsFixture ? "검증용 가짜 자료 · 실제 실행 아님" : "실제 기록 조회")} · {DateTime.Now:HH:mm:ss} · {Activities.Count}개"; return RefreshOutcome.Completed; }
+        catch (OperationCanceledException) { return RefreshOutcome.Cancelled; }
+        catch (Exception ex) { Message = "조회 실패 · " + WorkDashboardService.SafeText(ex.Message); return RefreshOutcome.Failed; }
         finally { IsRefreshing = false; _gate.Release(); }
     }
     public void ApplySnapshot(IReadOnlyList<WorkActivity> rows)
@@ -110,6 +144,7 @@ public sealed class WorkDashboardViewModel : ObservableObject
         foreach (var row in incoming.Values) Activities.Add(row);
         Selected = id is null ? null : Activities.FirstOrDefault(r => r.Id == id);
         NotifyFilters(); OnPropertyChanged(nameof(CanStopOwned));
+        NotifyProjectContext();
         SnapshotApplied?.Invoke(this,EventArgs.Empty);
     }
     public async Task LoadSelectedDetailsAsync()
@@ -126,7 +161,20 @@ public sealed class WorkDashboardViewModel : ObservableObject
     }
     public async Task RegisterSourceAsync()
     {
-        try { RegisterContinuousPath?.Invoke(SourcePathInput); Message = "명시한 상태 파일을 연결했습니다."; await RefreshAsync(); }
+        try
+        {
+            var register = RegisterContinuousPath;
+            if (register is null) { Message = "연결하지 못함 · 상태 파일 연결 경로 없음 · 작업 실행 없음"; return; }
+            if (!register(SourcePathInput)) { Message = "상태 파일 연결이 거절되었습니다 · 기존 연결 유지 · 작업 실행 없음"; return; }
+            // Registration and reading are separate outcomes; a failed read must remain visible.
+            switch (await RefreshCoreAsync(CancellationToken.None))
+            {
+                case RefreshOutcome.Completed: Message = "명시한 상태 파일을 연결했습니다 · 기록 조회 확인 · 작업 실행 없음"; break;
+                case RefreshOutcome.Cancelled: Message = "상태 파일 연결 확인 · 조회 취소 · 작업 실행 없음"; break;
+                case RefreshOutcome.Inflight: Message = "상태 파일 연결 확인 · 기존 조회 진행 중 · 작업 실행 없음"; break;
+            }
+        }
+        catch (OperationCanceledException) { Message = "상태 파일 연결 취소 · 기존 연결 유지 · 작업 실행 없음"; }
         catch (Exception ex) { Message = "연결하지 못함 · " + WorkDashboardService.SafeText(ex.Message); }
     }
 }

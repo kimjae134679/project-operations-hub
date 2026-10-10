@@ -17,7 +17,7 @@ namespace AIControlTower.Tests;
 public sealed class CommunicationSelectionTests
 {
     [Fact]
-    public void DetachedTopicSelectionImmediatelyUpdatesEntryListAndBody() => OnSta(() =>
+    public void DetachedTopicSelectionImmediatelyUpdatesBodyAndAllComments() => OnSta(() =>
     {
         using var vm = NewVm();
         Apply(vm, Snapshot());
@@ -29,7 +29,7 @@ public sealed class CommunicationSelectionTests
             Pump();
             Assert.Same(topic, vm.SelectedInbox);
             Assert.Equal(topic.ThreadEntries.Select(e => e.Identity), vm.Entries.Select(e => e.Entry.Identity));
-            Assert.Same(vm.SelectedEntry, entries.SelectedItem);
+            Assert.Equal(vm.CommunityComments, entries.Items.Cast<CommunityCommentRow>());
             Assert.NotNull(vm.SelectedEntry);
             Assert.Contains(topic.Title + " 본문", new TextRange(reader.Document.ContentStart, reader.Document.ContentEnd).Text);
         }
@@ -58,7 +58,7 @@ public sealed class CommunicationSelectionTests
     });
 
     [Fact]
-    public void DetachedEntrySelectionUpdatesBodyAndUnchangedRefreshKeepsChosenTopic() => OnSta(() =>
+    public void DetachedInlineCommentsStayVisibleAndUnchangedRefreshKeepsChosenTopic() => OnSta(() =>
     {
         using var vm = NewVm();
         Apply(vm, Snapshot());
@@ -67,16 +67,15 @@ public sealed class CommunicationSelectionTests
         var topic = vm.InboxItems[2];
         topics.SetCurrentValue(Selector.SelectedItemProperty, topic);
         Pump();
-        var reply = vm.Entries.Last();
-        entries.SetCurrentValue(Selector.SelectedItemProperty, reply);
-        Pump();
-        Assert.Same(reply, vm.SelectedEntry);
-        Assert.Contains(topic.Title + " 답변", new TextRange(reader.Document.ContentStart, reader.Document.ContentEnd).Text);
+        var reply = Assert.Single(entries.Items.Cast<CommunityCommentRow>());
+        Assert.True(reply.Entry.IsComment);
+        Assert.Contains(topic.Title + " 답변", reply.Body);
+        Assert.Contains(topic.Title + " 본문", new TextRange(reader.Document.ContentStart, reader.Document.ContentEnd).Text);
         Apply(vm, Snapshot());
         Pump();
         Assert.Same(topic, topics.SelectedItem);
-        Assert.Same(reply, entries.SelectedItem);
-        Assert.Contains(topic.Title + " 답변", vm.SelectedBody);
+        Assert.Same(reply, Assert.Single(entries.Items.Cast<CommunityCommentRow>()));
+        Assert.Contains(topic.Title + " 답변", Assert.Single(vm.CommunityComments).Body);
     });
 
     [Fact]
@@ -102,8 +101,8 @@ public sealed class CommunicationSelectionTests
         view.DataContext = vm;
         Layout(view);
         var topics = (ListBox)view.FindName("InboxList");
-        var entries = (ListBox)view.FindName("EntryList");
-        var reader = (RichTextBox)view.FindName("ArticleReader");
+        var entries = (ItemsControl)view.FindName("CommentsList");
+        var reader = (RichTextBox)view.FindName("PostBody");
         var target = vm.InboxItems[1];
         var snapshot = Snapshot();
         var refreshed = snapshot with
@@ -118,18 +117,20 @@ public sealed class CommunicationSelectionTests
         Assert.Same(target, topics.SelectedItem);
         Assert.Same(target, vm.SelectedInbox);
         Assert.Equal(target.ThreadEntries.Select(e => e.Identity), vm.Entries.Select(e => e.Entry.Identity));
-        Assert.Same(vm.SelectedEntry, entries.SelectedItem);
+        Assert.Equal(vm.CommunityComments, entries.Items.Cast<CommunityCommentRow>());
         Assert.Contains("운동앱 본문", new TextRange(reader.Document.ContentStart, reader.Document.ContentEnd).Text);
+        var visibleReply = Assert.Single(VisualDescendants(entries).OfType<RichTextBox>());
+        Assert.Contains("운동앱 답변", new TextRange(visibleReply.Document.ContentStart, visibleReply.Document.ContentEnd).Text);
         Assert.DoesNotContain("Obsidian 본문", vm.SelectedBody);
     });
 
     [Fact]
-    public void PrimaryTopicNavigationUsesListSelectionAndSearchHasVisiblePrompt()
+    public void PrimaryTopicNavigationUsesListSelectionAndHasNoSearchOrPreviousNextButtons()
     {
         var document = XDocument.Load(ViewPath());
         Assert.DoesNotContain(document.Descendants(), e => e.Name.LocalName == "Button" &&
             (string?)e.Attribute("Command") is "{Binding PreviousPostCommand}" or "{Binding NextPostCommand}");
-        Assert.Contains(document.Descendants(), e => e.Name.LocalName == "TextBlock" && (string?)e.Attribute("Text") == "검색");
+        Assert.DoesNotContain(document.Descendants(), e => e.Name.LocalName is "TextBox" or "ComboBox" && ((string?)e.Attribute("Text") ?? (string?)e.Attribute("ItemsSource") ?? "").Contains("Search"));
     }
 
     [Fact]
@@ -138,10 +139,10 @@ public sealed class CommunicationSelectionTests
         var document = XDocument.Load(ViewPath());
         Assert.DoesNotContain(document.Descendants(), e => e.Name.LocalName == "TextBlock" &&
             (string?)e.Attribute("Text") is "{Binding UserReadExplanation}" or "{Binding SelectedEntry.SourceLabel}");
-        Assert.Contains(document.Descendants(), e => (string?)e.Attribute("Text") == "{Binding CentralSyncMessage}");
+        Assert.DoesNotContain(document.Descendants(), e => (string?)e.Attribute("Text") == "{Binding CentralSyncMessage}");
     }
 
-    private static (Grid Host, ListBox Topics, ListBox Entries, RichTextBox Reader) BindWorkspace(MainViewModel vm)
+    private static (Grid Host, ListBox Topics, ItemsControl Entries, RichTextBox Reader) BindWorkspace(MainViewModel vm)
     {
         var document = XDocument.Load(ViewPath());
         XNamespace x = "http://schemas.microsoft.com/winfx/2006/xaml";
@@ -155,9 +156,12 @@ public sealed class CommunicationSelectionTests
             return (ListBox)XamlReader.Parse(element.ToString());
         }
         var topics = CopyList("InboxList");
-        var entries = CopyList("EntryList");
+        var commentSource = document.Descendants().Single(e => e.Name.LocalName == "ItemsControl" && (string?)e.Attribute(x + "Name") == "CommentsList");
+        var entries = new ItemsControl();
+        entries.SetBinding(ItemsControl.ItemsSourceProperty, new System.Windows.Data.Binding(nameof(MainViewModel.CommunityComments)));
+        Assert.Equal("{Binding CommunityComments}", commentSource.Attribute("ItemsSource")!.Value);
         var reader = new RichTextBox { IsReadOnly = true };
-        reader.SetBinding(NoticeDocument.TextProperty, new System.Windows.Data.Binding(nameof(MainViewModel.SelectedBody)));
+        reader.SetBinding(NoticeDocument.TextProperty, new System.Windows.Data.Binding(nameof(MainViewModel.SelectedCommunityBody)));
         var host = new Grid { DataContext = vm };
         host.ColumnDefinitions.Add(new() { Width = new GridLength(250) });
         host.ColumnDefinitions.Add(new() { Width = new GridLength(250) });
@@ -165,6 +169,15 @@ public sealed class CommunicationSelectionTests
         Grid.SetColumn(entries, 1); Grid.SetColumn(reader, 2);
         host.Children.Add(topics); host.Children.Add(entries); host.Children.Add(reader);
         return (host, topics, entries, reader);
+    }
+    private static IEnumerable<DependencyObject> VisualDescendants(DependencyObject root)
+    {
+        for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = System.Windows.Media.VisualTreeHelper.GetChild(root, i);
+            yield return child;
+            foreach (var descendant in VisualDescendants(child)) yield return descendant;
+        }
     }
     private static UserControl ParseActualView()
     {

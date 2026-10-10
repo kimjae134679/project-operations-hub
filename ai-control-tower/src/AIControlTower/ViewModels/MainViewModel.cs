@@ -37,7 +37,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public bool CanMutate => !IsReadOnlyView;
     public string ViewModeLabel => IsManualControl ? "연결 자동 유지 · 등록 작업 수동 실행 · 설정/Git/설치 자동 변경 없음" : IsReadOnlyView ? "로컬 조회 · 외부 연결/실행/공유는 중지 · 표시 시각 ≠ 생존" : "자동으로 최신 상태 유지";
     public bool BlockRegisteredOperation()
-    { if(CanRunRegisteredTasks)return false;return BlockOperation(); }
+    { if(ManualAdmissionClosed){Message="안전 종료 확인 중 · 새 등록 작업 보류";return true;}if(CanRunRegisteredTasks)return false;return BlockOperation(); }
     public bool BlockOperation()
     { if(!IsReadOnlyView)return false; Message="로컬 조회 · 외부 연결/실행/공유 보류 · 기존 파일과 작업은 변경하지 않습니다."; return true; }
     private readonly RemoteBridgeService _remote = new(new ProcessRunner());
@@ -80,18 +80,18 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             _workDashboardService.ContinuousPaths.Add(WorkDashboardService.FoundationState);
         PcConnection = new(pcService,(root,path,title) => Documents.OpenAsync(root,path,title),IsReadOnlyView,IsManualControl);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath, [], _settings.CommunicationFolders.Values);
-        WorkDashboard = new(_workDashboardService.ReadAsync,_workDashboardService.DetailsAsync,_jobs.IsRunning,_jobs.Stop)
+        WorkDashboard = new(ReadOwnedDashboardAsync,ReadOwnedDetailsAsync,_jobs.IsRunning,_jobs.Stop)
         {
             RegisterContinuousPath = path =>
             {
-                if(BlockOperation())return;
-                var full=WorkDashboardService.SafePath(path); _=WorkDashboardService.ReadContinuous(full);
-                if(_workDashboardService.ContinuousPaths.Contains(full,StringComparer.OrdinalIgnoreCase)) return;
-                if(_workDashboardService.ContinuousPaths.Count>=40) throw new InvalidDataException("상태 파일 연결은 최대 40개입니다.");
-                _workDashboardService.ContinuousPaths.Add(full); _settings.ContinuousStatePaths=_workDashboardService.ContinuousPaths.ToList(); SaveSettings();
+                if(IsManualControl)return _workDashboardService.RegisterContinuousSource(path,IsReadOnlyView,true);
+                if(BlockOperation())return false;
+                if(!_workDashboardService.RegisterContinuousSource(path,IsReadOnlyView,false))return false;
+                _settings.ContinuousStatePaths=_workDashboardService.ContinuousPaths.ToList(); SaveSettings();
+                return true;
             }
         };
-        ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),_workDashboardService.DetailsAsync) { ManagementOnly=true };
+        ManagementDashboard = new(_ => Task.FromResult<IReadOnlyList<WorkActivity>>(WorkDashboard.Activities.ToArray()),ReadOwnedDetailsAsync) { ManagementOnly=true };
         if(!IsReadOnlyView)_settings.AutoCommunication = true;
         InitializeCommunication();
         _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
@@ -111,10 +111,20 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (DateTime.UtcNow - _lastStatus > TimeSpan.FromSeconds(20)) await RefreshAsync();
         };
         _serverLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(RosterRefreshSeconds) };
-        _serverLiveTimer.Tick += async (_, _) => {await RefreshRosterAsync();if(IsManualControl)await RefreshServerAsync();};
+        _serverLiveTimer.Tick += async (_, _) =>
+        {
+            if(ManualAdmissionClosed)return;
+            _manualTimerCycles++;
+            try{await RefreshRosterAsync();if(IsManualControl)await RefreshServerAsync();}
+            finally{_manualTimerCycles--;}
+        };
         _pcLiveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
         _pcLiveTimer.Tick += async (_, _) =>
         {
+            if(ManualAdmissionClosed)return;
+            _manualTimerCycles++;
+            try
+            {
             if(IsManualControl)
             {
                 await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
@@ -123,6 +133,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 {_lastManualDashboardRefresh=DateTime.UtcNow;await RefreshWorkDashboardAsync();}
             }
             else await PcConnection.PollAsync();
+            }
+            finally{_manualTimerCycles--;}
         };
         if (enablePolling && !IsReadOnlyView)
         {
@@ -135,7 +147,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task InitializeManualAsync()
     {
-        if(!IsManualControl || _disposed)return;
+        if(!IsManualControl || _disposed || ManualAdmissionClosed)return;
         await DiscoverAsync();await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
         await RefreshAsync();await RefreshWorkDashboardAsync();await SyncCommunicationAsync(true);
         await RefreshRosterAsync(true);await RefreshServerAsync(true);
@@ -148,8 +160,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string ToolEvidenceSummary=>$"근거 연결 {Statuses.Count(s=>s.HasUsageEvidence)} / 등록 {Statuses.Count} · 설치 ≠ 실제 사용";
     public string ToolSearch { get => _toolSearch; set { if (SetProperty(ref _toolSearch,value)) OnPropertyChanged(nameof(FilteredToolStatuses)); } }
     public IReadOnlyList<ToolStatusViewModel> UserFacingStatuses => Statuses.Where(s => s.IsUserFacing).ToArray();
-    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => UserFacingStatuses.Where(s => (s.HasUsageEvidence || ShowOtherTools || !string.IsNullOrWhiteSpace(ToolSearch))
-        && Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel,s.UsageEvidence)).ToArray();
+    public static IReadOnlyList<ToolStatusViewModel> SelectKnownTools(IEnumerable<ToolStatusViewModel> statuses,IReadOnlySet<string> knownInstallations,bool showOther)
+        =>statuses.Where(s=>s.IsUserFacing && (showOther || s.HasUsageEvidence || knownInstallations.Contains(s.Id) || s.Kind is StatusKind.Ready or StatusKind.Running)).ToArray();
+    private static IReadOnlySet<string> KnownToolInstallations()
+    {
+        // Existing allowlisted installation contracts only, never authentication or process probes.
+        var ids=new HashSet<string>(StringComparer.Ordinal);
+        if(File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"npm","node_modules","jev-router","package.json")))ids.Add("jev");
+        if(EnvironmentProbe.FindCommand("codex") is not null)ids.Add("codex");
+        if(EnvironmentProbe.FindCommand("gh") is not null)ids.Add("github-cli");
+        return ids;
+    }
+    public IReadOnlyList<ToolStatusViewModel> FilteredToolStatuses => SelectKnownTools(UserFacingStatuses,KnownToolInstallations(),ShowOtherTools || !string.IsNullOrWhiteSpace(ToolSearch))
+        .Where(s=>Matches(ToolSearch,s.RawName,s.DisplayName,s.Purpose,s.StateLabel,s.UsageEvidence)).ToArray();
     private void RefreshToolEvidence()
     {
         // Only explicit task/command identities, not installation probes or actor-name guesses.
@@ -162,7 +185,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 "n8n"=>new[]{"n8n","n8n local bridge"},"aider"=>new[]{"Aider"},"hyperframes"=>new[]{"HyperFrames"},
                 "voicestudio"=>new[]{"VoiceStudio"},"zonos2"=>new[]{"Zonos2"},_=>Array.Empty<string>()
             };
-            var record=WorkDashboard.Activities.FirstOrDefault(r=>r.Source!="작업 연결 없음" && workerNames.Contains(r.Worker,StringComparer.OrdinalIgnoreCase));
+            var record=WorkDashboard.Activities.FirstOrDefault(r=>!r.IsConversation && r.Source!="작업 연결 없음"
+                && (workerNames.Contains(r.WorkerKind,StringComparer.Ordinal)||workerNames.Contains(r.Worker,StringComparer.Ordinal) && r.Source is "로컬 GET 상태" or "ProjectBridge GET"));
             string? evidence=record is null?null:$"등록 작업 기록: {record.Project} · {record.Title} · {record.UpdatedLabel} · 현재 생존/실사용 성공은 별도 확인";
             if(evidence is null)
             {
@@ -199,13 +223,20 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public int RunningCount => _jobs.RunningCount;
     public bool IsBusy => _jobs.BusyProjectCount > 0;
     public bool CanStopSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && _jobs.IsRunning(SelectedProgram.Id);
-    public bool CanLaunchSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && CanOpenSelectedProgram && !_jobs.IsProjectBusy(SelectedProgram.ProjectId);
+    public bool CanLaunchSelectedProgram => CanRunRegisteredTasks && SelectedProgram is not null && CanOpenSelectedProgram && _jobs.CanRun(SelectedProgram);
     public bool CanOpenSelectedProgram => SelectedProgram is not null && (File.Exists(SelectedProgram.Path) || Directory.Exists(SelectedProgram.Path));
     public bool HasSelectedCommands => SelectedProgram?.CanLaunch == true;
     public bool ShowSeparateOpenButton => HasSelectedCommands || SelectedProgram?.HasEditorLauncher == true;
     public string RootPath { get => _settings.RootPath; set { if (_settings.RootPath == value) return; _settings.RootPath = value; _needsDiscovery = true; OnPropertyChanged(); } }
     private bool? _jevSessionEnabled;
     private bool _jevSessionVerified;
+    private bool _independentJevWorkspace;
+    public bool IndependentJevWorkspace
+    {
+        get => _independentJevWorkspace;
+        set { if (SetProperty(ref _independentJevWorkspace, value)) OnPropertyChanged(nameof(JevWorkspacePath)); }
+    }
+    public string JevWorkspacePath => IndependentJevWorkspace ? SelectedProgram?.WorkingDirectory ?? "등록 작업 폴더 선택 필요" : ProjectPath;
     public bool EnableJev
     {
         get => JevExecutionPolicy.ResolveSessionEnable(_settings.EnableJev,IsManualControl,_jevSessionEnabled);
@@ -231,14 +262,32 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         set { if (_settings.DarkMode == value) return; _settings.DarkMode = value; ThemeService.Apply(value); SaveSettings(); OnPropertyChanged(); OnPropertyChanged(nameof(ThemeSwitchLabel)); }
     }
     public string ThemeSwitchLabel => DarkMode ? "밝은 화면" : "어두운 화면";
+    public static IReadOnlyList<CommunicationProjectTarget> CurrentCommunicationTargets(IEnumerable<ProjectItem> projects,CatalogDefinition catalog)
+    {
+        static string Full(string path) {try{return Path.IsPathFullyQualified(path)?Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar):"";}catch(ArgumentException){return "";}}
+        return projects.Select(p=>
+        {
+            var path=Full(p.Path);
+            CatalogProject[] registered=path.Length==0?[]:catalog.Projects.Where(c=>Full(c.Path).Equals(path,StringComparison.OrdinalIgnoreCase)).Take(2).ToArray();
+            var communication=registered.Length==1?CommunicationIdForCatalog(registered[0].Id):registered.Length>1?null:CommunicationIdForCatalog(p.Id);
+            return new CommunicationProjectTarget(p.Id,p.DisplayName,communication);
+        }).ToArray();
+    }
     public ProjectItem? SelectedProject
     {
         get => _selectedProject;
         set
         {
+            var sameScopeProject = value is not null && _selectedProject is not null
+                && value.Id == _selectedProject.Id && SameJevWorkspacePath(value.Path, _selectedProject.Path);
+            var previousProgramId = SelectedProgram?.Id;
             if (!SetProperty(ref _selectedProject, value)) return;
-            SelectedProgram = value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
+            if (!sameScopeProject) IndependentJevWorkspace = false;
+            // Discovery replaces DTOs. Restore the semantic selection without temporarily choosing another scope.
+            SelectedProgram = (sameScopeProject ? value?.Functions.SelectMany(f => f.Programs).FirstOrDefault(p => p.Id == previousProgramId) : null)
+                ?? value?.Functions.Where(f => !f.IsAdvanced).SelectMany(f => f.Programs).FirstOrDefault();
             ProjectPath = value?.Path ?? "";
+            WorkDashboard.SetProjectContext(value?.Id??"",value?.DisplayName??"");
             ProgramSearch = "";
             OnPropertyChanged(nameof(FilteredFunctions)); OnPropertyChanged(nameof(NoProgramSearchResults));
         }
@@ -246,10 +295,27 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public ProgramItem? SelectedProgram
     {
         get => _selectedProgram;
-        set { if (!SetProperty(ref _selectedProgram, value)) return; SelectedCommand = value?.Commands.FirstOrDefault(); OnPropertyChanged(nameof(CanStopSelectedProgram)); OnPropertyChanged(nameof(CanLaunchSelectedProgram)); OnPropertyChanged(nameof(CanOpenSelectedProgram)); OnPropertyChanged(nameof(HasSelectedCommands)); OnPropertyChanged(nameof(ShowSeparateOpenButton)); }
+        set
+        {
+            var sameScope = value is not null && _selectedProgram is not null && value.Id == _selectedProgram.Id
+                && value.ProjectId == _selectedProgram.ProjectId && value.CanLaunch && _selectedProgram.CanLaunch
+                && SameJevWorkspacePath(value.WorkingDirectory, _selectedProgram.WorkingDirectory);
+            if (!SetProperty(ref _selectedProgram, value)) return;
+            if (!sameScope) IndependentJevWorkspace = false;
+            SelectedCommand = value?.Commands.FirstOrDefault(); OnPropertyChanged(nameof(JevWorkspacePath)); OnPropertyChanged(nameof(CanStopSelectedProgram)); OnPropertyChanged(nameof(CanLaunchSelectedProgram)); OnPropertyChanged(nameof(CanOpenSelectedProgram)); OnPropertyChanged(nameof(HasSelectedCommands)); OnPropertyChanged(nameof(ShowSeparateOpenButton));
+        }
+    }
+    private static bool SameJevWorkspacePath(string left, string right)
+    {
+        try { return JevExecutionWorkspace.Same(left, right); }
+        catch (Exception ex) when (ex is ArgumentException or IOException or NotSupportedException or InvalidOperationException) { return false; }
     }
     public ProgramCommand? SelectedCommand { get => _selectedCommand; set => SetProperty(ref _selectedCommand, value); }
-    public string ProjectPath { get => _projectPath; set => SetProperty(ref _projectPath, value); }
+    public string ProjectPath
+    {
+        get => _projectPath;
+        set { var samePath = SameJevWorkspacePath(_projectPath, value); if (!SetProperty(ref _projectPath, value)) return; if (!samePath) IndependentJevWorkspace = false; OnPropertyChanged(nameof(JevWorkspacePath)); }
+    }
     public string TaskInput { get => _taskInput; set => SetProperty(ref _taskInput, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public bool IsRefreshing { get => _isRefreshing; private set => SetProperty(ref _isRefreshing, value); }
@@ -258,7 +324,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public string ActivitySummary => IsReadOnlyView && !IsManualControl ? "로컬 저장 기록 조회 · 실제 작업/프로세스 생존 미확인" : IsBusy ? $"관제탑 작업 {_jobs.BusyProjectCount}개 · 실행 프로세스 {RunningCount}개" : "실행 중인 관제탑 작업이 없습니다.";
     public async Task RefreshWorkDashboardAsync()
     {
-        if(_disposed)return;
+        if(_disposed || ManualAdmissionClosed)return;
         _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
         _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
             Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
@@ -269,7 +335,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task DiscoverAsync()
     {
-        if (_disposed || !await _discoveryLock.WaitAsync(0)) return;
+        if (_disposed || ManualAdmissionClosed || !await _discoveryLock.WaitAsync(0)) return;
         try
         {
             if (!Directory.Exists(RootPath)) { Message = "탐색 폴더가 없습니다. 실제 프로젝트 루트를 선택하세요."; return; }
@@ -316,13 +382,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 }
                 _watcher.Created += Mark; _watcher.Deleted += Mark; _watcher.Renamed += (_, e) => Mark(null, e); _watcher.Changed += Mark;
                 _watcher.Error += (_, _) => _needsDiscovery = true;
-                _watcher.EnableRaisingEvents = true;
+                _watcher.EnableRaisingEvents = !ManualAdmissionClosed;
             }
             SaveSettings();
             OnPropertyChanged(nameof(ProjectsCount)); OnPropertyChanged(nameof(ProgramsCount));
             OnPropertyChanged(nameof(FilteredProjects)); OnPropertyChanged(nameof(NoProjectSearchResults));
             CatalogRefreshed?.Invoke(this, EventArgs.Empty);
             _workDashboardService.RegisterCatalog(Projects,DashboardProjectAliases);
+            WorkDashboard.SetProjectContext(SelectedProject?.Id??"",SelectedProject?.DisplayName??"");
+            SetCurrentCommunicationProjects(CurrentCommunicationTargets(Projects,_catalog));
             RefreshToolEvidence();
             _workDashboardService.RefreshKnownExchangeRoots(_settings.CommunicationHubPath,
                 Projects.Select(project => project.Path), _settings.CommunicationFolders.Values);
@@ -336,6 +404,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
     public async Task RefreshAsync()
     {
+        if(ManualAdmissionClosed)return;
         if(IsManualControl)
         {
             await PcConnection.MaintainConnectionAsync(DateTimeOffset.UtcNow);
@@ -450,14 +519,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (program is null || command is null) { Message = "실행할 프로그램과 등록된 명령을 선택하세요."; return; }
         await RunProgramAsync(program, command);
     }
-    private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null,AiCompletionContract? aiContract=null)
+    private async Task RunProgramAsync(ProgramItem program, ProgramCommand command, string? input = null,AiCompletionContract? aiContract=null,string? independentWorkspaceRoot=null)
     {
         if(BlockRegisteredOperation())return;
-        if (_jobs.IsProjectBusy(program.ProjectId)) { Message = "이 프로젝트에는 실행 중인 작업이 있습니다."; return; }
+        if (!_jobs.CanRun(program, independentWorkspaceRoot)) { Message = "같은 실행 ID·공유 프로젝트·겹치는 작업 폴더에 소유 작업이 있습니다."; return; }
         try
         {
             UpdateProgramState(program, "실행 중 · " + command.Name);
-            var result = await _jobs.RunAsync(program, command, _lifetime.Token, input,aiContract:aiContract);
+            var result = await _jobs.RunAsync(program, command, _lifetime.Token, input,aiContract:aiContract,independentWorkspaceRoot:independentWorkspaceRoot);
             UpdateProgramState(program, result.State + (result.ExitCode is null ? "" : " · exit " + result.ExitCode));
             Message = program.DisplayName + " · " + program.StatusLabel + " · 작업 기록에서 결과를 확인하세요.";
         }
@@ -487,21 +556,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         { _jevSessionVerified=false;if(IsManualControl)_jevSessionEnabled=false;OnPropertyChanged(nameof(EnableJev));OnPropertyChanged(nameof(IsLocalJevExecutionAllowed));OnPropertyChanged(nameof(LocalJevPolicyMessage));Message="Jev 실행 보류 · " + (evidence.IsVerified?reason:evidence.Reason);return; }
         if (string.IsNullOrWhiteSpace(TaskInput)) { Message = "작업 내용을 입력하세요."; return; }
         if (!Directory.Exists(ProjectPath)) { Message = "존재하는 프로젝트 경로를 선택하세요. 다른 폴더로 대체 실행하지 않습니다."; return; }
+        JevExecutionTarget target;
+        try { target = JevExecutionWorkspace.Resolve(SelectedProject, SelectedProgram, ProjectPath, IndependentJevWorkspace); }
+        catch (Exception ex) { Message = ProcessRunner.Sanitize(ex.Message); return; }
         var node = EnvironmentProbe.FindCommand("node.exe");
         if (node is null) { Message = "설치된 Node 런처를 찾지 못했습니다."; return; }
         string package;
         try { package=JevNativeLauncher.Prepare(); }
         catch { Message="Jev 런처 검증 실패 · 기존 파일은 덮어쓰지 않습니다.";return; }
-        var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
-        var program = new ProgramItem { Id = projectId + "/jev", ProjectId = projectId, Name = "Jev · Codex 작업", Kind = "Jev", Path = ProjectPath, WorkingDirectory = ProjectPath };
         var command = new ProgramCommand { Name = "Jev 작업", FileName = node, Arguments = JevExecutionPolicy.BuildArguments(package,contract!.RequestedModel).ToArray(), TimeoutSeconds = 1800 };
-        await RunProgramAsync(program, command, TaskInput,contract);
+        await RunProgramAsync(target.Program, command, TaskInput,contract,target.IndependentWorkspaceRoot);
     }
     public Task CancelJevTaskAsync()
     {
         if(BlockRegisteredOperation())return Task.CompletedTask;
-        var projectId = SelectedProject?.Path.Equals(ProjectPath, StringComparison.OrdinalIgnoreCase) == true ? SelectedProject.Id : "folder:" + Path.GetFullPath(ProjectPath).ToLowerInvariant();
-        Message = _jobs.Stop(projectId + "/jev") ? "이 프로젝트 Jev 작업의 취소를 요청했습니다." : "이 프로젝트에서 관제탑이 시작한 Jev 작업이 없습니다.";
+        try
+        {
+            var target = JevExecutionWorkspace.Resolve(SelectedProject, SelectedProgram, ProjectPath, IndependentJevWorkspace);
+            Message = _jobs.Stop(target.Program.Id) ? "선택한 Jev 소유 작업의 취소를 요청했습니다." : "선택한 범위에서 관제탑이 시작한 Jev 작업이 없습니다.";
+        }
+        catch (Exception ex) { Message = ProcessRunner.Sanitize(ex.Message); }
         return Task.CompletedTask;
     }
     public async Task ConsolidateRemoteStartupAsync()

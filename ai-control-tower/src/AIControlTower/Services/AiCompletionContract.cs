@@ -68,6 +68,13 @@ public sealed class AiCompletionEvaluator
             var type = String(json, "type");
             if (type is "error" or "turn.failed" || json.TryGetProperty("error", out var error) && error.ValueKind != JsonValueKind.Null)
                 _failure ??= "ai_failed";
+            // Explicit item errors are semantic failures; an ordinary tool's nonzero
+            // exit/status alone may be recovered by the model and is not a turn error.
+            if (type is not null && type.StartsWith("item.", StringComparison.Ordinal)
+                && json.TryGetProperty("item", out var errorItem) && errorItem.ValueKind == JsonValueKind.Object
+                && (String(errorItem, "type") == "error"
+                    || errorItem.TryGetProperty("error", out var nestedError) && nestedError.ValueKind != JsonValueKind.Null))
+                _failure ??= "ai_failed";
             if (type == "turn.completed")
             {
                 _terminal = true;

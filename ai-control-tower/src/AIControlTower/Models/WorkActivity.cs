@@ -10,6 +10,18 @@ public sealed record WorkActivity
     public string ProjectDisplayName { get; init; } = "";
     public string ProgramId { get; init; } = "";
     public string WorkerKind { get; init; } = "미확인";
+    public string ActorId { get; init; } = "";
+    public string SessionId { get; init; } = "";
+    public string RequestSource { get; init; } = "";
+    public string ResponseSource { get; init; } = "";
+    public string ResponseSummary { get; init; } = "";
+    public string ExecutionId { get; init; } = "";
+    public string RequestedModel { get; init; } = "";
+    internal string RecordFingerprint { get; init; } = "";
+    public bool IsConversation => Source == "명령·답변 task_exchange 기록";
+    public bool IsRegisteredExecution => Source is "관제탑 소유 실행 기록" or "연속 실행기 단계 기록" || BridgeJobId is not null;
+    public string MeaningfulStatusLabel => Status is "unknown" or "ready" || StatusLabel=="정보 없음" ? "" : StatusLabel;
+    public string SessionLabel => SessionId.Length>0 ? SessionId : ExecutionId;
     public string CommandSummary { get; init; } = "명령 메타데이터 미확인";
     public string ResultSummary { get; init; } = "결과 메타데이터 미확인";
     public string ProcessStatus { get; init; } = "unknown";
@@ -39,7 +51,7 @@ public sealed record WorkActivity
         "succeeded" or "completed" => "완료 기록", "running" => LivenessKnown ? "실행 중" : "실행 기록 · 생존 미확인",
         "queued" or "pending" => "대기", "accepted" => "접수 · 완료 미확인", "failed" or "error" => "오류",
         "blocked" => "막힘", "stopped" or "cancelled" => "중단", "timed_out" => "시간 초과",
-        "interrupted" => "결과 불명", "in_progress" => "진행 기록", "ready" => "연결 준비", "stale" => "오래된 기록", _ => "정보 없음"
+        "interrupted" => "결과 불명", "in_progress" => "진행 기록", "ready" => "연결 준비", "stale" => "오래된 기록", "output_limit" => "출력 한도", "superseded" => "변경된 요청", _ => "정보 없음"
     };
 }
 

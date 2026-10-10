@@ -8,6 +8,9 @@ public sealed record TaskExchangeView(string RecordId, string ProjectId, string 
     string Title, string RequestSummary, string ResponseSummary, string Status, DateTimeOffset UpdatedAt,
     string Markdown, string SearchText)
 {
+    public string SessionId { get; init; } = "";
+    public string RequestSource { get; init; } = "";
+    public string ResponseSource { get; init; } = "";
     public string StateLabel => TaskExchangeDocument.StateLabel(Status);
 }
 
@@ -95,7 +98,8 @@ public static class TaskExchangeDocument
             builder.AppendLine("- 요청 받은 시각: " + received.ToOffset(TimeSpan.FromHours(9)).ToString("yyyy-MM-dd HH:mm:ss") + " KST");
             builder.AppendLine("- 기록 갱신 시각: " + updated.ToOffset(TimeSpan.FromHours(9)).ToString("yyyy-MM-dd HH:mm:ss") + " KST");
             if (supersedes.Length > 0) builder.AppendLine("- 대체한 기록: " + string.Join(", ", supersedes));
-            return new(recordId, projectId, actor, revision, title, requestSummary, responseSummary, state, updated, builder.ToString(), body);
+            return new(recordId, projectId, actor, revision, title, requestSummary, responseSummary, state, updated, builder.ToString(), body)
+                { SessionId=session, RequestSource=requestSource, ResponseSource=responseSource };
         }
         catch (Exception ex) when (ex is JsonException or FormatException or InvalidOperationException or KeyNotFoundException or OverflowException)
         {
