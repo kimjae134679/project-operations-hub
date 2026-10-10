@@ -35,9 +35,12 @@ receipt 필수 필드는 schemaVersion=1, projectId, owner, checkedAt(UTC), sour
 
 기존 primary entry/relatedFolders 규칙은 유지한다. 화면 정리만을 위해 원본을 이동하지 않는다. 실제 운영 경로 정착은 담당의 SHA256/크기/경로 mapping과 복구책을 검증한 복사 및 소비 참조 전환으로 진행한다. 이미 안내한 위치가 바뀌면 대응표와 최종 사용자 안내를 함께 제공한다. 전체 보기와 검토의 최신 진입점은 담당 manifest로 확인하며 구버전을 최신으로 추측하지 않는다.
 
-공통 코드 기준은 `341c5025c576a3df56f41988678eaf9112d382b2`이며 검증기 SHA-256은 `8561fcfeefa9045129249cf02b60fffc2b51a6ccbe73aaf3ccd44accd7d5fd33`이다. 이 catalog와 계약은 사용자에게 실제 경로·명령·연결 규칙의 공개 범위를 확인받아 별도 후속 커밋으로 추가한다. 공개 등록, 로컬 검증기 정착, 앱 전체 설치와 native UI 검증은 별개다. 기존 catalog에 controller가 없으면 검증기는 지원되지 않은 계약으로 보류한다.
+공통 코드 기준은 `341c5025c576a3df56f41988678eaf9112d382b2`이며 검증기 SHA-256은 `20aceb4da73c91f0de87dbf7467fdef48f9b601fec4f6adaf676e0dc60e7b4c0`이다. 이 catalog와 계약은 사용자에게 실제 경로·명령·연결 규칙의 공개 범위를 확인받아 별도 후속 커밋으로 추가한다. 공개 등록, 로컬 검증기 정착, 앱 전체 설치와 native UI 검증은 별개다. 기존 catalog에 controller가 없으면 검증기는 지원되지 않은 계약으로 보류한다.
 
 
 ## 접근 우선순위
 
 GitHub 직접 연결 → 기존 승인된 ProjectBridge → 기존 cloud task의 Codex 로컬 파일/셸 → 허용된 원격 제어 순서다. 앞 경로가 지원하는 작업은 우선 사용한다. 사용자 PC는 기존 cloud task를 통해 접근하며 GitHub 파일만으로 PC 설치 상태를 판단하지 않는다. Desktop Commander/remote_desktop_commander는 읽기·상태조회 포함 사용 금지이며 마지막 원격 제어 순서는 재사용 허가가 아니다. 새 인증·권한 변경·거절·도구 한도 우회는 허용하지 않는다. 실행 전 setup refresh 초기화 실패의 원인이 미확인이면 앱 실제 오류와 구분한다. 중지 상태와 파일별 소유권을 유지하며, 이후 사용자의 명시적 1회차 승인 등 범위 변경은 해당 담당에게만 적용한다.
+
+
+역할별 실제 잠금은 `lockPaths:[{role:"operating",path:".local/.state-lock"}]`로 고정하며 receipt.locks의 role/path가 같아야 합니다. 기존 프로젝트 루트 기준 문자열도 유지합니다. 제작 전달의 `dependencyArtifacts[{owner,role,path,sha256,bytes}]`는 receipt.dependencies의 동일 항목과 실제 바이트를 검사하고 검사 끝에 다시 읽습니다. 경로 탈출·알 수 없는 역할·해시 불일치·검사 중 변경은 완료가 아닙니다. 자동 연동 scanner의 running=false는 전체 서버 유휴 증거가 아닙니다.

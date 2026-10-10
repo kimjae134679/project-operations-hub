@@ -24,6 +24,14 @@ function regular(p, max = 256 * 1024) {
 }
 function localProject(project, integration, issues, now) {
   const started=Date.now();
+  const lockPath = spec => {
+    const root=typeof spec==='string'?project.path:roles.includes(spec?.role)?integration.roles[spec.role]:null;
+    const name=typeof spec==='string'?spec:spec?.path;
+    return text(root)&&relative(name)?path.join(root,name):null;
+  };
+  const lockExists = file => {try { fs.lstatSync(file); return true; } catch(e) {return e.code==='ENOENT'?false:true;} };
+  const dependencies=[];
+  const evidenceFiles=[];
   let sourceHead;
   let runtimeBytes, revisionBytes;
   for (const [role, p] of Object.entries(integration.roles ?? {})) {
@@ -62,12 +70,27 @@ function localProject(project, integration, issues, now) {
   if (!Number.isFinite(date) || now-date > 15*60*1000 || date-now > 5000) issues.push('receipt_stale');
   if (receipt.complete !== true) issues.push('owner_not_complete');
   if (!Array.isArray(integration.lockPaths) || !integration.lockPaths.length
-    || integration.lockPaths.some(p=>!relative(p))
-    || integration.lockPaths.some(p=>!receipt.locks.some(l=>l?.path===p))) issues.push('locks_unpinned');
-  if (!Array.isArray(receipt.locks) || !receipt.locks.length) issues.push('locks_unverified');
+    || integration.lockPaths.some(pin=>!lockPath(pin))
+    || integration.lockPaths.some(pin=>!receipt.locks.some(l=>l?.path===(typeof pin==='string'?pin:pin.path)
+      && l.role===(typeof pin==='string'?undefined:pin.role)))) issues.push('locks_unpinned');
+  if (!receipt.locks.length) issues.push('locks_unverified');
   else for (const lock of receipt.locks) {
-    if (!relative(lock?.path) || typeof lock.held !== 'boolean') { issues.push('lock_invalid'); continue; }
-    if (lock.held || fs.existsSync(path.join(project.path,lock.path))) issues.push('lock_held');
+    const file=lockPath(lock?.role===undefined?lock?.path:lock);
+    if (!file || typeof lock?.held !== 'boolean') { issues.push('lock_invalid'); continue; }
+    if (lock.held || lockExists(file)) issues.push('lock_held');
+  }
+  if (integration.dependencyArtifacts!==undefined) {
+    if (!Array.isArray(integration.dependencyArtifacts)||!integration.dependencyArtifacts.length||integration.dependencyArtifacts.length>20) issues.push('dependency_invalid');
+    else for(const dep of integration.dependencyArtifacts) {
+      if(!text(dep?.owner)||!roles.includes(dep.role)||!relative(dep.path)||!hex(dep.sha256)
+        || dep.bytes!==undefined&&(!Number.isSafeInteger(dep.bytes)||dep.bytes<0||dep.bytes>32*1024*1024)) {issues.push('dependency_invalid');continue;}
+      if(!Array.isArray(receipt.dependencies)||!receipt.dependencies.some(r=>r?.owner===dep.owner&&r.role===dep.role&&r.path===dep.path&&r.sha256===dep.sha256)) issues.push('dependency_receipt_missing');
+      try {
+        const file=path.join(integration.roles[dep.role],dep.path),data=regular(file,32*1024*1024);
+        if(sha(data)!==dep.sha256||dep.bytes!==undefined&&data.length!==dep.bytes)issues.push('dependency_hash_mismatch');
+        dependencies.push({file,hash:sha(data)});
+      }catch{issues.push('dependency_unreadable');}
+    }
   }
   if (receipt.revisionBefore !== undefined || receipt.revisionAfter !== undefined) {
     if (!Number.isSafeInteger(receipt.revisionBefore) || receipt.revisionBefore !== receipt.revisionAfter) issues.push('revision_changed');
@@ -99,7 +122,9 @@ function localProject(project, integration, issues, now) {
     if (a.appliedSha256 !== undefined && a.appliedSha256 !== a.sha256) issues.push('applied_bytes_mismatch');
     if (a.role === 'operating' && !hex(a.appliedSha256)) issues.push('applied_bytes_unverified');
     try {
-      if (sha(regular(path.join(integration.roles[a.role],a.path),128*1024*1024)) !== a.sha256) issues.push('artifact_hash_mismatch');
+      const file=path.join(integration.roles[a.role],a.path),data=regular(file,128*1024*1024);
+      const hash=sha(data);evidenceFiles.push({file,hash,max:128*1024*1024,issue:'artifact_changed'});
+      if (hash !== a.sha256) issues.push('artifact_hash_mismatch');
     } catch { issues.push('artifact_unreadable'); }
   }
   if (!receipt.artifacts.some(a=>a?.role==='operating' && hex(a.sha256) && a.appliedSha256===a.sha256)) issues.push('operating_apply_unverified');
@@ -112,12 +137,12 @@ function localProject(project, integration, issues, now) {
   for (const c of integration.contracts ?? []) {
     if (!hex(c.sha256) || !roles.includes(c.role) || !relative(c.path)
       || !receipt.contracts.some(r=>r?.reference===c.reference && r.sha256===c.sha256)) issues.push('contract_unverified');
-    else try {if(sha(regular(path.join(integration.roles[c.role],c.path)))!==c.sha256)issues.push('contract_hash_mismatch');}
+    else try {const file=path.join(integration.roles[c.role],c.path),data=regular(file),hash=sha(data);evidenceFiles.push({file,hash,max:256*1024,issue:'contract_changed'});if(hash!==c.sha256)issues.push('contract_hash_mismatch');}
     catch {issues.push('contract_unreadable');}
   }
   // Recheck admission evidence after all potentially lengthy reads, using the end time.
   const endNow=now+(Date.now()-started);
-  for(const lock of receipt.locks) if(relative(lock?.path) && fs.existsSync(path.join(project.path,lock.path))) issues.push('lock_held');
+  for(const lock of receipt.locks) {const file=lockPath(lock?.role===undefined?lock?.path:lock);if(file&&lockExists(file))issues.push('lock_held');}
   if(runtimeBytes) try {
     const endBytes=regular(path.join(integration.roles[idle.role],idle.path));
     const status=JSON.parse(endBytes.toString('utf8').replace(/^\uFEFF/,''));
@@ -135,6 +160,9 @@ function localProject(project, integration, issues, now) {
   // Capture races without writing a lock or modifying an owner's receipt.
   try { if (sha(regular(receiptPath)) !== sha(bytes)) issues.push('receipt_changed'); }
   catch { issues.push('receipt_changed'); }
+  for(const dep of dependencies) try {if(sha(regular(dep.file,32*1024*1024))!==dep.hash)issues.push('dependency_changed');}catch{issues.push('dependency_changed');}
+  for(const e of evidenceFiles) try {if(sha(regular(e.file,e.max))!==e.hash)issues.push(e.issue);}catch{issues.push(e.issue);}
+  try {if(sha(regular(receiptPath))!==sha(bytes))issues.push('receipt_changed');}catch{issues.push('receipt_changed');}
   // Git rechecks can take time too; the final idle check uses the actual finish time.
   if(runtimeBytes) try {
     const finalBytes=regular(path.join(integration.roles[idle.role],idle.path));
@@ -143,9 +171,10 @@ function localProject(project, integration, issues, now) {
     if(sha(finalBytes)!==sha(runtimeBytes))issues.push('runtime_status_changed');
     if(!Number.isFinite(stamp)||finishNow-stamp>15000||stamp-finishNow>5000||status[idle.activeJobsField]!==0)issues.push('runtime_not_verified_idle');
   }catch{issues.push('runtime_status_changed');}
-  for(const lock of receipt.locks) if(relative(lock?.path) && fs.existsSync(path.join(project.path,lock.path))) issues.push('lock_held');
+  for(const lock of receipt.locks) {const file=lockPath(lock?.role===undefined?lock?.path:lock);if(file&&lockExists(file))issues.push('lock_held');}
 }
 export function validateCatalog(catalog, {local=false, now=Date.now()}={}) {
+  const catalogStarted=Date.now();
   const errors=[], projects=[];
   if (!catalog || catalog.schemaVersion !== 1 || !Array.isArray(catalog.projects))
     return {schemaVersion:1,errors:['invalid_catalog'],total:0,registered:0,complete:0,projects};
@@ -172,7 +201,7 @@ export function validateCatalog(catalog, {local=false, now=Date.now()}={}) {
       if(text(i.roles?.[roles[a]]) && text(i.roles?.[roles[b]]) && norm(i.roles[roles[a]])===norm(i.roles[roles[b]])) issues.push('role_collision:'+roles[a]+':'+roles[b]);
     }
     if(!Array.isArray(i.contracts)||!i.contracts.length||i.contracts.some(c=>!text(c?.owner)||!/^https:\/\/github\.com\/.+\/blob\/[a-f0-9]{40}\/.+/.test(c.reference??''))) issues.push('contract_reference_unverified');
-    if(local) localProject(p,i,issues,now);
+    if(local) localProject(p,i,issues,now+(Date.now()-catalogStarted));
     const unique=[...new Set(issues)];
     projects.push({id:p.id,owner:i.owner,state:unique.length?'blocked':local?'complete':'registered',issues:unique});
   }
