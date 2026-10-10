@@ -9867,3 +9867,14 @@ Threads main e91d820에 Windows 0.3.2 / 제작 규칙 2026-10-04.3을 반영했�
 매핑 원문은 C:\Users\user\Documents\Codex\2026-10-08\task-16\portrait-package-20261009-ec0cd89\incremental-current-199\HANDOFF.md 및 같은폴더 current-199-mapping.json/proof.json이다. 이 환경에서 로컬 원문을 읽지 못했으므로 필드/자산/지문을 추정해 연결하지 않는다. 검토앱 PC 정상 반영 뒤 실제 매핑과 현재 판정·이전/신규 버전·순서별SHA 및 의미보존을 확인해 사용자 승인된 layout-only 평가 승계를 수행한다. 미통과 항목에 통과를 만들지 않는다.
 
 [갱신한 검토 인계](https://github.com/kimjae134679/Threads/blob/9592ad91e8b22f9582d62e7c0d39e62a5637f202/upload-studio/FINAL_REVIEW_HANDOFF.md). 이번 변경은 인계 기록뿐이며 PC 실행 장애를 재시도하거나 새큐/배포/Buffer변경을 하지 않았다. C: START.ps1 복원도 실행환경 시작오류로 미실행이며 이후 시험/적용은 별도 승인 범위를 따른다.
+
+
+## 2026-10-10 07:00 UTC — Codex 검토/Upload Studio 담당 — 새 목록 교체 및 자동 완료 연결 적용
+
+식별: fresh-portrait-autolink-bf18b05. 사용자 최신 명시 지시에 따라 이전 평가/통과 승계 계획을 취소하고 현재 목록을 새 세로 결과로 교체했다. PC에서199글·1918PNG(고유1911개)의 실제 바이트/1080×1440/순서/SHA와 체크포인트 관련11710파일을 확인하고 운영 앱에 연결했다. revision122의 현재 통과는0, 미검토199이며 이전 통과60건은 현재 승인으로 쓰지 않는다. 이번 단계에서 이미지를 새로 생성했다고 표시하지 않는다. 이미지대기166글은 제외했다.
+
+이전 검토 메모·판정·이력과 자산3426파일은 현재 목록에서 제거하고 .local/replaced/portrait-20261010-60/에 복구 가능한 원본으로 보관했다. 원본 제작/평가 파일과 문안·태그·계정/플랫폼 입력은 보존하고 기존 플랫폼 결과92파일은 바이트 그대로 유지했다. Buffer의 실제 예약/게시물을 바꾸지 않았다. 이전 snapshot120/통과60 또는 과거 Library manifest를 현재 게시 승인으로 쓰지 않는다.
+
+운영 코드466f059399d3547bdbe5c0b0c07370d47b1927d1을 PC에 설치하고 자동 연결을 켰다. 앱 실행 중15초마다 기존 설치 제작 목록과 등록된 세로 제작 패키지 완료 체크포인트를 확인하며, 완료 감사·파일/이미지 해시·실제 크기·복사 전후 버전이 맞는 새 결과만 자동 연결하고 이전 결과를 보관한다. 재시작 중복/편집 충돌을 막고 새 버전은 미검토로 시작한다. 자동 게시·예약은 없다. 설치 첫 확인enabled=true/linked0/waiting0, revision122 및state바이트 유지. GET /api/production/auto-status와 화면 하단에서 상태를 확인한다.
+
+전체Node92건+추가41검증과 실제Chrome 테스트 통과, 운영 브라우저에서199글/미검토/1080×1440 및 자동 연결 켜짐을 직접 확인했다. 최신 [FINAL_REVIEW_HANDOFF.md](https://github.com/kimjae134679/Threads/blob/bf18b05657b1dadaa514e39034e2f897831e7a7a/upload-studio/FINAL_REVIEW_HANDOFF.md), [자동 입력/보관 계약](https://github.com/kimjae134679/Threads/blob/bf18b05657b1dadaa514e39034e2f897831e7a7a/upload-studio/AUTO_PRODUCTION_LINK.md), [Draft PR #11](https://github.com/kimjae134679/Threads/pull/11). PC 증거는 운영 폴더PC_FRESH_PORTRAIT_PROOF.json/PC_AUTO_PRODUCTION_PROOF.json이다. 원문·문안·평가·이미지 바이트를 공개 저장소에 올리지 않는다. 다른 담당의 허브 문서와 공유 큐는 수정하지 않는다.
