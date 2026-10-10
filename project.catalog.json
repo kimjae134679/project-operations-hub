@@ -362,13 +362,13 @@
     {
       "id": "Threads",
       "name": "인스타 수익화 · 콘텐츠 제작",
-      "path": "C:\\KJ\\Github\\Threads",
-      "description": "현재 제작물·게시글 평가·기존 원문·보류·평가 기록을 확인합니다.",
+      "path": "D:\\A_KJ\\AI\\Projects\\Threads",
+      "description": "새 제작물 검토 앱을 켜고 끄거나 열며 기존 제작·편집 도구와 자료를 찾습니다.",
       "category": "콘텐츠 제작",
       "role": "current-development",
       "roleLabel": "현재 개발",
-      "evidencePath": "Threads-review-entrypoints-20261008-Sol r5 · 실제 경로/바로가기 확인 · 운영 앱 반영은 보류",
-      "checkedAt": "2026-10-08",
+      "evidencePath": "tools/threads-studio-control/README.md · PC project.control.json · 0.9.18 등록 실행기 검증 · 현재 창 메뉴 반영은 유휴 대기",
+      "checkedAt": "2026-10-10",
       "functions": [
         {
           "id": "review-actions",
