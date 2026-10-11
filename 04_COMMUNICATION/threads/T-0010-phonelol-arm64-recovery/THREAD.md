@@ -1,7 +1,7 @@
 # T-0010 — PhoneLOL ARM64 복구와 인수인계
 
-상태: OPEN — `main` 1.18.6 소스 병합 및 Windows Android 빌드 완료. 1.18.5 기기 확인본은 `v1.18.5-known-good` 태그로 보존. 1.18.6 폰 실전과 iOS 서명은 미확인.
-현재 상태 원본: [RECOVERY_STATUS.md](https://github.com/kimjae134679/PhoneLoL_02/blob/main/RECOVERY_STATUS.md).
+상태: OPEN — 개발·배포 기록은 아래 댓글로 이어지며, 실제 휴대폰 다인 플레이 검증은 별도로 확인한다.
+현재 상태 원본: [개발 README](https://github.com/kimjae134679/PhoneLoL_02-Source/blob/main/README.md) · [인수인계](https://github.com/kimjae134679/PhoneLoL_02-Source/blob/main/HANDOFF.md). 아래 과거 기록의 저장소·버전은 당시 기준이다.
 후속 기록은 별도 댓글 파일을 만들지 말고 이 THREAD.md 아래에 이어 쓴다.
 
 ## 2026-09-23 — [B계정] Nova — [B계정] 전체 작업 인수인계
@@ -192,3 +192,13 @@
 - 추가 수정: 아군 미니언 순보, 로비 랭크/전체 전적, 클릭한 아이템 설명창에만 URF 쿨감 문구 표시, 상점 전부 판매, 넥서스 사망 시 즉시 결과 판정, 5레벨 단위 성장치, 바론 이펙트 높이, 연습용 알리스타 피해 숫자 및 1만 초과 원샷 후 스킨·체력 5만·처치 5천 골드 단계. 기존 1.18.5 게임 규칙은 이전 태그에 남는다.
 - Unity 6000.3.14f1 Windows Android 빌드 `Succeeded`; APK `PhoneLOL-02/Builds/PhoneLOL-1.18.6.apk`, 113516837 bytes, SHA-256 `85048FCA11712C1C4E977FDDCC8574E717FB9DB7035BC68C02BC3581EE07990D`. Unity 로그의 ProjectSettings 저장 오류 2건과 경고 750건은 남아 있다. Android 기기 ADB 연결 없음; 1.18.6의 휴대폰 전투·UI·승패는 검증하지 못했다.
 - 운영 공지는 1.18.5의 7000골드/20%와 1.18.6의 4000골드/50%를 함께 표시하도록 갱신했다. [다른 Mac용 iPhone 안내](https://github.com/kimjae134679/PhoneLoL_02/blob/main/Docs/IOS_MAC_BUILD_GUIDE.md)를 메인에 통합했으나 연결된 Mac/Xcode/아이폰이 없어 iOS 서명·설치는 수행하지 않았다. 사용자 `UnityConnectSettings.asset` 변경과 임시 로그·APK는 Git에 올리지 않았다.
+
+## 2026-10-12 02:43 KST — Codex Work — 댓글: URF 아이템 수정과 새 APK 배포 (원글 T-0010)
+
+- 사용자의 URF 수정·새 앱 배포 요청을 ProjectBridge로 수행했다. 원격 데스크톱 사용 없음. 실제 게임 개발 위치는 `D:\A_KJ\AI\PhoneLoL_02`이다.
+- 몰락 현재 체력4%, 란두인 방어력15%, 라일라이 둔화 곱연산 중첩, 주문흡혈 아이템100%, 워모그 체력45%, 리안드리 체력15%·매초 현재 체력2% 곱연산 중첩을 적용했다. 아이템 설명은 평범한 문구로 수정했다.
+- 구버전 `v0.23.4`에는 URF 시작금4,000원 코드가 있다. 새 버전의 신규 생성·재사용·비방장 수신 경로는1,000원이며 재접속 earned골드는 보존한다. 참가자 모두 같은 새 APK로 업데이트해야 한다. 버전 혼용이 제보의 실제 원인인지는 미검증이다.
+- [0.24.8/build268 공개 APK](https://github.com/kimjae134679/PhoneLoL_02/releases/download/v0.24.8/PhoneLOL-0.24.8.apk) 배포 완료. 114,144,026 bytes, SHA-256 `323e9d878b64410c83674c1348e826886a6f0dfb9595ae041527b32a8f2d81fe`. ARM64·원본과 동일 서명·manifest·CRC·공개 asset digest 확인.
+- 소스 main 및 `v0.24.8`: `61663a437aa58583bb9dce8061b2665d84fb6c69`. 수치 검사174개와 실제 Unity 캐릭터 검사162개 통과. [검증 원본](https://github.com/kimjae134679/PhoneLoL_02-Source/blob/main/Docs/ARTIFACTS_0.24.8.json).
+- 첫 패키징 자바 프로세스 종료 후 실행·결과를 확인하고 별도 작업ID로 재시도하여 성공했다. 기존 배포본·Known-Good·앞선 핑 복구를 보존했으며 이번 URF 작업에서 서버 코드 변경·재시작은 하지 않았다.
+- 실제 휴대폰 다인 전투·핑 수치는 미검증이다. 본인 task_exchange를 실제 프로젝트 소통함에 남겼고 다른 담당자의 수신·읽음이나 자동 수집·중앙 공유 완료를 대신 주장하지 않는다.
