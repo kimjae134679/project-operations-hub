@@ -364,5 +364,108 @@ class ContinuousManagerTests(unittest.TestCase):
                 self.assertFalse(self.snapshot()['steps']['a']['aiReceipt']['artifactVerified'])
 
 
+class JevItemErrorCompletionTests(unittest.TestCase):
+    # Reuse only fixture helpers, not the old class's tests or default temp location.
+    step = ContinuousManagerTests.step
+    plan = ContinuousManagerTests.plan
+    run_plan = ContinuousManagerTests.run_plan
+    snapshot = ContinuousManagerTests.snapshot
+    ai_step = ContinuousManagerTests.ai_step
+    ai_success_code = ContinuousManagerTests.ai_success_code
+
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location('continuous_manager_item_errors', MODULE)
+        self.cm = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.cm)
+        base = self.cm.safe_path(Path('D:/A_KJ/AI/Workspace/ControlTower/continuous-20261007/checks/jev-python-item-errors'))
+        base.mkdir(parents=True, exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(dir=base, prefix='owned-')
+        self.addCleanup(self.temp.cleanup)
+        self.root = self.cm.safe_path(Path(self.temp.name), base)
+        self.state = self.root / 'private'
+
+    def assert_item_error_blocks_dependency(self, item, after_completion, event_type='item.completed'):
+        event = {'type': event_type, 'item': item}
+        error_code = 'print(' + repr(json.dumps(event)) + ')'
+        success_code = self.ai_success_code()
+        code = (success_code + '\n' + error_code if after_completion
+                else error_code + '\n' + success_code)
+        plan = self.plan([self.ai_step(code), self.step('next',
+                         "from pathlib import Path; Path('must_not_run').touch()", ['a'])])
+        self.assertEqual(1, self.run_plan(plan))
+        state = self.snapshot()
+        receipt = state['steps']['a']['aiReceipt']
+        self.assertEqual('failed', state['steps']['a']['status'])
+        self.assertEqual('failed', receipt['status'])
+        self.assertEqual('ai_failed', receipt['failureCode'])
+        self.assertEqual(0, receipt['processExitCode'])
+        self.assertTrue(receipt['terminalObserved'])
+        self.assertTrue(receipt['reportObserved'])
+        self.assertEqual('blocked', state['steps']['next']['status'])
+        self.assertEqual(0, state['steps']['next']['attempts'])
+        self.assertFalse((self.root / 'must_not_run').exists())
+        self.assertNotIn('PRIVATE_ITEM_ERROR', json.dumps(receipt))
+        self.assertNotIn('private fixture report', json.dumps(receipt))
+        self.assertEqual(1, self.run_plan(plan))
+        replay = self.snapshot()
+        self.assertEqual(1, replay['steps']['a']['attempts'])
+        self.assertEqual(receipt, replay['steps']['a']['aiReceipt'])
+        self.assertEqual('blocked', replay['steps']['next']['status'])
+        self.assertEqual(0, replay['steps']['next']['attempts'])
+        self.assertFalse((self.root / 'must_not_run').exists())
+
+    def assert_normal_item_allows_dependency(self, item):
+        code = 'print(' + repr(json.dumps({'type': 'item.completed', 'item': item})) + ')\n' + self.ai_success_code()
+        plan = self.plan([self.ai_step(code), self.step('next',
+                         "from pathlib import Path; Path('success.marker').touch()", ['a'])])
+        self.assertEqual(0, self.run_plan(plan))
+        state = self.snapshot()
+        receipt = state['steps']['a']['aiReceipt']
+        self.assertEqual('succeeded', receipt['status'])
+        self.assertIsNone(receipt['failureCode'])
+        self.assertEqual('succeeded', state['steps']['next']['status'])
+        self.assertTrue((self.root / 'success.marker').exists())
+        self.assertNotIn('PRIVATE_REASONING', json.dumps(receipt))
+        self.assertNotIn('private fixture report', json.dumps(receipt))
+        self.assertEqual(0, self.run_plan(plan))
+        replay = self.snapshot()
+        self.assertEqual(1, replay['steps']['a']['attempts'])
+        self.assertEqual(1, replay['steps']['next']['attempts'])
+
+    def test_error_item_before_completion_blocks_dependency(self):
+        self.assert_item_error_blocks_dependency({'type': 'error', 'message': 'PRIVATE_ITEM_ERROR'}, False)
+
+    def test_error_item_after_completion_blocks_dependency(self):
+        self.assert_item_error_blocks_dependency({'type': 'error', 'message': 'PRIVATE_ITEM_ERROR'}, True)
+
+    def test_nested_tool_error_before_completion_blocks_dependency(self):
+        self.assert_item_error_blocks_dependency({'type': 'mcp_tool_call', 'status': 'failed',
+                                                 'error': {'message': 'PRIVATE_ITEM_ERROR'}}, False)
+
+    def test_nested_tool_error_after_completion_blocks_dependency(self):
+        self.assert_item_error_blocks_dependency({'type': 'mcp_tool_call', 'status': 'failed',
+                                                 'error': {'message': 'PRIVATE_ITEM_ERROR'}}, True)
+
+    def test_updated_tool_error_before_completion_blocks_dependency(self):
+        self.assert_item_error_blocks_dependency({'type': 'mcp_tool_call',
+                                                 'error': {'message': 'PRIVATE_ITEM_ERROR'}}, False, 'item.updated')
+
+    def test_updated_tool_error_after_completion_blocks_dependency(self):
+        self.assert_item_error_blocks_dependency({'type': 'mcp_tool_call',
+                                                 'error': {'message': 'PRIVATE_ITEM_ERROR'}}, True, 'item.updated')
+
+    def test_recoverable_command_nonzero_allows_dependency(self):
+        self.assert_normal_item_allows_dependency({'type': 'command_execution', 'status': 'failed', 'exit_code': 17})
+
+    def test_null_tool_error_allows_dependency(self):
+        self.assert_normal_item_allows_dependency({'type': 'mcp_tool_call', 'status': 'completed', 'error': None})
+
+    def test_successful_tool_allows_dependency(self):
+        self.assert_normal_item_allows_dependency({'type': 'command_execution', 'status': 'completed', 'exit_code': 0})
+
+    def test_reasoning_allows_dependency(self):
+        self.assert_normal_item_allows_dependency({'type': 'reasoning', 'text': 'PRIVATE_REASONING'})
+
+
 if __name__ == '__main__':
     unittest.main()

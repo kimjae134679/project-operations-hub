@@ -10,6 +10,8 @@ namespace AIControlTower.Services;
 public sealed class ProjectRecordPublisher
 {
     public const string JournalRoot = @"D:\A_KJ\AI\ControlTowerData\record-publication";
+    private const int MaximumNewPaths = 100;
+    private const int MaximumExportBytes = 8 * 1024 * 1024;
     private const string FixtureRoot = @"D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks\project-record-publishing-fixtures";
     private static readonly Dictionary<string,(long Id,string Name,bool Private)> Repositories = new(StringComparer.Ordinal)
     {
@@ -57,7 +59,9 @@ public sealed class ProjectRecordPublisher
             if (records.TryGetValue(path,out var prior) && (prior.SourceHash!=export.SourceHash || prior.Content!=export.Content)) throw new InvalidDataException("Conflicting local revision");
             records[path]=export;
         }
-        if (records.Count>100) throw new InvalidDataException("Publication batch limit");
+        // Retain and validate every revision; only missing remote paths count toward a write batch.
+        if (records.Values.Sum(v=>(long)Encoding.UTF8.GetByteCount(v.Content))>MaximumExportBytes)
+            throw new InvalidDataException("Publication export byte limit");
         return records.Values.OrderBy(v=>v.Path,StringComparer.Ordinal).ToArray();
     }
     public async Task<ProjectRecordPublishingResult> PublishAsync(ProjectRecordPublishingRegistration r,CommunicationCollectionResult collection,CancellationToken ct=default)
@@ -66,7 +70,14 @@ public sealed class ProjectRecordPublisher
         ProjectRecordPublishingResult Result(string status,string? url=null)=>new(status,r.ProjectId,batch,uploaded,url,status is "held" or "upload_uncertain" or "pr_uncertain"?stage:null);
         try
         {
+            ct.ThrowIfCancellationRequested();
             ValidateRegistration(r);
+            // This lease spans record validation, remote reads/writes and the batch journal. A changed batch
+            // must not race another publisher of this registered project, including another process.
+            stage="project_lease"; SafePath(_journalRoot); Directory.CreateDirectory(_journalRoot); SafePath(_journalRoot);
+            var projectLeasePath=Path.Combine(_journalRoot,r.RepositoryId.ToString(System.Globalization.CultureInfo.InvariantCulture)+"-publisher.lock");
+            SafePath(projectLeasePath);
+            using var projectLease=new FileStream(projectLeasePath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
             stage="record_validation";
             var exports=PrepareExports(r,collection);
             if (exports.Count==0) return Result("empty");
@@ -92,6 +103,8 @@ public sealed class ProjectRecordPublisher
                 if (state.Stage is not ("prepared" or "tree_pending" or "tree_created" or "commit_pending" or "commit_created" or "branch_pending" or "branch_uploaded" or "pr_pending" or "pr_open"))
                     throw new InvalidDataException("Unknown journal stage");
                 if (state.BatchHash!=batch || state.RepositoryId!=r.RepositoryId || state.Branch!=branch || state.BaseBranch!=r.BaseBranch || state.Paths.Except(exports.Select(e=>e.Path),StringComparer.Ordinal).Any()) throw new InvalidDataException("Journal binding mismatch");
+                if (state.Paths.Length>MaximumNewPaths || state.Paths.Distinct(StringComparer.Ordinal).Count()!=state.Paths.Length)
+                    throw new InvalidDataException("Publication journal path limit");
             }
             else
             {
@@ -106,6 +119,7 @@ public sealed class ProjectRecordPublisher
                     else missing.Add(export.Path);
                 }
                 if (missing.Count==0) {uploaded=true;return Result("already_present");}
+                if (missing.Count>MaximumNewPaths) throw new InvalidDataException("Publication batch limit");
                 state=new Journal {BatchHash=batch,RepositoryId=r.RepositoryId,Branch=branch,BaseBranch=r.BaseBranch,BaseSha=baseSha,BaseTree=baseTree,Paths=missing.ToArray(),Stage="prepared"};
                 Save(journalPath,state);
             }

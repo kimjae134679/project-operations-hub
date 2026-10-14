@@ -7,6 +7,17 @@ public sealed class DocumentReaderViewModel : ObservableObject
 {
     private readonly Func<string,string,CancellationToken,Task<ReaderDocument>> _read;
     private int _generation;
+    private readonly object _ownedAdmission=new();
+    private int _ownedReads;
+    private bool _ownedFrozen;
+    public bool OwnedReadsIdle {get {lock(_ownedAdmission)return _ownedReads==0;}}
+    public void FreezeOwnedAdmission(bool frozen){lock(_ownedAdmission)_ownedFrozen=frozen;}
+    private async Task<ReaderDocument> ReadOwnedAsync(string root,string path)
+    {
+        lock(_ownedAdmission){if(_ownedFrozen)throw new InvalidOperationException("안전 종료 확인 중 · 새 문서 조회 보류");_ownedReads++;}
+        try{return await _read(root,path,CancellationToken.None);}
+        finally{lock(_ownedAdmission)_ownedReads--;}
+    }
     private string _title="문서 읽기",_filePath="",_rawText="",_format="text",_error="안내·텍스트 기록을 선택하면 이 화면에서 읽습니다.",_searchText="";
     private bool _wrapText=true,_showRaw,_isLoading;
     private IReadOnlyList<DocumentSearchHit> _matches=[];
@@ -46,6 +57,7 @@ public sealed class DocumentReaderViewModel : ObservableObject
     public string SearchText {get=>_searchText;set { if(SetProperty(ref _searchText,value)) UpdateMatches(); }}
     public async Task OpenAsync(string approvedRoot,string filePath,string? title=null)
     {
+        lock(_ownedAdmission)if(_ownedFrozen)return;
         Opening?.Invoke(this,EventArgs.Empty); SaveCurrent();
         if(_historyIndex+1<_history.Count)_history.RemoveRange(_historyIndex+1,_history.Count-_historyIndex-1);
         var state=new DocumentState(approvedRoot,filePath,title??Path.GetFileName(filePath));_history.Add(state);
@@ -57,6 +69,7 @@ public sealed class DocumentReaderViewModel : ObservableObject
     public void ReturnToOrigin() { if(CanReturnToOrigin)ReturnRequested?.Invoke(this,EventArgs.Empty); }
     private async Task NavigateAsync(int direction)
     {
+        lock(_ownedAdmission)if(_ownedFrozen)return;
         var next=_historyIndex+direction;if(next<0 || next>=_history.Count)return;
         Opening?.Invoke(this,EventArgs.Empty);SaveCurrent();_historyIndex=next;NotifyHistory();await LoadAsync(_history[next],true);
     }
@@ -75,7 +88,7 @@ public sealed class DocumentReaderViewModel : ObservableObject
         try
         {
             // History stores metadata only. Re-read through the same approved-root/security reader.
-            var document=await _read(state.Root,state.Path,CancellationToken.None);
+            var document=await ReadOwnedAsync(state.Root,state.Path);
             if(current!=_generation) return;
             RawText=document.RawText; Format=document.Format; Error=document.Error; ShowRaw=Format!="markdown"; UpdateMatches();
             if(restore && document.Success)

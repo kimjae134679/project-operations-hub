@@ -53,13 +53,72 @@ public sealed class RegisteredRecordPublishingTests
         public void Dispose(){if(Directory.Exists(Root))Directory.Delete(Root,true);}
     }
     private static CommunicationCollectionResult Collection()=>new([new("Threads","outbox","safe.md",@"D:\owned\Threads\_통합소통\보낼자료\safe.md",new string('a',64),@"D:\owned\sink\safe.md","# task_exchange\nbenign evidence",DateTimeOffset.UtcNow)],[],DateTimeOffset.UtcNow);
-    private static async Task<string> Publish(object helper,bool manual,Func<string,CommunicationCollectionResult,CancellationToken,Task<string>> publish,CancellationToken ct=default)
+    private static async Task<string> Publish(object helper,bool manual,Func<string,CommunicationCollectionResult,CancellationToken,Task<string>> publish,CancellationToken ct=default,CommunicationCollectionResult? collection=null)
     {
         var method=Helper().GetMethod("PublishAsync");Assert.NotNull(method);
-        var task=(Task)method!.Invoke(helper,[manual,Collection(),publish,ct])!;await task;
+        var task=(Task)method!.Invoke(helper,[manual,collection??Collection(),publish,ct])!;await task;
         return (string)task.GetType().GetProperty("Result")!.GetValue(task)!;
     }
     private static bool Running(object helper)=>(bool)Helper().GetProperty("IsRunning")!.GetValue(helper)!;
+    private static CommunicationCollectionResult PreparationCollection(Fixture fixture,params CommunicationIssue[] errors)
+    {
+        Directory.CreateDirectory(Path.Combine(fixture.Root,".git"));
+        File.WriteAllText(Path.Combine(fixture.Root,".git","config"),"[remote \"origin\"]\n url = https://github.com/kimjae134679/Threads.git\n");
+        var body=JsonSerializer.Serialize(new{schemaVersion=1,recordType="task_exchange",recordId="scope-proof",revision=1,title="Synthetic scope proof",projectId="Threads",actorId="fixture-owner",sessionId="fixture-session",
+            receivedAt="2026-10-07T10:00:00+09:00",updatedAt="2026-10-07T10:01:00+09:00",request=new{summary="Synthetic request",details="Fixture only",source="current_chat"},
+            response=new{summary="Synthetic response",details="Fixture only",source="current_chat"},status="in_progress",workDone=new[]{"Prepared fixture"},
+            verification=new[]{new{name="Fixture check",result="not_run",evidence=Array.Empty<string>()}},nextActions=new[]{"Inspect isolation"},blockers=Array.Empty<string>(),supersedes=Array.Empty<string>()});
+        var path=Path.Combine(fixture.Root,"_통합소통","보낼자료","scope.json");Directory.CreateDirectory(Path.GetDirectoryName(path)!);File.WriteAllText(path,body);
+        var record=new CommunicationCollectedRecord("Threads","outbox","_통합소통/보낼자료/scope.json",path,CommunicationService.ContentHash(body),Path.Combine(fixture.Root,"collected","scope.json"),body,DateTimeOffset.UtcNow);
+        return new([record,record with{ProjectId="Control-Tower"}],errors,DateTimeOffset.UtcNow);
+    }
+    [Theory]
+    [InlineData("Control-Tower")]
+    [InlineData("threads")]
+    public async Task ForeignProjectIssueDoesNotBlockValidSelectedMetadata(string foreignProject)
+    {
+        using var fixture=new Fixture();var helper=(RegisteredRecordPublishing)fixture.New();var registration=Assert.Single(helper.ReadRegistrations());
+        var issue=new CommunicationIssue(foreignProject,"collection_retry","Synthetic foreign issue");var collection=PreparationCollection(fixture,issue);var calls=0;InvalidDataException? preparationFailure=null;
+        var status=await Publish(helper,true,(project,selected,_)=>
+        {
+            calls++;Assert.Equal("Threads",project);Assert.Same(collection.Records[0],Assert.Single(selected.Records));
+            IReadOnlyList<ProjectRecordExport> exports;
+            try{exports=ProjectRecordPublisher.PrepareExports(registration,selected);}
+            catch(InvalidDataException ex){preparationFailure=ex;return Task.FromResult("held");}
+            var export=Assert.Single(exports);
+            Assert.StartsWith("04_COMMUNICATION/shared-records/Threads/",export.Path);Assert.Empty(selected.Errors);
+            return Task.FromResult("empty");
+        },collection:collection);
+        Assert.Null(preparationFailure);Assert.Equal("empty",status);Assert.Equal(1,calls);
+        Assert.Equal(2,collection.Records.Count);Assert.Same(issue,Assert.Single(collection.Errors));
+    }
+    [Theory]
+    [InlineData("Threads","collection_retry")]
+    [InlineData(null,"path_blocked")]
+    public async Task OwnAndGlobalIssuesStillBlockRealExportPreparation(string? project,string code)
+    {
+        using var fixture=new Fixture();var helper=(RegisteredRecordPublishing)fixture.New();var registration=Assert.Single(helper.ReadRegistrations());
+        var issue=new CommunicationIssue(project,code,"Synthetic blocking issue");var collection=PreparationCollection(fixture,issue);var calls=0;
+        Assert.Equal("held",await Publish(helper,true,(_,selected,__)=>
+        {
+            calls++;Assert.Same(issue,Assert.Single(selected.Errors));
+            Assert.Throws<InvalidDataException>(()=>ProjectRecordPublisher.PrepareExports(registration,selected));return Task.FromResult("held");
+        },collection:collection));
+        Assert.Equal(1,calls);Assert.Same(issue,Assert.Single(collection.Errors));Assert.Equal(2,collection.Records.Count);
+    }
+    [Theory]
+    [InlineData(null,"manifest_invalid")]
+    [InlineData(null,"collection_blocked")]
+    [InlineData("Threads","manifest_invalid")]
+    [InlineData("Threads","collection_blocked")]
+    [InlineData("Control-Tower","manifest_invalid")]
+    [InlineData("Control-Tower","collection_blocked")]
+    public async Task CriticalCollectionIssuesRemainGlobalBeforePublisherInvocation(string? project,string code)
+    {
+        using var fixture=new Fixture();var issue=new CommunicationIssue(project,code,"Synthetic critical issue");var collection=PreparationCollection(fixture,issue);var calls=0;
+        Assert.Equal("held",await Publish(fixture.New(),true,(_,__,___)=>{calls++;return Task.FromResult("empty");},collection:collection));
+        Assert.Equal(0,calls);Assert.Same(issue,Assert.Single(collection.Errors));Assert.Equal(2,collection.Records.Count);
+    }
     [Fact] public async Task LocalViewAndDisabledRegistrationNeverInvokePublisher()
     {
         using var fixture=new Fixture();var calls=0;

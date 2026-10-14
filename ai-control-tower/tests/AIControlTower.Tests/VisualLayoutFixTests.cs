@@ -14,7 +14,7 @@ public sealed class VisualLayoutFixTests
 {
     [Fact] public void LatestRequestedMyProjectsIsFirstAndDefaultByNamedIdentity()
     {
-        var xml=XDocument.Load(Source("MainWindow.xaml"));var tabs=xml.Descendants().Single(e=>e.Name.LocalName=="TabControl");
+        var xml=XDocument.Load(Source("MainWindow.xaml"));var tabs=xml.Descendants().Single(e=>(string?)e.Attribute(XName.Get("Name","http://schemas.microsoft.com/winfx/2006/xaml"))=="WorkspaceTabs");
         Assert.Equal("ProjectsTab",(string?)tabs.Elements().First().Attribute(XName.Get("Name","http://schemas.microsoft.com/winfx/2006/xaml")));
         Assert.Equal("True",(string?)tabs.Elements().First().Attribute("IsSelected"));
     }
@@ -35,19 +35,16 @@ public sealed class VisualLayoutFixTests
         Assert.Same(resources["AccentBrush"],border.BorderBrush);
     });
     [Theory] [InlineData(false)] [InlineData(true)]
-    public void DashboardUsesCompactSearchWatermarkAndHidesStateRegistrationUnderAdvanced(bool dark)=>Sta(()=>
+    public void DashboardRemovesSearchFiltersAndAdvancedWhileRetainingOnlyOwnedStop(bool dark)=>Sta(()=>
     {
         var view=new AIControlTower.Views.WorkDashboardView{Resources=Resources(dark)};
-        var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<AIControlTower.Models.WorkActivity>>([]));view.DataContext=vm;Layout(view,1060,660);
-        var labels=Children(view).OfType<TextBlock>().Where(t=>t.Visibility==Visibility.Visible && t.ActualHeight>0).Select(t=>t.Text).ToArray();
-        Assert.Contains("작업 검색",labels);
-        var watermark=Children(view).OfType<TextBlock>().Single(t=>t.Name=="WorkSearchWatermark");
-        var advanced=view.FindName("AdvancedSources") as Expander;Assert.NotNull(advanced);Assert.Equal("고급",advanced.Header);Assert.False(advanced.IsExpanded);
-        Assert.Equal(Visibility.Visible,watermark.Visibility);Assert.False(watermark.IsHitTestVisible);
-        vm.Search="Codex";Layout(view,1060,660);Assert.Equal(Visibility.Collapsed,watermark.Visibility);
-        advanced.IsExpanded=true;Layout(view,1060,660);
-        var stateHint=view.FindName("StatePathWatermark") as TextBlock;Assert.NotNull(stateHint);Assert.Equal(Visibility.Visible,stateHint.Visibility);
-        var state=view.FindName("StatePathInput") as TextBox;Assert.NotNull(state);state.Text=@"D:\A_KJ\AI\explicit\state.json";Layout(view,1060,660);Assert.Equal(Visibility.Collapsed,stateHint.Visibility);
+        var vm=new WorkDashboardViewModel(_=>Task.FromResult<IReadOnlyList<AIControlTower.Models.WorkActivity>>([]),owns:id=>id=="fixture-owned");view.DataContext=vm;Layout(view,1060,660);
+        Assert.Empty(Children(view).OfType<TextBox>());Assert.Empty(Children(view).OfType<ComboBox>());Assert.Empty(Children(view).OfType<Expander>());
+        Assert.Null(view.FindName("WorkSearchWatermark"));Assert.Null(view.FindName("AdvancedSources"));Assert.Null(view.FindName("StatePathInput"));
+        var stop=Assert.Single(Children(view).OfType<Button>(),b=>Equals(b.Content,"소유 작업 중지"));
+        Assert.Equal(Visibility.Collapsed,stop.Visibility);
+        vm.Selected=new(){Id="owned",OwnedProgramId="fixture-owned"};Layout(view,1060,660);Assert.Equal(Visibility.Visible,stop.Visibility);Assert.True(stop.IsEnabled);
+        vm.Selected=new(){Id="external"};Layout(view,1060,660);Assert.Equal(Visibility.Collapsed,stop.Visibility);
     });
     [Theory] [InlineData(false)] [InlineData(true)]
     public void ActualThemeChoiceButtonsShowCurrentSelectionAndKeepCompleteHitTargets(bool dark)=>Sta(()=>

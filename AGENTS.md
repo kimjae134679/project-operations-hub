@@ -130,3 +130,33 @@
 ## 대화 중단 전 기록과 모델
 
 작업 시작·재개 때 공지 N-0010도 읽습니다. 대화가 길어지거나 시간·문맥 한계에 가까워지면 기록할 여유를 남기고 안전한 중단점에서 task_exchange를 갱신합니다. 실행 중인 소유 작업 ID·검증·남은 일·다음 구체적인 명령을 저장하고 실제 지원되는 실행기에서만 대화 밖 연속 작업을 사용합니다. 새 모델 호출은 실제 지원되는 6.1 계열 우선이며 Astra는 제외합니다. 거절된 6.1은 공식 실행기 업데이트와 지원 여부를 먼저 확인합니다. 자세한 기준은 N-0010과 USER_POLICIES를 따릅니다.
+
+## 이전 C1 운영·0.9.8 준비 경계 · 2026-10-07
+
+이 구역의 현재/미배포 표현은 당시 기록입니다. 문서 끝의 최신 0.9.8 운영 확인을 우선합니다.
+
+다음 0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다. 실행기 버전은 ASCII 정규형 숫자 3부분(각 0~65535, 선행 0 없음)에 바인딩하고 다운그레이드를 거부하며 모든 nonlegacy 현재 descriptor를 확인합니다. legacy096 pin·정확 capability 튜플·guard·프로세스 신원·기한 계약은 유지합니다. 명시 AI 항목 오류는 후속 성공으로 지우지 않는 sticky 오류이며 일반 도구 nonzero는 회복 가능한 도구 오류입니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 .NET 634 PASS/0 FAIL(49초, Window 3개 제외), scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)입니다. 신규 패키지·실제 전체 자동 버전 교체 성공은 아직 주장하지 않습니다.
+
+현재 운영본은 0.9.7 autoexit manual-control PID 9552/source `5b0f3296d259ce03882e16eba1d8f93604af570f`, 생성 16:48:14.613517 KST입니다. 루트 담당자가 fresh 상태의 trayRegistered/pcConnected true·ownedJobsBusy false와 endpoint PID 신원을 확인했고 root supervisor PID 5996은 그대로 보존했습니다. 사용자 트레이 종료 확인 후 legacy PID 37456 실제 종료 → 검증 helper의 C1 PID 25136 실행으로 첫 전환을 완료했습니다. 정확 C1 headless client PID 22216의 `graceful_exit_accepted/0`·빈 stderr → 원래 PID 25136 실제 종료 → 고정 guard CheckOnly 0·명시 재시작 0 → PID 9552를 확인했습니다. 이것은 **유휴 CLI 정상 종료와 동일 패키지 guard 재시작 1회**이며 capable 기존본 → 다른 새 패키지의 helper 전체 자동 교체·운영 busy drain 검증은 아닙니다. X는 트레이를 유지합니다. 강제 종료·창 제어·구버전 CLI 탐색은 하지 않았으며 불명확한 전송·응답·신원은 계속 재요청 없이 보류합니다.
+
+별도 `0.9.7-20261007-autoexit` 패키지와 고정 capability 등록은 그대로입니다. 앱 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`; C1 앱·C2 helper 바이트/해시는 변경하지 않았습니다. 앞선 비운영 순수 검사 0·owner 없는 요청 `unsupported/4`·추가 인수 `invalid_request/2`를 이번 운영 정상 종료 증거와 구분합니다.
+
+앞선 .NET 624 PASS/0 FAIL, scripts 102 PASS/0 FAIL(89.035초, 실행기 34개 포함), 환경·외부 EOF focused 4 PASS(6.217초)는 운영 전환 후 재실행한 검사가 아닙니다. 종료 client의 압축 해제·TEMP/TMP를 검증된 기존 D 패키지 폴더에 고정했고 Python harness는 D 출력 파일과 정확한 부모 종료만 기다립니다. 이전 전체 98개 두 번은 외부 35초 timeout으로 각각 97 PASS/1 ERROR(95.932초·126.665초); 동일 deadline 단독 검사는 변경 없이 PASS(25.864초)였습니다. private 추적에서 상속 capture EOF 지연은 확인했지만 전체 실행 추가 지연의 원인은 전부 입증되지 않았습니다. 보호 Bridge config와 중앙 clone locks는 그대로이며 실제 여러 모델 동시 작업 증거는 미확인입니다. PR #31은 draft·미병합, receipt review는 disabled/unmanaged입니다. 과거 이력보다 실제 최신 앱·패키지·검사 근거를 우선하고 운영 성공을 추측하지 않습니다.
+
+## 최신 자동 교체 운영 확인 · 2026-10-07
+
+현재 0.9.8 manual-control PID 25772, 생성 17:39:00.861918 KST/endpoint ticks `639269591408619180`; 루트 담당자가 fresh trayRegistered/pcConnected true·ownedJobsBusy false와 endpoint 신원을 확인했습니다. 패키지 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-managed`, 앱 소스 `c4f9669fcc287dcb47d74c97dd1f3661e621b488`, SHA-256 `484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b`, helper/Python 소스 `cbdefbfa09caed87439ad9e680e744a446ef20b3`입니다.
+
+helper PID 37016/1회/종료 코드 0으로 C1 PID 9552 소멸 → 별도 0.9.8 PID 376 실행(17:37:24.751947 KST, ticks `639269590447519475`)을 확인했습니다. `FULL_HANDOFF.json`의 operatingHandoffConfirmed=true, oldExitReplyDirectlyCaptured=false입니다. 구버전 수락 원문을 별도 캡처했다고 대필하지 않습니다. 이어 exact 새 client PID 28344의 `graceful_exit_accepted/0`·빈 stderr → PID 376 실제 종료 → guard PID 23092 CheckOnly 0·재시작 0 → PID 25772를 확인했습니다(`NEW_IDLE_ROUNDTRIP.json`). activated/automaticDifferentPackageHandoffVerified/idleCliRoundtripVerified=true, busyDrainOperatingVerified=false입니다. X는 트레이 유지, 강제 종료·창 제어는 없습니다.
+
+최종 scripts 119 PASS/0 FAIL(119.066초, 종료 코드 0, 실행기 41개), 앱 C# 추가 변경 없는 .NET 634 PASS/0 FAIL(49초, Window 3개 제외)입니다. 직전 117개/118.331초의 teardown 1 ERROR, cleanup RED 2 FAIL(16.568초) → GREEN 5 PASS(15.034초)를 보존합니다. 기존 8초 소유 파일 release barrier는 프로세스 종료 증거가 아니며 production deadline은 변경하지 않았습니다. Python CLI RED 6 FAIL/4 PASS(15.112초) → GREEN 10 PASS(14.896초), DAG 차단·replay 1·privacy 0은 소스 CLI 검증이며 기존 Bridge 3.0 운영 설치 변경이 아닙니다. 정규형 버전·다운그레이드 거부·nonlegacy descriptor·고정 capability/guard·PID/birth·기한·미확인 무재시도 계약과 sticky 명시 AI 오류/회복 가능한 일반 도구 nonzero 구분은 유지합니다.
+
+root supervisor PID 5996 보존, Bridge PID 5140/v3 localReady·relayConnected true/parallel 4(08:39:30Z), 별도 Remote pong(08:39:27Z)을 확인했습니다. 보호 config·중앙 Git locks·실제 여러 Jev 모델 완료·모든 GPT 자동 연결은 미완료입니다. PR #31 draft·미병합, review disabled/unmanaged, 예약 PAUSED입니다.
+
+## 최신 운영 확인 · 2026-10-07 19:14 KST
+
+앞선 PID/소스 표시는 당시 이력입니다. 현재 scoped 0.9.8 운영 앱은 source `5e79fa1db693982a876187c455d06369b4762511`, PID 21936이며 정확한 EXE SHA는 `606d81c0d7bf4b42559420b7fca255ceff3e98b66c32c0a1f3d541012652772a`입니다. 지원 helper의 다른 패키지 전환 및 exact 새 EXE의 유휴 정상 종료/guard 재시작을 확인했고 root5996/Bridge5140의 생성 신원을 보존했습니다. 새 앱이 별도 publisher CLI 없이 45개 구조 기록을 draft PR34로 자동 공유했습니다. PR34는 미병합이고 CentralShared/공지 ACK는 false이며 명령/답변 원문은 로컬에 유지합니다.
+
+부모 .NET654 PASS/0 FAIL(8초, Window.Show3 제외), 교체 helper43 PASS/0 FAIL(82.630초/native0)입니다. 현재 빌드의 실제 지원 종료 왕복 이후 helper source `73a15134bf1b0856b6fd21a3f110f254f457f6a3`/SHA `3ee433b0d8c7fdb5987299fc77aedb2d4fe7112242f834b5db6d720f1eddf125`를 별도 등록했습니다. 앱 EXE는 helper 변경으로 재빌드하지 않았습니다. root 최신 실행 입구는 scoped fixed guard로 연결하되 wrapper 재실행은 하지 않았습니다. 실행 descriptor의 UTC 만료를 보존하며 임의 연장하지 않습니다.
+
+타 프로젝트 일반 수집 오류가 다른 publisher를 막던 경계만 정확한 project ID로 격리했고 본인/전역 오류 및 manifest/collection 차단은 유지합니다. 원격 본체 protected config 설치와 실제 중앙 clone 잠금은 미해결·무변경이며 운영 busy drain/전체 GPT-Jev 대화 연결/실제 여러 모델 완료는 아직 미검증입니다. 예약 PAUSED, receipt review disabled/unmanaged, 런타임 Engram 미등록으로 agent memory 호출0을 유지합니다. 자세한 원본/실행/기록 경계는 `ai-control-tower/docs/project-record-publishing.md`와 최신 본인 task_exchange를 확인합니다.

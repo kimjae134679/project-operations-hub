@@ -37,6 +37,28 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     private PcConnectionSnapshot _snapshot = new(false,false,false,"기기 확인 대기","unknown","연결 상태를 확인하고 있습니다.","",0,4,[]);
     private bool _working; private string _error = ""; private readonly bool _readOnly, _manualControl;
     private bool _desiredConnected=true, _permissionBlocked;private int _retryFailures;
+    private readonly object _ownedAdmission=new();
+    private bool _ownedFrozen;
+    private int _ownedActivities,_ownedMutations;
+    // Local API operations only. Remote Bridge job counts are not manager-owned lifetime.
+    public bool OwnedActivitiesIdle {get {lock(_ownedAdmission)return _ownedActivities==0 && _gate.CurrentCount==1 && _operations.CurrentCount==1 && !_working;}}
+    public bool OwnedMutationInFlight {get {lock(_ownedAdmission)return _ownedMutations>0;}}
+    public void FreezeOwnedAdmission(bool frozen){lock(_ownedAdmission)_ownedFrozen=frozen;}
+    private async Task<T> WithOwnedActivityAsync<T>(Func<Task<T>> action,bool mutation)
+    {
+        lock(_ownedAdmission)
+        {
+            if(_ownedFrozen)throw new InvalidOperationException("안전 종료 확인 중 · 새 PC 요청 보류");
+            _ownedActivities++;if(mutation)_ownedMutations++;
+        }
+        try{return await action();}
+        finally{lock(_ownedAdmission){_ownedActivities--;if(mutation)_ownedMutations--;}}
+    }
+    private async Task WithOwnedActivityAsync(Func<Task> action,bool mutation)
+    {
+        try{await WithOwnedActivityAsync(async()=>{await action();return true;},mutation);}
+        catch(InvalidOperationException) when(_ownedFrozen){}
+    }
     public bool AutoReconnectSuppressed => !_desiredConnected || _permissionBlocked;
     public DateTimeOffset NextRetryAt { get; private set; } = DateTimeOffset.MinValue;
     public PcConnectionDiagnostics Diagnostics { get; private set; } = new();
@@ -69,7 +91,8 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     public string RelayStatusText => IsReadOnly ? "로컬 조회 · 원격/API 상태 미확인 · 기존 연결은 변경하지 않습니다." : _snapshot.RelayConnected ? "다른 GPT의 원격 요청 통로도 연결됨" : _snapshot.RelayCode switch { "github_login_required" => "원격 요청 통로: GitHub 로그인 필요", "github_http_404" => "원격 요청 통로: 저장소 접근 또는 주소 확인 필요", _ => "원격 요청 통로 대기 · PC 안의 도구는 로컬 연결로 작업합니다." };
     private void Notify() { foreach(var p in new[]{nameof(DeviceLabel),nameof(IsInstalled),nameof(IsConnected),nameof(HasError),nameof(IsBusy),nameof(ActiveJobCount),nameof(ParallelLimit),nameof(StatusText),nameof(DetailText),nameof(RelayStatusText),nameof(AutoReconnectSuppressed),nameof(NextRetryAt)}) OnPropertyChanged(p); }
     private void ShowError(Exception e) { _error = ProcessRunner.Sanitize(e.Message); Notify(); }
-    public async Task PollAsync()
+    public Task PollAsync()=>WithOwnedActivityAsync(PollCoreAsync,false);
+    private async Task PollCoreAsync()
     {
         if(IsReadOnly){Notify();return;}
         if (!await _gate.WaitAsync(0)) return;
@@ -103,7 +126,8 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
             _gate.Release();OnPropertyChanged(nameof(Diagnostics));
         }
     }
-    public async Task MaintainConnectionAsync(DateTimeOffset now)
+    public Task MaintainConnectionAsync(DateTimeOffset now)=>WithOwnedActivityAsync(()=>MaintainConnectionCoreAsync(now),true);
+    private async Task MaintainConnectionCoreAsync(DateTimeOffset now)
     {
         if(!_manualControl || _lifetime.IsCancellationRequested || _permissionBlocked || now<NextRetryAt)return;
         bool acquired;
@@ -130,7 +154,8 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
         }
         finally{Diagnostics=Diagnostics with {NextRetryAtUtc=NextRetryAt==DateTimeOffset.MinValue?null:NextRetryAt};_operations.Release();OnPropertyChanged(nameof(Diagnostics));Notify();}
     }
-    private async Task RunAsync(Func<Task> action)
+    private Task RunAsync(Func<Task> action)=>WithOwnedActivityAsync(()=>RunCoreAsync(action),true);
+    private async Task RunCoreAsync(Func<Task> action)
     {
         if(IsReadOnly){_error="로컬 조회 · PC 실행/설치/중지는 보류합니다.";Notify();return;}
         if(_manualControl)await _operations.WaitAsync(_lifetime.Token);else if (!await _operations.WaitAsync(0)) return;
@@ -141,6 +166,7 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
     }
     private Task OperateAsync(string action)
     {
+        lock(_ownedAdmission)if(_ownedFrozen)return Task.CompletedTask;
         if(_manualControl){_desiredConnected=action=="resume";if(action=="resume"){_permissionBlocked=false;NextRetryAt=DateTimeOffset.MinValue;}_error="";Notify();}
         return RunAsync(async()=> {if(_manualControl)await _service.ControlApiOnlyAsync(action,_lifetime.Token);else {await _service.ControlAsync(action,_lifetime.Token);await Task.Delay(500,_lifetime.Token);}});
     }
@@ -152,7 +178,15 @@ public sealed class PcConnectionViewModel : ObservableObject, IDisposable
         return OperateAsync("stop");
     }
     private Task InstallAsync() => RunAsync(async()=>{await _service.InstallAsync(_lifetime.Token);await Task.Delay(1000,_lifetime.Token);});
-    public Task<string> SubmitAsync(string project, string tool, string action, object args) => IsReadOnly ? Task.FromException<string>(new InvalidOperationException("로컬 조회 · PC 명령 제출 보류")) : _manualControl?_service.SubmitApiOnlyAsync(project,tool,action,args,_lifetime.Token):_service.SubmitAsync(project,tool,action,args,_lifetime.Token);
-    public Task<string> ResultAsync(string id) => IsReadOnly ? Task.FromException<string>(new InvalidOperationException("로컬 조회 · 외부 API 결과 확인 없음")) : _service.ResultAsync(id,_lifetime.Token);
+    public Task<string> SubmitAsync(string project, string tool, string action, object args) => WithOwnedActivityAsync(()=>IsReadOnly ? Task.FromException<string>(new InvalidOperationException("로컬 조회 · PC 명령 제출 보류")) : _manualControl?_service.SubmitApiOnlyAsync(project,tool,action,args,_lifetime.Token):_service.SubmitAsync(project,tool,action,args,_lifetime.Token),true);
+    public Task<string> ResultAsync(string id) => ResultAsync(id,CancellationToken.None);
+    public Task<string> ResultAsync(string id,CancellationToken ct)=>WithOwnedActivityAsync(()=>ResultCoreAsync(id,ct),false);
+    private async Task<string> ResultCoreAsync(string id,CancellationToken ct)
+    {
+        if(IsReadOnly)throw new InvalidOperationException("로컬 조회 · 외부 API 결과 확인 없음");
+        using var linked=CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token,ct);
+        linked.Token.ThrowIfCancellationRequested();
+        return await _service.ResultAsync(id,linked.Token).ConfigureAwait(false);
+    }
     public void Dispose() { _lifetime.Cancel(); _service.Dispose(); }
 }

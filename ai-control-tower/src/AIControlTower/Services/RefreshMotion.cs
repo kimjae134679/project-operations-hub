@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 namespace AIControlTower.Services;
-/// <summary>A single compositor clock repeats continuously; stopping finishes the current turn.</summary>
+ /// <summary>A single eased compositor clock repeats; stopping finishes the current turn.</summary>
 public static class RefreshMotion
 {
  public static readonly DependencyProperty ActiveProperty = DependencyProperty.RegisterAttached("Active",typeof(bool),typeof(RefreshMotion),new PropertyMetadata(false,Changed));
@@ -28,9 +28,11 @@ public static class RefreshMotion
  {
   angle=double.IsFinite(angle)?((angle%360)+360)%360:0;
   var duration=NormalizeDuration(milliseconds);
-  return finishing
-   ? new DoubleAnimation(angle,360,TimeSpan.FromMilliseconds(duration*(360-angle)/360)) { FillBehavior=FillBehavior.HoldEnd }
-   : new DoubleAnimation(angle,angle+360,TimeSpan.FromMilliseconds(duration)) { RepeatBehavior=RepeatBehavior.Forever };
+   var animation=finishing
+    ? new DoubleAnimation(angle,360,TimeSpan.FromMilliseconds(duration*(360-angle)/360)) { FillBehavior=FillBehavior.HoldEnd }
+    : new DoubleAnimation(angle,angle+360,TimeSpan.FromMilliseconds(duration)) { RepeatBehavior=RepeatBehavior.Forever };
+   animation.EasingFunction=new SineEase { EasingMode=EasingMode.EaseInOut };
+   return animation;
  }
  private static void Changed(DependencyObject target,DependencyPropertyChangedEventArgs args)
  {
@@ -50,7 +52,7 @@ public static class RefreshMotion
   if (active)
   {
    var angle = state.Rotation.Angle; state.Generation++; state.Running = true; state.Finishing = false;state.AppliedDuration=duration;
-   // Linear interpolation keeps angular velocity at every wrap; no timer, easing or per-turn restart.
+    // One S-shaped angle/time turn: slow start/end, faster middle. Replacement starts at the current angle.
    var animation = CreateRotationAnimation(angle,duration,false);
    state.Rotation.BeginAnimation(RotateTransform.AngleProperty,animation,HandoffBehavior.SnapshotAndReplace);
   }

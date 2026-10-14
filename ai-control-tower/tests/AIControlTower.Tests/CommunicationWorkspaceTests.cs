@@ -74,10 +74,10 @@ public sealed class CommunicationWorkspaceTests
         Assert.Contains(n.Descendants(),e=>e.Name.LocalName=="GridSplitter");
         Assert.DoesNotContain(n.Descendants(),e=>e.Name.LocalName=="Expander");
         foreach(var document in new[]{n,c}) Assert.Contains(document.Descendants(),e=>e.Name.LocalName=="Setter" && (string?)e.Attribute("Property")=="AutomationProperties.Name" && (string?)e.Attribute("Value")=="{Binding AutomationLabel}");
-        Assert.Contains(c.Descendants(),e=>e.Name.LocalName=="ListBox" && (string?)e.Attribute("ItemsSource")=="{Binding Entries}");
-        Assert.Contains(c.Descendants(),e=>e.Name.LocalName=="ComboBox" && (string?)e.Attribute("SelectedValue")=="{Binding InboxProjectFilterId}");
+        Assert.Contains(c.Descendants(),e=>e.Name.LocalName=="ItemsControl" && (string?)e.Attribute("ItemsSource")=="{Binding CommunityComments}");
+        Assert.DoesNotContain(c.Descendants(),e=>e.Name.LocalName=="ComboBox");
         Assert.DoesNotContain(c.Descendants(),e=>e.Attributes().Any(a=>a.Name.LocalName=="AutoHeight"));
-        foreach(var document in new[]{n,c}) Assert.Contains(document.Descendants(),e=>(string?)e.Attribute("Text")=="{Binding CentralSyncMessage}");
+        foreach(var document in new[]{n,c}) Assert.DoesNotContain(document.Descendants(),e=>(string?)e.Attribute("Text")=="{Binding CentralSyncMessage}");
     }
     private static CommunicationReceiptItem Receipt(string project,string actor,string session,string status,int hour)=>new(new() { NoticeId="N",Revision=2,ContentSha256="current",ProjectId=project,ActorId=actor,SessionId=session,ApplicationStatus=status,CheckedAt=$"2026-10-06T0{hour}:00:00Z",Note=session },true,session);
     private static CommunicationInboxItem Item(string project,string name)=>new(project,"hash",name,name,DateTimeOffset.UtcNow) { Title=name,Body="# 제목\n\n본문" };

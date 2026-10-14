@@ -72,6 +72,7 @@ public sealed class ProjectRecordPublisherTests
         public bool Push=true,Archived=false,Private=false,Branch,Pr,ThrowAfterBranch,ThrowAfterPr,Auth404,Conflict;
         public readonly List<(string Method,string Endpoint,string? Body)> Calls=[];
         public readonly Dictionary<string,string> Files=new(StringComparer.Ordinal);
+        public readonly HashSet<string> BasePaths=new(StringComparer.Ordinal);
         public string BaseSha=new('a',40),BaseTree=new('b',40),NewTree=new('c',40),Commit=new('d',40),BranchName="";
         public Task<(int StatusCode,string Json)> Call(string method,string endpoint,string? body,CancellationToken ct)
         {
@@ -88,7 +89,7 @@ public sealed class ProjectRecordPublisherTests
                 result=new{truncated=false,tree=Files.Select(p=>new{path=p.Key,type="blob",mode="100644",sha=Conflict?new string('e',40):Blob(p.Value)}).ToArray()};
             else if(method=="GET"&&endpoint.Contains("/contents/"))
             {var path=Uri.UnescapeDataString(endpoint.Split("/contents/")[1].Split('?')[0]);if(!Files.TryGetValue(path,out var value))return Task.FromResult((404,"{}"));result=new{type="file",encoding="base64",content=Convert.ToBase64String(Encoding.UTF8.GetBytes(value)),sha=Blob(value)};}
-            else if(method=="GET"&&endpoint.Contains("/compare/"))result=new{files=Files.Keys.Select(p=>new{filename=p,status="added"}).ToArray(),total_commits=1,commits=new[]{new{sha=Commit}}};
+            else if(method=="GET"&&endpoint.Contains("/compare/"))result=new{files=Files.Keys.Where(p=>!BasePaths.Contains(p)).Select(p=>new{filename=p,status="added"}).ToArray(),total_commits=1,commits=new[]{new{sha=Commit}}};
             else if(method=="GET"&&endpoint.Contains("/pulls?"))result=Pr?new[]{Pull()}:Array.Empty<object>();
             else if(method=="POST"&&endpoint.EndsWith("/git/trees"))
             {var j=JsonNode.Parse(body!)!;Assert.Equal(BaseTree,j["base_tree"]!.GetValue<string>());foreach(var entry in j["tree"]!.AsArray()){var path=entry!["path"]!.GetValue<string>();Assert.StartsWith(Prefix+"/",path);Files[path]=entry["content"]!.GetValue<string>();}result=new{sha=NewTree};}
@@ -105,6 +106,100 @@ public sealed class ProjectRecordPublisherTests
             head=new{@ref=BranchName,sha=Commit,repo=new{id=RepoId,full_name=Repo}},@base=new{@ref="main",repo=new{id=RepoId,full_name=Repo}}};
         private static string Blob(string value){var bytes=Encoding.UTF8.GetBytes(value);return Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes("blob "+bytes.Length+"\0").Concat(bytes).ToArray())).ToLowerInvariant();}
         public int Posts=>Calls.Count(c=>c.Method=="POST");
+    }
+
+    private static CommunicationCollectionResult History(Fixture f,int count)=>Collection(f,Enumerable.Range(1,count).Select(i=>Body(revision:i)).ToArray());
+    private static void SeedHistory(Fixture f,FakeApi api,int count)
+    {
+        foreach(var revision in Enumerable.Range(1,count))
+        {
+            var export=Assert.Single(Exports(f.Registration(),Collection(f,Body(revision:revision))));
+            var path=export!["Path"]!.GetValue<string>();
+            api.Files.Add(path,export["Content"]!.GetValue<string>());api.BasePaths.Add(path);
+        }
+    }
+    [Theory]
+    [InlineData(24,100)]
+    [InlineData(110,14)]
+    public async Task HistoricalRevisionsOverHundredPublishOnlyBoundedMissingPaths(int present,int missing)
+    {
+        using var f=new Fixture();var api=new FakeApi();SeedHistory(f,api,present);
+        var before=api.Files.ToDictionary(p=>p.Key,p=>p.Value);var collection=History(f,124);
+        var result=await Publish(f,api,f.Registration(),collection);
+        Assert.Equal("pr_open",Text(result,"Status"));Assert.Equal(4,api.Posts);Assert.Equal(124,api.Files.Count);
+        foreach(var old in before)Assert.Equal(old.Value,api.Files[old.Key]);
+        var tree=Assert.Single(api.Calls,c=>c.Method=="POST"&&c.Endpoint.EndsWith("/git/trees"));
+        Assert.Equal(missing,JsonNode.Parse(tree.Body!)!["tree"]!.AsArray().Count);
+        var journal=JsonNode.Parse(File.ReadAllText(Assert.Single(Directory.GetFiles(f.Journal,"*.json"))))!;
+        Assert.Equal(missing,journal["Paths"]!.AsArray().Count);
+        var replay=await Publish(f,api,f.Registration(),collection);
+        Assert.Equal("pr_open",Text(replay,"Status"));Assert.Equal(Text(result,"BatchHash"),Text(replay,"BatchHash"));Assert.Equal(4,api.Posts);
+    }
+    [Fact]
+    public async Task MoreThanHundredMissingPathsHoldAfterComparisonWithoutPostOrJournal()
+    {
+        using var f=new Fixture();var api=new FakeApi();SeedHistory(f,api,23);
+        var result=await Publish(f,api,f.Registration(),History(f,124));
+        Assert.Equal("held",Text(result,"Status"));Assert.Equal("base",Text(result,"FailureStage"));Assert.Equal(0,api.Posts);
+        Assert.Contains(api.Calls,c=>c.Method=="GET"&&c.Endpoint.Contains("/git/trees/"));
+        Assert.Empty(Directory.Exists(f.Journal)?Directory.GetFiles(f.Journal,"*.json"):[]);
+    }
+    [Fact]
+    public async Task LargeHistoryAlreadyPresentRequiresNoRemoteMutation()
+    {
+        using var f=new Fixture();var api=new FakeApi();SeedHistory(f,api,124);
+        var result=await Publish(f,api,f.Registration(),History(f,124));
+        Assert.Equal("already_present",Text(result,"Status"));Assert.Equal(0,api.Posts);
+    }
+    [Fact]
+    public async Task LargeHistoryRemoteConflictIsCheckedWithoutTruncatingOldRevisions()
+    {
+        using var f=new Fixture();var api=new FakeApi();SeedHistory(f,api,110);
+        var path=api.BasePaths.Last();api.Files[path]="different remote metadata";
+        var result=await Publish(f,api,f.Registration(),History(f,124));
+        Assert.Equal("held",Text(result,"Status"));Assert.Equal("base",Text(result,"FailureStage"));Assert.Equal(0,api.Posts);
+        Assert.Equal("different remote metadata",api.Files[path]);
+    }
+    [Fact]
+    public async Task CollectionCountLimitStillRejectsBeforeApi()
+    {
+        using var f=new Fixture();var api=new FakeApi();var result=await Publish(f,api,f.Registration(),History(f,3001));
+        Assert.Equal("held",Text(result,"Status"));Assert.Empty(api.Calls);
+    }
+    [Fact]
+    public async Task ExistingJournalCannotBypassMissingPathWriteLimit()
+    {
+        using var f=new Fixture();var api=new FakeApi();SeedHistory(f,api,24);var collection=History(f,124);
+        var exports=Enumerable.Range(1,124).Select(i=>Assert.Single(Exports(f.Registration(),Collection(f,Body(revision:i)))))
+            .OrderBy(e=>e!["Path"]!.GetValue<string>(),StringComparer.Ordinal).ToArray();
+        var batch=Hash("1368308612\nmain\n"+string.Join("\n",exports.Select(e=>e!["Path"]!.GetValue<string>()+"\n"+Hash(e["Content"]!.GetValue<string>())+"\n"+Hash(Body(revision:JsonNode.Parse(e["Content"]!.GetValue<string>())!["revision"]!.GetValue<int>())))));
+        Directory.CreateDirectory(f.Journal);
+        var journal=Path.Combine(f.Journal,"1368308612-"+batch+".json");
+        File.WriteAllText(journal,JsonSerializer.Serialize(new {BatchHash=batch,RepositoryId=1368308612,Branch="ai-records/threads-"+batch,BaseBranch="main",
+            BaseSha=api.BaseSha,BaseTree=api.BaseTree,Paths=exports.Take(101).Select(e=>e!["Path"]!.GetValue<string>()).ToArray(),Stage="prepared"}));
+        var before=File.ReadAllBytes(journal);var result=await Publish(f,api,f.Registration(),collection);
+        Assert.Equal("held",Text(result,"Status"));Assert.Equal("journal",Text(result,"FailureStage"));Assert.Equal(0,api.Posts);
+        Assert.Equal(before,File.ReadAllBytes(journal));
+    }
+    [Fact]
+    public async Task DifferentBatchesShareProjectLeaseBeforeApiAndReleaseAfterFailure()
+    {
+        using var f=new Fixture();var entered=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Func<string,string,string?,CancellationToken,Task<(int StatusCode,string Json)>> blocked=async (_,_,_,ct)=>
+        {entered.TrySetResult();await release.Task.WaitAsync(ct);throw new IOException("Unconfirmed read");};
+        var engine=Activator.CreateInstance(Required("AIControlTower.Services.ProjectRecordPublisher"),blocked,f.Journal)!;
+        var task=Assert.IsAssignableFrom<Task>(engine.GetType().GetMethod("PublishAsync")!.Invoke(engine,[f.Registration(),Collection(f,Body()),CancellationToken.None]));
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));var secondApi=new FakeApi();
+            var held=await Publish(f,secondApi,f.Registration(),Collection(f,Body(revision:2)));
+            Assert.Equal("held",Text(held,"Status"));Assert.Empty(secondApi.Calls);
+        }
+        finally{release.TrySetResult();await task.WaitAsync(TimeSpan.FromSeconds(5));}
+        Assert.Equal("held",Text(Snapshot(task.GetType().GetProperty("Result")!.GetValue(task)!),"Status"));
+        var nextApi=new FakeApi();Assert.Equal("pr_open",Text(await Publish(f,nextApi,f.Registration(),Collection(f,Body(revision:2))),"Status"));
+        Assert.Equal(4,nextApi.Posts);
     }
 
     [Fact]
@@ -135,7 +230,7 @@ public sealed class ProjectRecordPublisherTests
     }
     [Fact]
     public async Task DisabledOrUnverifiedRepositoryRegistrationCannotPublish()
-    {using var f=new Fixture();foreach(var reg in new[]{f.Registration(enabled:false),f.Registration(repoId:42),f.Registration(prefix:"../private")}){var api=new FakeApi();var r=await Publish(f,api,reg,Collection(f,Body()));Assert.Equal("held",Text(r,"Status"));Assert.Equal(0,api.Posts);}}
+    {using var f=new Fixture();foreach(var reg in new[]{f.Registration(enabled:false),f.Registration(repoId:42),f.Registration(prefix:"../private")}){var api=new FakeApi();var r=await Publish(f,api,reg,Collection(f,Body()));Assert.Equal("held",Text(r,"Status"));Assert.Empty(api.Calls);Assert.False(Directory.Exists(f.Journal));}}
     [Fact]
     public async Task ServerRepoIdentityPermissionAnd404AreNotMissingBranchPermission()
     {using var f=new Fixture();foreach(var api in new[]{new FakeApi{RepoId=42},new FakeApi{Push=false},new FakeApi{Archived=true},new FakeApi{Auth404=true}}){var r=await Publish(f,api,f.Registration(),Collection(f,Body()));Assert.Equal("held",Text(r,"Status"));Assert.Equal(0,api.Posts);}}
