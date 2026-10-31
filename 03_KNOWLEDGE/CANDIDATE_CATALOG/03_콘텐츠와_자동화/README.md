@@ -7,4 +7,3 @@
 • [Content / Video / Audio](CONTENT_MEDIA.md)
 
 • [UI / Design / Agent-Rule References](UI_DESIGN_REFERENCES.md)
-

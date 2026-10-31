@@ -13,4 +13,3 @@
 • [OpenAI Agents API](OPENAI_AGENTS_API.md)
 
 • [OpenAI Prism — 2026-09-17 검증 메모](OPENAI_PRISM.md)
-

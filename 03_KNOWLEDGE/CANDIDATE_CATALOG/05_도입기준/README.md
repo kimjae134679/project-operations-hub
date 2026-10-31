@@ -13,4 +13,3 @@
 • [AI Tool Usage & Assistance Matrix](USAGE_AND_ASSISTANCE.md)
 
 • [Candidate Master Index — canonical index](전체_도구목록.md)
-

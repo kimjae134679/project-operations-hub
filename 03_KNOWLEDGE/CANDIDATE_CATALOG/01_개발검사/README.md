@@ -41,4 +41,3 @@
 • [yamllint](YAMLLINT.md)
 
 • [zizmor](ZIZMOR.md)
-
