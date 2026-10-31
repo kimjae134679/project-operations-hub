@@ -279,7 +279,7 @@
             {
               "id": "tower-guide",
               "name": "이 관리 화면의 사용법",
-              "path": "000_사용자용/08_AI_관제탑.md",
+              "path": "000_사용자용/02_프로그램/AI_관제탑.md",
               "description": "프로젝트 선택, 폴더 연결과 작업 실행 방법을 안내합니다.",
               "kindLabel": "사용 안내",
               "openActionLabel": "사용 안내 보기"
@@ -287,7 +287,7 @@
             {
               "id": "tools-guide",
               "name": "도구를 잘 쓰는 방법",
-              "path": "000_사용자용/10_도구_활용_추천.md",
+              "path": "000_사용자용/03_참고도구/용도별_도구선택.md",
               "description": "작업마다 적합한 도구와 분업 방법을 고르고 과용을 피하는 기준입니다.",
               "kindLabel": "도구 안내",
               "openActionLabel": "도구 안내 보기"

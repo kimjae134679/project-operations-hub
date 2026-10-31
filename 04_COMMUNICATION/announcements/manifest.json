@@ -165,7 +165,7 @@
     },
     {
       "id": "N-0002",
-      "revision": 1,
+      "revision": 2,
       "title": "사람이 이해하는 화면과 폴더",
       "path": "notices/N-0002.md",
       "targets": [
@@ -173,11 +173,11 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516"
+      "contentSha256": "21561ec7e1312ef11f6dfb0ec5a7d9a1ffde6a23c51281fb3ebc6736814cec4b"
     },
     {
       "id": "N-0003",
-      "revision": 1,
+      "revision": 2,
       "title": "도구와 분업을 적절하게 사용",
       "path": "notices/N-0003.md",
       "targets": [
@@ -185,11 +185,11 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe"
+      "contentSha256": "69dc07eb42adb014e78a470e9f543373118cf70673043580b919569ab0a66174"
     },
     {
       "id": "N-0004",
-      "revision": 1,
+      "revision": 2,
       "title": "관리 앱과 공유 원격 연결",
       "path": "notices/N-0004.md",
       "targets": [
@@ -197,11 +197,11 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de"
+      "contentSha256": "b0987608480e82a4172a93405e52bbc10c303f6135fef636607acd1a7ef23855"
     },
     {
       "id": "N-0005",
-      "revision": 2,
+      "revision": 3,
       "title": "프로젝트 소통 폴더와 자료 정리",
       "path": "notices/N-0005.md",
       "targets": [
@@ -209,7 +209,7 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c"
+      "contentSha256": "dd699f7ef0369a4b3423ef24534557973ebe0a29b9f6060091b6a65a4dea542b"
     },
     {
       "id": "N-0006",
@@ -237,7 +237,7 @@
     },
     {
       "id": "N-0008",
-      "revision": 2,
+      "revision": 3,
       "title": "프로젝트 자료 위치와 사용 안내 먼저 읽기",
       "path": "notices/N-0008.md",
       "targets": [
@@ -245,7 +245,7 @@
       ],
       "required": true,
       "active": true,
-      "contentSha256": "63b5e40aef6a2907dea7693e0d6956255a45342efe626edbd1b6f7f535330e0f"
+      "contentSha256": "b7cedb3dd2c0427e28a655591ee5caa740c4e08ccfbbe7b5fb29f6cee8cfa8d7"
     },
     {
       "id": "N-0009",

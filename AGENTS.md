@@ -26,7 +26,7 @@
 
 `000_사용자용/`은 사용자에게 보여주는 요약이며 AI 정책 원본이 아닙니다.
 
-관제 UI·프로젝트 이름·폴더 설명·사용자용 인수인계를 수정할 때는 `01_CONTROL/PROJECT_PRESENTATION_RULES.md`를 읽습니다. 실제 연결 정보는 `project.catalog.json`과 대상 프로젝트의 현재 안내·파일에서 확인하고, 사람용 요약은 `000_사용자용/11_프로젝트와_폴더_안내.md`와 함께 갱신합니다.
+관제 UI·프로젝트 이름·폴더 설명·사용자용 인수인계를 수정할 때는 `01_CONTROL/PROJECT_PRESENTATION_RULES.md`를 읽습니다. 실제 연결 정보는 `project.catalog.json`과 대상 프로젝트의 현재 안내·파일에서 확인하고, 사람용 요약은 `000_사용자용/01_프로젝트/프로젝트와_폴더_안내.md`와 함께 갱신합니다.
 
 ## 효율적인 탐색
 
@@ -38,7 +38,7 @@
 
 ## 작업별 도구와 분업
 
-- 도구 선택 기준은 `03_KNOWLEDGE/CANDIDATE_CATALOG/TOOL_SELECTION_PLAYBOOK.md`를 따릅니다. 서브에이전트뿐 아니라 연결된 Plugin, CLI, Skill, 검색, 검사기, 화면 검증을 작업 목적에 맞게 비교합니다.
+- 도구 선택 기준은 `03_KNOWLEDGE/CANDIDATE_CATALOG/05_도입기준/TOOL_SELECTION_PLAYBOOK.md`를 따릅니다. 서브에이전트뿐 아니라 연결된 Plugin, CLI, Skill, 검색, 검사기, 화면 검증을 작업 목적에 맞게 비교합니다.
 - 과거 후보 카탈로그는 참고자료입니다. 과거에 조사했다는 이유로 채택을 강제하거나 새 대안을 배제하지 않습니다. 현재 공식 문서·호환성·비용·실제 결과가 더 좋은 선택을 우선합니다.
 - 사용자는 이 허브 작업에서 필요한 서브에이전트·병렬 분업과 Jev 사용을 허용했습니다. 작은 작업은 단독으로 처리하고, 독립적으로 나눌 수 있는 탐색·재현·검토부터 제한적으로 병렬화합니다.
 - 수정 작업에는 파일 담당자 또는 별도 worktree를 지정합니다. 같은 파일의 무조정 동시 수정, 중복 조사, 대기 중인 검토자의 반복 실행을 피합니다.
@@ -79,7 +79,7 @@
 
 내부 원본을 바꾸면 같은 작업에서 대응되는 사용자용 문서를 갱신합니다.
 
-- 정책 → `01_CONTROL/USER_POLICIES.md` + `000_사용자용/05_내_작업규칙.md`
+- 정책 → `01_CONTROL/USER_POLICIES.md` + `000_사용자용/04_운영기록/작업규칙.md`
 - 도구 채택·설치 → `01_CONTROL/TOOLS.md` 또는 `AI_INSTALLATIONS.md` + 사용자용 도구 현황
 - 프로젝트 등록 → `PROJECT_REGISTRY.md` + 해당 `02_PROJECTS/` + 사용자용 프로젝트 현황
 - 관제 화면·프로젝트 설명 → `01_CONTROL/PROJECT_PRESENTATION_RULES.md` + `project.catalog.json` + 사용자용 폴더 안내

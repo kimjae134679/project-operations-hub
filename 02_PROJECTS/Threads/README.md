@@ -9,8 +9,8 @@
 ## 재개 순서
 
 1. 실제 저장소의 `00_START_HERE/NEXT_RUN_HANDOFF.md`와 현재 main.
-2. `docs/SOURCE_CUT_DESKTOP.md`: Windows 실행·검증·현재 자료 상태.
-3. `docs/INSTAGRAM_REFERENCE_GUIDE.md`: 레퍼런스 관찰과 제작 기획.
+2. `docs/01_사용방법/Windows_편집기.md`: Windows 실행·검증·현재 자료 상태.
+3. `docs/02_제작기준/인스타그램_레퍼런스_기준.md`: 레퍼런스 관찰과 제작 기획.
 4. 필요한 경우에만 `04_COMMUNICATION/threads/T-0008-ai-content-monetization/THREAD.md`의 관련 기록.
 
 실제 저장소 상태가 오래된 허브 기록보다 우선합니다. 이 포인터에 변동이 잦은 버전·커밋·순차 메시지 번호를 고정하지 않습니다.
@@ -28,4 +28,4 @@
 
 주 소통 기록: `04_COMMUNICATION/threads/T-0008-ai-content-monetization/THREAD.md`.
 
-마지막 정리: **2026-10-04**.
+마지막 포인터 정리: **2026-10-31**.

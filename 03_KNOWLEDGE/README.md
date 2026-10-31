@@ -52,4 +52,4 @@ BURDEN    = 설치/운영 무게
 
 ## 추가 공통 패턴
 - [`WINDOWS_TERMINAL_PROGRESS.md`](WINDOWS_TERMINAL_PROGRESS.md) — Windows 빌드/설치용 Unicode `━` Rich 스타일 터미널 진행 표시와 fallback 규칙
-- [`CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md`](CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md) — UI/motion 참고자료
+- [`CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md`](CANDIDATE_CATALOG/03_콘텐츠와_자동화/UI_DESIGN_REFERENCES.md) — UI/motion 참고자료

@@ -14,7 +14,7 @@
 
 ## 실제 확인한 사용자 참고 사이트
 
-허브의 [UI_DESIGN_REFERENCES.md](../../03_KNOWLEDGE/CANDIDATE_CATALOG/UI_DESIGN_REFERENCES.md)를 읽은 뒤 아래 공식 페이지를 다시 열었습니다. `SceneAI`는 `sceneai.art`이며 이름이 비슷한 영상 분석·아바타 서비스와 구분했습니다. 무료 공개 접근만 사용했고 로그인·결제·유료 프롬프트 다운로드는 하지 않았습니다.
+허브의 [UI_DESIGN_REFERENCES.md](../../03_KNOWLEDGE/CANDIDATE_CATALOG/03_콘텐츠와_자동화/UI_DESIGN_REFERENCES.md)를 읽은 뒤 아래 공식 페이지를 다시 열었습니다. `SceneAI`는 `sceneai.art`이며 이름이 비슷한 영상 분석·아바타 서비스와 구분했습니다. 무료 공개 접근만 사용했고 로그인·결제·유료 프롬프트 다운로드는 하지 않았습니다.
 
 | 참고한 공식 페이지 | 이번에 확인한 내용 | 데스크톱 적용 제안 | 무료 접근 범위 |
 |---|---|---|---|

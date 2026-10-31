@@ -225,7 +225,7 @@ git commit -m "feat: add control tower navigation"
 
 **Files:**
 - Modify: `ai-control-tower/README.md`
-- Modify: `000_사용자용/08_AI_관제탑.md`
+- Modify: `000_사용자용/02_프로그램/AI_관제탑.md`
 - Modify: `04_COMMUNICATION/threads/T-0009-ai-control-tower/THREAD.md`
 
 **Interfaces:**
