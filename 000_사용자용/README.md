@@ -9,6 +9,6 @@
 | [참고도구](03_참고도구/) | 찾아둔 도구·활용법·후보 |
 | [운영기록](04_운영기록/) | 공지·소통·백업·작업규칙 |
 
-[수익화 프로그램](https://github.com/kimjae134679/Threads/blob/main/프로젝트_사용안내.md) · [분야별 후보 도구](../03_KNOWLEDGE/CANDIDATE_CATALOG/README.md)
+[수익화 프로그램](https://github.com/kimjae134679/Threads) · [분야별 후보 도구](../03_KNOWLEDGE/CANDIDATE_CATALOG/README.md)
 
 정리: 2026-10-31. 과거 조사 날짜와 현재 설치·연결 확인 범위는 각 문서에 구분합니다.
