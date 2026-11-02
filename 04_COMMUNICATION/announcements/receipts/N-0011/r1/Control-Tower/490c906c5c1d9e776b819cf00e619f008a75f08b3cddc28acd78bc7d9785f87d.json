@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "noticeId": "N-0011",
+  "revision": 1,
+  "contentSha256": "a2eb1f76d12558fc9fcfe59e5ca6228030f679fb99aa40d8aabc13b3df52e2c4",
+  "projectId": "Control-Tower",
+  "actorId": "Codex-HubCleanup",
+  "sessionId": "hub-cleanup-20261103",
+  "checkedAt": "2026-11-02T16:29:38.700814+00:00",
+  "applicationStatus": "applied",
+  "note": "이번 브랜치·도구 정리에 본인 기록, 기존 데이터·설치 보존, 한글 안내, 명시 Git 전송, 비과금·비상시실행 경계를 적용했습니다. 다른 AI 읽음은 기록하지 않았습니다.",
+  "evidence": [
+    "01_CONTROL/AI_INSTALLATIONS.md"
+  ],
+  "appliedAt": "2026-11-02T16:45:22.643270+00:00"
+}
