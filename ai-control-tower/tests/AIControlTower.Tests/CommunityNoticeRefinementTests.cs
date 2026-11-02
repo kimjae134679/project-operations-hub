@@ -79,9 +79,16 @@ public sealed class CommunityNoticeRefinementTests
         var views = Path.Combine(SourceRoot(), "ai-control-tower", "src", "AIControlTower", "Views");
         var community = XDocument.Load(Path.Combine(views, "CommunicationWorkspaceView.xaml"));
         var notice = XDocument.Load(Path.Combine(views, "NoticeOverviewView.xaml"));
-        var forbiddenBindings = new[] { "CommunicationSearch", "InboxProjectFilterId", "CommunicationStateFilter", "OnlyUnread", "CentralSyncMessage", "CommunicationMessage", "ReceiptSearch", "ReceiptFilter", "UnreadLabel", "StateLabel", "PrevEntryCommand", "NextEntryCommand" };
+        var forbiddenBindings = new[] { "CommunicationSearch", "InboxProjectFilterId", "CommunicationStateFilter", "OnlyUnread", "CentralSyncMessage", "CommunicationMessage", "ReceiptSearch", "ReceiptFilter", "StateLabel", "PrevEntryCommand", "NextEntryCommand" };
         foreach (var document in new[] { community, notice })
             Assert.DoesNotContain(document.Descendants().Attributes(), a => forbiddenBindings.Any(binding => a.Value.Contains("{Binding " + binding)));
+        // The later count/reply UI adds row-local unread badges, not global admin controls.
+        var inbox = Assert.Single(community.Descendants(), e => (string?)e.Attribute("ItemsSource") == "{Binding InboxItems}");
+        var rowTemplate = Assert.Single(inbox.Descendants(), e => e.Name.LocalName == "DataTemplate");
+        Assert.Contains(rowTemplate.Descendants().Attributes(), a => a.Value == "{Binding UnreadLabel}");
+        Assert.Contains(rowTemplate.Descendants().Attributes(), a => a.Value == "{Binding NewCommentLabel}");
+        foreach (var document in new[] { community, notice })
+            Assert.DoesNotContain(document.Descendants().Attributes(), a => a.Value.Contains("{Binding UnreadLabel") && !a.Parent!.AncestorsAndSelf().Contains(rowTemplate));
         Assert.DoesNotContain(community.Descendants(), e => (string?)e.Attribute("Name") == "EntryList" || (string?)e.Attribute(XName.Get("Name", "http://schemas.microsoft.com/winfx/2006/xaml")) == "EntryList");
         Assert.Contains(community.Descendants(), e => (string?)e.Attribute("ItemsSource") == "{Binding CommunityComments}");
         Assert.Contains(notice.Descendants(), e => (string?)e.Attribute("ItemsSource") == "{Binding NoticeProjectRows}");
