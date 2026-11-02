@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "deliveredProjectId": "Video-Downloader",
+  "projects": [
+    {
+      "id": "HealthAPK",
+      "name": "운동앱",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "Investment-Lab",
+      "name": "주식 자동매매",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "ChungYack",
+      "name": "청약",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "PhoneLOL",
+      "name": "멀티의 신",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "PhoneLOL-Server",
+      "name": "멀티의 신 서버",
+      "category": "게임 서버",
+      "required": true
+    },
+    {
+      "id": "Market-Radar",
+      "name": "주식 앱",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "Figure-01",
+      "name": "피규어 만들기",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "Tiny-Village",
+      "name": "동물의숲",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "Threads",
+      "name": "콘텐츠 제작",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "Mushoku-Audiobook",
+      "name": "무직전생 오디오북",
+      "category": "등록 프로젝트",
+      "required": true
+    },
+    {
+      "id": "Burgundy",
+      "name": "버건디 보드게임",
+      "category": "기존 프로젝트 방",
+      "required": true
+    },
+    {
+      "id": "SideMemojang",
+      "name": "사이드메모장",
+      "category": "경험 소스·기존 방",
+      "required": true
+    },
+    {
+      "id": "Control-Tower",
+      "name": "통합소통방·컨트롤타워",
+      "category": "관리 작업",
+      "required": true
+    },
+    {
+      "id": "Video-Downloader",
+      "name": "영상·음원 저장",
+      "category": "연결된 PC 작업",
+      "required": true
+    },
+    {
+      "id": "FinanceOne",
+      "name": "가계부",
+      "category": "경험 자료",
+      "required": false
+    },
+    {
+      "id": "ASCII-Aquarium",
+      "name": "아스키 수족관",
+      "category": "경험 자료",
+      "required": false
+    }
+  ],
+  "participants": [
+    {
+      "id": "Sol",
+      "name": "Sol",
+      "mailbox": "../mailboxes/Sol.md"
+    },
+    {
+      "id": "Astra",
+      "name": "Astra",
+      "mailbox": "../mailboxes/Astra.md"
+    },
+    {
+      "id": "account-b-nova",
+      "name": "B계정 Nova",
+      "mailbox": "../mailboxes/Account-B-Nova.md"
+    },
+    {
+      "id": "/root",
+      "name": "관리 담당 Codex",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/control_tower_audit",
+      "name": "화면·코드 검토 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/project_inventory",
+      "name": "프로젝트·폴더 확인 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/efficiency_research",
+      "name": "도구·확인 절차 검토 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/record_protocol",
+      "name": "안내·디자인 정리 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/review_ui",
+      "name": "화면·도구 검토 AI",
+      "mailbox": ""
+    },
+    {
+      "id": "/root/project_guides",
+      "name": "프로젝트 안내 담당 AI",
+      "mailbox": ""
+    }
+  ],
+  "notices": [
+    {
+      "id": "N-0001",
+      "revision": 2,
+      "title": "공지 확인과 기록",
+      "path": "N-0001.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "ca8797d46c4ba099bced46c15f51daff246a49867cfd724e5f8c2eb2053e5bea"
+    },
+    {
+      "id": "N-0002",
+      "revision": 1,
+      "title": "사람이 이해하는 화면과 폴더",
+      "path": "N-0002.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "40ad0598b0261b9f285f657bbe4426e00a5d398de9d8a34377561a1e1e6e9516"
+    },
+    {
+      "id": "N-0003",
+      "revision": 1,
+      "title": "도구와 분업을 적절하게 사용",
+      "path": "N-0003.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "e8fa0a5f96fe5ed5629a36aea3b4ad297596d319416e2beb9e8e2721b56323fe"
+    },
+    {
+      "id": "N-0004",
+      "revision": 1,
+      "title": "관리 앱과 공유 원격 연결",
+      "path": "N-0004.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "4eb1044f0453ac9892700ce95c3e66f58c4300710c22cf56c033fd8575c728de"
+    },
+    {
+      "id": "N-0005",
+      "revision": 2,
+      "title": "프로젝트 소통 폴더와 자료 정리",
+      "path": "N-0005.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "157179cb4f7a38c74b0adf5bb5127f3064e22337a946d724e8c057449c414a2c"
+    },
+    {
+      "id": "N-0006",
+      "revision": 1,
+      "title": "멀티의 신 서버 연결과 운영 구분",
+      "path": "N-0006.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d"
+    },
+    {
+      "id": "N-0007",
+      "revision": 1,
+      "title": "받은 명령과 AI 답변 기록",
+      "path": "N-0007.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "3f0edd4e30dbb06fb14d4d1e29c5edd3cb2c8146ec589787bb7afe904250a9f8"
+    },
+    {
+      "id": "N-0008",
+      "revision": 2,
+      "title": "프로젝트 자료 위치와 사용 안내 먼저 읽기",
+      "path": "N-0008.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "63b5e40aef6a2907dea7693e0d6956255a45342efe626edbd1b6f7f535330e0f"
+    },
+    {
+      "id": "N-0009",
+      "revision": 1,
+      "title": "부팅 창과 종료 방해 없는 백그라운드 실행",
+      "path": "N-0009.md",
+      "targets": [
+        "*"
+      ],
+      "required": true,
+      "active": true,
+      "contentSha256": "4cf1d9e1a61213e75efd2abcf6f416b31a981454b9ef0f24f5c60c211ade0073"
+    }
+  ]
+}

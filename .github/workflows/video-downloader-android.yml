@@ -1,0 +1,99 @@
+name: Video Downloader APK and QA
+on:
+  push:
+    branches: [video-downloader-android-20261006]
+    paths: ['VideoDownloaderAndroid/app/**', 'VideoDownloaderAndroid/qa/**', 'VideoDownloaderAndroid/*.gradle', 'VideoDownloaderAndroid/gradle.properties', '.github/workflows/video-downloader-android.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: video-downloader-android
+  cancel-in-progress: true
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start with fresh QA evidence
+        run: rm -rf VideoDownloaderAndroid/dist
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+          cache-read-only: false
+      - name: Preserve installation signing identity for future builds
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: video-downloader-installation-key-v1
+      - name: Compile, unit tests and Android lint
+        run: gradle -p VideoDownloaderAndroid :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug --no-daemon
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Mobile and tablet UI QA
+        working-directory: VideoDownloaderAndroid/qa
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+          npm test
+      - name: Prepare real short MP4, HLS and DASH fixtures
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          mkdir -p /tmp/vd-fixtures/hls /tmp/vd-fixtures/dash
+          ffmpeg -y -f lavfi -i testsrc=size=320x180:rate=24 -f lavfi -i sine=frequency=440 -t 3 -c:v libx264 -pix_fmt yuv420p -c:a aac /tmp/vd-fixtures/sample.mp4
+          ffmpeg -y -i /tmp/vd-fixtures/sample.mp4 -c copy -hls_time 1 -hls_list_size 0 /tmp/vd-fixtures/hls/index.m3u8
+          ffmpeg -y -i /tmp/vd-fixtures/sample.mp4 -map 0 -c copy -f dash /tmp/vd-fixtures/dash/index.mpd
+          ffmpeg -y -f lavfi -i testsrc2=size=640x360:rate=30 -f lavfi -i sine=frequency=440 -t 12 -c:v libx264 -b:v 2M -minrate 2M -maxrate 2M -bufsize 4M -x264-params nal-hrd=cbr -pix_fmt yuv420p -c:a aac -movflags +faststart /tmp/vd-fixtures/slow.mp4
+          nohup python3 VideoDownloaderAndroid/qa/fixture-server.py /tmp/vd-fixtures >/tmp/vd-fixtures/server.log 2>&1 &
+      - name: Enable emulator hardware acceleration
+        run: sudo chmod 666 /dev/kvm
+      - name: Android 35 real engine and file QA
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          working-directory: VideoDownloaderAndroid/qa
+          script: bash run-native.sh
+      - name: APK certificate and package verification
+        run: |
+          mkdir -p VideoDownloaderAndroid/dist/qa
+          BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          for ABI in arm64-v8a armeabi-v7a; do
+            cp "VideoDownloaderAndroid/app/build/outputs/apk/release/app-$ABI-release.apk" "VideoDownloaderAndroid/dist/VideoDownloader-1.1.0-$ABI.apk"
+            "$BUILD_TOOLS/apksigner" verify --verbose "VideoDownloaderAndroid/dist/VideoDownloader-1.1.0-$ABI.apk" > "VideoDownloaderAndroid/dist/qa/signature-$ABI.txt"
+            "$BUILD_TOOLS/zipalign" -c -P 16 4 "VideoDownloaderAndroid/dist/VideoDownloader-1.1.0-$ABI.apk"
+          done
+          cp VideoDownloaderAndroid/app/build/reports/lint-results-debug.html VideoDownloaderAndroid/dist/qa/
+          cp -r VideoDownloaderAndroid/qa/screenshots VideoDownloaderAndroid/dist/qa/screenshots
+          cd VideoDownloaderAndroid/dist
+          sha256sum *.apk > SHA256SUMS.txt
+          printf 'Build, JVM unit tests, Android lint, 18 responsive UI tests, Android 35 native MP4/HLS/DASH/short media/MediaStore/collision/recovery/explicit-file-deletion tests passed.\nSource commit: %s\n' "$GITHUB_SHA" > qa/RESULT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video-downloader-build-and-qa
+          path: |
+            VideoDownloaderAndroid/app/build/outputs/apk/debug/*.apk
+            VideoDownloaderAndroid/app/build/reports/
+            VideoDownloaderAndroid/qa/playwright-report/
+            VideoDownloaderAndroid/dist/
+          retention-days: 30
+      - name: Publish verified APK and evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create video-downloader-android-v1.1.0 VideoDownloaderAndroid/dist/*.apk VideoDownloaderAndroid/dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title '영상다운로더 Android 1.1.0 · UI 개편' --notes 'Polished library UI, light/dark themes and short animations. Open pages directly from link entry or any task. MP4/best quality automatic defaults. Separate list-only removal and explicit saved-file deletion. Android 35 native download/file QA and 18 responsive UI checks passed. S22: arm64-v8a. The previous 1.0.2 build did not preserve its signing key; back up lists to JSON before reinstalling if Android rejects the update. This version caches its signing identity for subsequent builds.' --latest=false
+          git config user.name 'Video Downloader Build'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f VideoDownloaderAndroid/dist/qa VideoDownloaderAndroid/dist/SHA256SUMS.txt
+          git commit -m 'Publish tested video downloader APK and QA evidence'
+          git push origin HEAD:video-downloader-android-20261006

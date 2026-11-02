@@ -1,0 +1,24 @@
+{
+  "projectId": "Video-Downloader",
+  "actorId": "Codex-VideoDownloader",
+  "sessionId": "android-ui-20261007",
+  "checkedAt": "2026-10-07T01:39:11.825Z",
+  "source": "Latest main read through connected GitHub",
+  "notices": [
+    {
+      "id": "N-0002",
+      "version": 1,
+      "blobSha": "e529d5912c1050e6febfcb57630d3b75dd04e511",
+      "status": "applied",
+      "applied": "Compact status/actions/results/details, native page flow, light/dark and touch QA"
+    },
+    {
+      "id": "N-0010",
+      "version": 1,
+      "blobSha": "8984b6f6257aaaa5980f09eda1896a071be85876",
+      "status": "applied",
+      "applied": "Task exchange and owned CI run tracked; limited delegated native edits with disjoint files"
+    }
+  ],
+  "centralAppCollection": "unverified"
+}

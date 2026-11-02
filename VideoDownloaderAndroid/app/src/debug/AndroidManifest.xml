@@ -1,0 +1,1 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"><instrumentation android:name="kr.co.kjw.videodownloader.SmokeInstrumentation" android:targetPackage="kr.co.kjw.videodownloader" android:label="Native download QA"/></manifest>
