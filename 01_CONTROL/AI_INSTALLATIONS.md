@@ -32,7 +32,7 @@
 
 - `D:/A_KJ/AI/Launchers/개발도구_콘솔.cmd` — 원할 때 여는 PowerShell 개발 콘솔.
 - `D:/A_KJ/AI/Launchers/개발도구_환경.ps1` — 해당 콘솔 세션에만 PATH/모듈 경로를 더함. profile·global PATH·global module·ExecutionPolicy 변경 없음.
-- 기본 소스 후보는 `D:/A_KJ/AI/Projects/project-operations-hub-current`. 새 clean clone 배포 여부는 부모 작업 최종 확인을 따르며, 미존재 시 이번 Codex `work/hub-cleanup`으로 fallback하도록 구현했습니다. 기존 dirty D 저장소는 보존합니다.
+- 기본 소스는 별도로 만든 clean clone `D:/A_KJ/AI/Projects/project-operations-hub-current`입니다. main 브랜치·clean 상태·GitHub origin을 확인했고, 변경하지 않은 콘솔 환경을 기본 Windows PowerShell 정책으로 로드해 이 D 경로 선택과 jq1.8.2/Ruff0.17.3/PSScriptAnalyzer1.25.0 해석을 확인했습니다. 기존 dirty D 저장소는 그대로 보존합니다. 미존재 시 fallback은 이번 Codex `work/hub-cleanup`입니다. 최종 문서의 원격 main 동기화는 별도 확인합니다.
 - 콘솔 환경 합성 검사 **3/3**, 기본 Windows PowerShell 정책 로드 exit0. 실제 interactive 콘솔을 열거나 UI 작업은 하지 않았습니다.
 
 ## 기존 관리 앱 보존
