@@ -259,19 +259,20 @@ class DetachedLifecycleTests(unittest.TestCase):
   with patch.object(u,'atomic',side_effect=observe):w.submit(self.parent());self.accept(w)
   self.assertTrue(written);self.assertTrue(all(result['outcome']=='running' for result in written))
   self.assertTrue(all('finishedAt' not in result for result in written))
- def test_legacy_published_acceptance_final_result_uses_new_public_revision(self):
-  from test_universal_worker import Client
-  private=Client();public=Client();w=u.UniversalWorker(self.home,private,public,self.execute);self.workers.append(w)
+ def test_legacy_published_acceptance_preserved_and_completion_quarantined(self):
+  from test_universal_worker import Client,ImmutableClient
+  private=ImmutableClient();public=Client();w=u.UniversalWorker(self.home,private,public,self.execute);self.workers.append(w)
   w.submit(self.parent(),source='github');self.accept(w)
   row=w.journal['parent'];row['result']=row.pop('acceptedResult');row['state']='published'
   w.publish('parent',row);w.checkpoint();w.stop();w.pool.shutdown(wait=True)
   w=u.UniversalWorker(self.home,private,public,self.execute);self.workers.append(w)
   self.phase('completed',8);self.drain(w);w.publish_pending()
   records=[value for path,value in public.writes if path.endswith('/content.json')]
-  self.assertEqual([record['revision'] for record in records],[1,2])
-  self.assertEqual([record['status'] for record in records],['completed','blocked'])
-  self.assertEqual(records[0]['recordId'],records[1]['recordId'])
-  self.assertTrue(any(value['sourceName'].endswith('-r2.json') for path,value in public.writes if path.endswith('/item.json')))
+  self.assertEqual([record['revision'] for record in records],[1])
+  self.assertEqual(private.values[w.result_path('parent')],w.journal['parent']['acceptedResult'])
+  self.assertEqual(w.journal['parent']['state'],'finished');self.assertEqual(w.journal['parent']['result']['outcome'],'failed')
+  self.assertEqual(w.get_job('parent')['publication']['state'],'quarantined')
+  self.assertEqual(self.calls.count('parent'),1)
 
 
 if __name__=='__main__':unittest.main()

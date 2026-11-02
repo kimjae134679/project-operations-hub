@@ -7,24 +7,46 @@ namespace AIControlTower.Services;
 public sealed record JobResult(string Id, string ProjectId, string ProgramId, string Command, string State, DateTimeOffset StartedAt,
     DateTimeOffset? FinishedAt, int? ExitCode, string LogPath);
 
-/// <summary>Owns only processes started here. A project has one writer/runner at a time.</summary>
+/// <summary>Owns only processes started here. Default project-exclusive; explicitly declared Jev workspaces may run independently.</summary>
 public sealed class JobManager
 {
     private readonly string _dataDirectory;
     public JobManager() : this(ControlTowerSettings.DataDirectory) { }
     public JobManager(string dataDirectory) => _dataDirectory = Path.GetFullPath(dataDirectory);
-    private readonly ConcurrentDictionary<string, (Process Process, CancellationTokenSource Cancellation, WindowsProcessGroup Group)> _running = new();
-    private readonly ConcurrentDictionary<string, byte> _projects = new();
+    private readonly ConcurrentDictionary<string, (Process Process, CancellationTokenSource Cancellation, WindowsProcessGroup Group)> _running = new(StringComparer.OrdinalIgnoreCase);
+    private sealed record Reservation(string ProgramId, string ProjectId, string Workspace, bool Independent);
+    private readonly object _admissionGate = new();
+    private readonly Dictionary<string, Reservation> _reservations = new(StringComparer.OrdinalIgnoreCase);
     private readonly SemaphoreSlim _slots = new(3, 3);
     public event Action<string>? Log;
     public int RunningCount => _running.Count;
-    public int BusyProjectCount => _projects.Count;
-    public bool IsProjectBusy(string projectId) => _projects.ContainsKey(projectId);
+    public int BusyProjectCount { get { lock (_admissionGate) return _reservations.Values.Select(r => r.ProjectId).Distinct(StringComparer.OrdinalIgnoreCase).Count(); } }
+    public bool IsProjectBusy(string projectId) { lock (_admissionGate) return _reservations.Values.Any(r => r.ProjectId.Equals(projectId, StringComparison.OrdinalIgnoreCase)); }
     public bool IsRunning(string programId) => _running.ContainsKey(programId);
-    public async Task<JobResult> RunAsync(ProgramItem program, ProgramCommand command, CancellationToken cancellationToken = default, string? standardInput = null, AiCompletionContract? aiContract = null)
+    private static Reservation Candidate(ProgramItem program, string? independentWorkspaceRoot)
+    {
+        if (string.IsNullOrWhiteSpace(program.Id) || string.IsNullOrWhiteSpace(program.ProjectId)) throw new InvalidOperationException("등록 실행 ID가 필요합니다.");
+        if (independentWorkspaceRoot is not null && program.Kind != "Jev") throw new InvalidOperationException("독립 작업 폴더는 명시한 Jev 작업만 사용합니다.");
+        var workspace = independentWorkspaceRoot is null ? JevExecutionWorkspace.Normalize(program.WorkingDirectory) : JevExecutionWorkspace.Validate(independentWorkspaceRoot, program.WorkingDirectory);
+        return new(program.Id, program.ProjectId, workspace, independentWorkspaceRoot is not null);
+    }
+    private bool Conflicts(Reservation candidate) => _reservations.ContainsKey(candidate.ProgramId)
+        || _reservations.Values.Any(r => (r.ProjectId.Equals(candidate.ProjectId, StringComparison.OrdinalIgnoreCase) && (!r.Independent || !candidate.Independent))
+            || JevExecutionWorkspace.Overlaps(r.Workspace, candidate.Workspace));
+    public bool CanRun(ProgramItem program, string? independentWorkspaceRoot = null)
+    {
+        try { var candidate = Candidate(program, independentWorkspaceRoot); lock (_admissionGate) return !Conflicts(candidate); }
+        catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException or InvalidOperationException) { return false; }
+    }
+    public async Task<JobResult> RunAsync(ProgramItem program, ProgramCommand command, CancellationToken cancellationToken = default, string? standardInput = null, AiCompletionContract? aiContract = null, string? independentWorkspaceRoot = null)
     {
         if (command.TimeoutSeconds is < 0 or > 86400) throw new ArgumentOutOfRangeException(nameof(command.TimeoutSeconds), "timeoutSeconds는 0~86400입니다.");
-        if (!_projects.TryAdd(program.ProjectId, 0)) throw new InvalidOperationException("이 프로젝트에는 실행 중인 작업이 있습니다.");
+        var reservation = Candidate(program, independentWorkspaceRoot);
+        lock (_admissionGate)
+        {
+            if (Conflicts(reservation)) throw new InvalidOperationException("같은 실행 ID·공유 프로젝트·겹치는 작업 폴더에 소유 작업이 있습니다.");
+            _reservations.Add(program.Id, reservation); // Queued work owns its reservation until durable completion too.
+        }
         var acquired = false;
         var id = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N")[..8];
         var started = DateTimeOffset.UtcNow;
@@ -46,6 +68,8 @@ public sealed class JobManager
             Save(directory, result);
             await _slots.WaitAsync(linked.Token).ConfigureAwait(false);
             acquired = true;
+            // A queued declaration must still resolve to the same non-link workspace at execution time.
+            if (independentWorkspaceRoot is not null) JevExecutionWorkspace.Validate(independentWorkspaceRoot, program.WorkingDirectory);
             if (!Directory.Exists(program.WorkingDirectory)) throw new DirectoryNotFoundException("실행 폴더가 없습니다: " + program.WorkingDirectory);
             if (aiContract is not null) ai = new AiCompletionEvaluator(aiContract, program.WorkingDirectory, id, started);
             if (ai?.PreflightFailure is not null) throw new InvalidOperationException("AI 완료 계약 사전 검사 실패 · " + ai.PreflightFailure);
@@ -174,7 +198,7 @@ public sealed class JobManager
             finally
             {
                 _running.TryRemove(program.Id, out _);
-                _projects.TryRemove(program.ProjectId, out _);
+                lock (_admissionGate) _reservations.Remove(program.Id);
                 if (acquired) _slots.Release();
                 group?.Dispose();
                 process?.Dispose();

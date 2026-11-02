@@ -10,6 +10,8 @@ public sealed record PcConnectionSnapshot(bool Installed, bool Connected, bool R
     string Stage, string Detail, string RelayCode, int ActiveJobs, int ParallelLimit, IReadOnlyList<PcJobSnapshot> Jobs)
 {
     public string StatusReasonCode { get; init; } = "unknown";
+    public int? PublicationConflictCount { get; init; }
+    public int? PendingPublicationCount { get; init; }
 }
 
 // Only allowlisted metadata may be persisted. Never add raw errors, body, endpoint or device data.
@@ -37,10 +39,13 @@ public sealed class ProjectBridgeService : IDisposable
 {
     public const string DefaultHome = @"D:\A_KJ\AI\Applications\ProjectBridge";
     private readonly HttpClient _client;
+    private readonly Action<ProcessStartInfo> _startBridge;
     public string Home { get; }
     public string Executable => Path.Combine(Home, "프로젝트연결.exe");
     public ProjectBridgeService(string? home = null, HttpClient? client = null)
-    { Home = home ?? DefaultHome; _client = client ?? new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false}) { Timeout = TimeSpan.FromSeconds(3) }; }
+        : this(home,client,null) { }
+    public ProjectBridgeService(string? home,HttpClient? client,Action<ProcessStartInfo>? startBridge)
+    { Home = home ?? DefaultHome; _client = client ?? new HttpClient(new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false}) { Timeout = TimeSpan.FromSeconds(3) }; _startBridge=startBridge??(info=>Process.Start(info)?.Dispose()); }
     internal static string Text(JsonElement j, string key, string fallback = "") => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? fallback : fallback;
     private static bool Flag(JsonElement j, string key) => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.True;
     private static int Number(JsonElement j, string key, int fallback) => j.ValueKind == JsonValueKind.Object && j.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out var n) ? n : fallback;
@@ -75,12 +80,17 @@ public sealed class ProjectBridgeService : IDisposable
     private async Task<JsonDocument> RequestAsync(HttpMethod method, string path, object? value, CancellationToken ct)
     {
         var ep = Endpoint(); using var request = new HttpRequestMessage(method, new Uri(ep.Address, path));
+        // ResponseHeadersRead ends HttpClient.Timeout at headers. Bound GET body reads too;
+        // POST/control and their existing fallback/uncertain-result semantics are unchanged.
+        using var deadline=method==HttpMethod.Get?CancellationTokenSource.CreateLinkedTokenSource(ct):null;
+        if(deadline is not null && _client.Timeout!=Timeout.InfiniteTimeSpan)deadline.CancelAfter(_client.Timeout);
+        var requestToken=deadline?.Token??ct;
         request.Headers.Add("X-ProjectBridge-Token", ep.Token);
         if (value is not null) request.Content = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
-        using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, requestToken);
         if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.StatusCode is System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.Unauthorized?"PC 로컬 API 권한 거부":"PC 연결 요청 실패",null,response.StatusCode);
-        using var input=await response.Content.ReadAsStreamAsync(ct);using var output=new MemoryStream();var buffer=new byte[8192];
-        while(true){var count=await input.ReadAsync(buffer,ct);if(count==0)break;if(output.Length+count>900*1024)throw new InvalidDataException("결과가 너무 큽니다. 읽을 범위를 줄이세요.");output.Write(buffer,0,count);}
+        using var input=await response.Content.ReadAsStreamAsync(requestToken);using var output=new MemoryStream();var buffer=new byte[8192];
+        while(true){var count=await input.ReadAsync(buffer,requestToken);if(count==0)break;if(output.Length+count>900*1024)throw new InvalidDataException("결과가 너무 큽니다. 읽을 범위를 줄이세요.");output.Write(buffer,0,count);}
         return JsonDocument.Parse(output.ToArray(),new JsonDocumentOptions{MaxDepth=32});
     }
     /// <summary>Existing authenticated API only: no config read, installer, native fallback or process start.</summary>
@@ -98,7 +108,9 @@ public sealed class ProjectBridgeService : IDisposable
                 foreach(var row in rows.EnumerateArray().Take(200))jobs.Add(new(Text(row,"id"),Text(row,"title",ActionName(Text(row,"action"))),Text(row,"projectId"),Text(row,"toolId","ProjectBridge"),Text(row,"state","unknown"),Text(row,"action")));
             return new(installed,fresh&&Flag(j,"localReady")&&stage is not("stopped" or "disconnected" or "paused"),fresh&&Flag(j,"relayConnected"),Text(j,"deviceId","기기 미확인"),fresh?stage:"stale",
                 fresh?"기존 인증 API 응답 확인 · 연결 상태와 작업을 조회합니다. 설정/설치/원격 프로세스는 변경하지 않습니다.":"API 응답 시각이 오래되었습니다. 제한된 간격으로 상태만 다시 확인합니다.",Text(j,"relayCode"),Number(j,"activeJobCount",0),Math.Clamp(Number(j,"parallelLimit",4),1,8),jobs)
-                {StatusReasonCode=fresh?"status_confirmed":parsed?"stale_status":"invalid_status_timestamp"};
+                {StatusReasonCode=fresh?"status_confirmed":parsed?"stale_status":"invalid_status_timestamp",
+                    PublicationConflictCount=fresh?PublicationCount(j,"publicationConflictCount"):null,
+                    PendingPublicationCount=fresh?PublicationCount(j,"pendingPublicationCount"):null};
         }
         catch(OperationCanceledException){ct.ThrowIfCancellationRequested();return new(installed,false,false,"기기 미확인","offline","PC 상태 조회 시간 초과 · 기존 연결 실행기에 복구를 맡기고 상태만 다시 확인합니다.","",0,4,[]) {StatusReasonCode="timeout"};}
         catch(Exception e) when(e is IOException or HttpRequestException or JsonException or UnauthorizedAccessException or InvalidOperationException)
@@ -123,6 +135,18 @@ public sealed class ProjectBridgeService : IDisposable
         using var response=await RequestAsync(HttpMethod.Post,"v1/control",new{action},ct);
         if(!Flag(response.RootElement,"accepted"))throw new IOException("PC 연결 제어 승인 응답이 없습니다.");
     }
+    /// <summary>Explicit user resume only; no installer, configuration, authentication or elevation changes.</summary>
+    public async Task ResumeExistingAsync(CancellationToken ct)
+    {
+        try {await ControlApiOnlyAsync("resume",ct);return;}
+        catch(Exception e) when((e is FileNotFoundException or DirectoryNotFoundException)&&!File.Exists(Path.Combine(Home,"state","local_endpoint.json")) || e is HttpRequestException{StatusCode:null} || e is TaskCanceledException && !ct.IsCancellationRequested) { }
+        ct.ThrowIfCancellationRequested();
+        for(var item=Executable;!string.IsNullOrEmpty(item);item=Path.GetDirectoryName(item))
+            if((File.Exists(item)||Directory.Exists(item))&&(File.GetAttributes(item)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("PC 연결 실행 경로를 확인하세요.");
+        if(!File.Exists(Executable))throw new FileNotFoundException("PC 연결 프로그램이 없습니다. 설치·복구를 눌러 주세요.");
+        var info=new ProcessStartInfo(Executable){WorkingDirectory=Home,UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden};
+        info.ArgumentList.Add("--resume");info.ArgumentList.Add("--background");_startBridge(info);
+    }
     public async Task<PcConnectionSnapshot> CheckAsync(CancellationToken ct)
     {
         var installed = File.Exists(Executable); string device = "기기 확인 대기";
@@ -144,7 +168,9 @@ public sealed class ProjectBridgeService : IDisposable
                 foreach (var r in rows.EnumerateArray().Take(200)) jobs.Add(new(Text(r, "id"), Text(r, "title", ActionName(Text(r, "action"))), Text(r, "projectId"), Text(r, "toolId", "ProjectBridge"), Text(r, "state", "unknown"), Text(r,"action")));
             return new(true, connected, fresh && Flag(j, "relayConnected"), Text(j, "deviceId", device), fresh ? stage : "stale",
                 fresh ? "파일·명령은 병렬 처리하고 화면 조작과 같은 파일 수정은 순서대로 처리합니다." : "최근 응답이 없습니다. 연결을 다시 시작하세요.",
-                Text(j, "relayCode"), Number(j, "activeJobCount", 0), Math.Clamp(Number(j, "parallelLimit", 4), 1, 8), jobs);
+                Text(j, "relayCode"), Number(j, "activeJobCount", 0), Math.Clamp(Number(j, "parallelLimit", 4), 1, 8), jobs)
+                {PublicationConflictCount=fresh?PublicationCount(j,"publicationConflictCount"):null,
+                    PendingPublicationCount=fresh?PublicationCount(j,"pendingPublicationCount"):null};
         }
         catch (Exception e) when (e is IOException or HttpRequestException or JsonException or UnauthorizedAccessException or TaskCanceledException)
         {
@@ -211,10 +237,21 @@ public sealed class ProjectBridgeService : IDisposable
             var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync(); await process.WaitForExitAsync();
             var output = ProcessRunner.Sanitize((await stdout) + "\n" + (await stderr));
             Directory.CreateDirectory(ControlTowerSettings.DataDirectory); await File.WriteAllTextAsync(Path.Combine(ControlTowerSettings.DataDirectory, "projectbridge-install.log"), output);
-            if (process.ExitCode != 0) throw new IOException("PC 연결 설치가 완료되지 않았습니다. 설치 기록을 확인하세요.");
+            if (process.ExitCode != 0) throw new IOException(InstallationFailureMessage(output));
         }
         finally { if (Directory.Exists(stage)) Directory.Delete(stage, true); }
     }
+    // Never surface installer stdout/stderr in the GUI; recognize only fixed reason codes.
+    public static string InstallationFailureMessage(string output)
+    {
+        if(output.Contains("config_not_writable_before_install",StringComparison.Ordinal))return "설정 파일에 필요한 쓰기 권한이 없어 설치를 보류했습니다. 권한·인증·기존 연결은 강제로 변경하지 않았습니다. (config_not_writable_before_install)";
+        if(output.Contains("config_changed_since_",StringComparison.Ordinal)||output.Contains("config_staged_content_changed",StringComparison.Ordinal))return "설정이 다른 작업에서 변경되어 설치를 보류했습니다. 기존 기록과 백업을 확인하세요. (config_changed)";
+        if(output.Contains("hash mismatch",StringComparison.OrdinalIgnoreCase)||output.Contains("Unsupported release manifest",StringComparison.Ordinal))return "설치 자료의 무결성 검증이 실패하여 교체를 보류했습니다. (release_validation_failed)";
+        if(output.Contains("Bridge release tests failed",StringComparison.Ordinal)||output.Contains("Native bridge compile failed",StringComparison.Ordinal))return "설치 자료의 빌드·검사가 실패하여 교체를 보류했습니다. (release_checks_failed)";
+        return "PC 연결 설치가 완료되지 않았습니다. 설치 기록과 보존된 백업을 확인하세요. (installation_failed)";
+    }
     public static string ActionName(string action) => action switch { "capabilities" => "PC 기능 확인", "list_dir" => "폴더 확인", "read_file" => "파일 읽기", "write_file" => "파일 수정", "run_command" => "명령 실행", "start_process" => "장기 작업", "process_status" => "진행 확인", "stop_process" => "작업 중지", "ui_control" => "화면 조작", _ => "PC 작업" };
+    private static int? PublicationCount(JsonElement row,string name)
+        =>row.ValueKind==JsonValueKind.Object&&row.TryGetProperty(name,out var value)&&value.ValueKind==JsonValueKind.Number&&value.TryGetInt32(out var count)&&count>=0?count:null;
     public void Dispose() => _client.Dispose();
 }

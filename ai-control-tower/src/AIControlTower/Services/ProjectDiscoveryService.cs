@@ -65,6 +65,7 @@ public sealed class ProjectDiscoveryService
                 Programs = function.Programs.Select(program =>
                 {
                     if (string.IsNullOrWhiteSpace(program.Id) || !programIds.Add(program.Id)) throw new InvalidDataException("프로그램 id는 프로젝트 안에서 유일해야 합니다.");
+                    if (program.Control is not null) ValidateControl(program.Control);
                     var work = ResolveInside(directory, program.WorkingDirectory);
                     var path = ResolveInside(directory, program.Path);
                     if (program.Commands.Any(c => string.IsNullOrWhiteSpace(c.FileName) || c.TimeoutSeconds is < 0 or > 86400 || c.Arguments is null || c.Arguments.Any(a => a is null)))
@@ -74,13 +75,33 @@ public sealed class ProjectDiscoveryService
                         Id = config.Id + "/" + program.Id, ProjectId = config.Id,
                         Name = string.IsNullOrWhiteSpace(program.Name) ? program.Id : program.Name,
                         Kind = program.Kind, Detail = program.Description, Path = path,
-                        WorkingDirectory = work, Commands = program.Commands,
+                        WorkingDirectory = work, Commands = program.Control?.Actions ?? program.Commands, Control = program.Control,
+                        Description = program.Description, KindLabel = program.Kind,
+                        ActionLabel = "등록 작업 실행",
                         Status = "등록됨 · 실행 전"
                     };
                 }).ToArray()
             };
         }).ToArray();
         return new() { Id = config.Id, Name = config.Name, Path = directory, Summary = config.Description, ManifestPath = manifest, Functions = functions };
+    }
+
+    private static void ValidateControl(ExternalControl control)
+    {
+        // Preserve the existing finite external JSON command contract. No controller is invoked here.
+        if (control.Status is null || control.Fields is null || control.Options is null
+            || control.Fields.Count > 40 || control.Options.Count > 10
+            || control.Fields.Any(f => f is null || string.IsNullOrWhiteSpace(f.Label)
+                || !System.Text.RegularExpressions.Regex.IsMatch(f.Path ?? "", @"^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)*$")
+                || System.Text.RegularExpressions.Regex.IsMatch(f.Path ?? "", @"(?i)(password|secret|token|authorization|api.?key)"))
+            || control.Options.Any(o => o is null || string.IsNullOrWhiteSpace(o.Id) || string.IsNullOrWhiteSpace(o.Label)
+                || o.Enable is null || o.Disable is null)
+            || control.Options.Select(o => o.Id).Distinct(StringComparer.OrdinalIgnoreCase).Count() != control.Options.Count)
+            throw new InvalidDataException("control status/fields/options를 확인하세요.");
+        foreach (var command in control.Actions.Concat(control.Options.SelectMany(o => new[] { o.Enable!, o.Disable! })))
+            if (string.IsNullOrWhiteSpace(command.FileName) || command.Arguments is null || command.Arguments.Any(a => a is null)
+                || command.TimeoutSeconds is < 1 or > 120)
+                throw new InvalidDataException("control은 1~120초 기한의 유한 JSON 명령만 등록합니다.");
     }
 
     public static string ResolveInside(string root, string relative)

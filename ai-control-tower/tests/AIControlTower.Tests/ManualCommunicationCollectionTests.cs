@@ -58,11 +58,33 @@ public sealed class ManualCommunicationCollectionTests
         Assert.Equal("completed",Status(await Refresh(helper,true,true,Collect)));Assert.Equal(2,calls);
         now=now.AddMinutes(5);Assert.Equal("completed",Status(await Refresh(helper,true,false,Collect)));Assert.Equal(3,calls);
     }
-    [Fact] public async Task DeadlineReturnsBlockedButKeepsSingleFlightForCancellationIgnoringCollector()
+    [Fact] public async Task DeadlineReturnsBlockedWithoutPublishingCollectorResult()
     {
         var helper=New(TimeSpan.FromMilliseconds(40));var release=new TaskCompletionSource<CommunicationCollectionResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var result=await Refresh(helper,true,true,_=>release.Task);Assert.Equal("blocked",Status(result));Assert.True(Running(helper));
-        Assert.Equal("inflight",Status(await Refresh(helper,true,true,_=>Task.FromResult(Empty()))));release.SetResult(Empty());
+        try
+        {
+            var result=await Refresh(helper,true,true,_=>release.Task);Assert.Equal("blocked",Status(result));
+            Assert.Null(Helper().GetProperty("Latest")!.GetValue(helper));
+            // The deadline may cancel Task.Run before the collector enters; either scheduling outcome is valid.
+        }
+        finally {release.TrySetResult(Empty());}
+        for(var i=0;i<100&&Running(helper);i++)await Task.Delay(5);Assert.False(Running(helper));
+        Assert.Null(Helper().GetProperty("Latest")!.GetValue(helper));
+    }
+    [Fact] public async Task CallerCancellationKeepsSingleFlightForEnteredCancellationIgnoringCollector()
+    {
+        var helper=New();var entered=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release=new TaskCompletionSource<CommunicationCollectionResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cancellation=new CancellationTokenSource();var calls=0;
+        var first=Refresh(helper,true,true,_=>{Interlocked.Increment(ref calls);entered.TrySetResult();return release.Task;},cancellation.Token);
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(3));cancellation.Cancel();
+            Assert.Equal("blocked",Status(await first));Assert.True(Running(helper));
+            Assert.Equal("inflight",Status(await Refresh(helper,true,true,_=>{Interlocked.Increment(ref calls);return Task.FromResult(Empty());})));
+            Assert.Equal(1,calls);Assert.Null(Helper().GetProperty("Latest")!.GetValue(helper));
+        }
+        finally {cancellation.Cancel();release.TrySetResult(Empty());await first;}
         for(var i=0;i<100&&Running(helper);i++)await Task.Delay(5);Assert.False(Running(helper));
         Assert.Null(Helper().GetProperty("Latest")!.GetValue(helper));
     }

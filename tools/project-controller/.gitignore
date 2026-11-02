@@ -1,0 +1,3 @@
+manifest-tests/bin/
+manifest-tests/obj/
+.local/

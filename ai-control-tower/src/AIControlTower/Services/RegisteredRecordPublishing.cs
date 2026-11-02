@@ -145,7 +145,8 @@ public sealed class RegisteredRecordPublishing
                 ReadRegistrations();
                 var key=BatchKey(registration.ProjectId,collection);
                 lock(_gate)_attempts[key]="upload_uncertain";
-                var selected=new CommunicationCollectionResult(collection.Records.Where(r=>r.ProjectId==registration.ProjectId).ToArray(),collection.Errors,collection.CollectedAt);
+                var selected=new CommunicationCollectionResult(collection.Records.Where(r=>r.ProjectId==registration.ProjectId).ToArray(),
+                    collection.Errors.Where(e=>e.ProjectId is null||string.Equals(e.ProjectId,registration.ProjectId,StringComparison.Ordinal)).ToArray(),collection.CollectedAt);
                 status=await publish(registration.ProjectId,selected,linked.Token).ConfigureAwait(false);
                 linked.Token.ThrowIfCancellationRequested();
                 if(status is not("held" or "empty" or "branch_uploaded" or "upload_uncertain" or "pr_uncertain" or "pr_open" or "pr_closed" or "pr_merged" or "already_present"))status="upload_uncertain";

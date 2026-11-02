@@ -81,13 +81,14 @@ public sealed class NavigationPresentationTests
         Assert.Equal("작업",vm.WorkDashboard.Search);Assert.Equal("통합",vm.ManagementDashboard.Search);Assert.Equal(0,calls);
         Assert.Equal(bytes,File.ReadAllBytes(file));Assert.Equal(attrs,File.GetAttributes(file));Assert.Single(Directory.GetFiles(root));
     }
-    [Fact] public void InstallationOnlyDoesNotMakeCandidateDefaultVisibleButSearchCanFindIt()
+    [Fact] public void KnownInstallationIsVisibleWithoutUsageEvidenceWhileUnknownCandidatesStayHidden()
     {
-        var settings=ControlTowerSettings.LoadReadOnly(Path.Combine(@"D:\A_KJ\AI\Workspace\ControlTower\continuous-20261007\checks","nav-missing-"+Guid.NewGuid().ToString("N"),"settings.json"));
-        using var vm=new MainViewModel(settings,false,()=>throw new InvalidOperationException("No recovery"));
-        var row=new ToolStatusViewModel(new("aider","Aider",StatusKind.Ready,"설치만 확인",DateTimeOffset.Now));vm.Statuses.Add(row);
-        Assert.False(Get<bool>(row,"HasUsageEvidence"));Assert.Empty(vm.FilteredToolStatuses);
-        vm.ToolSearch="Aider";Assert.Single(vm.FilteredToolStatuses);vm.ToolSearch="";Set(vm,"ShowOtherTools",true);Assert.Single(vm.FilteredToolStatuses);
+        var row=new ToolStatusViewModel(new("aider","Aider",StatusKind.Ready,"설치만 확인",DateTimeOffset.Now));
+        var candidate=new ToolStatusViewModel(new("hyperframes","HyperFrames",StatusKind.Unknown,"설치 미확인",DateTimeOffset.Now));
+        Assert.False(row.HasUsageEvidence);Assert.False(candidate.HasUsageEvidence);
+        var visible=MainViewModel.SelectKnownTools([row,candidate],new HashSet<string>(),false);
+        Assert.Same(row,Assert.Single(visible));
+        Assert.Equal(2,MainViewModel.SelectKnownTools([row,candidate],new HashSet<string>(),true).Count);
         Assert.True(row.IsUserFacing);Assert.NotEqual("실행 중",row.StateLabel);
     }
     [Theory] [InlineData("n8n","n8n")] [InlineData("ai-ops-runner","GitHub Actions")] [InlineData("delivery-chain","Jev")] [InlineData("voicestudio","VoiceStudio")]
@@ -136,7 +137,7 @@ public sealed class NavigationPresentationTests
         var focus=Descendants(first).OfType<Border>().Single(b=>b.Name=="TabFocus");Assert.Equal(new Thickness(0),focus.Margin);
         Assert.True(focus.ActualWidth<=first.ActualWidth);Assert.True(focus.ActualHeight<=first.ActualHeight);
         var splitter=new GridSplitter{Resources=resources,Style=(Style)resources[typeof(GridSplitter)]};
-        Assert.True(splitter.ShowsPreview);Assert.Equal(GridResizeBehavior.PreviousAndNext,splitter.ResizeBehavior);
+        Assert.False(splitter.ShowsPreview);Assert.Equal(GridResizeBehavior.PreviousAndNext,splitter.ResizeBehavior);
     });
     private static string Source(string file)
     { var dir=new DirectoryInfo(AppContext.BaseDirectory);while(dir is not null&&!File.Exists(Path.Combine(dir.FullName,"ai-control-tower","src","AIControlTower","App.xaml")))dir=dir.Parent;Assert.NotNull(dir);return Path.Combine(dir.FullName,"ai-control-tower","src","AIControlTower",file); }

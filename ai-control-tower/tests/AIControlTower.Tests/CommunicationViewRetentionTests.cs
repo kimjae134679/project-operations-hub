@@ -41,6 +41,31 @@ public sealed class CommunicationViewRetentionTests : IDisposable
     }
 
     [Fact]
+    public async Task NormalGuiReadsLocalBoardWithoutPreparingGitEvenWhenAutoUploadIsEnabled()
+    {
+        using var vm=CreateViewModel();
+        vm.AutoPublishCommunication=true;
+        // Keep the in-memory read-position store, then exercise the normal operational sync branch.
+        var settings=(ControlTowerSettings)typeof(MainViewModel).GetField("_settings",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(vm)!;
+        settings.IsTemporary=false;
+        // This test owns only local board reading. Hold the existing single-flight collection gate
+        // so it cannot consult catalog roots/sink or leave an unpumped dispatcher operation behind.
+        var collectionGate=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var collectionTask=typeof(MainViewModel).GetField("_manualCollectionTask",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        collectionTask.SetValue(vm,collectionGate.Task);
+        try
+        {
+            await vm.SyncCommunicationAsync(true);
+            Assert.Equal(Body,Assert.Single(vm.Notices).Notice.Body);
+            Assert.Single(vm.InboxItems);
+            Assert.False(Directory.Exists(Path.Combine(_root,".git")));
+            Assert.Same(collectionGate.Task,collectionTask.GetValue(vm));
+            Assert.False(vm.IsCommunicating);
+        }
+        finally { collectionGate.TrySetResult(); }
+    }
+
+    [Fact]
     public async Task InvalidBoardKeepsLastGoodNoticeReceiptAndInboxThenRecovers()
     {
         using var vm = CreateViewModel();

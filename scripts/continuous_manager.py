@@ -421,12 +421,17 @@ def ai_receipt(contract, stdout, result, root, started_ns, identity, preflight=N
                         kind = item.get('type')
                         if kind in ('error', 'turn.failed') or item.get('error') is not None:
                             failure = failure or 'ai_failed'
+                        child = item.get('item')
+                        # Explicit item errors fail the turn contract; ordinary tool
+                        # exit/status alone may be recovered by the model.
+                        if (isinstance(kind, str) and kind.startswith('item.') and isinstance(child, dict)
+                                and (child.get('type') == 'error' or child.get('error') is not None)):
+                            failure = failure or 'ai_failed'
                         if kind == 'turn.completed':
                             terminals += 1
                             receipt['terminalObserved'] = True
                             if terminals != 1:
                                 failure = failure or 'contradictory_terminal'
-                        child = item.get('item')
                         if (kind == 'item.completed' and isinstance(child, dict) and child.get('type') == 'agent_message'
                                 and isinstance(child.get('text'), str) and child['text'].strip()):
                             receipt['reportObserved'] = True

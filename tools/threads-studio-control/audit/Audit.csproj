@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <Target Name="RequireReviewedAssembly" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(ControlTowerAssembly)' == ''" Text="Specify -p:ControlTowerAssembly=the reviewed AIControlTower.dll path." />
+    <Error Condition="!Exists('$(ControlTowerAssembly)')" Text="Reviewed AIControlTower assembly does not exist." />
+  </Target>
+  <ItemGroup>
+    <Reference Include="AIControlTower"><HintPath>$(ControlTowerAssembly)</HintPath></Reference>
+  </ItemGroup>
+</Project>

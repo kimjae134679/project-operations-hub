@@ -42,6 +42,7 @@ public sealed class ProgramItem : ObservableObject
     public string Detail { get; init; } = "";
     public string Path { get; init; } = "";
     public string WorkingDirectory { get; init; } = "";
+    public ExternalControl? Control { get; init; }
     public bool CanLaunch => Commands.Count > 0;
     public IReadOnlyList<ProgramCommand> Commands { get; init; } = [];
     private string _displayName = "";
@@ -101,5 +102,6 @@ public sealed class ManifestProgram
     public string Path { get; set; } = ".";
     public string WorkingDirectory { get; set; } = ".";
     public string Description { get; set; } = "";
+    public ExternalControl? Control { get; set; }
     public List<ProgramCommand> Commands { get; set; } = [];
 }

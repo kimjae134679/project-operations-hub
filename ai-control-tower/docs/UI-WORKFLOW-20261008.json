@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-08T02:40:21.7311730+00:00",
+  "branch": "codex/hub-workflow-ui-20261008",
+  "baseCommit": "b4b62e092d52db4023c52960c61e89f2090c558e",
+  "operationalDeployment": false,
+  "tests": {
+    "excluded": "MouseWheelRoutingTests (3 existing visible-window tests)",
+    "trx": "qa-tests/workflow-regression-pass.trx",
+    "failed": 0,
+    "passed": 766
+  },
+  "releaseBuild": "PASS; framework dependent; existing CS8602 warning retained",
+  "diffCheck": "PASS",
+  "scopeCheck": {
+    "ProtectedBridgeServiceAuthQueueProtocolStartup": "no changed files",
+    "UnrelatedCatalogProjects": "unchanged",
+    "PcConnectionTab": "unchanged XML",
+    "ThreadsCommands": "unchanged registered 0.3.19"
+  },
+  "finalUi": {
+    "projectFrames": 8,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "operationalReviewProgramsLaunched": 0,
+    "filterFrames": 2,
+    "sizes": [
+      "1460x920",
+      "1060x720"
+    ],
+    "host": "plain System.Windows.Application; production ResourceDictionary; no App startup",
+    "realizedRows": 3,
+    "proof": "qa-workflow-final-source/workflow-ui-proof.json",
+    "largeTextScale": 1.25,
+    "lastRowRealized": true,
+    "userEvaluationWritten": false,
+    "isolatedArtifactButtons": 4,
+    "stressFixtureRows": 600,
+    "bridgeTasksSubmitted": 0,
+    "allWindowHandlesZero": true
+  },
+  "preview": {
+    "launchedByAgent": false,
+    "arguments": "--local-view",
+    "path": "preview-workflow/START_UI_PREVIEW.vbs",
+    "version": "0.9.11.0"
+  },
+  "limitations": [
+    "Operational preview/review execution not verified or deployed",
+    "Four Library reference images: transfer HTTP 403; pixels not inspected; no workaround retry",
+    "Initial new App() host scheduled startup; those native-window absence claims superseded by final plain Application checks",
+    "Engram MCP tools unavailable; repository handoff retained without changing app/config"
+  ]
+}

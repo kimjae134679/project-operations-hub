@@ -19,16 +19,16 @@ public sealed class RefreshMotionTests
     }
 
     [Fact]
-    public void DetachedRotationTimelineKeepsLinearVelocityAcrossWholeTurns()
+    public void DetachedRotationTimelineStartsSlowAcceleratesAndEndsSlowAcrossWholeTurns()
     {
         InSta(()=>
         {
             var animation=Animation(90,1400,false);
             Assert.Equal(90d,animation.From);Assert.Equal(450d,animation.To);
             Assert.Equal(TimeSpan.FromMilliseconds(1400),animation.Duration.TimeSpan);
-            Assert.Equal(RepeatBehavior.Forever,animation.RepeatBehavior);Assert.Null(animation.EasingFunction);
+            Assert.Equal(RepeatBehavior.Forever,animation.RepeatBehavior);
+            AssertEaseInOut(animation);
             var clock=animation.CreateClock();Assert.NotNull(clock); // Never attached to a user control/window.
-            Assert.Equal(360d/1400,(animation.To!.Value-animation.From!.Value)/animation.Duration.TimeSpan.TotalMilliseconds,10);
         });
     }
 
@@ -46,7 +46,7 @@ public sealed class RefreshMotionTests
     }
 
     [Fact]
-    public void FinishingTurnRateChangePreservesRemainingDistanceAndVelocity()
+    public void FinishingTurnRateChangePreservesRemainingDistanceAndEasesToCompleteTurn()
     {
         Assert.True(Replace(true,true,false,1400,1000));
         Assert.False(Replace(true,true,false,1400,1400));
@@ -57,8 +57,8 @@ public sealed class RefreshMotionTests
         {
             var finish=Animation(270,1000,true);
             Assert.Equal(270d,finish.From);Assert.Equal(360d,finish.To);
-            Assert.Equal(TimeSpan.FromMilliseconds(250),finish.Duration.TimeSpan);Assert.Null(finish.EasingFunction);
-            Assert.Equal(360d/1000,(finish.To!.Value-finish.From!.Value)/finish.Duration.TimeSpan.TotalMilliseconds,10);
+            Assert.Equal(TimeSpan.FromMilliseconds(250),finish.Duration.TimeSpan);
+            AssertEaseInOut(finish);
             Assert.NotEqual(RepeatBehavior.Forever,finish.RepeatBehavior);
         });
     }
@@ -86,6 +86,19 @@ public sealed class RefreshMotionTests
 
     private static DoubleAnimation Animation(double angle,double milliseconds,bool finishing)
         => (DoubleAnimation)Method("CreateRotationAnimation").Invoke(null,[angle,milliseconds,finishing])!;
+    private static void AssertEaseInOut(DoubleAnimation animation)
+    {
+        var easing=Assert.IsType<SineEase>(animation.EasingFunction);
+        Assert.Equal(EasingMode.EaseInOut,easing.EasingMode);
+        Assert.Equal(0,easing.Ease(0),10);Assert.Equal(.5,easing.Ease(.5),10);Assert.Equal(1,easing.Ease(1),10);
+        var start=easing.Ease(.1)-easing.Ease(0);
+        var middle=easing.Ease(.55)-easing.Ease(.45);
+        var end=easing.Ease(1)-easing.Ease(.9);
+        Assert.True(start<middle/3);Assert.True(end<middle/3);
+        Assert.Equal(start,end,10);
+        var previous=0d;
+        for(var i=1;i<=100;i++){var progress=easing.Ease(i/100d);Assert.True(progress>=previous);Assert.InRange(progress,0,1);previous=progress;}
+    }
     private static bool Replace(bool running,bool finishing,bool active,double previous,double requested)
         => (bool)Method("ShouldReplaceClock").Invoke(null,[running,finishing,active,previous,requested])!;
     private static MethodInfo Method(string name) { var method=typeof(RefreshMotion).GetMethod(name);Assert.NotNull(method);return method!; }

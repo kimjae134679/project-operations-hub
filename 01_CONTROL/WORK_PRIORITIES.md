@@ -1,4 +1,47 @@
+## 최신 운영 확인 · 2026-10-07 · 0.9.8 자동 교체 완료
+
+현재 **0.9.8 manual-control PID 25772**, 생성 17:39:00.861918 KST/endpoint ticks `639269591408619180`입니다. 루트 담당자가 fresh 트레이·PC 연결 true, ownedJobsBusy false와 endpoint 신원을 확인했습니다. 패키지는 `D:\A_KJ\AI\Applications\AIControlTower\versions\0.9.8-20261007-managed`, 앱 소스 `c4f9669fcc287dcb47d74c97dd1f3661e621b488`, SHA-256 `484cdc3e25a9e3b71fa183898a65bf58165c97f97f3fcabb0d74e5a95667dd2b`입니다. helper/Python 소스는 `cbdefbfa09caed87439ad9e680e744a446ef20b3`; 기존 앱·guard 바이트를 덮어쓰지 않았습니다.
+
+실제 helper PID 37016이 **한 번 실행·종료 코드 0**으로 C1 PID 9552의 실제 종료 → 다른 0.9.8 패키지 PID 376 실행(17:37:24.751947 KST)을 완료했습니다. `FULL_HANDOFF.json`의 operatingHandoffConfirmed는 true이며 **구버전 종료 수락 원문은 별도 직접 캡처하지 않았습니다**(`oldExitReplyDirectlyCaptured=false`). 이어 정확한 새 client PID 28344의 `graceful_exit_accepted/0`·빈 stderr → PID 376 실제 종료 → guard PID 23092 CheckOnly 0·재시작 0 → 현재 PID 25772를 확인했습니다(`NEW_IDLE_ROUNDTRIP.json`). activated/automaticDifferentPackageHandoffVerified/idleCliRoundtripVerified는 true, **busyDrainOperatingVerified는 false**입니다. X는 트레이를 유지하고 강제 종료·창 제어는 하지 않았습니다.
+
+최종 **scripts 119 PASS/0 FAIL(119.066초, 종료 코드 0, 실행기 41개)**입니다. 앱 C# 추가 변경 없이 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)** 근거를 유지합니다. 직전 117개 검사의 118.331초/teardown 1 ERROR 이력은 보존합니다. cleanup RED 2 FAIL(16.568초) → focused GREEN 5 PASS(15.034초); 기존 8초 안에서 소유 파일 release를 확인하는 검사 barrier이며 프로세스 종료 증거가 아닙니다. production deadline은 변경하지 않았습니다. Python CLI는 RED 6 FAIL/4 PASS(15.112초) → GREEN 10 PASS(14.896초), DAG 차단·replay 1·privacy 0 근거를 확보했으나 기존 Bridge 3.0 운영 설치를 수정한 것은 아닙니다.
+
+root supervisor PID 5996은 그대로입니다. Bridge PID 5140/v3 localReady·relayConnected true/parallel 4는 08:39:30Z, 별도 Remote pong은 08:39:27Z에 확인했습니다. 보호 config·중앙 Git locks·실제 여러 Jev 모델 완료·모든 GPT 자동 연결은 여전히 막힘/미완료입니다. PR #31 draft·미병합, review disabled/unmanaged, 예약 PAUSED를 유지합니다.
+
+## 이전 C1 운영·0.9.8 준비 기록
+
+아래의 현재/미배포 표현은 0.9.8 활성화 전 당시 상태이며 위 최신 확인이 우선합니다.
+
+다음 **0.9.8은 소스 준비 단계이며 아직 배포·실행하지 않았습니다.** 교체 실행기는 선행 0 없는 ASCII 숫자 3부분(각 0~65535)·버전별 정확한 폴더·다운그레이드 거부·모든 nonlegacy 현재 descriptor 검증을 유지하도록 확장했습니다. 명시 AI 항목 오류는 이후 성공에도 오류 상태를 유지하고, 일반 도구의 nonzero 종료는 회복 가능한 오류로 구분합니다. 버전 focused 4개(62행렬) PASS(1.850초), AI 오류 focused 10개 PASS(47ms); 최신 전체 **.NET 634 PASS/0 FAIL(49초, Window 3개 제외)**, **scripts 106 PASS/0 FAIL(103.428초, 종료 코드 0)**입니다(`full-handoff-net-final.log/trx`, `full-handoff-scripts-final.log`). 신규 패키지 신원·capability·실제 전체 자동 교체는 아직 확정하지 않습니다.
+
+이 구역이 아래 이전 준비·배포 이력보다 우선합니다. 현재 실행 앱은 **0.9.7 autoexit manual-control PID 9552 / 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`**입니다(생성 16:48:14.613517 KST). 루트 담당자가 새 상태의 트레이 등록·PC 연결 true, ownedJobsBusy false와 endpoint PID 9552 신원을 확인했습니다. root 원격 supervisor PID 5996은 그대로 보존했습니다. 실제 화면 사용·프로젝트 업무 전체 완료를 뜻하지 않습니다.
+
+사용자가 트레이 종료를 확인했고 종료 IPC 미지원 `475a0fc` PID 37456의 실제 종료 후 검증 helper로 C1 PID 25136을 실행하여 첫 전환을 완료했습니다. 이어 정확한 C1 headless client PID 22216의 `--request-manual-exit`가 `graceful_exit_accepted/0`·빈 stderr를 반환했고 원래 PID 25136의 실제 종료를 확인했습니다. 고정 guard CheckOnly 0 및 명시 재시작 0으로 현재 PID 9552를 실행했습니다. **유휴 상태의 정상 CLI 종료 → 동일 패키지 guard 재시작을 한 번 확인한 것**이며, capable 기존본 → 다른 새 패키지의 helper 전체 자동 교체나 운영 busy drain을 검증한 것은 아닙니다. X는 트레이 동작을 유지하고 강제 종료·창 제어·구버전 CLI 탐색은 하지 않았습니다.
+
+별도 `0.9.7-20261007-autoexit`의 정확한 capability 튜플을 등록했습니다. 앱 소스 `5b0f3296d259ce03882e16eba1d8f93604af570f`, SHA-256 `2615d4a88f53410d963403cbb4dafabd7f6abf003c3a95737d4138b362cb244f`입니다. C1 앱·C2 helper 바이트/해시는 변경하지 않았습니다. 앞선 비운영 순수 검사 0, 서버 정보 없는 종료 요청 `unsupported/4`, 추가 인수 `invalid_request/2`는 운영 정상 종료 증거와 구분합니다.
+
+앞서 검증된 **.NET 624 PASS / 0 FAIL**, **scripts 102 PASS / 0 FAIL(89.035초, 실행기 34개 포함)**입니다(`automatic-exit-scripts-C2-final-102.log`). 환경·외부 EOF focused 4개도 PASS(6.217초)이며 이번 운영 전환 후 검사를 다시 실행하지 않았습니다. 종료 client의 압축 해제·TEMP/TMP를 검증된 기존 D 패키지 폴더에 고정했고, Python harness는 D 출력 파일과 정확한 부모 종료 대기로 자식 상속 EOF를 기다리지 않습니다.
+
+이전 검증 이력: 전체 98개 검사는 두 번 외부 35초 timeout으로 각각 97 PASS/1 ERROR(95.932초·126.665초)였습니다. 변경 없는 deadline 단독 검사는 PASS(25.864초); private 추적은 내부 reader 약 20초 반환과 외부 capture EOF 지연을 구분했습니다. 두 전체 실행의 추가 지연 원인이 모두 증명된 것은 아닙니다. 보호 Bridge 설정/운영 업그레이드와 중앙 clone Git lock은 그대로이며 우회·복구 완료로 표시하지 않습니다. 실제 여러 모델 동시 작업 증거는 미확인입니다. PR #31은 draft·미병합, receipt review는 disabled/unmanaged입니다.
+
+## 이전 준비 기록 · 자동 교체와 독립 병렬 실행
+
+2026-10-07 사용자는 구버전 교체를 자동으로 처리하는 작은 실행기를 만들고 사용하며 남은 일을 계속하라고 승인했습니다. 기존 0.9.6 일반 모드에는 안전 종료 IPC가 없으므로 임의 강제 종료·창 메시지 주입·저장된 busy=false를 종료 허가로 사용하는 방법은 쓰지 않습니다. 정확 구버전이 정상 종료하면 현재 실행 파일·버전·소스 commit·SHA·기한을 재검증하고 새 버전을 한 번만 실행하는 숨김 일회 실행기를 구현합니다. 이 실행기는 완전 자동 구버전 종료 기능이 아닙니다. 기존 root 원격 supervisor와 Bridge·다른 프로젝트 작업은 보존합니다.
+
+병렬 실행은 전역 1개 제한이 아닙니다. 로컬 기본은 프로젝트별 1개/전체 3개, 원격 request pool은 기본 4개(1~16 설정)이며 detached 자식 전체 수 제한과 다릅니다. 같은 프로젝트의 Jev 병렬 실행은 명시적으로 선택한 등록 독립 작업 폴더에만 허용하도록 소스로 보완합니다. 동일·상하위 폴더와 기본 프로젝트 전용 작업은 충돌 거부하고, 실행 ID·중지 소유권·완료 기록을 분리합니다. 작업 폴더 선언은 파일시스템 sandbox가 아니며 실제 여러 AI 모델 동시 작업 완료를 뜻하지 않습니다. 운영 Bridge의 장기 작업 의존성 수정은 보호 설치 거절 때문에 아직 미적용입니다.
+
+최신 fresh 검사: .NET 602 PASS/0 FAIL(실제 Window 휠 3개 제외), scripts 81 PASS/0 FAIL(교체 실행기 13개 포함). 등록 독립 폴더 2곳의 실제 무해한 D 시험 프로세스가 동시에 생존했고 하나만 중지한 뒤 다른 하나는 계속 살아 있었습니다. 이것은 실제 병렬 Jev 모델 완료가 아닙니다. 자동 교체 실행기 소스·검사는 완료했으며 정확 별도 패키지 준비/대기 실행과 실제 운영 활성화는 본인 체크포인트에서 구분합니다. 예약은 계속 PAUSED, receipt review는 disabled/unmanaged입니다.
 # 통합관제 승인 작업 · 우선순위와 완료 기준
+
+## 최신 사용자 승인 · 프로젝트 중심 화면 개편
+
+2026-10-07 사용자 정지 스샷 11개와 ‘그대로 진행’ 승인을 기준으로 P1 화면을 정리합니다. 내 프로젝트를 첫 화면으로 두고 목록은 제목만, 프로젝트별 최근 명령/답변·등록 실행 기록을 모읍니다. 검색·필터·고급·수동 조회는 제거하고 기존 자동 갱신·선택 유지·문서 이동 이력은 보존합니다. 소통은 게시글/실제 댓글, 공지는 현재 프로젝트별 현재 버전·해시의 실제 읽기 기록으로 체크합니다. 라이브 분할 크기, 분할 여백·카드 패딩·테두리, 서버 회전 ease-in-out을 검사합니다.
+
+PC 결과 조회의 headers 이후 무제한 body 대기와 이전 선택 오류를 별도 P2 소스로 수정합니다. GET 읽기만 기존 3초 timeout과 caller/lifetime 취소를 적용하며 POST/control/fallback·작업 재제출 정책은 바꾸지 않습니다. 조회 취소/시간 초과와 실행 작업 자체의 완료·취소를 구분합니다.
+
+현재 호스트에서 확인한 인간 사용 앱은 0.9.6 일반 모드입니다. 오래된 manual-control PID/상태 파일과 아래 이전 배포 이력은 현재 상태로 재사용하지 않습니다. 이 회차는 0.9.7 소스·검사·별도 패키지를 준비하며 현재 GUI·원격을 임의 종료하지 않습니다. 전체 GPT/Jev 채팅 자동 연결, 실제 clone lock 복구, 보호 Bridge 운영 업그레이드, 장기 프로세스 의존성 운영 완료는 여전히 별도 남은 일입니다. receipt review는 disabled/unmanaged입니다.
+
+최신 fresh Release 코드 기반 검사: **586 PASS / 0 FAIL**(기존 Window 휠 검사 3개 제외). 별도 RED는 요청 화면·본문 deadline·공식 기록 identity·자동 갱신 선택 유실을 실제 재현했습니다. 분수 배율 테두리는 고정 RGB 대신 엄격한 stroke 혼합 색과 네 변/viewport/slot 범위를 검사하고, 테두리 제거·옛 margin 복원의 음성 대조군도 통과했습니다. 2026-10-07 14:10 KST Bridge worker5140 localReady/relayConnected, 별도 Remote Desktop pong을 재확인했습니다. 이것은 운영 업그레이드나 모든 장기 작업 완료가 아닙니다.
 
 현재 사용자 직접 지시까지 반영한 작업 목록입니다(2026-10-07 KST). 기능 계획, 소스 구현, 검사 통과, 배포 준비, 운영 설치, 실제 사용 완료는 별개입니다. 이 문서는 완료표나 다른 담당자의 읽음 확인을 대신하지 않습니다. 최신 진행은 본인 task_exchange와 해당 프로젝트의 실제 상태를 확인합니다.
 

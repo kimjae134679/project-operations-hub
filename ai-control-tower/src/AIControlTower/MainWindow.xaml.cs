@@ -48,9 +48,11 @@ public partial class MainWindow : Window
         PreviewMouseWheel += MouseWheelRouting.HandlePreviewMouseWheel;
         SourceInitialized += (_, _) => ApplyTitlebarTheme();
         Loaded += async (_, _) => { EnsureSelectedTabVisible(WorkspaceTabs);StartOwnedTray();await InitializeAsync(); };
-        SizeChanged += (_, _) => ApplyResponsiveLayout();
+        SizeChanged += (_, _) => { ApplyResponsiveLayout();Dispatcher.BeginInvoke(()=>EnsureSelectedTabVisible(WorkspaceTabs),System.Windows.Threading.DispatcherPriority.Loaded); };
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProgram)) { ApplyResponsiveLayout(); Dispatcher.BeginInvoke(SynchronizeProgramSelections, System.Windows.Threading.DispatcherPriority.DataBind); } };
         _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.DarkMode)) ApplyTitlebarTheme(); };
+        _viewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(MainViewModel.SelectedProject)) { UpdateProjectShortcuts(); QuickEntryNotice.Text = "선택 후 아래 버튼으로 결과·자료를 엽니다."; } };
+        UpdateProjectShortcuts();
         _viewModel.CatalogRefreshing += (_, _) => CaptureCatalogView();
         _viewModel.CatalogRefreshed += (_, _) => Dispatcher.BeginInvoke(RestoreCatalogView, System.Windows.Threading.DispatcherPriority.Loaded);
         Closing += HandleWindowClosing;
@@ -82,6 +84,14 @@ public partial class MainWindow : Window
         catch(Exception ex) when(ex is IOException or UnauthorizedAccessException){ }
     }
     public void PrepareSessionEnding() => _sessionEnding=true;
+    public Task<string> RequestOwnedManualExitAsync() => _viewModel.RequestManualExitAsync(_initializeTask ?? Task.CompletedTask);
+    public void CompleteOwnedManualExit()
+    {
+        // Only invoked after the authenticated response is flushed and actual work is drained.
+        if(!_viewModel.IsManualControl || !_viewModel.ManualExitFrozen)return;
+        _trayExitRequested=true;
+        Application.Current.Shutdown();
+    }
     private void HandleWindowClosing(object? sender,System.ComponentModel.CancelEventArgs e)
     {
         if(!_viewModel.IsManualControl)return;
@@ -91,12 +101,10 @@ public partial class MainWindow : Window
         if(decision==WindowCloseAction.HideToTray)Hide();
         else { _trayExitRequested=false;if(!IsVisible)Show(); }
     }
-    private void RequestTrayExit()
+    private async void RequestTrayExit()
     {
-        _trayExitRequested=true;
-        if(_viewModel.IsBusy){_trayExitRequested=false;Show();return;}
-        Close();
-        if(_trayExitRequested)Application.Current.Shutdown();
+        if(await RequestOwnedManualExitAsync()=="accepted")CompleteOwnedManualExit();
+        else {_trayExitRequested=false;Show();}
     }
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
@@ -116,6 +124,7 @@ public partial class MainWindow : Window
         if(scroll is null)return;
         FrameworkElement viewport=Descendants(scroll).OfType<ScrollContentPresenter>().FirstOrDefault()??(FrameworkElement)scroll;
         if(viewport.ActualWidth<=0 || !viewport.IsAncestorOf(selected))return;
+        selected.BringIntoView(new Rect(selected.RenderSize));
         var bounds=selected.TransformToAncestor(viewport).TransformBounds(new Rect(selected.RenderSize));
         var delta=bounds.Right>viewport.ActualWidth?bounds.Right-viewport.ActualWidth+2:bounds.Left<0?bounds.Left-2:0;
         if(delta!=0)scroll.ScrollToHorizontalOffset(Math.Max(0,scroll.HorizontalOffset+delta));
@@ -141,7 +150,7 @@ public partial class MainWindow : Window
         Descendants(ProjectList).OfType<ScrollViewer>().FirstOrDefault()?.ScrollToVerticalOffset(_catalogOffset);
     }
 
-    public Task InitializeAsync() => _initializeTask ??= InitializeCoreAsync();
+    public Task InitializeAsync() => _viewModel.ManualExitFrozen ? Task.CompletedTask : _initializeTask ??= InitializeCoreAsync();
 
     private async Task InitializeCoreAsync()
     {
@@ -208,15 +217,15 @@ public partial class MainWindow : Window
             InspectorColumn.Width = new GridLength(narrow ? 246 : 284);
             _paneWidthsInitialized=true;
         }
-        ProjectHeader.Padding = compact ? new Thickness(18,10,18,6) : new Thickness(narrow ? 18 : 24);
+        ProjectHeaderFace.Padding = new Thickness(compact || narrow ? 18 : 24);
         ProjectCategory.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
-        ProjectHeaderBody.Margin = new Thickness(0,0,7,compact ? 2 : 18);
+        ProjectHeaderBody.Margin = new Thickness(0);
         ProjectHeader.Margin = new Thickness(0, 0, 0, compact ? 12 : 16);
         ProjectTitle.FontSize = narrow ? 27 : 32;
         ProjectDescription.MaxHeight = compact ? 44 : 60;
         ProjectPathLine.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
 
-        LogPanel.Margin = new Thickness(0, compact ? 8 : 14, 0, 0);
+        LogPanel.Margin = new Thickness(0);
         var hideMetadata = compact && _viewModel.HasSelectedCommands;
         ProgramInspector.Padding = new Thickness(compact ? 14 : 20);
         InspectorType.Visibility = hideMetadata ? Visibility.Collapsed : Visibility.Visible;
@@ -253,11 +262,56 @@ public partial class MainWindow : Window
     private void Projects_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.OriginalSource != sender || e.AddedItems.Count == 0 || WorkspaceContent is null) return;
+        if (e.AddedItems[0] is ProjectItem project) _viewModel.SelectedProject = project;
         _activeProgramList = null;
         FadeIn(ProjectHeader);
         FadeIn(ProgramInspector);
     }
 
+    // Navigation only; uses the catalog's existing actions and never submits work here.
+    private ProgramItem? ProjectShortcutTarget(string kind) => _viewModel.SelectedProject?.Functions
+        .SelectMany(f => f.Programs).FirstOrDefault(p => kind == "review"
+            ? p.Id.EndsWith("/review-current", StringComparison.Ordinal)
+            : p.Id.EndsWith("/current-production", StringComparison.Ordinal) || p.Id.EndsWith("/outputs", StringComparison.Ordinal));
+    private void UpdateProjectShortcuts()
+    {
+        ProjectResultShortcut.IsEnabled = ProjectShortcutTarget("result") is not null;
+        ProjectReviewShortcut.IsEnabled = ProjectShortcutTarget("review") is not null;
+        ProjectReviewShortcut.Content = ProjectReviewShortcut.IsEnabled ? "리뷰 선택" : "리뷰 미연결";
+    }
+    private void ProjectShortcut_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: string kind } || _viewModel.SelectedProject is not { } project) return;
+        if (kind == "attention")
+        {
+            var dashboard = _viewModel.SelectedProjectDashboard;
+            dashboard.ProjectFilterId = _viewModel.SelectedProjectRecordId;
+            dashboard.Search = "";
+            dashboard.WorkerFilterKey = "";
+            dashboard.StatusFilterKey = "needs-action";
+            WorkspaceTabs.SelectedItem = ReferenceEquals(dashboard, _viewModel.ManagementDashboard) ? ManagementProcessTab : WorkDashboardTab;
+            return;
+        }
+        if (kind == "recent") { ProjectContentTabs.SelectedItem = ProjectActivityTab; return; }
+        if (ProjectShortcutTarget(kind) is not { } target) return;
+        _viewModel.ProgramSearch = "";
+        _viewModel.SelectedProgram = target;
+        ProjectContentTabs.SelectedIndex = 0;
+        void Expand(DependencyObject node)
+        {
+            if (node is Expander { DataContext: FunctionItem function } group && function.Programs.Any(p => p.Id == target.Id)) group.IsExpanded = true;
+            for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(node); i++) Expand(System.Windows.Media.VisualTreeHelper.GetChild(node, i));
+        }
+        Dispatcher.BeginInvoke(() =>
+        {
+            Expand(ProjectContentTabs);
+            ProjectContentTabs.UpdateLayout();
+            var item = Descendants(ProjectContentTabs).OfType<ListBox>().Select(list => list.ItemContainerGenerator.ContainerFromItem(target)).OfType<FrameworkElement>().FirstOrDefault();
+            if (item is not null && ProgramScroll.Content is UIElement content)
+                ProgramScroll.ScrollToVerticalOffset(item.TranslatePoint(new Point(0, 0), content).Y);
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
+        QuickEntryNotice.Text = "선택한 " + target.DisplayName + " · 아래 버튼으로 열기를 선택하세요.";
+    }
     private void Programs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ListBox list || e.AddedItems.Count == 0 || e.AddedItems[0] is not ProgramItem program) return;
@@ -288,6 +342,13 @@ public partial class MainWindow : Window
         FadeIn(WorkspaceContent);
         if (CommunicationTab.IsSelected) _viewModel.MarkCommunicationViewed();
         if (WorkDashboardTab.IsSelected || ManagementProcessTab.IsSelected) _ = _viewModel.RefreshWorkDashboardAsync();
+    }
+
+    private void ProjectContentTabs_SelectionChanged(object sender,SelectionChangedEventArgs e)
+    {
+        if(e.OriginalSource!=sender || ProjectActivityTab is null)return;
+        EnsureSelectedTabVisible(ProjectContentTabs);
+        if(ProjectActivityTab.IsSelected)_=_viewModel.RefreshWorkDashboardAsync();
     }
 
     public void ShowPcJobs()

@@ -27,10 +27,19 @@ public sealed class TrayWindowIntegrationTests
         Assert.Contains("_tray.TryStart",code);
         Assert.Contains("manual-control-status.json",code);
         var start=code.IndexOf("private void HandleWindowClosing",StringComparison.Ordinal);
-        var end=code.IndexOf("private void RequestTrayExit",start,StringComparison.Ordinal);
+        var traySignature=System.Text.RegularExpressions.Regex.Match(code[start..],@"private\s+(?:async\s+)?void\s+RequestTrayExit\s*\(");
+        Assert.True(traySignature.Success);
+        var end=start+traySignature.Index;
         Assert.True(start>=0 && end>start);
         var close=code[start..end];
         Assert.DoesNotContain("Dispose",close);Assert.DoesNotContain("StopProgram",close);
         Assert.DoesNotContain("StopAsync",close);Assert.Contains("Hide()",close);
+        var tray=code[end..code.IndexOf("[DllImport",end,StringComparison.Ordinal)];
+        Assert.Matches(@"if\s*\(\s*await\s+RequestOwnedManualExitAsync\(\)\s*==\s*""accepted""\s*\)\s*CompleteOwnedManualExit\(\);",tray);
+        Assert.DoesNotContain("Shutdown",tray);Assert.DoesNotContain("Dispose",tray);Assert.DoesNotContain("StopAsync",tray);
+        var complete=code[code.IndexOf("public void CompleteOwnedManualExit",StringComparison.Ordinal)..start];
+        Assert.Contains("if(!_viewModel.IsManualControl || !_viewModel.ManualExitFrozen)return;",complete);
+        Assert.Contains("Application.Current.Shutdown()",complete);
+        Assert.True(complete.IndexOf("ManualExitFrozen",StringComparison.Ordinal)<complete.IndexOf("Shutdown()",StringComparison.Ordinal));
     }
 }

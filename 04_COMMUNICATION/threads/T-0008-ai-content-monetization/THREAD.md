@@ -9884,3 +9884,43 @@ Threads main e91d820에 Windows 0.3.2 / 제작 규칙 2026-10-04.3을 반영했�
 - **기록:** [공개 현재상태/main392ad9e](https://github.com/kimjae134679/Threads/blob/main/docs/FEEDBACK_REWORK_2026-10-06.md), [DraftPR6](https://github.com/kimjae134679/Threads/pull/6). [비공개 v5 체크포인트](https://github.com/kimjae134679/KimJae-Project-Backups/tree/main/threads/reference-rework-20261007-v5), 공식 task_exchange형식 [3d56351](https://github.com/kimjae134679/KimJae-Project-Backups/commit/3d56351511c2f2b484818764a0406df62e9bf01b). JSON 구조검사완료/blocked이며 본인로컬기록도우미·앱수집은 미실행·미확인으로 구분. 최종답변은 기록시점미전송. 이전단계기록과 전체3239/변경533 실제SHA보고서는 보존했다.
 
 재개 시 pending153–160의 실제결과·소유프로세스·출력을 먼저확인하고 성공한작업은 반복하지않는다. 새delta를 세기존검수담당자에게전장확인한뒤 실제패키지와전달을 마친다. 미제작685(접근422/URL56/원문174/선별13/미디어15/제외5), 손상원문·가린UI, 표지7정확한ID연결은 별도보류다. 사용자에게 전체계정대화/미제공첨부까지 완전보존됐다고 주장하지않는다.
+
+## 2026-10-09 21:22 UTC — Codex 검토/Upload Studio 담당 — 댓글: 현재 작업·규칙 반영·검증 인계
+
+원글: 이 T-0008 AI Content Monetization 스레드. 사용자 요청 Sentinel_bcf9c2dd427c81918ef8a5b715e181c4에 따라 본인 담당 결과만 기록한다. 공통 목차/adapter 문서는 통합 담당이 관리하며 다른 담당의 수신·완료를 대신 기록하지 않는다.
+
+- 프로젝트 원본: [최종 검토 운영 인계](https://github.com/kimjae134679/Threads/blob/2f4dff049701afc59b92fa52d34a1bcaf886e157/upload-studio/FINAL_REVIEW_HANDOFF.md), 문서 커밋 [2f4dff0](https://github.com/kimjae134679/Threads/commit/2f4dff049701afc59b92fa52d34a1bcaf886e157), [기존 Draft PR10](https://github.com/kimjae134679/Threads/pull/10). 원격 파일을 전체 재조회해 작성한 내용과 일치하고 이 커밋은 해당 문서 1개만 변경함을 확인했다.
+- 구현: 공식 API 기존 도구를 격리 dry-run에 재사용, 글별 미리보기/자산 해시·순서/로컬 큐·중복 방지·재시작 복구, 현재 버전·내용 기준 최종 판정/메모, 제목 장식만 제거하는 정확한 사용자 편집 승인 연결, 작은 판정 파일 및 리비전 보호 manifest 생성, 별도 Buffer 결과 consumer. 새 버전만으로 자동 게시하지 않는다. 원본·문안·태그·이미지 순서·기존 판정 감사기록을 보존한다.
+- 소유권: 검토 프로그램만 state·문안·메모·판정·manifest를 쓴다. 제작 담당이 원본 렌더를 소유하고 Buffer만 final-review-results를 쓴다. 통합 담당은 현재 리비전·버전·지문을 대조해 읽기 등록한다. snapshot을 live 게시 승인으로 취급하지 않으며 scheduled/draft/sending과 실제 sent, 다중 플랫폼 일부게시를 구분한다.
+- 검증: 정확한 코드4b2fbbe의 [Linux check](https://github.com/kimjae134679/Threads/actions/runs/37990979994), [Windows 잠금 복구](https://github.com/kimjae134679/Threads/actions/runs/37990979922), [실제 Chromium 3흐름](https://github.com/kimjae134679/Threads/actions/runs/37990979875)을 21:19 UTC에 completed/success로 재조회했다. PC47은 이전5cfccaab에서 하위75개 pass였지만 구버전 제목 기대값의 uncaught 오류로 전체 exit1이며 Chromium 미실행, 운영 code/state 변경 없음이다.
+- 원인·해결: 파일 작성의 추가 LF는 정확한 바이트 해시 확인으로 수정했다. 제목 변경에 맞는 기존 테스트 기대값을 갱신하고 실제 이미지 decode 후 검사했다. 플랫폼 테스트는 미리보기 헤더를 버튼으로 오선택한 원인이 확인돼 button[data-platform]으로 좁혔다. 큰 자산 해시는 저장 잠금 밖에서 수행하고 CAS/최신성 검증을 유지한다. 가설을 확정 원인으로 기록하지 않는다.
+- 남은 일: 운영 최신 코드 미설치, 최종 전체 PC48 미제출. 1회 승인된 재시험을 PC47에서 사용했으므로 새1건은 추가 승인 대상이다. 최소 문구: “기존 ProjectBridge 큐의 모든 항목을 보존하고 최신 SHA로 충돌을 확인하여, 최종 커밋4b2fbbe의 동일 범위 PC 격리 재시험 48번 1건을 추가하고, 통과하면 이미 승인된 upload-studio-20261009 폴더 백업·적용 1건을 진행하도록 승인한다.”
+- 레이아웃만 변경한 평가 승계는 사용자 승인 범위지만 제작 담당의 검증된 이전↔새 자산/버전 매핑 계약이 아직 없어 적용하지 않았다. 기존 예약·게시·자산을 임의 삭제/차단하지 않는다. 의미 변경은 재검토한다.
+- 재개 규칙: 코드/CI/PC/외부 성공을 분리하고 담당별 쓰기 경계, 최신 SHA, 정확한 버전/지문/자산 해시와 승인 횟수를 확인한다. 원문·문안 전문·이미지·음원·개인 평가·비밀값은 이번 공개 기록에 추가하지 않았다. 이 댓글은 원격 기록이며 관리 앱 수집·다른 AI 읽음·PC 적용 완료를 뜻하지 않는다.
+
+
+## 2026-10-09 21:55 UTC — Codex 검토/Upload Studio 담당 — 댓글: 승인된 PC48 사전 검증 실패, 적용 보류
+
+원글: 위 검토/Upload Studio 운영 인계 댓글. 사용자가 PC48 격리 재시험1건과 성공 시 지정 앱 백업·적용을 명시 승인하여 기존 큐131건을 보존해1건을 추가했고132건/기존내용 일치를 재확인했다. 실제 PC48 결과는21:55:14 UTC failed/returnCode1, pinned_code_blob_mismatch:START.ps1이다. 기준4b2fbbe의 START.ps1 blob36eff473997c39117b5d82a365185cbfc69c7836과 PC 작업본 바이트가 달랐다. 핵심3소스 SHA 검사는 이 앞에서 통과했지만 Node/Chromium은 실행 전이다. CRLF/LF 또는 내용 차이의 정확한 원인은 미진단이며 이전 실패와 같다고 단정하지 않는다.
+
+운영 쓰기 이전에 중단되어 적용 큐를 제출하지 않았고 운영 코드·평가·메모·자산을 변경하지 않았다. 승인된48번을 다시 제출하거나 검사를 생략하지 않는다. 조건부 적용은 통과 조건 미충족이다. [현재 프로젝트 기록](https://github.com/kimjae134679/Threads/blob/3b08be1472807d22ea494925136e549bf10a0397/upload-studio/FINAL_REVIEW_HANDOFF.md), 문서 커밋3b08be1. 앞선 “48번 미제출”은 과거 상태이며 이 실제 실패 결과로 갱신한다. 다음은 불일치 파일의 정확한 바이트 진단과 격리 소스 수정이며 새 시험은 신규 승인 범위를 확인한 뒤 진행한다.
+
+
+## 2026-10-09 22:31 UTC — Codex 검토/Upload Studio 담당 — 댓글: 세로199글 인계 수신과 활성화 의존성
+
+원글: 위 검토/Upload Studio 인계 댓글. 제작 검증문서89f08601cc6c7f7588eb458d6b76d7559de76fec을 실제 원격 읽어 현재199글1918PNG(대표4글33장+증분195글1885장), 이미지대기166글 제외, 제작보류0을 확인했다. 이는 제작 담당의 파일검증 기록이며 본 검토 담당의1918장 원본/시각 검수를 뜻하지 않는다. 기존 결과·평가·예약·게시물 보존, activationAllowed/publicationAllowed=false, 운영 활성화/평가 버전 연결 미완료를 유지한다.
+
+매핑 원문은 C:\Users\user\Documents\Codex\2026-10-08\task-16\portrait-package-20261009-ec0cd89\incremental-current-199\HANDOFF.md 및 같은폴더 current-199-mapping.json/proof.json이다. 이 환경에서 로컬 원문을 읽지 못했으므로 필드/자산/지문을 추정해 연결하지 않는다. 검토앱 PC 정상 반영 뒤 실제 매핑과 현재 판정·이전/신규 버전·순서별SHA 및 의미보존을 확인해 사용자 승인된 layout-only 평가 승계를 수행한다. 미통과 항목에 통과를 만들지 않는다.
+
+[갱신한 검토 인계](https://github.com/kimjae134679/Threads/blob/9592ad91e8b22f9582d62e7c0d39e62a5637f202/upload-studio/FINAL_REVIEW_HANDOFF.md). 이번 변경은 인계 기록뿐이며 PC 실행 장애를 재시도하거나 새큐/배포/Buffer변경을 하지 않았다. C: START.ps1 복원도 실행환경 시작오류로 미실행이며 이후 시험/적용은 별도 승인 범위를 따른다.
+
+
+## 2026-10-10 07:00 UTC — Codex 검토/Upload Studio 담당 — 새 목록 교체 및 자동 완료 연결 적용
+
+식별: fresh-portrait-autolink-bf18b05. 사용자 최신 명시 지시에 따라 이전 평가/통과 승계 계획을 취소하고 현재 목록을 새 세로 결과로 교체했다. PC에서199글·1918PNG(고유1911개)의 실제 바이트/1080×1440/순서/SHA와 체크포인트 관련11710파일을 확인하고 운영 앱에 연결했다. revision122의 현재 통과는0, 미검토199이며 이전 통과60건은 현재 승인으로 쓰지 않는다. 이번 단계에서 이미지를 새로 생성했다고 표시하지 않는다. 이미지대기166글은 제외했다.
+
+이전 검토 메모·판정·이력과 자산3426파일은 현재 목록에서 제거하고 .local/replaced/portrait-20261010-60/에 복구 가능한 원본으로 보관했다. 원본 제작/평가 파일과 문안·태그·계정/플랫폼 입력은 보존하고 기존 플랫폼 결과92파일은 바이트 그대로 유지했다. Buffer의 실제 예약/게시물을 바꾸지 않았다. 이전 snapshot120/통과60 또는 과거 Library manifest를 현재 게시 승인으로 쓰지 않는다.
+
+운영 코드466f059399d3547bdbe5c0b0c07370d47b1927d1을 PC에 설치하고 자동 연결을 켰다. 앱 실행 중15초마다 기존 설치 제작 목록과 등록된 세로 제작 패키지 완료 체크포인트를 확인하며, 완료 감사·파일/이미지 해시·실제 크기·복사 전후 버전이 맞는 새 결과만 자동 연결하고 이전 결과를 보관한다. 재시작 중복/편집 충돌을 막고 새 버전은 미검토로 시작한다. 자동 게시·예약은 없다. 설치 첫 확인enabled=true/linked0/waiting0, revision122 및state바이트 유지. GET /api/production/auto-status와 화면 하단에서 상태를 확인한다.
+
+전체Node92건+추가41검증과 실제Chrome 테스트 통과, 운영 브라우저에서199글/미검토/1080×1440 및 자동 연결 켜짐을 직접 확인했다. 최신 [FINAL_REVIEW_HANDOFF.md](https://github.com/kimjae134679/Threads/blob/bf18b05657b1dadaa514e39034e2f897831e7a7a/upload-studio/FINAL_REVIEW_HANDOFF.md), [자동 입력/보관 계약](https://github.com/kimjae134679/Threads/blob/bf18b05657b1dadaa514e39034e2f897831e7a7a/upload-studio/AUTO_PRODUCTION_LINK.md), [Draft PR #11](https://github.com/kimjae134679/Threads/pull/11). PC 증거는 운영 폴더PC_FRESH_PORTRAIT_PROOF.json/PC_AUTO_PRODUCTION_PROOF.json이다. 원문·문안·평가·이미지 바이트를 공개 저장소에 올리지 않는다. 다른 담당의 허브 문서와 공유 큐는 수정하지 않는다.

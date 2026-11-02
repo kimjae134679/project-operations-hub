@@ -15,7 +15,7 @@ public sealed class ProjectCatalogService
         return JsonSerializer.Deserialize<CatalogDefinition>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
     }
 
-    public IReadOnlyList<ProjectItem> Apply(IReadOnlyList<ProjectItem> discovered, string root, CatalogDefinition catalog)
+    public IReadOnlyList<ProjectItem> Apply(IReadOnlyList<ProjectItem> discovered, string root, CatalogDefinition catalog, IList<string>? warnings = null)
     {
         if (catalog.SchemaVersion != 1) throw new InvalidDataException("지원하지 않는 프로젝트 소개 형식입니다.");
         var anchor = SamePath(root, catalog.AnchorRoot);
@@ -24,39 +24,34 @@ public sealed class ProjectCatalogService
         {
             if (!anchor && !Inside(root, entry.Path)) continue;
             if (!Directory.Exists(entry.Path)) continue;
+            var registered = result.FirstOrDefault(p => p.ManifestPath.Length > 0 && p.Id.Equals(entry.Id, StringComparison.OrdinalIgnoreCase));
+            if (registered is not null && !SamePath(registered.Path, entry.Path))
+            {
+                warnings?.Add("등록 manifest의 실제 위치를 유지했습니다 · " + entry.Id);
+                result.RemoveAll(p => SamePath(p.Path, entry.Path) && p.ManifestPath.Length == 0);
+                continue;
+            }
             var original = result.FirstOrDefault(p => SamePath(p.Path, entry.Path));
             var id = original?.Id ?? entry.Id;
-            var functions = entry.Functions.Select(f => new FunctionItem
+            var keepManifest = original is not null && (original.ManifestPath.Length > 0 || entry.PreserveManifest);
+            // Do not parse stale catalog paths/commands when the owner manifest is authoritative.
+            var functions = keepManifest ? original!.Functions.ToList() : entry.Functions.Select(f => new FunctionItem
             {
                 Id = f.Id, Name = f.Name, IsAdvanced = f.IsAdvanced,
                 Programs = f.Programs.Select(p => MakeProgram(entry.Path, id, p)).Where(p => p is not null).Cast<ProgramItem>().ToArray()
             }).Where(f => f.Programs.Count > 0).ToList();
-            if (entry.PreserveManifest && original is not null)
-            {
-                foreach (var function in original.Functions)
-                {
-                    if (entry.Functions.Count > 0 && function.Id != "control-tower") continue;
-                    foreach (var program in function.Programs)
-                    {
-                        program.DisplayName = program.Id.EndsWith("/validation") ? "관제탑 점검" : "관리 프로그램 개발 소스";
-                        program.Description = program.Id.EndsWith("/validation") ? "관리 프로그램의 오류를 검사합니다. 일반 사용에는 필요하지 않습니다." : program.Detail;
-                        program.KindLabel = program.CanLaunch ? "점검 도구" : "운영 자료";
-                        program.ActionLabel = program.CanLaunch ? "선택한 검사 실행" : "자료 위치 보기";
-                    }
-                    functions.Add(new() { Id = function.Id, Name = function.Id == "control-tower" ? "개발·점검 도구" : function.Name, IsAdvanced = function.Id == "control-tower", Programs = function.Programs });
-                }
-            }
+            if (keepManifest) warnings?.Add("프로젝트 담당 manifest의 기능을 유지했습니다 · " + original!.Id);
             var related = new List<ProgramItem>();
             foreach (var folder in entry.RelatedFolders.Where(f => Directory.Exists(f.Path)))
             {
-                result.RemoveAll(p => SamePath(p.Path, folder.Path));
+                result.RemoveAll(p => SamePath(p.Path, folder.Path) && p.ManifestPath.Length == 0);
                 related.Add(new() { Id = id + "/related/" + folder.Id, ProjectId = id, Name = folder.Name, DisplayName = folder.Name,
                     Description = folder.Description, Detail = folder.Description, KindLabel = folder.RoleLabel, Kind = "folder",
                     Path = folder.Path, WorkingDirectory = folder.Path, ActionLabel = "폴더 보기", IsAdvanced = true });
             }
             if (related.Count > 0) functions.Add(new() { Id = "related-folders", Name = "연결된 폴더·보관 자료", IsAdvanced = true, Programs = related });
             result.RemoveAll(p => SamePath(p.Path, entry.Path));
-            if (entry.Role == "planned")
+            if (entry.Role == "planned" && !keepManifest)
                 foreach (var p in functions.SelectMany(f => f.Programs))
                     p.Description = Directory.EnumerateFileSystemEntries(entry.Path).Any()
                         ? "새 파일이 들어 있는 준비 폴더입니다. 실행 기능은 아직 연결되지 않았습니다."
