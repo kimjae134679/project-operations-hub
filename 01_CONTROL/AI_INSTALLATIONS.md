@@ -1,20 +1,55 @@
-# AI Installations / Work Root
+# AI 설치·실제 확인 원본
 
-새 AI 작업 기본 관리 루트: `D:\A_KJ\AI` (2026-10-05 최신 사용자 지시/실제 경로 반영). 기존 안정 설치는 일괄 이동하지 않습니다.
+확인 **2026-11-03 KST** (PC 증거 생성 UTC 2026-11-02 16:37:01). 정책 루트 `D:/A_KJ/AI`를 유지하며 기존 안정 설치·사용자 자료는 이동/교체하지 않았습니다. 새 작은 CLI는 `Tools/<도구>/<버전>`, 사용자 입구는 `Launchers`로 분리했습니다. npm/공식 updater 환경은 기본 위치를 유지합니다.
 
-## 폴더 구조
-- `Applications/` — AI가 직접 관리하는 portable/독립 프로그램
-- `Installers/` — 설치 원본, 압축파일, 검증한 패키지
-- `Scripts/` — 설치·업데이트·복구 스크립트
-- `Launchers/` — 사용자가 바로 실행하는 진입점
-- `Projects/` — 새 AI 프로젝트 기본 작업 위치
-- `Workspace/` — 임시 실험/검증 작업
-- `External/` — 기본 위치를 유지하는 외부 설치의 포인터/설명
+## 이번 설치와 제한된 검사
 
-## 예외 원칙
-패키지 매니저·공식 업데이터·런타임이 기본 위치를 전제로 하면 안정성을 우선합니다. 이 경우 억지로 이동하지 않고 실제 경로와 이유를 기록합니다.
+| 도구 | 버전/실제 위치 | 확인 결과 |
+|---|---|---|
+| jq | 1.8.2 · `D:/A_KJ/AI/Tools/jq/1.8.2/jq.exe` | 한글 JSON 추출: exit0, 한글 정상 |
+| ruff | 0.17.3 · `D:/A_KJ/AI/Tools/ruff/0.17.3/ruff.exe` | 미사용 import F401 검출: 예상/실제 exit1, 자동 fix 없음 |
+| agent-desktop | 1.0.2 · `D:/A_KJ/AI/Tools/agent-desktop/1.0.2/agent-desktop.exe` | version/help exit0만 확인; 실화면 읽기/입력/기능 UI 검증 0회 |
+| PSScriptAnalyzer | 1.25.0 · `D:/A_KJ/AI/Tools/PSScriptAnalyzer/Modules/PSScriptAnalyzer/1.25.0/PSScriptAnalyzer.psd1` | PSAvoidUsingWriteHost 경고 1건 검출, exit0 |
 
-## 현재 등록
+네 도구 모두 무료 로컬 도구입니다. 공식 배포 asset/checksum와 대조했습니다. **동일 발행처 checksum 일치는 별도 독립 공급망 출처 보증이 아닙니다.** 설치는 전체 프로젝트 검사나 실제 업무/화면 E2E 검증이 아닙니다.
+
+## 출처와 무결성
+
+- **jq 1.8.2**: [공식 asset](https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-windows-amd64.exe) · [검증 metadata/checksum](https://github.com/jqlang/jq/releases/download/jq-1.8.2/sha256sum.txt).
+  - archive SHA256: `a6fc67fedaf9128a3309a1e2ebb8b986aeccf70122ee46d2cb4849e423f0c627`
+  - executable SHA256: `a6fc67fedaf9128a3309a1e2ebb8b986aeccf70122ee46d2cb4849e423f0c627`
+- **ruff 0.17.3**: [공식 asset](https://github.com/astral-sh/ruff/releases/download/0.17.3/ruff-x86_64-pc-windows-msvc.zip) · [검증 metadata/checksum](https://github.com/astral-sh/ruff/releases/download/0.17.3/ruff-x86_64-pc-windows-msvc.zip.sha256).
+  - archive SHA256: `a84d9ac74af8ef5bac84a1888a1634df18e6e985e2f930d35c052beacd00e813`
+  - executable SHA256: `1447a6a20b86e5d40bfebb0c2e56f8b929e2c30b0131f9ab1b5afbc826f5a11b`
+- **agent-desktop 1.0.2**: [공식 asset](https://github.com/vercel-labs/agent-desktop/releases/download/v1.0.2/agent-desktop-v1.0.2-x86_64-pc-windows-msvc.tar.gz) · [검증 metadata/checksum](https://github.com/vercel-labs/agent-desktop/releases/download/v1.0.2/checksums.txt).
+  - archive SHA256: `2186c76e7df197c0e67365e45d36d869f74714c56bb8a73817e2a66f3e18e222`
+  - executable SHA256: `409e58cbdd6aed47e29771ffa60bc122a9843505a227af488cded85215943988`
+- **PSScriptAnalyzer 1.25.0**: [공식 asset](https://www.powershellgallery.com/api/v2/package/PSScriptAnalyzer/1.25.0) · [검증 metadata/checksum](https://www.powershellgallery.com/api/v2/Packages(Id='PSScriptAnalyzer',Version='1.25.0')).
+  - archive SHA256: `14e634c828eb98efb9f40b2918ba90f139ed5eccdf663a2a747736d996995d60`
+  - module manifest SHA256: `2b219f688bcdd67101040f845e530b22907d39bbf49089b4b5b2afaba7996791`
+
+## 사용자 실행 입구 (상시 실행 아님)
+
+- `D:/A_KJ/AI/Launchers/개발도구_콘솔.cmd` — 원할 때 여는 PowerShell 개발 콘솔.
+- `D:/A_KJ/AI/Launchers/개발도구_환경.ps1` — 해당 콘솔 세션에만 PATH/모듈 경로를 더함. profile·global PATH·global module·ExecutionPolicy 변경 없음.
+- 기본 소스 후보는 `D:/A_KJ/AI/Projects/project-operations-hub-current`. 새 clean clone 배포 여부는 부모 작업 최종 확인을 따르며, 미존재 시 이번 Codex `work/hub-cleanup`으로 fallback하도록 구현했습니다. 기존 dirty D 저장소는 보존합니다.
+- 콘솔 환경 합성 검사 **3/3**, 기본 Windows PowerShell 정책 로드 exit0. 실제 interactive 콘솔을 열거나 UI 작업은 하지 않았습니다.
+
+## 기존 관리 앱 보존
+
+설치 앱 `D:/A_KJ/AI/Applications/AIControlTower`의 **0.9.18.0**과 고정 source `a1bb5c4d376a05dc62b003a510a88012d5a466e6`을 보존했습니다. 기존 launcher `-CheckOnly` identity 검사 exit0/started:false만 확인했습니다. source 계열의 버전 표기와 설치 파일버전은 같다고 가정하지 않으며 낮은 main 빌드로 덮지 않습니다.
+
+`D:/A_KJ/AI/Launchers/통합관제탑.lnk`는 기존 `D:/A_KJ/AI/Applications/AIControlTower/START_LATEST_VIEW.vbs`를 가리킵니다. 바로가기/VBS는 실행하지 않았습니다. 기존 VBS 내부의 ExecutionPolicy Bypass는 사전 구성으로 이번 편집/실행하지 않았으며 **새 개발 콘솔은 Bypass를 사용하지 않습니다**.
+
+## 재사용한 환경
+
+Codex0.160.1, Git2.50.0.windows.1, gh2.100.0, Node24.16.0/npm11.13.0, rg15.2.0, uv0.12.13, .NET SDK9.0.306, Python `py -3.13` (`C:/TempPy13/python.exe`), 기존 Python Playwright1.63.0/npm Playwright MCP0.0.80/Chromium cache1234를 확인·재사용했습니다. fd/Gitleaks도 기존 PATH에서 발견해 재설치하지 않았으며 이번 전체 기능 재검증은 아닙니다. Codex 업그레이드 없음.
+
+## 변경하지 않은 것
+
+새 결제·구독·유료 모델 호출 **0**, 실화면 동작 **0**. global PATH/module/profile·ExecutionPolicy·repo trust·autostart 변경 없음. 기존 앱 교체·서비스 종료·재부팅 없음. optional agent-desktop skills/integration 추가 없음. 현재 PC 연결은 ProjectBridge 경로이며 원격 연결을 임의 종료하지 않습니다. 옛 2분 예약/승인 생략 실행기·구형 shared-PC installer/updater를 활성화하지 않았습니다.
+
+## 이전 프로젝트별 설치 관찰 (이번 재실행/현재 버전 검증 아님)
 | Tool | Version | Current / Target | 상태/이유 |
 |---|---:|---|---|
 | MoneyPrinterTurbo | 1.3.7 | 현재 staging `C:\KJ\Tools\AI\Applications\MoneyPrinterTurbo\1.3.7` → 목표 `C:\Program Files\_My\AI\Applications\MoneyPrinterTurbo\1.3.7` | 구조 정리 완료, Program Files 이동은 관리자 승인 필요 |
@@ -22,35 +57,11 @@
 | HyperFrames | 0.8.40 | `%APPDATA%\npm` + npm global modules | npm 기본 관리 위치 유지 |
 | Aider | 0.86.2 | `%USERPROFILE%\.local\bin` + installer-managed Python env | updater/환경 관리 경로 유지 |
 | jev-router | 0.2.0 | `C:\Users\user\AppData\Roaming\npm` | npm 기본 위치 유지. upstream gargpratyush/jev-router 확인. 사용자 환경의 키 존재와 Codex ChatGPT 로그인 확인. 사용 허용/선택 사용이며 인증·라우팅 왕복·업무 성공은 미검증 |
-| AI Control Tower | 0.7.0 기존 배포 / 0.8.0 개편 | 실행 `D:\A_KJ\AI\Applications\AIControlTower\AIControlTower.exe`; 정식 저장소 `D:\A_KJ\AI\Projects\project-operations-hub`; 이번 소유 작업 트리 `D:\A_KJ\AI\Workspace\ControlTower\shared-pc-20261006\source` | 작업 트리 이동·대조와 최신 로컬 .NET175/175 검사 완료. 실제 PC 빌드·배포·화면·자동 시작은 진행 중. 검사·로그·배포 준비물은 같은 전용 Workspace 아래. 설정·기록·백업은 기존 위치 유지 |
-| ProjectBridge / 프로젝트 연결 | 2.0 실제 설치 / 3.0 개편 | `D:\A_KJ\AI\Applications\ProjectBridge\프로젝트연결.exe` | 기기 KJW-80ea388278fd와 기존 연결 왕복 확인. 404 주소 수정. 이전 범위65 검사 통과, 최신 주체별 공간·기록·실행 단계 분리 보완은 재검증 중. 실제 새 설치·자동 시작·왕복은 별도 확인 |
 | Unity iOS Build Support | 6000.3.14f1 | C:/Program Files_My/A_3D/Unity_Hub/Unity_Editor/6000.3.14f1/Editor/Data/PlaybackEngines/iOSSupport | 2026-09-25 공식 Unity CLI 설치 성공. 기존 Unity Editor 종속 모듈이므로 공식 설치 위치 유지. Windows에서 Xcode 프로젝트 내보내기용이며 Mac/Xcode는 별도 필요. 원격 에디터 실행은 PhoneLoL_02/Automation/OpenUnity.ps1 사용 |
 
 | 무직전생 AI 오디오북 | VoxCPM2 원본참조 / 록시 CosyVoice3 선호 유지 | D:/AI/VoiceAudiobook; 환경 D:/AI/envs; 추가 모델 D:/A_KJ/AI/Models, 검토 환경 Workspace/VoiceBench | 현재 실행기 무직전생.exe / 오디오북제작.exe. 본편15~24 준비128회차, 완성 수는 실제 로컬 상태 확인 필요. 원본참조 새 판과 이전 판 분리. 공용 PC 연결 복구 확인, 이번 연결·관리 작업으로 오디오 제작 완료를 주장하지 않음. [공용 연결 현재 상태](../04_COMMUNICATION/remote-bridge/README.md) |
 
-## 인수인계 필수 항목
-모든 인수인계에는 `AI 설치/작업 위치`, `관리 루트 준수/예외`, `실제 실행 진입점`, `이동 시 갱신해야 할 경로`를 적습니다.
 
-## 이전 마이그레이션 메모 (현재 실행 계획이 아님)
-`C:\KJ\Tools\AI`는 새 구조와 동일한 폴더 체계로 임시 staging 정리되었습니다. `Scripts\Install\migrate-ai-root.ps1`가 준비되어 있으며, 이전 C루트 이관안이며 현재 정책은 D루트입니다. MoneyPrinterTurbo 등 다른 안정 설치는 이번 작업에서 이동하지 않았습니다.
+기존 n8n localhost bridge/ProjectBridge 왕복 등 이전 검증은 당시 기록이며 현재 연결/업무 성공이 아닙니다. Jev 설치·키 존재와 실제 인증/라우팅/비용 절감도 별개이며 새 유료 호출을 하지 않습니다.
 
-## n8n local bridge
-- Workflow: `AI Ops Hub - Local Task Bridge`
-- Workflow ID: `aiOpsBridge001`
-- Local endpoint: `POST http://127.0.0.1:5678/webhook/ai-ops-task`
-- Helper: staging `C:\KJ\Tools\AI\Scripts\Runtime\Send-N8nTask.ps1`
-- 검증: n8n 재시작 후 helper POST → `{ ok: true, source: local-n8n-bridge }` 응답 확인
-- 보안: localhost 전용. 외부 tunnel/public webhook은 별도 승인·인증 설계 전에는 열지 않습니다.
-
-
-## ProjectBridge — 공용 PC 실제 연결과 새 버전 적용
-
-현재 D:/A_KJ/AI/Applications/ProjectBridge/프로젝트연결.exe의 2.0 설치와 실제 장치·파일·명령·창 목록 왕복을 확인했습니다. 기존 D:/AI/VoiceAudiobook과 실행 중인 제작 작업은 유지합니다. 3.0은 로컬 API·MCP·병렬 처리와 프로젝트·명령 주체별 공간·기록·실행 단계 분리를 보완·재검증 중입니다. 관리 앱 0.8.0 내부에서 설치·복구와 연결·작업 상태를 관리하고 실행용 별도 창을 없앱니다. 실제 새 설치·로그인 자동 시작·전체 왕복은 완료 기록에서 갱신합니다.
-
-바탕화면 파일 없이 창 없는 worker·트레이로 시작하며, 기존 인증·기기 ID·자료·안정 설치와 백업을 보존합니다. 공개 기록에 비밀값·파일 원문·실제 명령·화면·상세 로그를 넣지 않습니다. [설치 및 검증](../04_COMMUNICATION/remote-bridge/README.md).
-
-## 사용자 입구와 이번 작업 자료
-
-사용자에게 보여주는 실행 입구는 관리 앱·프로젝트연결.exe와 프로젝트_사용안내.md입니다. 새 설치 소스는 내부 worker·MCP·helper·소스·검사·manifest를 숨김 Runtime에 모읍니다. 기존 루트 config.json·state는 경로 그대로 숨김 표시하며 실제 설정·백업·활성 작업을 보존합니다. MCP는 Runtime/bridge_mcp.py를 실행하고 --home은 기존 ProjectBridge 루트입니다. 실제 설치 검증은 진행 중입니다. 편집·미확인 파일을 임의 삭제하지 않습니다.
-
-이번 소유 작업 트리는 `D:\A_KJ\AI\Workspace\ControlTower\shared-pc-20261006\source`로 실제 이동·대조했습니다. 검사·로그·빌드·배포 준비물은 `shared-pc-20261006` 아래에 모으고 완료 후 이번 작업에서 만든 불필요한 파일만 정리합니다. 보조 앱·CMD·PowerShell 창 없이 처리하며 바탕화면을 변경하지 않습니다. 정식 프로젝트·기존 오디오북과 실행 중 제작 작업은 보존합니다.
+[사람용 사용법](../000_사용자용/02_프로그램/설치_도구_현황.md) · [채택 기준](TOOLS.md).

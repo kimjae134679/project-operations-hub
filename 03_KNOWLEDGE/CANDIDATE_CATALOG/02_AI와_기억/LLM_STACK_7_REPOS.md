@@ -1,22 +1,9 @@
 # 7 GitHub Repos — 실제 검증 메모 (2026-09-15)
 
+> **2026-11-03:** 과거 비교자료이며 활성 후보/순위/설치 대기열이 아닙니다. 중복 기억·Agent·harness는 현재 도입하지 않습니다. [현재 판단](../05_도입기준/전체_도구목록.md)이 우선합니다.
+
 사용자가 전달한 X 게시물의 7개 저장소를 공식 GitHub/README 기준으로 다시 확인한 문서입니다.
 SNS의 `무료`, `어떤 모델도`, `스스로 학습`, `전체 스택` 같은 표현은 그대로 믿지 않고 실제 설치·비용·라이선스·우리 적용처를 분리합니다.
-
-## 결론 먼저
-
-이 7개는 **서로 딱 맞물리는 하나의 무료 스택이 아닙니다.** 역할이 겹치는 도구도 많고, self-host가 가능해도 모델 API·GPU·서버·운영비가 따로 들 수 있습니다.
-
-우리 기준 우선순위:
-1. **Firecrawl — HIGH-FIT**: Threads/콘텐츠 수집·웹 조사 파이프라인에 직접 쓸모 큼.
-2. **ECC — VERIFY-FIRST / HIGH-FIT**: Codex/Agent 작업 규율·Skill·검증에 강하지만 기존 AGENTS/Project Operations Hub와 충돌 가능성이 커 격리 테스트 필수.
-3. **Ollama — PROJECT-FIT**: 로컬 모델 실행/비용 절감/오프라인 처리에 실용적. GPU VRAM에 따라 모델 선택 제한.
-4. **Dify — PROJECT-FIT**: 시각적 Workflow/RAG/Agent 앱 제작에 좋지만 현재 작업에는 다소 무거울 수 있음.
-5. **Hermes Agent — VERIFY-FIRST**: 지속 기억·Skill 생성·메신저·스케줄 자동화가 강한 독립 Agent. 권한 범위와 장기 실행 안전성 확인 필요.
-6. **AutoGPT — WATCH / PROJECT-FIT**: 현재는 agent platform 쪽이 중심. Dify/Hermes/n8n과 겹쳐 우선순위는 낮음.
-7. **prompts.chat — REFERENCE**: 프롬프트 자료/MCP/Plugin 참고용. 인프라 도구는 아님.
-
----
 
 ## 01. Ollama
 - 공식: https://github.com/ollama/ollama
@@ -45,7 +32,7 @@ SNS의 `무료`, `어떤 모델도`, `스스로 학습`, `전체 스택` 같은 
 - 비용: self-host는 라이선스비가 없어도 서버/프록시/브라우저 자원 비용이 들 수 있고 Cloud API는 별도 서비스.
 - 주의: robots.txt, 사이트 약관, 로그인/유료벽, anti-bot을 무시해도 된다는 뜻이 아님.
 - 우리 적용: **Threads AI Lab의 공개 웹 수집/기사·블로그·커뮤니티 자료 정리 후보 1순위**. DC/Blind 등은 각 사이트 정책·로그인·차단 구조를 별도 검토.
-- 판단: **HIGH-FIT**.
+- 판단: **과거 적합성 평가**.
 
 ## 04. prompts.chat
 - 공식: https://github.com/f/prompts.chat
@@ -85,7 +72,7 @@ SNS의 `무료`, `어떤 모델도`, `스스로 학습`, `전체 스택` 같은 
 - 홍보문구 보정: `운영체제`는 제품 포지셔닝 표현. 실제로는 기존 Agent 위에 붙는 harness/config/tooling 묶음에 가깝다.
 - 우리 적용: Project Operations Hub와 매우 비슷한 영역을 건드림. 잘 쓰면 보강되지만 그대로 설치하면 AGENTS/Skill/Hook가 중복돼 오히려 AI가 느려지거나 충돌할 수 있음.
 - 권장 테스트: 별도 빈 저장소 + minimal/selective 설치 → 생성 파일 diff 확인 → Codex 동작/품질 gate 확인 → 필요한 Skill만 선별 채택.
-- 판단: **HIGH-FIT지만 VERIFY-FIRST**.
+- 판단: **과거 적합성 평가지만 VERIFY-FIRST**.
 
 ---
 
@@ -115,8 +102,5 @@ Hermes Agent 단독 테스트
 7개를 모두 설치하면 Docker, 모델 런타임, Agent memory, cron, MCP, hooks, rules가 겹쳐 관리 지점과 공격면이 급격히 늘어납니다.
 따라서 `유명함/Star 수`가 아니라 **현재 프로젝트에 필요한 기능 하나씩** 검증해 채택합니다.
 
-### 추천 다음 테스트
-1. Firecrawl: 공개 페이지 5~10개를 Markdown으로 수집하고 품질/속도/차단 여부 확인.
-2. ECC: 빈 Codex 테스트 저장소에 minimal 설치 후 생성 파일·hooks·AGENTS 충돌 확인.
-3. Ollama: 12GB VRAM에서 실제 사용할 1~2개 모델로 속도/품질/메모리 측정.
-4. 나머지는 위 3개 결과가 나온 뒤 필요할 때만 테스트.
+
+현재 설치/시험 대기열은 없습니다. [현재 판단](../05_도입기준/전체_도구목록.md)을 따릅니다.

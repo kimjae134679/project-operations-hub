@@ -1,23 +1,10 @@
 # Agent Skills / Harness 10 Repos — 2026-09-15 검증본
 
+> **2026-11-03:** 과거 비교자료이며 활성 후보/순위/설치 대기열이 아닙니다. 중복 기억·Agent·harness는 현재 도입하지 않습니다. [현재 판단](../05_도입기준/전체_도구목록.md)이 우선합니다.
+
 원문 SNS: https://x.com/DivyanshT91162/status/2099439107122597950
 
-SNS 요약은 후보 발견용으로만 보고, 아래 평가는 각 공식 GitHub 저장소와 현재 README 기준입니다. 전부 아직 `CANDIDATE`이며 설치·채택 상태가 아닙니다.
-
-## 결론 먼저
-
-| 후보 | 실제 정체 | 현재 판단 | Project Operations Hub 관점 |
-|---|---|---|---|
-| Vercel Skills | Agent Skill 검색·설치·업데이트 CLI | `HIGH-FIT / VERIFY-FIRST` | 가장 먼저 시험할 가치 큼 |
-| Superpowers | Skill 기반 개발 방법론/워크플로 | `PROJECT-FIT / VERIFY-FIRST` | 일부 Skill만 골라 쓰는 편이 적합 |
-| ECC | 대형 Agent harness: Skills/Agents/Hooks/Rules/MCP | `HIGH-FIT / VERIFY-FIRST` | 강력하지만 기존 규칙과 충돌 가능성 큼 |
-| Hermes Agent | 기억·Skill 학습·도구·스케줄을 가진 독립 Agent | `HIGH-FIT` | 이미 별도 문서에서 상세 검토됨 |
-| Scientific Agent Skills | 과학·연구용 대규모 Skill 모음 | `PROJECT-FIT / REFERENCE` | 과학 작업이 생길 때만 |
-| Agency Agents | 전문 역할별 Agent persona 모음 | `REFERENCE / PROJECT-FIT` | 수백 개 전체보다 필요한 역할만 선별 |
-| Anthropic Agent Skills | Agent Skills 예제·표준·템플릿 | `HIGH-FIT / REFERENCE` | Skill 설계 기준으로 매우 유용 |
-| Awesome Agent Skills | Skill 큐레이션 인덱스 | `REFERENCE` | 새 Skill 찾는 검색 출발점 |
-| OpenViking | Memory/Knowledge/Skill 통합 Context Database | `HIGH-FIT / VERIFY-FIRST` | Hub의 장기 기억 계층 후보 |
-| Learn Claude Code | 실제 Agent 구조를 단계별 구현하는 학습 저장소 | `HIGH-FIT / REFERENCE` | 구조 아이디어를 가져오기에 매우 좋음 |
+SNS 요약은 후보 발견용으로만 보고, 아래 평가는 각 공식 GitHub 저장소와 현재 README 기준입니다. 전부 과거 조사 참고이며 현재 설치·채택을 뜻하지 않습니다.
 
 ## 1. Vercel Skills
 공식: https://github.com/vercel-labs/skills
@@ -36,7 +23,7 @@ SNS 요약은 후보 발견용으로만 보고, 아래 평가는 각 공식 GitH
 ### 실제 평가
 우리처럼 Codex/Claude/기타 Agent의 Skill을 함께 관리하려는 환경에 가장 직접적으로 맞습니다. 다만 CLI가 원격 Git 저장소의 Skill을 받아오기 때문에 **설치기 자체가 안전성을 대신 보장하지는 않습니다.** 출처·스크립트·권한은 별도 검토해야 합니다.
 
-**판단: `HIGH-FIT / VERIFY-FIRST`**
+**판단: `과거 적합성 평가 / VERIFY-FIRST`**
 
 ---
 
@@ -79,7 +66,7 @@ Claude Code, Codex 등 위에 얹는 대형 **Agent harness**입니다. 현재 �
 
 따라서 전체 전역 설치는 context 증가와 규칙 충돌 위험이 큽니다. 먼저 테스트 저장소에서 필요한 Skill/기능만 선별해 기존 Workbench보다 실제 속도·품질이 좋아지는지 비교해야 합니다.
 
-**판단: `HIGH-FIT / VERIFY-FIRST`**
+**판단: `과거 적합성 평가 / VERIFY-FIRST`**
 
 상세 기존 조사: `LLM_STACK_7_REPOS.md`
 
@@ -96,7 +83,7 @@ SNS의 “사용자와 함께 성장한다”는 표현은 방향은 맞지만 �
 
 우리 Hub의 장기 맥락/Skill 축적을 실제 실행 Agent가 대신할 수 있는지 볼 후보지만, 자동으로 쌓이는 기억과 Skill도 stale될 수 있으므로 현재 실행본을 깨끗하게 유지하는 정책이 필요합니다.
 
-**판단: `HIGH-FIT`, 별도 격리 테스트 필요**
+**판단: `과거 적합성 평가`, 별도 격리 테스트 필요**
 
 상세 기존 조사: `AI_AGENTS_AND_DEV.md`, `LLM_STACK_7_REPOS.md`
 
@@ -152,7 +139,7 @@ Agent 정의는 주로 문서이지만 설치 스크립트나 executable이 포�
 
 이 방식이 Hub의 `AGENTS는 현재 실행본` 원칙과 잘 맞습니다.
 
-**판단: `HIGH-FIT / REFERENCE`**
+**판단: `과거 적합성 평가 / REFERENCE`**
 
 상세 기존 조사: `AI_AGENTS_AND_DEV.md`
 
@@ -191,7 +178,7 @@ OpenViking은 이 중 일부를 실제 검색 가능한 context 계층으로 바
 ### 주의
 동기화하는 자료가 서비스/backend로 전달될 수 있으므로 private repo, 사용자 데이터, credential이 섞인 환경에서는 데이터 경계를 먼저 정해야 합니다. 기존 Hub를 바로 대체하지 말고 테스트 repo 하나로 memory/search 정확도와 삭제/갱신 정책부터 확인합니다.
 
-**판단: `HIGH-FIT / VERIFY-FIRST`**
+**판단: `과거 적합성 평가 / VERIFY-FIRST`**
 
 ---
 
@@ -214,7 +201,7 @@ OpenViking은 이 중 일부를 실제 검색 가능한 context 계층으로 바
 - worktree isolation
 - agent-team protocol
 
-**판단: `HIGH-FIT / REFERENCE`**
+**판단: `과거 적합성 평가 / REFERENCE`**
 
 ---
 

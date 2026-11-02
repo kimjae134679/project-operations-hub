@@ -1,5 +1,7 @@
 # AI Agents & Developer Tools
 
+> **2026-11-03:** 과거 비교자료이며 활성 후보/순위/설치 대기열이 아닙니다. 중복 기억·Agent·harness는 현재 도입하지 않습니다. [현재 판단](../05_도입기준/전체_도구목록.md)이 우선합니다.
+
 확인 기준: 공식 GitHub README/조직 페이지, 2026-09-15.
 
 ---
@@ -8,7 +10,7 @@
 
 - 공식: https://github.com/OpenHands/OpenHands
 - 종류: **독립형 AI 개발 Agent 플랫폼 / Agent control center**
-- 상태: `HIGH-FIT`, 설치 전 격리 테스트 권장
+- 상태: `과거 적합성 평가`, 설치 전 격리 테스트 권장
 
 ### 현재 정체
 현재 OpenHands 저장소는 단순 “코딩 Agent 하나”보다 **Agent Canvas**라는 self-hosted 개발자 control center 성격을 강하게 내세웁니다. OpenHands 자체 Agent뿐 아니라 Claude Code, Codex, Gemini 및 ACP 호환 Agent를 local/remote/cloud backend로 연결할 수 있습니다.
@@ -41,7 +43,7 @@
 
 - 공식: https://github.com/NousResearch/hermes-agent
 - 종류: **독립형 self-improving personal AI agent**
-- 상태: `HIGH-FIT`, 별도 테스트 환경 권장
+- 상태: `과거 적합성 평가`, 별도 테스트 환경 권장
 
 ### 현재 정체
 공식 README는 Hermes를 **built-in learning loop를 가진 self-improving AI agent**로 설명합니다. 작업 경험에서 Skill을 만들고, 사용 중 Skill을 개선하고, 과거 대화를 검색하고, 세션을 넘어 사용자 모델/기억을 유지하는 구조를 강조합니다.
@@ -99,7 +101,7 @@
 
 - 공식: https://github.com/Aider-AI/aider
 - 종류: **터미널 AI pair programmer**
-- 상태: `HIGH-FIT`
+- 상태: `과거 적합성 평가`
 
 ### 주요 기능
 - 기존 codebase map을 만들어 큰 저장소 문맥 파악
@@ -150,7 +152,7 @@ Investment-Lab, 콘텐츠 자동화, 장기 리서치처럼 **중간상태를 �
 
 - 공식: https://github.com/browser-use/browser-use
 - 종류: **AI browser automation library/platform**
-- 상태: `HIGH-FIT / VERIFY-FIRST`
+- 상태: `과거 적합성 평가 / VERIFY-FIRST`
 
 ### 하는 일
 Agent가 브라우저를 열어 페이지를 탐색하고, 클릭하고, 입력하고, 정보를 추출하는 일을 자동화합니다.
@@ -239,7 +241,7 @@ Sol/Astra/다른 모델을 한 UI에서 비교할 필요가 커질 때 검토.
 - 공식: https://github.com/anthropics/skills
 - 표준: https://agentskills.io/
 - 종류: **Skill 예제 + specification + template**
-- 상태: `HIGH-FIT / REFERENCE`
+- 상태: `과거 적합성 평가 / REFERENCE`
 
 ### 정체
 Skill은 `SKILL.md`와 선택적인 script/resource를 묶어 Agent가 특정 작업을 반복적으로 잘하게 만드는 구조입니다. 공식 저장소에는 creative/design, technical, enterprise, document 계열 예제가 포함됩니다.

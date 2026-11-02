@@ -1,12 +1,14 @@
 # OpenAI Prism — 2026-09-17 검증 메모
 
+> **2026-11-03:** 별도 제품/API의 과거 조사 참고입니다. 현재 기본 추천·설치·무료 무제한 경로가 아니며 새 유료 호출을 하지 않습니다. [현재 목록](../05_도입기준/전체_도구목록.md)이 우선합니다.
+
 공식 서비스: https://prism.openai.com/
 
 공식 소개: https://openai.com/index/introducing-prism/
 
 공식 도움말: https://help.openai.com/en/articles/20001050-troubleshooting-and-getting-help-in-prism
 
-상태: `CANDIDATE / HIGH-FIT / VERIFY-FIRST`
+상태: `REFERENCE / 현재 기본 도입 제외`
 
 설치 부담: ⚪ `NONE` — 웹 서비스. 다만 프로젝트 파일을 클라우드에 올려 쓰는 구조라 보안/데이터 경계는 반드시 별도로 봅니다.
 
@@ -170,7 +172,7 @@ ChatGPT Work / Codex / Remote Desktop
 
 ## 현재 시험 가치
 
-`HIGH-FIT / VERIFY-FIRST`로 둡니다.
+`과거 비교 참고 / 현재 도입 제외`로 둡니다.
 
 테스트할 때는 민감정보 없는 작은 샘플 프로젝트로 다음 4가지만 확인하면 됩니다.
 

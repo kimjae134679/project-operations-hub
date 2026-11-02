@@ -1,5 +1,7 @@
 # Content / Video / Audio
 
+> **2026-11-03:** 아래는 당시 기술 비교입니다. 기존 설치는 보존하고 실제 프로젝트 요구가 있을 때만 검토합니다. 현재 전역 추천/설치 목록은 [작은 목록](../05_도입기준/전체_도구목록.md)을 따릅니다.
+
 확인 기준: 공식 GitHub README/사이트, 2026-09-15.
 
 ---
@@ -8,7 +10,7 @@
 
 - 공식: https://github.com/harry0703/MoneyPrinterTurbo
 - 종류: **AI short-video automation application / WebUI / API / CLI / Agent Skill**
-- 상태: `HIGH-FIT`
+- 상태: `PROJECT-CONDITIONAL`
 - 라이선스: MIT
 
 ### 현재 실제 기능
@@ -68,7 +70,7 @@ Instagram 게시물 → Reels/Shorts까지 확장하려는 콘텐츠 파이프�
 
 - 공식: https://github.com/heygen-com/hyperframes
 - 종류: **HTML-native deterministic video rendering framework**
-- 상태: `HIGH-FIT`
+- 상태: `PROJECT-CONDITIONAL`
 - 라이선스: Apache-2.0
 
 ### 정확한 정체
@@ -116,7 +118,7 @@ MoneyPrinterTurbo가 “자료/스크립트/소재 자동 조합”에 가깝다
 
 - 공식: https://github.com/OpenBMB/VoxCPM
 - 종류: **local TTS + voice design + voice cloning model/toolkit**
-- 상태: `HIGH-FIT / VERIFY-FIRST`
+- 상태: `PROJECT-CONDITIONAL / VERIFY-FIRST`
 - 라이선스: Apache-2.0
 
 ### 현재판

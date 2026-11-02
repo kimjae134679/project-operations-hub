@@ -1,5 +1,7 @@
 # Automation & Integrations
 
+> **2026-11-03:** 아래는 당시 기술 비교입니다. 기존 설치는 보존하고 실제 프로젝트 요구가 있을 때만 검토합니다. 현재 전역 추천/설치 목록은 [작은 목록](../05_도입기준/전체_도구목록.md)을 따릅니다.
+
 확인 기준: 공식 GitHub README/조직 페이지, 2026-09-15.
 
 ---
@@ -8,7 +10,7 @@
 
 - 공식: https://github.com/n8n-io/n8n
 - 종류: **workflow automation platform**
-- 상태: `HIGH-FIT / VERIFY-FIRST`
+- 상태: `PROJECT-CONDITIONAL / VERIFY-FIRST`
 - 라이선스 성격: 공식 표현은 **fair-code**. 일반적인 의미의 완전한 오픈소스와 동일하게 적지 않음.
 
 ### 정체
@@ -90,7 +92,7 @@ Cloudflare 계정 안에서 돌아가는 이메일 클라이언트 + AI Agent입
 
 - 공식: https://github.com/NangoHQ/nango
 - 종류: **API integration / OAuth / sync / action infrastructure**
-- 상태: `HIGH-FIT / PROJECT-FIT`
+- 상태: `PROJECT-CONDITIONAL / PROJECT-FIT`
 - 현재 공식 설명: 900+ APIs 지원
 - 라이선스: 현재 repo는 Elastic License 계열. “무조건 완전 오픈소스”라고 단순 표기하지 않음.
 

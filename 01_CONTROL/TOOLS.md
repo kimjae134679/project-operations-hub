@@ -1,58 +1,31 @@
-# Tool Registry
+# 도구 등록부
 
-## 상태
-- `ACTIVE` — 허브 전반에서 채택
-- `PROJECT` — 특정 프로젝트에서 채택
-- `CANDIDATE` — 후보 보관
-- `RETIRED` — 사용 중단
+기준 **2026-11-03 KST**. 설치 버전·경로·검사 증거는 [AI_INSTALLATIONS](AI_INSTALLATIONS.md)가 원본입니다. 등록·설치·현재 연결·실제 업무 성공은 별개입니다.
 
-| 도구 | 상태 | 역할 |
+## 현재 유지할 핵심
+
+| 도구 | 채택 범위 | 운용 기준 |
 |---|---|---|
-| GitHub | ACTIVE | 저장소·문서·commit·PR·Actions |
-| Remote Desktop Commander / Desktop Remote | ACTIVE | 실제 PC 파일·명령·빌드·실행·기기 검증 |
-| ProjectBridge / 프로젝트 연결 | PROJECT — 2.0 실제 연결 / 3.0 개편·재검증 | 여러 프로젝트·명령 주체별 작업 공간·기록·상태 분리와 공용 PC 작업. 기존 404 주소 수정·실제 왕복 확인. 최신 3.0 로컬 API·MCP·병렬 처리·실행 단계 분리와 앱 내부 작업 화면은 구현·재검증 중 |
-| ChatGPT Files / Library | ACTIVE | 현재/과거 첨부와 저장자료 회수 |
-| n8n | ACTIVE — local | 로컬 자동화/워크플로. `AI Ops Hub - Local Task Bridge`로 localhost task receipt 검증 완료 |
-| AI Control Tower | PROJECT — 0.7.0 / 0.8.0 적용 중 | 프로젝트·기능·프로그램·공용 연결과 소통 관리. 0.8.0 소스는 새로고침 조작 없이 자동 확인, 글 작성자·안 읽음·게시글 이동과 공지 명단 검색. 실제 설치 버전과 새 소스 검증을 구분. Jev는 선택 사용, 옛 텍스트 큐는 자동 실행하지 않음 |
-| Supabase | PROJECT — chunkyack | DB/인증/프로젝트 연결. 비밀값은 문서화 금지 |
-| Google Drive / OAuth / Android SDK / Blender 연동 등 | PROJECT when verified | 실제 프로젝트에서 확인된 경우만 등록 |
+| Codex | ACTIVE · 코딩 | 기존 공식 환경/ChatGPT 로그인 재사용. npm CLI 0.160.1 유지, 이번 업그레이드 없음. 한도와 별도 유료 API 과금 구분 |
+| GitHub | ACTIVE · 원본/협업 | 저장소·commit·Issue·PR·Actions. 현재 계정 권한·원격 반영 성공은 작업별 확인 |
+| ProjectBridge / 프로젝트 연결 | PROJECT · PC 연결 | 최신 사용자 원격 경로. 현재 장치 응답으로 연결·파일·명령을 확인; 과거 버전/왕복을 현재 정상으로 복제하지 않음 |
+| AI Control Tower | PROJECT · 프로젝트 운영 | 설치 앱 0.9.18.0 보존. 개발 소스·설치 버전·실행을 구분하며 낮은 버전으로 덮지 않음 |
+| Engram · 현재 AGENTS/Skill | ACTIVE · 기억/기준 | 기존 구성 유지. 중복 기억 서버·대형 harness 추가 안 함 |
+| 현재 파일/문서/브라우저 도구 | 작업별 | 현재 세션 도구·실제 파일/계정 권한 범위만 사용 |
+| n8n | PROJECT · 기존 로컬 흐름 | 실제 반복 workflow에 한정. 과거 localhost bridge 검증 ≠ 현재 health/workflow 성공 |
+| Supabase · Drive/OAuth · SDK/Blender 연동 | PROJECT · 대상별 | 실제 해당 프로젝트에서 필요·연결이 확인된 경우만 |
 
-n8n bridge는 현재 `127.0.0.1:5678`에만 연결하며 외부 공개 endpoint로 취급하지 않습니다.
+## 작은 실무 보조
 
-## 후보 도구 위치
+기존 `rg/fd/gh/uv/Gitleaks CLI`를 우선 재사용합니다. `jq/Ruff/PSScriptAnalyzer`는 JSON/Python/PowerShell의 빈틈을 보완합니다. 실제 설치·제한된 검사 결과는 설치 원본에서 확인하며 이 문서만으로 전부 READY라고 하지 않습니다.
 
-후보 조사/비교의 canonical 위치는:
+`agent-desktop`은 선택형 수동 UIA CLI이며 원격 연결 대체품이 아닙니다. help/version 검사는 실제 화면 조작 검증이 아닙니다. 잠금/UAC/서비스 세션·최소화 앱 미지원과 headed 입력 제한은 [공식 근거](../03_KNOWLEDGE/CANDIDATE_CATALOG/03_콘텐츠와_자동화/SCREENSHOT_TOOLS_20261103.md)를 따릅니다. 이번 실화면 probe·새 autostart는 없습니다.
 
-- `03_KNOWLEDGE/CANDIDATE_CATALOG/05_도입기준/전체_도구목록.md` — 전체 후보 상태/설치부담/상세문서 연결
-- `03_KNOWLEDGE/CANDIDATE_CATALOG/05_도입기준/INSTALLATION_BURDEN.md` — 설치 무게 분류
-- `03_KNOWLEDGE/CANDIDATE_CATALOG/` — 주제별 상세 조사
+## 현재 기본 운용에서 제외
 
-`03_KNOWLEDGE/TOOL_CANDIDATES.md`는 이전 장문 카탈로그의 과거 참고용입니다.
+- Remote Desktop Commander는 과거 설치·연결 기록만 보존합니다. 최신 지정은 **ProjectBridge 우선/이번 작업 RDC 미사용**이며 과거 ACTIVE를 현재 허가로 쓰지 않습니다.
+- Jev 0.2.0 설치·키 존재 기록은 보존하되 인증·라우팅·절감은 미검증. 필수 실행기가 아니며 새 유료 호출 안 함. 옛 `--approve-for-me`/2분 예약 실행기는 활성화하지 않습니다.
+- ComfyUI는 사용자 요청으로 현재 후보·추천·설치 목록에서 제거했습니다. **PC 앱·모델·작업·데이터 삭제 지시가 아닙니다.**
+- Bytebot는 공식 보관 저장소로 신규 도입 제외. 중복 기억/Agent/대형 서버는 [비추천 과거 참고](../03_KNOWLEDGE/CANDIDATE_CATALOG/05_도입기준/전체_도구목록.md)로만 남깁니다.
 
-중요: `설치됨`과 `ACTIVE/PROJECT`는 같은 뜻이 아닙니다. 실제 설치 버전/경로는 `01_CONTROL/AI_INSTALLATIONS.md`에서 별도로 관리합니다.
-
-## 추천과 현재 상태
-
-- [작업별 선택과 과용 비용](../03_KNOWLEDGE/CANDIDATE_CATALOG/05_도입기준/TOOL_SELECTION_PLAYBOOK.md)을 사용합니다. 과거 탐색을 고정 규칙으로 삼지 않고 최신 공식 자료와 실제 환경을 다시 비교합니다.
-- Jev 사용은 허용되었습니다. 0.2.0 설치, Windows 사용자 환경의 키 존재, Codex ChatGPT 로그인 확인과 실제 라우팅 왕복은 별개입니다. 추가 결제는 이 허가에 포함되지 않습니다.
-- 원격 연결의 여러 Node PID는 부모·자식일 수 있으므로 독립 연결 수와 구분합니다. n8n은 Node 이름 대신 실제 healthz를 확인합니다. GitHub Actions 서비스와 AI Ops 예약 작업을 혼동하지 않습니다.
-
-## 2026-10-06 관제탑 표시와 설치 안내
-
-관제탑0.7.0의 도구·연결에는 등록된 상태11개를 모두 표시합니다. 설치됨은 실제 연결·업무 성공과 다릅니다. Remote Desktop Commander와 Jev 제품명을 유지하며 n8n·GPT 전달·Aider·HyperFrames도 숨기지 않습니다.
-
-- [VoiceStudio 사용 안내](D:/A_KJ/AI/Applications/VoiceStudio/프로젝트_사용안내.md): D실행기, 기존 음원·배역·더빙작업·공유모델·환경 위치.
-- [Zonos2 사용 안내](D:/A_KJ/AI/Applications/Zonos2/프로젝트_사용안내.md): 앱/CLI/server와 외부Q8 모델 위치. 기본 BAT의 q6 신규다운로드 가능성 때문에 자동 실행하지 않습니다.
-
-## 공용 PC 연결 — 기존 연결 복구 / 새 통합 버전 적용 중
-
-ProjectBridge 2.0은 실제 PC에 설치되어 있고, 저장소 API 주소 오류를 수정한 뒤 `KJW-80ea388278fd` 장치의 파일·명령·창 목록 왕복을 확인했습니다. 공용 연결 3.0과 관리 앱 0.8.0은 이전 범위 검사를 통과했으나 최신 주체별 분리·실행기 단계·앱 내부 화면 수정은 재검증합니다. 실제 새 버전 적용·자동 시작·화면 검증과 구분합니다.
-
-3.0의 PC 안 도구는 같은 로컬 API 또는 MCP 어댑터에 연결하며 파일 작업마다 GitHub를 거치지 않습니다. 외부 GPT는 지원되는 인증된 비공개 GitHub 중계를 사용합니다. 프로젝트와 명령 주체별 작업 공간·기록·상태를 분리하고 독립 작업은 병렬, 실제 겹치는 파일·공유 자원·프로세스·화면은 순서 조정합니다. 작업·상태·결과는 앱 내부에서 확인하고 실행 때문에 별도 창을 띄우거나 포커스를 가져가지 않습니다. 상세 요청·출력·화면은 비공개로, 통합소통에는 공개 요약만 남깁니다. 기존 제작 큐는 보존합니다. [설치·동작·검증](../04_COMMUNICATION/remote-bridge/README.md).
-
-2026-10-07 추가 지시: 사용자 입구는 실행 파일·안내로 정리하고 보조 앱·CMD·PowerShell을 보이게 띄우지 않습니다. 내부 실행 자료는 Runtime 하위로 묶는 개편 중이며 소유한 검사·빌드·로그·배포 준비물은 `D:\A_KJ\AI\Workspace\ControlTower\shared-pc-20261006`에 모읍니다. 최신 관리 앱 로컬175/175 검사와 실제 PC 설치·화면·자동 시작 성공은 별도로 확인합니다. 기존 자료·설정·백업은 보존합니다.
-
-
-## 2026-10-31 수익화 정리에서 확인한 연결
-
-ProjectBridge 3.2.0을 통한 PC 파일·명령 실행을 실제 사용했습니다. 사용자 원격 사용 지시는 ProjectBridge 우선이며 Remote Desktop Commander를 사용하지 않습니다. 아래 과거 연결 기록은 현재 사용 허가를 대신하지 않습니다. Threads 설치파일과 바로가기 대상은 실제 .39.1 통합 루트로 확인했고, 그 외 도구의 전체 기능을 이번 작업에서 재검증하지 않았습니다.
+[사용 순서](../000_사용자용/03_참고도구/AI_도구와_플러그인.md) · [설치 현황](../000_사용자용/02_프로그램/설치_도구_현황.md)

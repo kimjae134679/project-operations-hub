@@ -1,6 +1,6 @@
 # Source Bookmarks — 2026-09-15
 
-사용자가 직접 전달한 링크 + 조사 중 확인한 공식 원본을 한 곳에 보관합니다.
+사용자가 직접 전달한 원문/당시 공식 원본의 보관용 북마크입니다. 현재 추천·설치 목록이 아닙니다. 원문의 VERIFIED는 당시 확인이며 2026-11-03 재분류는 [현재 목록](../05_도입기준/전체_도구목록.md)을 따릅니다.
 
 상태:
 - `VERIFIED` — 현재 조사 환경에서 실제 페이지/README 확인
@@ -74,7 +74,6 @@
 - Supermemory — https://github.com/supermemoryai/supermemory
 - awesome-claude-skills — https://github.com/ComposioHQ/awesome-claude-skills
 - Bumblebee — https://github.com/perplexityai/bumblebee
-- ComfyUI — https://github.com/Comfy-Org/ComfyUI
 - DeepSeek organization — https://github.com/deepseek-ai
 - LobeHub — https://github.com/lobehub/lobehub
 
@@ -82,11 +81,10 @@
 - `ifixai-ai/iFix` — 2026-09-15 현재 404. 원본 특정 전 `SOURCE-UNVERIFIED`.
 - `geekan/MetaGPT` → 현재 `FoundationAgents/MetaGPT`로 이동 확인.
 - `mendableai/firecrawl` → 현재 `firecrawl/firecrawl`로 redirect/canonical 확인.
-- `comfyanonymous/ComfyUI` → 현재 `Comfy-Org/ComfyUI`로 이동 확인.
 - `lobehub/lobe-chat` → 현재 `lobehub/lobehub`으로 이동/확장 확인.
 - 게시물 #48/#49/#50은 각각 coding-interview-university / LangChain / n8n의 중복.
 
-상세 비교: `50_USEFUL_REPOS.md`
+상세 비교: [과거 원문표](50_USEFUL_REPOS.md)
 
 ---
 
@@ -100,7 +98,7 @@
 - Hermes Agent — https://github.com/NousResearch/hermes-agent
 - ECC — https://github.com/affaan-m/ECC
 
-상세 비교: `LLM_STACK_7_REPOS.md`
+상세 비교: [과거 LLM 비교](../02_AI와_기억/LLM_STACK_7_REPOS.md)
 
 ---
 
