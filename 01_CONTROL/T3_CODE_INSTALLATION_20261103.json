@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-03",
+  "tool": "T3 Code",
+  "version": "0.1.6",
+  "installed": true,
+  "desktopPath": "D:\\A_KJ\\AI\\Applications\\T3Code\\desktop\\0.1.6\\T3 Code (Beta).exe",
+  "cliPath": "D:\\A_KJ\\AI\\Applications\\T3Code\\cli\\0.1.6\\t3-0.1.6-win32-x64\\t3.exe",
+  "signatures": {
+    "desktop": "Valid",
+    "cli": "Valid",
+    "publisher": "T3 Tools Inc"
+  },
+  "verification": {
+    "cliVersion": {
+      "method": "Start-Process -WindowStyle Hidden, --version only",
+      "exitCode": 0,
+      "output": "t3 v0.1.6"
+    },
+    "manualEntryStaticTestsPass": 3,
+    "serverStartupExecuted": false,
+    "serverHealth": "not_verified",
+    "T3CodexRuntimeConnection": "not_verified",
+    "phoneConnection": "not_activated"
+  },
+  "configuredForNextManualStartup": {
+    "permission": "Supervised",
+    "model": "gpt-6.1-sol",
+    "fallback": null,
+    "existingCodex": "0.160.1",
+    "globalCodexModified": false
+  },
+  "safety": {
+    "remoteConnect": false,
+    "LAN": false,
+    "WindowsService": false,
+    "WindowsAutostart": false,
+    "publicPorts": false,
+    "securityBypass": false,
+    "modelTasksSubmitted": 0
+  },
+  "policyRejectionExplanation": "Execution tool rejected startup commands before execution and did not return a rule identifier. This is not a confirmed product malware/UAC/AV verdict. No bypass/retry through alternate launch routes."
+}

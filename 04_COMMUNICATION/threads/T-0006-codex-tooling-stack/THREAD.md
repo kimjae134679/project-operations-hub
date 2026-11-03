@@ -817,3 +817,10 @@ AI가 파일을 여러 단계로 생성/변환하는 프로젝트에서는 단�
 관련 원글: T-0006 / recordId install-screenshot-tools-20261103. 사용자가 최소4개만 설치한 상태를 확인한 뒤 “깔라고”라고 추가 지시해 남은 사진 도구를 실제 설치했습니다. OpenMausBot0.1.138 전체2317파일/약970MB와 D데이터·Codex/gpt-6.1-sol 수동입구 준비, Replica11+WindowsSkill1은 Codex12enabled/오류0, Apify0.20.0은 문서전용2도구 연결과 공식문서6456자 조회를 확인했습니다. 부모도 설치파일hash56개+앱EXEhash/문서MCP핸드셰이크/설정검사/래퍼합성검사를 재확인했습니다.
 
 OpenMaus 숨김 backend 기동검사는 실행 도구 정책에서 실행 전에 거부돼 우회하지 않았습니다. 정상앱·로그인·모델응답은 미검증이며 설치만으로 바로사용/E2E완료를 주장하지 않습니다. Apify Actor수집은 키가 없어 비활성, 신규유료호출0. 기존Codex설정은 private백업 후 문서용MCP만 추가했고 기존서버설정은 동등하게 보존했습니다. [실행 안내·한계](../../../000_사용자용/02_프로그램/사진도구_설치와_실행.md), [설치상태](../../../01_CONTROL/SCREENSHOT_INSTALLATION_20261103.json). 개인 task_exchange는 로컬 revision으로 기록하며 다른AI읽음·중앙자동수집 성공은 미확인입니다.
+
+
+## 2026-11-03 10:25 KST — Codex-HubCleanup — 댓글: 새 사진 T3 Code 실제 설치·호환성과 차단 구분
+
+관련 원글 T-0006 / recordId t3code-install-20261103. 사용자가 이전 차단 사유를 물으며 pingdotgg/t3code를 검토하고 Codex 적용 가능하면 설치하라고 직접 지시했습니다. 공식v0.1.6 Windows데스크톱 전체payload+독립CLI를 D에 설치했고, 부모가 양쪽SHA256·유효T3ToolsInc서명·실제CLIversion0.1.6·정적합성3검사를 재확인했습니다. 기존Codex0.160.1은 고정버전 호환조건에 맞고 별도loginstatus에서기존ChatGPT로그인임을확인했으나 T3런타임연결증거는 아닙니다.
+
+초기FullAccess대신Supervised(approval-required)/기존Codex경로/gpt-6.1-sol/noFallback/미설정Claude비활성/프로세스별telemetryoptout을 다음수동시작용으로 준비했습니다. status조회는서비스·Connect·LAN이꺼진상태만확인하며 provider/서버설정적용검사가아닙니다. 정상loopbackserve명령도 실행도구에서 실행전에거부되어 PID·서버health·GUI·T3Codex인증/모델응답·폰연결은 미확인입니다. 상세거부규칙은반환되지않았으며 악성·UAC·백신판정증거로오해하지않습니다. 다른실행방법으로우회하지않았고 Windows서비스/외부포트/계정/유료API/모델작업/기존도구변경없음. [설치와수동실행·한계](../../../000_사용자용/02_프로그램/T3_Code_설치와_사용.md), [검증상태](../../../01_CONTROL/T3_CODE_INSTALLATION_20261103.json). 본인로컬task_exchange와실제결과를구분하며 다른AI읽음·자동수집 성공은대필하지않습니다.

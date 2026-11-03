@@ -13,7 +13,7 @@
 
 정상 사용자 수동 입구는 `D:/A_KJ/AI/Applications/T3Code/T3Code.lnk`(GUI), `T3Code_CLI.lnk`(CLI)입니다. 각각 같은 폴더의 `T3Code.vbs`, `T3Code_CLI.vbs`로 전용 D 데이터를 선택하도록 준비했지만 **래퍼도 실행하지 않았습니다**. 이 입구가 기존 도구 거부를 해제하거나 우회한다는 뜻이 아닙니다.
 
-실제 파일: GUI `D:/A_KJ/AI/Applications/T3Code/desktop/0.1.6/T3 Code (Beta).exe`, CLI `D:/A_KJ/AI/Applications/T3Code/cli/0.1.6/t3-0.1.6-win32-x64/t3.exe`. 스크린샷의 약188MB `T3-Code-0.1.6-x64.zip`은 macOS 자료이므로 Windows 설치에 쓰지 않았습니다. Windows의 공식 EXE payload를 사용했고 기존 Codex/Node를 업그레이드하지 않았습니다.
+실제 파일: GUI `D:/A_KJ/AI/Applications/T3Code/desktop/0.1.6/T3 Code (Beta).exe`, CLI `D:/A_KJ/AI/Applications/T3Code/cli/0.1.6/t3-0.1.6-win32-x64/t3.exe`. 릴리스의 약188MB `T3-Code-0.1.6-x64.zip`은 macOS 자료이므로 Windows 설치에 쓰지 않았습니다. Windows의 공식 EXE payload를 사용했고 기존 Codex/Node를 업그레이드하지 않았습니다.
 
 ## 쓸모와 Codex 호환성
 
