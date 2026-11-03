@@ -2,9 +2,9 @@
 
 기준 **2026-11-03 KST**. 설치 버전·경로·검사 증거는 [AI_INSTALLATIONS](AI_INSTALLATIONS.md)가 원본입니다. 등록·설치·현재 연결·실제 업무 성공은 별개입니다.
 
-## 최신 실제 테스트 · 설치와 구분
+## 최신 문제해결 · 설치와 구분
 
-[실제 테스트 결과](../000_사용자용/02_프로그램/도구_실제테스트_결과_20261103.md): 유틸리티/Replica helper/Apify Docs24 PASS, 기본 도구 6기능 PASS(Playwright초기불일치후 공식1243 복구·기본 launch PASS). **agent-desktop은 기능 PASS이나 전경 비간섭 FAIL**, Codex는 실제 응답/전송만 PASS이고 소유 파일 과제는policy BLOCKED입니다. Actor인증·Replica모델 workflow·T3/OpenMaus기동/폰은 완료가 아닙니다.
+[문제해결 전체 보고](../000_사용자용/02_프로그램/도구_문제해결_전체보고_20261103.md): 실제 회귀24PASS/핵심6PASS, OpenMaus 기존 Codex 로그인선택 설정오류 수정·정적7PASS. agent-desktop은 원인(UIA AutoSetFocus기본값)을 고친 별도 로컬 수정본으로 자체창 기능·비간섭·정리 PASS, 새 콘솔/갱신 Skill로 연결했습니다(모든 앱 보장 아님). Codex파일과제/T3·OpenMaus기동/fixture정리는policy BLOCKED, Actor는AUTH_REQUIRED, Replica모델 workflow는NOT_RUN입니다. [초기 실제 테스트 이력](../000_사용자용/02_프로그램/도구_실제테스트_결과_20261103.md)과 구분하며 전체E2E완료로 표시하지 않습니다.
 
 ## 현재 유지할 핵심
 
@@ -30,7 +30,7 @@
 | 도구 | 설치/채택 범위 | 실제 검증과 남은 일 |
 |---|---|---|
 | Replica 11개 Skill | 설치됨 · 앱 재구현 작업별 선택 | Codex enabled 인식, 후속 실제 helper fixture18/18. 기존 Skill/hook 덮지 않음; 모델/복제 E2E NOT_RUN |
-| agent-desktop-windows Skill | 설치됨 · Windows CLI 지원 | Codex enabled 인식. 자체 격리창의 한글 입력/버튼/앱결과PASS, strict-headless 전경 비간섭 FAIL;원인 미확정 |
+| agent-desktop-windows Skill | 설치됨 · Windows CLI 지원 | Codex enabled 인식. 초기 전경비간섭FAIL의 UIA기본값원인을 수정한 로컬변형으로 자체창 기능/전경false/이벤트0/정리PASS.12skills재인식; 모든앱보장아님 |
 | Apify MCP | 설치됨 · `apify-docs` 문서 모드 채택/등록 | 토큰 없는2도구 초기화/목록·공식 문서6,456자 조회. Actor·데이터셋·유료 호출0; 인증 수집 모드는 비활성 |
 | OpenMausBot 0.1.138 | 실제 portable 설치 · 다음 정상 수동 시작 설정 | D 데이터/기존 Codex/gpt-6.1-sol 설정·수동 입구 준비. 정상 앱/로그인/모델 응답 미검증; 자동 실행·cloud 연결 없음 |
 
@@ -40,7 +40,7 @@ Replica 11개 + Windows 1개은 `skills/list`에서12개 enabled/오류0을 확�
 
 기존 `rg/fd/gh/uv/Gitleaks CLI`를 우선 재사용합니다. `jq/Ruff/PSScriptAnalyzer`는 JSON/Python/PowerShell의 빈틈을 보완합니다. 실제 설치·제한된 검사 결과는 설치 원본에서 확인하며 이 문서만으로 전부 READY라고 하지 않습니다.
 
-`agent-desktop`은 선택형 수동 UIA CLI이며 원격 연결 대체품이 아닙니다. help/version 검사는 실제 화면 조작 검증이 아닙니다. 잠금/UAC/서비스 세션·최소화 앱 미지원과 headed 입력 제한은 [공식 근거](../03_KNOWLEDGE/CANDIDATE_CATALOG/03_콘텐츠와_자동화/SCREENSHOT_TOOLS_20261103.md)를 따릅니다. 후속 허가로 자체 격리창을 실제조작했으나 전경 비간섭은실패했습니다. 사용자다른 작업과 병행하는 무간섭도구로 권장하지 않으며 파일/API연결을 우선합니다. 새autostart·vendor/Skill수정은없습니다.
+`agent-desktop`은 선택형 수동 UIA CLI이며 원격 연결 대체품이 아닙니다. help/version 검사는 실제 화면 조작 검증이 아닙니다. 잠금/UAC/서비스 세션·최소화 앱 미지원과 headed 입력 제한은 [공식 근거](../03_KNOWLEDGE/CANDIDATE_CATALOG/03_콘텐츠와_자동화/SCREENSHOT_TOOLS_20261103.md)를 따릅니다. 초기 격리창의 전경비간섭실패는 UIA기본값을 고친 별도 `1.0.2-local.nofocus.1`로 재검증해 자체창 기능/비간섭/정리PASS입니다. 원본보존·새콘솔/갱신Skill절대경로 연결, 라이선스Apache-2.0. 모든앱의 무간섭보장은 아니며 파일/API연결을 우선합니다. 새autostart·전역보안변경은없습니다.
 
 ## 현재 기본 운용에서 제외
 

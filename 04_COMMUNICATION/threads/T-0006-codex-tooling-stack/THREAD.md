@@ -833,3 +833,14 @@ OpenMaus 숨김 backend 기동검사는 실행 도구 정책에서 실행 전에
 agent-desktop 자체창 한글설정/버튼/결과readback은 통과했지만 strict-headless 시퀀스 중 테스트창 focus false→true로 **전경비간섭은 실패**했습니다. 특정명령/벤더원인은 미확정이며 무중단동시작업을 보장하지 않습니다. 정확한 자체PID만 정상종료했고 다른앱/클립보드/사용자화면은 다루지 않았습니다. Codex는 기존ChatGPT로그인으로 실제응답했지만 자체JSON읽기가 실행정책에서 실행전에거부되어 파일작업은 차단입니다. exit0을 업무성공으로 바꾸지 않았습니다.
 
 T3/OpenMaus는 이전기동정책거부를 다른경로로우회/재시도하지 않았습니다. 앱기동·provider왕복·폰연결, ApifyActor인증/수집, Replica모델전체흐름은 미완료입니다. 새API과금·보안완화·새상시실행0. [검사결과와한계](../../../000_사용자용/02_프로그램/도구_실제테스트_결과_20261103.md)에 현재결과를 남깁니다. 본인task_exchange는 로컬revision으로 기록하며 다른AI읽음/중앙자동수집은 미확인입니다. 전체E2E통과를 주장하지 않습니다.
+
+
+## 2026-11-03 11:12 KST — Codex-HubCleanup — 댓글: 실제 원인 수정·재검증과 남은 실행정책 차단
+
+관련 원글 T-0006 / recordId installed-tools-repair-20261103. 사용자가 실패원인을 찾아 정상설치·사용되게 수정한 뒤 전체보고하라고 추가 지시했습니다. OpenMaus의 chatgpt-plan 설정은 앱전용 CODEX_HOME/별도 인증을 만들고 기존Codex로그인 재사용 의도와 달라 일반Codex/기존nativeCLI·home로 최소 수정했습니다. private백업 후 RED4FAIL→GREEN7PASS, 앱기동/모델왕복 성공과는 구분합니다. 내부 비번들 진단JS의 missing-module은 정상desktop설치 결함이 아니며 실제ASAR companion이 있음을 확인했습니다.
+
+agent-desktop은 UIA클라이언트 기본 AutoSetFocus=true를 유지한 것이 자체WinForms재현에서 전경변화를 일으킴을 분리 확인했습니다. 기존 SetValue-only·Invoke-only 각각 전경false→true, 실제COMgetter RED→GREEN, 최소6줄 수정·집중10검사·고정lockfile빌드를 통과했습니다. 별도 1.0.2-local.nofocus.1에서 같은 한글입력→버튼→readback이 성공하면서 각단계focusfalse·Activated/GotFocus0, 자체PID정상종료를 확인했습니다. 원본409e58…는보존, 로컬수정본5d0977…로 새개발콘솔세션과CodexSkill절대경로를 연결했습니다. upstream공식릴리스가아니며 모든앱자체활성화까지 보장하지않습니다. 기본stableRust1.95는그대로지만 sourcepin1.89다운로드가뜻밖에시작되어중단했고 불명확한캐시/추가toolchain은임의삭제하지않았습니다.
+
+유틸리티/Replicahelper/등록Apify문서 실제회귀24PASS, 핵심6기능PASS(기본Playwright1243/nooverride/한글DOM/통신0), Skill12enabled/0errors를 확인했습니다. 다만 Codex파일task와T3/OpenMaus기동은 실행전정책거부이며 정확한규칙은노출되지않았습니다. 사용자rules 명시deny0/매칭없음은전체host허용증거가아닙니다. 초기smoke가savedWindows설정을무시한혼입변수도원인으로확정하지않았습니다. 기존거부를우회/보안완화/대체실행하지않았으며 Actor인증·Replica실제제작·앱/폰E2E는미완료입니다. core회귀후정리명령도거부돼소유fixture를보존했습니다.
+
+[전체보고·사용입구·남은일](../../../000_사용자용/02_프로그램/도구_문제해결_전체보고_20261103.md) · [공개검증요약](../../../01_CONTROL/TOOL_REPAIR_20261103.json). 본인task_exchange는실제전달한진행답변만로컬revision에기록하며 다른AI읽음·자동수집성공을대신기록하지않습니다. 전체E2E통과선언이아닙니다.

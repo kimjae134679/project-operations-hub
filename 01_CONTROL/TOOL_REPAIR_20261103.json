@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-11-03T11:11:34+09:00",
+  "scope": "이번 브랜치 정리·사진 도구 설치의 후속 문제 해결 및 통제된 실제 사용 재검증",
+  "overall": "PARTIAL_REPAIRED_WITH_EXTERNAL_BLOCKERS",
+  "allEndToEndPassed": false,
+  "repairs": [
+    {
+      "tool": "OpenMausBot",
+      "status": "CONFIG_FIXED_RUNTIME_BLOCKED",
+      "cause": "chatgpt-plan 모드는 기존 로그인 재사용이 아니라 앱 전용 CODEX_HOME/별도 인증을 선택함",
+      "change": "일반 Codex 모드·기존 native CLI·인스턴스 범위 기존 CODEX_HOME·명시적 fullAuto=false. 자격증명 복사 없음",
+      "regression": "RED4FAIL/3PASS -> GREEN7PASS; 부모 재검사7PASS",
+      "configBeforeSha256": "a9c28e78ac0df0721641d037b0cc7bad7ac927a25cd6f95b5de5256d0a997544",
+      "configAfterSha256": "f6ed502be09d8fdc17fabdb02ed46278d6e860f9d0d31080336f54ced79cef02",
+      "privateBackupVerified": true,
+      "runtimeVerified": false
+    },
+    {
+      "tool": "agent-desktop",
+      "status": "LOCAL_PATCH_INSTALLED_AND_OWN_FIXTURE_VERIFIED",
+      "cause": "원본 UIA 클라이언트가 AutoSetFocus=true 기본값을 유지. SetValue/Invoke 독립 재현에서 각각 전경 변화",
+      "variant": "1.0.2-local.nofocus.1",
+      "upstreamVersionOutput": "agent-desktop 1.0.2",
+      "officialUpstreamRelease": false,
+      "sourceCommit": "a47ed664e0db00d1d4df364eb3fe8a5599882f3c",
+      "license": "Apache-2.0",
+      "change": "클라이언트 SetAutoSetFocus(false), 실패는 전파. OS/전역 COM/보안 설정 변경 없음",
+      "sourceLockfileUnchanged": true,
+      "executable": "D:\\A_KJ\\AI\\Tools\\agent-desktop\\1.0.2-local.nofocus.1\\agent-desktop.exe",
+      "sha256": "5d097726cac87ce6f4779129e76064d423c39ac11cffcd7b8030eb51006c8933",
+      "originalSha256Unchanged": "409e58cbdd6aed47e29771ffa60bc122a9843505a227af488cded85215943988",
+      "tests": {
+        "realComGetter": "RED1FAIL -> GREEN1PASS",
+        "focusedRegressions": "10PASS",
+        "formatAndLockedReleaseBuild": "PASS",
+        "actualKoreanSetValueInvokeReadback": "PASS",
+        "focusBeforeAfterEachStage": [
+          false,
+          false,
+          false
+        ],
+        "ownFixtureCleanup": "PASS"
+      },
+      "activeEntry": "새 개발도구 콘솔의 세션 PATH 및 Codex agent-desktop-windows Skill 절대경로",
+      "allApplicationsNoninterferenceGuaranteed": false
+    },
+    {
+      "tool": "Playwright",
+      "status": "PREVIOUS_DEPENDENCY_REPAIR_REGRESSION_PASS",
+      "cause": "라이브러리1.63이 요구하는 Chromium1243 누락",
+      "change": "공식1243/headless1243 병행 설치, 기존611파일 보존",
+      "freshRegression": "기본경로/no override/한글 fill-click-DOM PASS, sandbox=true, 페이지 네트워크0"
+    }
+  ],
+  "freshTestGroups": [
+    {
+      "group": "jq/Ruff/PSScriptAnalyzer/Replica helpers/Apify Docs",
+      "pass": 24,
+      "fail": 0,
+      "includedReplicaHelperCases": 18
+    },
+    {
+      "group": "Git/rg/fd/uv/Gitleaks/Playwright",
+      "pass": 6,
+      "fail": 0
+    },
+    {
+      "group": "OpenMaus staged configuration",
+      "pass": 7,
+      "runtimeTest": false
+    },
+    {
+      "group": "agent-desktop focused client/cache/timeout",
+      "pass": 10
+    },
+    {
+      "group": "agent-desktop real COM getter",
+      "pass": 1
+    },
+    {
+      "group": "agent-desktop controlled UI and session entry",
+      "status": "PASS, scoped own fixture only"
+    },
+    {
+      "group": "Codex skill binding/discovery",
+      "status": "2 mechanical tests PASS; native discovery12 enabled/0errors, no model task"
+    }
+  ],
+  "remaining": [
+    {
+      "item": "T3/OpenMaus application startup/provider/phone",
+      "status": "BLOCKED_OR_NOT_RUN",
+      "reason": "이전 시작 요청이 프로세스 생성 전 도구 정책에서 거부. 앱 stderr/PID/정확한 규칙ID 없음, 우회 없음"
+    },
+    {
+      "item": "Codex owned-file smoke",
+      "status": "BLOCKED",
+      "reason": "실제 모델 응답은 왔으나 파일 읽기 요청은 실행 전 거부. --ignore-user-config가 기존 Windows sandbox 선택을 생략한 혼입변수이며 원인으로 확정할 수 없음"
+    },
+    {
+      "item": "Apify Actors",
+      "status": "AUTH_REQUIRED",
+      "reason": "문서 MCP와 별개로 인증/클라우드 사용 조건 필요. 설치 결함 아님, 자동 가입/유료 호출 없음"
+    },
+    {
+      "item": "Replica model workflows",
+      "status": "NOT_RUN",
+      "reason": "구체적 제작 대상과 워크플로 작업은 아직 수행하지 않음. 설치/보조스크립트 테스트와 구분"
+    },
+    {
+      "item": "Core regression fixture removal",
+      "status": "CLEANUP_BLOCKED_FIXTURES_PRESERVED",
+      "reason": "회귀 후 정리 명령도 정책에서 실행 전 거부. 다른 경로 재시도 없음"
+    }
+  ],
+  "policyDiagnostics": {
+    "exactEnforcingRuleKnown": false,
+    "userRuleExplicitDenyCount": 0,
+    "userRuleExplicitAllowCount": 6,
+    "recordedArgvMatchedRules": [],
+    "noExplicitMatchMeansAllow": false,
+    "malwareOrUacOrAvVerdictEstablished": false,
+    "securityRulesRelaxedOrBypassed": false
+  },
+  "correctedDiagnosticInterpretation": "OpenMaus 내부 비번들 JS의 missing-module은 진단용 호출에 한정. 실제 사용자 desktop EXE/ASAR의 companion module 존재를 확인했으며 GUI 설치 결함 증거가 아님",
+  "buildFootprint": "원본 Rust pin이1.89 동기화/다운로드를 시도해 중단. 이후 명시한 기존 stable1.95/MSVC로 빌드. 현재1.89도 존재하지만 사전 목록이 없어 정확한 선행 소유관계는 미확정, 임의 삭제하지 않음. 기본stable1.95 유지. Cargo.lock 종속성 다운로드 발생",
+  "repositoryBeforeReportPublication": {
+    "remoteHeads": 1,
+    "archiveTagCount": 42,
+    "openPullRequests": 0,
+    "main": "bbb8d3ba3e17f21781012daec77f1e7fac0717ff",
+    "verifiedAt": "2026-11-03T10:59:43+09:00"
+  },
+  "safety": {
+    "newPaidApiCalls": 0,
+    "credentialsCopied": false,
+    "newAccounts": false,
+    "globalPathChanged": false,
+    "newWindowsServicesOrAutostart": false,
+    "securityBypass": false,
+    "originalBinaryPreserved": true,
+    "existingDirtyRepositoryPreserved": true,
+    "comfyUiPcModelsDeleted": false
+  },
+  "sourceEvidenceSha256": {
+    "utilities-mcp-skills.json": "1e278b0a533d14c1aa61fb270f20a897a408eca01369fa5893422962fd3b3847",
+    "core-regression.json": "5b4f200dd3e6e5c0d8ba875a119a09435a157d7b2c7c6fe539622c3a3e77ffe7",
+    "agent-desktop-repair.json": "9487e2f735e7a80500a0225fe99e64020d10ea5a4333d8f339c802035dc8e962",
+    "openmaus-config-remediation.json": "0fb46d3b05e7635a998c92d6649bc5053101af217b6f76dd1044e3bdda41b6d0",
+    "openmaus-entry-classification.json": "922aa07aeb38639db0854a4eaf00b834f7c4bf7c042f060742bfe975f7af94df",
+    "execution-policy-diagnostics.json": "1007c40e4c8ed967ee66da265219916372fc26083b32fe53fd254d59e2159c01",
+    "console-env-remediation.json": "73565483a7db4e72fafcea8a2950421a975f1aa826d7fca256bf046328064cc7",
+    "updated-skills-discovery.json": "5ec01e4a2fda41b774dcce559f044a510872b1da21608ea8b3f1410878f23df3"
+  },
+  "countsNote": "서로 다른 그룹·재검사·정적/실제 검증을 합산해 전체 통과 숫자를 만들지 않음"
+}
