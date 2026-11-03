@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-03",
+  "stage": "remaining-selected-screenshot-tools",
+  "openMausBot": {
+    "version": "0.1.138",
+    "installed": true,
+    "exe": "D:/A_KJ/AI/Applications/OpenMausBot/0.1.138/OpenMausBot.exe",
+    "manualShortcut": "D:/A_KJ/AI/Applications/OpenMausBot/OpenMausBot.lnk",
+    "dataRoot": "D:/A_KJ/AI/Applications/OpenMausBot/data",
+    "startupVerified": false,
+    "startupTest": "rejected by execution tool policy before hidden backend launch; no bypass",
+    "normalGuiTest": "not_run",
+    "modelResponse": "not_run"
+  },
+  "replica": {
+    "installedSkills": 11,
+    "nativeCodexDiscoveryEnabled": 11,
+    "helperTestsPass": 18
+  },
+  "agentDesktop": {
+    "binaryVersion": "1.0.2",
+    "windowsSkillInstalled": true,
+    "nativeCodexDiscoveryEnabled": true,
+    "desktopActions": 0
+  },
+  "apify": {
+    "version": "0.20.0",
+    "installed": true,
+    "codexServer": "apify-docs",
+    "enabled": true,
+    "tools": [
+      "search-apify-docs",
+      "fetch-apify-docs"
+    ],
+    "initializeAndListVerified": true,
+    "publicDocFetchCharacters": 6456,
+    "actorToolsExposed": 0,
+    "actorCalls": 0,
+    "actorsAuth": "missing token; inactive",
+    "clientReload": "next turn/session",
+    "isolatedNoAuthHome": true
+  },
+  "preservation": {
+    "existingAppsReplaced": false,
+    "securityBypass": false,
+    "windowsAutostartChanged": false,
+    "paidApiCalls": 0,
+    "codexMcpConfig": "one additive docs-only server, existing settings equivalent; private backup retained"
+  },
+  "knownLimit": "Software installation is not proof of OpenMaus startup/UI/provider response or whole-project integration."
+}
