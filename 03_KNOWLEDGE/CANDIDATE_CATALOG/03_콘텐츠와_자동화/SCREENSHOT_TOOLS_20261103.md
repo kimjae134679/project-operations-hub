@@ -1,5 +1,10 @@
 # 스크린샷 7장 · 도구 6개: 조사와 실제 설치
 
+## 최신 후속 실제 테스트 · 2026-11-03
+
+[실제 결과/실패·차단](../../../000_사용자용/02_프로그램/도구_실제테스트_결과_20261103.md)을 먼저 봅니다. 아래는 설치 단계 기록입니다. 후속 검증에서 helper 18기능 PASS·등록 Apify문서 조회 PASS, Playwright공식1243 복구후기본 launch PASS를 확인했습니다. **agent-desktop자체창 기능 PASS와 전경 비간섭 FAIL을 분리**, Codex실제 응답/exit0와 **파일과제policy BLOCKED**를 분리합니다. Actor인증/Replica모델 workflow/T3·OpenMaus기동/폰흐름은미완료입니다. 설치 시점의화면0/모델0을전체기간으로확대하지않습니다.
+
+
 공식 확인/후속 설치 **2026-11-03 KST**. 이미지2·6은 같은 도구입니다. 스크린샷 자체는 외부 참고자료이며, **후속 사용자 설치 지시**로 실제 설치를 진행했습니다. [사용자 실행 입구](../../../000_사용자용/02_프로그램/사진도구_설치와_실행.md) · [설치 원본](../../../01_CONTROL/AI_INSTALLATIONS.md).
 
 ## 별도 새 이미지 · T3 Code (앞선7장/6저장소와 합산하지 않음)
@@ -49,7 +54,7 @@ Docs는 APIFY_TOKEN을 비우고 NoAuthHome으로 기존CLI인증파일 fallback
 
 Bytebot는 archived이며 Ubuntu/Dockerdesktop과 자기providerAPIkey구조입니다. “No Limits”는 무료 무제한추론이 아니므로 설치하지 않았습니다. Codex는 [공식인증](https://learn.chatgpt.com/docs/auth)/[한도](https://learn.chatgpt.com/docs/pricing)/[Windows안내](https://learn.chatgpt.com/docs/app/windows)와 기존local환경을 사용하며 ChatGPT요금제한도와 API과금을 구분합니다.
 
-## 유지한 경계
+## 설치 단계 당시 유지한 경계 · 후속 실제 테스트와 구분
 
 새 유료 API/구독/결제·autostart·보안 완화·실화면 조작 0. 허용된변경은 실제 프로그램/Skill설치·문서 전용MCP등록이며 기존 앱 0.9.18·계정 설정·모델·자료는보존했습니다. ComfyUI는 현재목록에서만제거했고 PC앱/모델/작업/데이터삭제는하지않았습니다. **모든 설치가 E2E 검증됐거나 모든 프로젝트가 연결됐다고 표현하지 않습니다.**
 

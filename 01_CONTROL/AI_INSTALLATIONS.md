@@ -1,5 +1,17 @@
 # AI 설치·실제 확인 원본
 
+## 최신 실제 테스트 · 2026-11-03
+
+[실제 테스트 결과와 실패/차단 구분](../000_사용자용/02_프로그램/도구_실제테스트_결과_20261103.md)이 아래 설치단계의 “도움말만/실화면0/모델미실행” 기록보다 후속입니다. 전부PASS가 아닙니다.
+
+- 유틸리티/Replica helper/등록된Apify문서MCP: **24 PASS/0 FAIL**, 그 안에 실제 helper18 fixture 포함. Actor는BLOCKED/AUTH_REQUIRED, Replica11모델 workflow는NOT_RUN.
+- Git/rg/fd/uv/Gitleaks/Playwright 자체fixture6기능 PASS. Playwright초기 기본1243 누락 FAIL과 explicit1234PASS는 이력으로 남기고, 공식1243/headless1243의존성을 추가한 뒤 **기본경로override없는 한글fill/click/DOM PASS**를 확인했습니다. sandbox=true/network0, 기존cache611파일hash동일/1234보존. Python/Playwrightpackage업그레이드나 기본cache이동은 없음.
+- agent-desktop1.0.2: 자체 격리창의 한글 입력/버튼/새앱결과 조회 **기능 PASS**. 다만 strict-headless에서도 is_focused false→true여서 **전경 비간섭 FAIL**, 정확한원인 미확정. 자체창 정상 종료/PID소멸PASS, 다른앱조사/강제 포커스 복구없음.
+- Codex0.160.1: 기존 요금제 실제 응답·turn완료·exit0는 확인했지만 **한글JSON파일과제는policy거부로BLOCKED**. 성공한합계나 반환실제modelID증거는없으며 gpt-6.1-sol은요청값입니다.
+- T3/OpenMaus기동의 이전거부는 재시도하지 않았고 GUI/provider/폰E2E는 여전히미검증입니다. 원문모델trace/privateconfig/비밀값은공개하지않습니다.
+
+
+
 확인 **2026-11-03 KST** (PC 증거 생성 UTC 2026-11-02 16:37:01). 정책 루트 `D:/A_KJ/AI`를 유지하며 기존 안정 설치·사용자 자료는 이동/교체하지 않았습니다. 새 작은 CLI는 `Tools/<도구>/<버전>`, 사용자 입구는 `Launchers`로 분리했습니다. npm/공식 updater 환경은 기본 위치를 유지합니다.
 
 ## 최신 추가 도구 · T3 Code 0.1.6 (이전 사진7장과 별개)
@@ -15,7 +27,7 @@
 
 수동 래퍼는 process-only `T3CODE_TELEMETRY_ENABLED=false`, `OTEL_SDK_DISABLED=true`를 설정하도록 준비했고 source/정적·합성 검사 **3/3**을 통과했습니다. ClaudeAgent 기본 항목은 명시적으로 disabled하여 Codex-only 구성을 준비했습니다. wrapper/설정은 실제로 실행·readback하지 않았습니다. 최종 SHA256: GUI wrapper `f0543489f525d45a901794605b932f6c8ae987ffcfa49a0e6c167bc41ec008a8`, CLI wrapper `b7a5b1c8f5e110117e8844e9a22b226e3deb3ce5745c161a7549f1c0a34cd4ba`, 전용 settings `97c008314a18d5aaee8a9df01b53b6cbfba329cda56c67b09ad7aba6db92d719`.
 
-읽기 전용 `t3 status --json --base-dir <전용D>` exit0에서 serviceInstalled=false/connectEnabled=false/lanEnabled=false를 확인했습니다. 이 명령은 DB/연결 검사를 하지 않는 CLI 설정 조회이며 **서버 health·Supervised/model설정 적용·Codexprovider 감지/인증·모델 가용성의 증거가 아닙니다**. raw 출력/연결 정보는 비공개로 보존했습니다.
+읽기 전용 `t3 status --json --base-dir <전용D>` exit0에서 serviceInstalled=false/connectEnabled=false/lanEnabled=false를 확인했습니다. 이 명령은 DB/연결 검사를 하지 않는 CLI 설정 조회이며 **서버 health·Supervised/model 설정 적용·Codexprovider 감지/인증·모델 가용성의 증거가 아닙니다**. raw 출력/연결 정보는 비공개로 보존했습니다.
 
 정확한 내부 거부 규칙은 미제공이며 malware/UAC/AV 판정은 관찰되지 않았습니다. 서명·hash확인은 손상/발행자 확인이지 전체 안전·동작보증이 아닙니다. 전역 CLI/Node/서비스/autostart/firewall/tunnel/보안 정책·키/계정/결제 변경과 model호출0. `t3 doctor`는 DB유지보수 명령으로 health검사에 쓰지 않았습니다.
 

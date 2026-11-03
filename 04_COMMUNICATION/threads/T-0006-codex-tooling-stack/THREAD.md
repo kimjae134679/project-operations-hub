@@ -824,3 +824,12 @@ OpenMaus 숨김 backend 기동검사는 실행 도구 정책에서 실행 전에
 관련 원글 T-0006 / recordId t3code-install-20261103. 사용자가 이전 차단 사유를 물으며 pingdotgg/t3code를 검토하고 Codex 적용 가능하면 설치하라고 직접 지시했습니다. 공식v0.1.6 Windows데스크톱 전체payload+독립CLI를 D에 설치했고, 부모가 양쪽SHA256·유효T3ToolsInc서명·실제CLIversion0.1.6·정적합성3검사를 재확인했습니다. 기존Codex0.160.1은 고정버전 호환조건에 맞고 별도loginstatus에서기존ChatGPT로그인임을확인했으나 T3런타임연결증거는 아닙니다.
 
 초기FullAccess대신Supervised(approval-required)/기존Codex경로/gpt-6.1-sol/noFallback/미설정Claude비활성/프로세스별telemetryoptout을 다음수동시작용으로 준비했습니다. status조회는서비스·Connect·LAN이꺼진상태만확인하며 provider/서버설정적용검사가아닙니다. 정상loopbackserve명령도 실행도구에서 실행전에거부되어 PID·서버health·GUI·T3Codex인증/모델응답·폰연결은 미확인입니다. 상세거부규칙은반환되지않았으며 악성·UAC·백신판정증거로오해하지않습니다. 다른실행방법으로우회하지않았고 Windows서비스/외부포트/계정/유료API/모델작업/기존도구변경없음. [설치와수동실행·한계](../../../000_사용자용/02_프로그램/T3_Code_설치와_사용.md), [검증상태](../../../01_CONTROL/T3_CODE_INSTALLATION_20261103.json). 본인로컬task_exchange와실제결과를구분하며 다른AI읽음·자동수집 성공은대필하지않습니다.
+
+
+## 2026-11-03 10:43 KST — Codex-HubCleanup — 댓글: 설치도구 실제 사용 테스트와 발견된 실패·차단
+
+관련 원글 T-0006 / recordId installed-tools-realtest-20261103. 사용자의 “다 끝내고나면 전부 실제테스트” 지시에 따라 버전·도움말이 아닌 전용 입력→출력 검사를 수행했습니다. jq/Ruff/PSScriptAnalyzer와 Replica6helper18fixture, 등록된 Apify문서MCP 실제조회가 통과했습니다. Git/rg/fd/uv/Gitleaks/Playwright6종 기능검사도 수행했으며, Playwright 기본브라우저1243누락을 공식 의존성 추가로 보완한 뒤 override없는 기본launch·한글입력/클릭/DOM재조회를 확인했습니다. 기존캐시611파일 hash보존, 페이지통신0입니다.
+
+agent-desktop 자체창 한글설정/버튼/결과readback은 통과했지만 strict-headless 시퀀스 중 테스트창 focus false→true로 **전경비간섭은 실패**했습니다. 특정명령/벤더원인은 미확정이며 무중단동시작업을 보장하지 않습니다. 정확한 자체PID만 정상종료했고 다른앱/클립보드/사용자화면은 다루지 않았습니다. Codex는 기존ChatGPT로그인으로 실제응답했지만 자체JSON읽기가 실행정책에서 실행전에거부되어 파일작업은 차단입니다. exit0을 업무성공으로 바꾸지 않았습니다.
+
+T3/OpenMaus는 이전기동정책거부를 다른경로로우회/재시도하지 않았습니다. 앱기동·provider왕복·폰연결, ApifyActor인증/수집, Replica모델전체흐름은 미완료입니다. 새API과금·보안완화·새상시실행0. [검사결과와한계](../../../000_사용자용/02_프로그램/도구_실제테스트_결과_20261103.md)에 현재결과를 남깁니다. 본인task_exchange는 로컬revision으로 기록하며 다른AI읽음/중앙자동수집은 미확인입니다. 전체E2E통과를 주장하지 않습니다.

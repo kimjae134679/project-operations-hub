@@ -14,7 +14,7 @@
 - Gmail/Drive/Notion 등은 과거 READY를 믿지 않고 현재 도구·계정 권한을 확인합니다.
 - Apify **문서 전용 apify-docs**는 실제 설치/등록했고 토큰없이도구 2개 연결·공식 문서 조회가 성공했습니다. **Actor 수집**은 별도인증/비용대기이며 local MCP라도 Actor실행/결과저장은cloud입니다. Firecrawl/Context7도계정/한도확인이먼저입니다. [추가설치/실행](../02_프로그램/사진도구_설치와_실행.md).
 - MarkItDown은 텍스트 추출이지 원본 레이아웃 보장 변환기가 아닙니다. LLM/음성/플러그인을 자동 켜지 않습니다.
-- agent-desktop은 UIA 보조 CLI입니다. 잠금/UAC/서비스 세션·최소화 앱에 한계가 있고 일부 입력은 실제 마우스/포커스를 쓰므로 항상 화면을 안 건드린다고 보장하지 않습니다. 이번 help/version만으로 화면 성공이라고 하지 않습니다.
+- agent-desktop은 UIA 보조 CLI입니다. 후속 실제자체창에서 한글 입력/버튼/결과 조회는PASS였지만 **strict-headless만 사용했는데도 is_focused false→true로 전경 비간섭 FAIL**이었습니다. 특정명령/Windows provider/framework의 원인은 미확정입니다. 사용자가 다른 일을 하는 동안 전경을 보존해야 하면 파일/API/구조화된 연결을 우선하며, 허가된 좁은 UI 범위에서도 focus 변화 시 멈춰 확인합니다. 강제 포커스 복구나vendor수정으로 감추지 않습니다. 잠금/UAC/서비스세션/최소화 한계도 유지됩니다. [실제 테스트/실패 범위](../02_프로그램/도구_실제테스트_결과_20261103.md).
 - 기존 n8n/Jev는 보존하되 새 상시 작업/공개 endpoint/유료 라우팅 호출 없음. Jev 키 존재는 인증·작업 성공·절감 증거가 아닙니다.
 
 [설치·콘솔 사용](../02_프로그램/설치_도구_현황.md) · [내부 사용 조건](../../03_KNOWLEDGE/CANDIDATE_CATALOG/05_도입기준/USAGE_AND_ASSISTANCE.md). 새 결제·구독·autostart·보안 완화 없이 사용하며 기존 프로젝트·모델·자료를 보존합니다.

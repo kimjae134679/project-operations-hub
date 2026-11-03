@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-11-03T10:43:04+09:00",
+  "scope": "이번에 설치·연결한 도구와 재사용 핵심 개발 도구의 통제된 실제 기능 검사. PC 전체 기존 앱 전수검사 아님.",
+  "overall": "PARTIAL_WITH_FAILURE_AND_BLOCKERS",
+  "allEndToEndPassed": false,
+  "results": [
+    {
+      "tool": "jq / Ruff / PSScriptAnalyzer",
+      "status": "PASS",
+      "evidence": "한글 JSON 변환, 실제 오류 검출 후 수정 fixture 정상"
+    },
+    {
+      "tool": "Git / rg / fd / uv / Gitleaks",
+      "status": "PASS",
+      "evidence": "전용 저장소 diff·한글 검색·오프라인 venv 연산·합성 토큰 탐지"
+    },
+    {
+      "tool": "Playwright",
+      "status": "PASS_AFTER_DEPENDENCY_REPAIR",
+      "evidence": "초기 기본 브라우저1243 누락. 공식1243 추가 후 경로 override 없는 기본 실행: 한글 입력→클릭→DOM 일치, 페이지 통신0. 기존611파일 hash 보존"
+    },
+    {
+      "tool": "Replica helpers",
+      "status": "PASS",
+      "evidence": "6개 helper의 실제 fixture18개 통과. 11개 모델 작업 흐름은 별도 미검증"
+    },
+    {
+      "tool": "Apify docs MCP",
+      "status": "PASS",
+      "evidence": "등록된 설정으로 초기화·2개 도구·공식 문서6456자 실제 조회"
+    },
+    {
+      "tool": "Apify Actors",
+      "status": "BLOCKED_AUTH_REQUIRED",
+      "evidence": "인증키 없음, Actor 실행·새 유료 호출 없음"
+    },
+    {
+      "tool": "agent-desktop functional",
+      "status": "PASS",
+      "evidence": "전용 창 한글 설정→버튼→실제 결과 재조회 일치, 자체 테스트 창 정상 종료"
+    },
+    {
+      "tool": "agent-desktop foreground noninterference",
+      "status": "FAIL",
+      "evidence": "strict-headless 시퀀스에서 자체 창 is_focused false→true. 원인·특정 명령 책임 미확정. 사용자와 동시 작업 시 전경 비간섭 보장 불가"
+    },
+    {
+      "tool": "Codex inference",
+      "status": "PASS",
+      "evidence": "기존 ChatGPT 로그인으로 실제 응답·turn.completed·exit0, 새 API 과금 경로 없음. 요청 모델 gpt-6.1-sol, 반환 model ID는 노출되지 않음"
+    },
+    {
+      "tool": "Codex owned-file task",
+      "status": "BLOCKED_EXECUTION_POLICY",
+      "evidence": "자체 JSON 읽기 명령이 실행 전에 거부됨. 기대 sum51 미달, exit0을 작업 성공으로 처리하지 않음"
+    },
+    {
+      "tool": "T3 Code / OpenMausBot app E2E",
+      "status": "BLOCKED_EXECUTION_POLICY",
+      "evidence": "이전 기동 검사 실행 전 정책 거부. 이번에 다른 경로로 재시도하지 않음. 설치 파일 hash 재확인과 앱 기동·로그인·모델 응답은 별개"
+    },
+    {
+      "tool": "Replica model workflows / phone connection",
+      "status": "NOT_RUN",
+      "evidence": "모델 파일 작업 차단·상위 앱 기동 미검증 상태에서 완료로 승격하지 않음"
+    }
+  ],
+  "safety": {
+    "newPaidApiRoute": false,
+    "securityBypass": false,
+    "policyDeniedCommandRetriedViaAlternative": false,
+    "unrelatedAppsControlled": false,
+    "ownUiFixtureClosed": true,
+    "preexistingPlaywrightCachePreserved": true
+  },
+  "sourceEvidenceSha256": {
+    "utilities-mcp-skills.json": "be303e5cb57b4786100d288565485b6bf0940c522853dcbda78bf69d40945e96",
+    "core-toolchain.json": "70a128209679468c0c0a834a26826d0e6d583e9616215e282d1b44028a572258",
+    "agent-desktop-ui.json": "533056175e09e068ffeb9ad35a3b740973145c484b4772732a09cdd25ff3cba9",
+    "codex-real-smoke.json": "c132f7208f6adb7d15e2fed82a34a07536a22c50e61a7e3804201f5bb1a53703",
+    "playwright-dependency-repair.json": "6704ebddeadec489d56b0838f8a4e2c4a92192bb74207a8129944d0181befe48"
+  },
+  "note": "정확한 실행정책 거부 규칙은 반환되지 않음. 악성코드·UAC·백신 차단 판정 근거가 아님. 원본 모델 trace·계정설정·비밀값은 공개하지 않음."
+}
