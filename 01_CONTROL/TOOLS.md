@@ -15,6 +15,19 @@
 | n8n | PROJECT · 기존 로컬 흐름 | 실제 반복 workflow에 한정. 과거 localhost bridge 검증 ≠ 현재 health/workflow 성공 |
 | Supabase · Drive/OAuth · SDK/Blender 연동 | PROJECT · 대상별 | 실제 해당 프로젝트에서 필요·연결이 확인된 경우만 |
 
+## 후속 지시로 실제 추가한 사진 속 도구
+
+사용자의 후속 **설치 지시**를 반영했습니다. 이전 선별 조사에서의 “Replica 참고만/Apify 미연결/OpenMaus 미도입”은 이 상태로 대체합니다.
+
+| 도구 | 설치/채택 범위 | 실제 검증과 남은 일 |
+|---|---|---|
+| Replica 11개 Skill | 설치됨 · 앱 재구현 작업별 선택 | Codex enabled 인식, 도우미 검사18/18. 기존 Skill/hook 덮지 않음; 모델/복제 E2E 미실행 |
+| agent-desktop-windows Skill | 설치됨 · Windows CLI 지원 | Codex enabled 인식, 기존1.0.2 지침/버전 확인. 실제 화면 제어 미실행 |
+| Apify MCP | 설치됨 · `apify-docs` 문서 모드 채택/등록 | 토큰 없는2도구 초기화/목록·공식 문서6,456자 조회. Actor·데이터셋·유료 호출0; 인증 수집 모드는 비활성 |
+| OpenMausBot 0.1.138 | 실제 portable 설치 · 다음 정상 수동 시작 설정 | D 데이터/기존 Codex/gpt-6.1-sol 설정·수동 입구 준비. 정상 앱/로그인/모델 응답 미검증; 자동 실행·cloud 연결 없음 |
+
+Replica 11개 + Windows 1개은 `skills/list`에서12개 enabled/오류0을 확인했습니다. 새 턴/세션 갱신 후 선택하며 설치가 다음 작업·배포·실결제·화면 제어의 자동 허가가 되지 않습니다. 안전하지 않은 기본 실결제/보안 우회 조언은 제한·제거했습니다. [실제 실행 안내](../000_사용자용/02_프로그램/사진도구_설치와_실행.md).
+
 ## 작은 실무 보조
 
 기존 `rg/fd/gh/uv/Gitleaks CLI`를 우선 재사용합니다. `jq/Ruff/PSScriptAnalyzer`는 JSON/Python/PowerShell의 빈틈을 보완합니다. 실제 설치·제한된 검사 결과는 설치 원본에서 확인하며 이 문서만으로 전부 READY라고 하지 않습니다.

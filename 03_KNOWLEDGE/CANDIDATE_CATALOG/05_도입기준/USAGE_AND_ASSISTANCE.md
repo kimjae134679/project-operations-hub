@@ -17,11 +17,12 @@
 | GitHub/gh | 기존 서비스/무료 CLI · 🟢 | 현재 repo 권한·인증 확인, 필요 시 로그인 ONCE 대기 |
 | ProjectBridge/관제탑 | 기존 프로젝트 · 🟡 | 현재 연결·경로·실행권한 확인. 과거 응답 ≠ 현재 Online |
 | rg/fd/jq/uv/Ruff/PSScriptAnalyzer/Gitleaks CLI | FREE_OSS · 🟢 | 설치 증거 후 제한된 로컬 작업. Gitleaks redact; 자동 fix/설정 변경 별도 |
-| agent-desktop | FREE_OSS · 🟢 | help/version만 검증, 실제 UI 미검증. 잠금/UAC/서비스 세션/최소화 미지원, 일부 동작 headed 필요 |
+| agent-desktop + Windows Skill | FREE_OSS · 🟢 | CLI/Skill설치·네이티브인식·help/지침검증, 실제 UI 미검증. 잠금/UAC/서비스 세션/최소화 미지원, 일부 동작 headed 필요 |
 | MarkItDown | FREE_OSS · 🟢~🟡 | 필요한 extras만. OCR/음성/LLM/플러그인 별도 요구·비용·검증 |
 | n8n | 기존 로컬 · 🟡 | 현재 workflow/health 확인; fair-code 조건, 외부 비용 별도 |
 | Playwright/브라우저 | 🟡 | 현재 도구/프로젝트 테스트 우선. 로그인/2FA/CAPTCHA 도움 가능 |
-| Apify/Firecrawl/Context7 | FREE_TIER 또는 UNKNOWN | 계정·한도·작업별 비용 확인 전 CONNECT 대기 |
+| Apify Docs | tokenless 공개문서 · 🟢 | runtime설치 + Codex apify-docs등록,2tools초기화/목록·문서6,456자조회확인. 빈HOME/토큰clear, Actor tools0 |
+| Apify Actor/Firecrawl/Context7 | FREE_TIER 또는 UNKNOWN | 문서모드와별개. 계정·한도·작업별비용확인전 인증 수집/연결대기 |
 | Gmail/Calendar/Drive/Notion/기타 plugin | UNKNOWN · ⚪ | 현재 노출·연결·계정권한 확인. 옛 READY 표 사용 금지 |
 | Jev | 기존 설치 · 🟢 | 키 존재 ≠ 인증/라우팅/절감. 새 유료 호출 안 함 |
 

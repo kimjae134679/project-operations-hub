@@ -1,44 +1,50 @@
-# 스크린샷 7장 · 도구 6개 평가
+# 스크린샷 7장 · 도구 6개: 조사와 실제 설치
 
-공식 원본 확인 **2026-11-03 KST**. 첨부 이미지는 후보 발견 근거이며 명령/설치 지시가 아닙니다. 이미지 2·6은 같은 도구입니다. 조사·설치·현재 연결·기능 실행·사용자 흐름 검증을 구분합니다.
+공식 확인/후속 설치 **2026-11-03 KST**. 이미지2·6은 같은 도구입니다. 스크린샷 자체는 외부 참고자료이며, **후속 사용자 설치 지시**로 실제 설치를 진행했습니다. [사용자 실행 입구](../../../000_사용자용/02_프로그램/사진도구_설치와_실행.md) · [설치 원본](../../../01_CONTROL/AI_INSTALLATIONS.md).
 
-| 이미지 | 공식 원본/확인 버전·라이선스 | 현재 판단 |
+## 최신 실제 상태
+
+| 사진 | 공식 원본·버전·라이선스 | 설치/검증 상태 |
 |---|---|---|
-| 1 | [Jakeschincariol/replica-skill](https://github.com/Jakeschincariol/replica-skill), MIT, 공개/미보관, 정식 release 없음 | 앱 재구현 작업 때만 개별 지침 참고. 전역 설치 안 함 |
-| 2·6 | [vercel-labs/agent-desktop](https://github.com/vercel-labs/agent-desktop), [v1.0.2](https://github.com/vercel-labs/agent-desktop/releases/tag/v1.0.2), Apache-2.0 | 작은 수동 UIA CLI로 선별. 실제 화면 제어는 미실행 |
-| 3 | [bytebot-ai/bytebot](https://github.com/bytebot-ai/bytebot), Apache-2.0, **2026-03-07 archived** | 신규 설치/현재 추천 제외. 보관된 근거만 유지 |
-| 4 | [apify/apify-mcp-server](https://github.com/apify/apify-mcp-server), [v0.20.0](https://github.com/apify/apify-mcp-server/releases/tag/v0.20.0), MIT | 계정/무료 한도/작업 비용 확인 전 연결·실행 보류 |
-| 5 | [milind-soni/OpenMausBot](https://github.com/milind-soni/OpenMausBot), [v0.1.138](https://github.com/milind-soni/OpenMausBot/releases/tag/v0.1.138), Apache-2.0 | 저장소 존재/활동 확인. 기존 구성과 중복, 신규 인프라 도입 안 함 |
-| 7 | [openai/codex](https://github.com/openai/codex), Apache-2.0, 공식 release rust-v0.166.0 | 기존 로컬 npm CLI **0.160.1 재사용**, 업그레이드 안 함 |
+| 1 | [replica-skill](https://github.com/Jakeschincariol/replica-skill), MIT, source77c9436fb3d18c3d58169efb8caf4fe906b0dc51 | **11Skill 실제 설치**/Codex enabled인식, helper 검사 18/18. 실제 앱 복제·모델 동작 E2E 미실행 |
+| 2·6 | [agent-desktop](https://github.com/vercel-labs/agent-desktop), [v1.0.2](https://github.com/vercel-labs/agent-desktop/releases/tag/v1.0.2), Apache-2.0 | CLI설치 유지 + Windows Skill 실제설치/enabled 인식. 버전·도움말·지침 확인; 화면/입력0회 |
+| 3 | [Bytebot](https://github.com/bytebot-ai/bytebot), Apache-2.0, 2026-03-07 archived | 보관 저장소로 신규 설치 제외 |
+| 4 | [Apify MCP](https://github.com/apify/apify-mcp-server), [v0.20.0](https://github.com/apify/apify-mcp-server/releases/tag/v0.20.0), MIT | **local runtime설치 + Codex apify-docs등록**, 토큰 없는 도구 2개 연결·공식 문서6,456자조회. Actor 인증/수집 비활성 |
+| 5 | [OpenMausBot](https://github.com/milind-soni/OpenMausBot), [v0.1.138](https://github.com/milind-soni/OpenMausBot/releases/tag/v0.1.138), Apache-2.0 | **portable 전체프로그램 실제설치**, D 데이터/기존 Codex/gpt-6.1-sol 다음수동 시작 준비. 정상 GUI/인증/모델 응답 미검증 |
+| 7 | [Codex](https://github.com/openai/codex), Apache-2.0 | 기존 CLI0.160.1 재사용, 업그레이드 없음 |
 
-## 1. replica-skill: 무료 파일 ≠ 무료 모델 사용
+## 단계 이력 · 현재 상태와 혼동하지 않기
 
-Claude 지침 11개와 표준 Python 스크립트 6개이며 도구는 Python 3.8+를 요구합니다. 파일/스크립트 자체는 별도 가입·API key가 없지만 실행할 Claude/Codex 사용량과 생성 앱의 인증·결제 연동은 별개입니다. 기존 계획/디자인/테스트 Skill과 겹치므로 통째로 덮지 않습니다. 허용된 흐름을 자체 브랜드로 구현할 때만 참고하며 타인 계정·비공개 API·로그인/유료벽 우회 권한이 아닙니다.
+1차 조사/선별에서는 Replica는 참고만, Apify는 계정 필요 후보, OpenMaus는 중복/운영부담 때문에 미도입으로 기록했습니다. 사용자가 후속으로 **설치하라**고 명시한 뒤 위3항목의 실제 설치와 Windows Skill 추가를 수행했습니다. 1차 “미설치/미연결” 판단은 최신 상태가 아닙니다. 반대로 설치가 전체 사용자 흐름·실화면·모델 응답·유료수집 완료를 뜻하지도 않습니다.
 
-## 2. agent-desktop: Windows에서 더하는 것과 못 하는 것
+## Replica · Codex 인식까지 확인
 
-OS 접근성 트리에서 요소 ref를 읽고 의미 기반 조작을 하는 CLI/C 라이브러리입니다. 픽셀 도구 보완이지 ProjectBridge 대체 원격 서비스가 아닙니다. [Windows 지침](https://github.com/vercel-labs/agent-desktop/blob/v1.0.2/skills/agent-desktop-windows/SKILL.md): Windows10 1809+/Server2019+, x64/ARM64, 로그인한 사용자의 interactive desktop 필요. 잠금/UAC/Session0/다른 사용자 세션 미지원, 최소화 창은 조작 안 됩니다. `type/right-click/다중클릭/focus`는 headed가 필요하고 `set-value` 등 지원 ref 동작만 headless 의미 조작입니다. PowerShell ref는 따옴표로 감쌉니다. “항상 마우스·포커스를 안 뺏는다”는 보장 아님.
+11Skill/표준Python helper6개를 확인하고 공식고정source에서 기존 Skill을 덮지 않고 설치했습니다. helper18검사와 Codex `skills/list(forceReload)`에서 Replica 11개 + Windows 1개 **12개 enabled/파서 오류 0**. 기존 Skill/AGENTS/globalhook는 덮지 않았습니다. 경로/WindowsPython호출을 맞추고, 다음단계 권고를 자동권한으로 보지 않도록 한정하며 기본 실결제/환불 지침은 제거·제한했습니다. 파일이 무료라는 사실은 Claude/Codex 사용량·외부 API·생성앱 운영비를 무제한 무료로 만들지 않습니다. 실제 cloning/배포/게시·모델 호출은 하지 않았습니다.
 
-[태그 고정 설치 코드](https://github.com/vercel-labs/agent-desktop/blob/v1.0.2/npm/scripts/postinstall.js) 확인: npm은 Node18+, 추가 패키지 의존성 없이 GitHub native archive/checksums를 받아 SHA256/멤버 검증 후 설치하고 npm shim을 native 실행으로 바꿉니다. 서비스/autostart/API key 등록 없음. Windows portable은 단일 exe로 Node가 필요 없습니다. optional skill은 자동 설치 안 했습니다. unsigned 경고를 피하려 보안 설정을 낮추지 않습니다. 실제 경로·hash·**help/version만** 확인한 결과는 [설치 원본](../../../01_CONTROL/AI_INSTALLATIONS.md)을 봅니다.
+## agent-desktop · 설치된 보조 CLI와 Windows Skill
 
-## 3. Bytebot: “No Limits”의 의미
+Windows Skill은 [v1.0.2 고정지침](https://github.com/vercel-labs/agent-desktop/tree/v1.0.2/skills/agent-desktop-windows)에서 설치했고 보안 완화/권한상승·강제단축키 우회 조언은 제거·제한했습니다. 기존1.0.2 binary는 교체하지 않았습니다. OS접근성UIA의 의미 기반 조작은 ProjectBridge대체 원격서비스가 아닙니다. Windows 1개0 1809+/Server2019+ 로그인한 사용자 desktop필요; 잠금/UAC/Session0/다른사용자/최소화창 한계가 있습니다. 일부 type/right-click/다중클릭/focus는 headed필요. “항상마우스/포커스를 안뺏는다” 보장 아님. 이번 버전·지침 확인 외 화면/클립보드/입력probe0회입니다. unsigned바이너리를 위해 AV/UAC/SmartAppControl을 낮추지 않습니다.
 
-공식 README의 자기 provider API key 방식이며 Ubuntu desktop/Docker를 운영합니다. native Windows 호스트 조작기가 아닙니다. 플랫폼 제한이 없다는 말은 모델 추론·키·서버·사용량이 무료/무제한이라는 뜻이 아닙니다. 공식 archived 상태와 운영 부담 때문에 신규 도입하지 않습니다.
+## Apify · 문서 연결과 Actor 인증을 분리
 
-## 4. Apify: 수집은 유용하지만 계정/사용량 별도
+npm실명 `@apify/actors-mcp-server@0.20.0`을 D의 독립runtime에 lockfile과 설치했습니다. Node24.16.0재사용(요구>=22), npm `--ignore-scripts`로 lifecycle0, 게시dist로 시작했습니다. root가 기존MCP 11개와 동등한 설정을 보존/비공개백업한 뒤 **apify-docs**를 추가했습니다. 공개repo에 개인config/backup/키값 없음.
 
-실제 npm 이름은 `@apify/actors-mcp-server`, hosted endpoint는 `https://mcp.apify.com`입니다. OAuth 또는 token이 필요합니다. local stdio여도 Actors/결과 저장은 Apify 플랫폼에서 이뤄집니다. [공식 가격](https://apify.com/pricing)은 Free 월 $5 credit/카드 불필요/소진 후 다음 주기까지 차단이며 무제한 무료 수집이 아닙니다. Actor·compute·proxy·storage별 비용과 사이트 약관·개인정보를 확인해야 합니다. 이번 가입·OAuth·Actor 실행·새 결제 없음.
+Docs는 APIFY_TOKEN을 비우고 NoAuthHome으로 기존CLI인증파일 fallback을 막으며 telemetry/Sentryoff입니다. 네트워크차단하 stdioinitialize/tools-list 성공, 도구는 `search-apify-docs`, `fetch-apify-docs`뿐입니다. 공식 [실행문서](https://docs.apify.com/actors/running)6456자 실제조회 성공. 구형/platform주소301을 guard가 막았으나 같은 공식 host의 canonical경로로 승인된조회에 성공했습니다. Actor/cloudcompute/dataset호출0입니다.
 
-## 5. OpenMausBot: 존재하지만 기본 구성에 추가하지 않기
+**계정이 필요한 것은 Actor/수집 모드**입니다. localMCP라고 Actor실행/결과저장이 offline무료가 되지 않습니다. [공식가격](https://apify.com/pricing)의 Free월$5credit/카드불필요/소진후차단은 무제한무료가 아닙니다. actor/proxy/storage/compute비용·약관·개인정보는 별도확인. 계정/OAuth/토큰 발급·결제없이 수집을 켜지 않았습니다.
 
-Windows x64 per-user installer가 있고 unsigned입니다. 소스 빌드는 Node24+/pnpm과 로그인한 agent CLI가 필요합니다. 기존 Claude/Codex 로그인 재사용은 새 한도/무제한 권한이 아닙니다. README의 host-control 인증 대상은 macOS/Ubuntu Xorg이며 Windows 패키지가 Windows host-control 검증을 뜻하지 않습니다. 선택형 Boat cloud는 체험 후 유료, Composio는 별도 계정/약관입니다. 현재 Codex 채팅·관제·ProjectBridge·n8n과 겹치므로 cloud/VM/계정 연결을 늘리지 않습니다.
+## OpenMausBot · 설치했지만 정상 앱 시작은 미검증
 
-## 6. Codex: 기존 공식 환경 활용
+공식NSISpayload를 D의버전폴더에 추출한 portable 전체Electron설치(970272192bytes)입니다. SHA256/GitHubassetdigest와 SHA512/latest.yml·EXE버전 확인. unsigned이며 installer실행/uninstall등록/autostart없음. 주바로가기 `D:/A_KJ/AI/Applications/OpenMausBot/OpenMausBot.lnk`는 문서화된 process-only OMB_DATA_DIR로 정상EXE를 다음사용자수동 시작 때 여는 래퍼를 가리킵니다. D 데이터의 기존 Codex/ChatGPT-plan/gpt-6.1-sol설정은 staged·미활성이고 추가로그인이 필요할수있습니다. 래퍼정적/합성 검사 3/3일뿐 실제실행하지 않았습니다.
 
-로컬 npm README/package와 [공식 인증](https://learn.chatgpt.com/docs/auth), [가격/한도](https://learn.chatgpt.com/docs/pricing), [Windows 안내](https://learn.chatgpt.com/docs/app/windows)를 확인했습니다. ChatGPT 로그인은 요금제 한도, API key는 표준 API 과금입니다. CLI `/status`로 사용량을 볼 수 있고 무료 무제한은 아닙니다. Windows native PowerShell 사용이 가능해 새 WSL/VM을 추가할 이유가 없습니다. 최신 release와 설치 버전은 별개이며 이번 기존 0.160.1 유지입니다.
+별도 동봉CLIhelp의 상대모듈누락exit1은 특정packaging문제이며 정상 GUI/번들backend고장증거가 아닙니다. hiddenbackend시도는 도구정책에서 **실행 전에 거부**되어 실행/포트 개방/우회 재시도 없음. 정상앱 첫시작의 CUAdriver·Composio익명 설치 등록은 무단실행하지 않았습니다. 문서의host-control인증대상은 macOS/UbuntuXorg이며 Windows패키지가 Windows실제제어검증을 뜻하지 않습니다. Boat는체험후유료, Composio등은별도계정/약관입니다. cloud/OAuth/model응답은미실행입니다.
 
-## 범위·다음 단계
+## Bytebot와 Codex
 
-새 유료 API/구독/결제·autostart·보안 완화·실화면 조작 없이 작은 도구만 준비했습니다. ComfyUI는 사용자 요청으로 현재 후보/추천/설치 목록에서 제거했으며 **기존 PC 앱·모델·작업·데이터는 보존**합니다. 공개 수집 계정/복잡한 연동은 필요 시 별도 로그인·비용 확인 후에만 검토합니다. 문서/바이너리 무결성 확인은 실제 UI/업무 E2E 검증이 아닙니다.
+Bytebot는 archived이며 Ubuntu/Dockerdesktop과 자기providerAPIkey구조입니다. “No Limits”는 무료 무제한추론이 아니므로 설치하지 않았습니다. Codex는 [공식인증](https://learn.chatgpt.com/docs/auth)/[한도](https://learn.chatgpt.com/docs/pricing)/[Windows안내](https://learn.chatgpt.com/docs/app/windows)와 기존local환경을 사용하며 ChatGPT요금제한도와 API과금을 구분합니다.
 
-[현재 작은 목록](../05_도입기준/전체_도구목록.md) · [실무 순서](../../../000_사용자용/03_참고도구/AI_도구와_플러그인.md)
+## 유지한 경계
+
+새 유료 API/구독/결제·autostart·보안 완화·실화면 조작 0. 허용된변경은 실제 프로그램/Skill설치·문서 전용MCP등록이며 기존 앱 0.9.18·계정 설정·모델·자료는보존했습니다. ComfyUI는 현재목록에서만제거했고 PC앱/모델/작업/데이터삭제는하지않았습니다. **모든 설치가 E2E 검증됐거나 모든 프로젝트가 연결됐다고 표현하지 않습니다.**
+
+[현재작은목록](../05_도입기준/전체_도구목록.md) · [사진도구실행](../../../000_사용자용/02_프로그램/사진도구_설치와_실행.md)

@@ -2,7 +2,40 @@
 
 확인 **2026-11-03 KST** (PC 증거 생성 UTC 2026-11-02 16:37:01). 정책 루트 `D:/A_KJ/AI`를 유지하며 기존 안정 설치·사용자 자료는 이동/교체하지 않았습니다. 새 작은 CLI는 `Tools/<도구>/<버전>`, 사용자 입구는 `Launchers`로 분리했습니다. npm/공식 updater 환경은 기본 위치를 유지합니다.
 
-## 이번 설치와 제한된 검사
+## 최신 추가 설치 · 후속 “설치” 지시 반영
+
+이 표가 초기 조사/1차 CLI 정리 때의 미도입 상태보다 우선합니다. 설치·Codex 인식·MCP 연결·정상 앱 시작·사용자 흐름 완료를 구분합니다. [사용자 실행 안내](../000_사용자용/02_프로그램/사진도구_설치와_실행.md).
+
+| 도구 | 실제 설치/설정 | 검증 범위 |
+|---|---|---|
+| Replica Skill11개 | `C:/Users/user/.codex/skills/replica-*`; 공식 source `77c9436fb3d18c3d58169efb8caf4fe906b0dc51`, staging `D:/A_KJ/AI/Tools/replica-skill/77c9436fb3d18c3d58169efb8caf4fe906b0dc51` | 네이티브 skills/list11개 enabled/오류0. 로컬 helper 검사 18/18. 앱 복제/모델 동작 E2E 미실행 |
+| agent-desktop Windows Skill | `C:/Users/user/.codex/skills/agent-desktop-windows`; tagv1.0.2 source `a47ed664e0db00d1d4df364eb3fe8a5599882f3c` | 기존binary1.0.2 재사용, 네이티브 enabled 인식·지침/버전 확인. 화면/클립보드/입력0회 |
+| Apify MCP0.20.0 | `D:/A_KJ/AI/Tools/apify-mcp-server/0.20.0`; local lockfile+271packages; Codex MCP `apify-docs` enabled 등록 | 직접/실제PS launcher 초기화·정확히문서 도구 2개·공식 문서6,456자 조회. Actor/auth/데이터셋 수집 미실행 |
+| OpenMausBot 0.1.138 | `D:/A_KJ/AI/Applications/OpenMausBot/0.1.138/OpenMausBot.exe`; portable payload970272192bytes | 배포hash/버전/필수 entry 파일 확인. 다음 수동 시작 wrapper정적·합성3/3. 정상 GUI/로그인/모델 응답 미검증 |
+
+### Codex Skill 설치 범위
+
+Replica 11개개와 Windows 1개개를 `skills/list(forceReload)`에서 **12개 enabled/오류0**으로 확인했으며 새 턴/세션 갱신 후 선택할 수 있습니다. 공식 Skill 설치 도구로 빈 대상에 설치해 기존 항목을 덮지 않았습니다. Replica Python6개/템플릿/지침과 Windows5개지침·참고를 확인했습니다. 실제 결제/환불을 기본 요구하는 지침·권한 상승/보안 우회 조언은 제한·제거했고, 단계 전환 권고가 자동 실행 권한이 아님을 추가했습니다. 자동 model 호출·global hook·AGENTS 덮어쓰기 없음.
+
+### Apify: 문서 모드는 연결됨, Actor 모드는 인증 대기
+
+공식 `@apify/actors-mcp-server@0.20.0`을 `--ignore-scripts --no-audit --no-fund --save-exact`로 설치했습니다. lifecycle/build script0, 게시된 dist로 실행했습니다. Node24.16.0 재사용(요구>=22). tokenless **`search-apify-docs`, `fetch-apify-docs` 두 개만** 등록했습니다. root가 기존 MCP 11개와 동등한 구성을 보존하고 private backup 후 `apify-docs`를 추가했습니다. CLI 직렬화에서 default true/빈 args가 생략된 것 외 의미 차이가 없음을 확인했고 backup/비밀값은 공개 저장소에 넣지 않았습니다.
+
+Docs child는 APIFY_TOKEN을 비우고 `NoAuthHome`을 사용해 기존 CLI auth파일 자동 fallback을 막으며 telemetry/Sentry는 false입니다. stdio initialize/tools-list는 outbound 차단 guard에서0시도/exit0, 실제 PS launcher도 성공했습니다. 공식 `https://docs.apify.com/actors/running` 조회6,456자, SHA256 `3eaf92e8c2eccb457438b69008a5e2b9fd4ce5903851e3eddb196c09101e738d`. 첫 구형URL의301은 테스트 guard가 막았으며 같은 공식 host의 canonical 경로를 확인해 성공했습니다. Actor/데이터셋/유료 model 호출0. Discovery는 세션APIFY_TOKEN 없으면 launcher exit3; default Actor server는 missing-auth exit1로 종료합니다. account/OAuth/결제 없이 임의 수집을 켜지 않았습니다.
+
+수동 입구 `D:/A_KJ/AI/Tools/apify-mcp-server/0.20.0/Start-ApifyMcp.cmd`와 `Launch-ApifyMcp.ps1` 기본은 Docs stdio입니다. 인증 Discovery 예제는 disabled template으로 남겼고 call-actor를 노출하지 않습니다. registry tarball SHA512 metadata 대조/lockfile 고정은 했지만 독립 공급망 보증·취약점 전체 감사는 아닙니다.
+
+### OpenMausBot: 프로그램 설치와 미실행 경계
+
+공식 NSIS의 app-64.7z를 기존7-Zip으로 추출한 **실제 portable Electron 전체 파일 설치**입니다. installer 실행·uninstall 등록·로그인 시작은 없었습니다. 공식 installer SHA256 `40cf0100333d012a5b5766a6f35a24fcc637ff24320ff0e09d59b02bc9b7ed44`는 GitHub assetdigest, SHA512는 latest.yml과 대조했습니다. EXE SHA256 `4350b98e165e2269a01148b6b9baf6f4ad0152abb8dd66a872706e037b00cf67`; FileVersion0.1.138/ProductVersion0.1.138.0. unsigned이며 보안 설정을 낮추지 않았습니다.
+
+주 입구 `D:/A_KJ/AI/Applications/OpenMausBot/OpenMausBot.lnk` → `OpenMausBot_D-data.vbs`는 문서화된 process-only `OMB_DATA_DIR=D:/A_KJ/AI/Applications/OpenMausBot/data`로 정상EXE를 다음 사용자 수동 시작 때 열도록 준비했습니다. staged config의 기존 `C:/Users/user/AppData/Roaming/npm/codex.cmd`/ChatGPT-plan/`gpt-6.1-sol`, automaticRecovery/cacheKeepWarm=false는 **미활성·미인증**입니다. credentials 복사 없음. 별도 직접실행 링크는 vendor 기본 데이터 경로를 쓰므로 구분합니다.
+
+별도 동봉 CLI help는 상대 모듈 누락으로 exit1이었으며 정상 GUI/번들 backend 고장으로 확대하지 않습니다. 안전한 hidden backend 실행 시도는 도구 정책에서 **CreateProcess 전에 거부**되어 실행/포트개방/재시도 없었습니다. 그 거부를 우회하려 래퍼를 실행하지 않았습니다. 정상 GUI·CUA·화면·로그인·모델 응답은 모두 미실행. 정상 첫 실행은 CUA driver·Composio 익명 설치등록을 시작할 수 있어 별도 확인이 필요합니다. Boat/Composio OAuth·계정/결제 생성 없음.
+
+공식 출처: [Replica 고정source](https://github.com/Jakeschincariol/replica-skill/tree/77c9436fb3d18c3d58169efb8caf4fe906b0dc51), [Windows Skill tag](https://github.com/vercel-labs/agent-desktop/tree/v1.0.2/skills/agent-desktop-windows), [Apify 0.20.0](https://github.com/apify/apify-mcp-server/releases/tag/v0.20.0), [OpenMaus0.1.138](https://github.com/milind-soni/OpenMausBot/releases/tag/v0.1.138). 같은 발행처 hash 일치는 독립 출처 보증이 아닙니다.
+
+## 1차 설치와 제한된 검사 · 초기 CLI 정리
 
 | 도구 | 버전/실제 위치 | 확인 결과 |
 |---|---|---|
@@ -43,11 +76,11 @@
 
 ## 재사용한 환경
 
-Codex0.160.1, Git2.50.0.windows.1, gh2.100.0, Node24.16.0/npm11.13.0, rg15.2.0, uv0.12.13, .NET SDK9.0.306, Python `py -3.13` (`C:/TempPy13/python.exe`), 기존 Python Playwright1.63.0/npm Playwright MCP0.0.80/Chromium cache1234를 확인·재사용했습니다. fd/Gitleaks도 기존 PATH에서 발견해 재설치하지 않았으며 이번 전체 기능 재검증은 아닙니다. Codex 업그레이드 없음.
+Codex 0.160.1, Git2.50.0.windows.1, gh2.100.0, Node24.16.0/npm11.13.0, rg15.2.0, uv0.12.13, .NET SDK9.0.306, Python `py -3.13` (`C:/TempPy13/python.exe`), 기존 Python Playwright1.63.0/npm Playwright MCP0.0.80/Chromium cache1234를 확인·재사용했습니다. fd/Gitleaks도 기존 PATH에서 발견해 재설치하지 않았으며 이번 전체 기능 재검증은 아닙니다. Codex 업그레이드 없음.
 
-## 변경하지 않은 것
+## 1차 안전 경계와 후속 변경 구분
 
-새 결제·구독·유료 모델 호출 **0**, 실화면 동작 **0**. global PATH/module/profile·ExecutionPolicy·repo trust·autostart 변경 없음. 기존 앱 교체·서비스 종료·재부팅 없음. optional agent-desktop skills/integration 추가 없음. 현재 PC 연결은 ProjectBridge 경로이며 원격 연결을 임의 종료하지 않습니다. 옛 2분 예약/승인 생략 실행기·구형 shared-PC installer/updater를 활성화하지 않았습니다.
+새 결제·구독·유료 모델 호출 **0**, 실화면 동작 **0**. global PATH/module/profile·ExecutionPolicy·repo trust·autostart 변경 없음. 후속 허용 변경은 사용자 Skill12개와 Codex apify-docs MCP 추가이며 기존 MCP는 보존했습니다. 기존 앱 교체·서비스 종료·재부팅 없음. 초기1차에는 optional Skill/MCP를 추가하지 않았으나 후속 지시로 위의 Skill12개와 Apify Docs MCP를 실제 추가했습니다.  현재 PC 연결은 ProjectBridge 경로이며 원격 연결을 임의 종료하지 않습니다. 옛 2분 예약/승인 생략 실행기·구형 shared-PC installer/updater를 활성화하지 않았습니다.
 
 ## 이전 프로젝트별 설치 관찰 (이번 재실행/현재 버전 검증 아님)
 | Tool | Version | Current / Target | 상태/이유 |
