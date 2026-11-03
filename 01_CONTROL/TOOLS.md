@@ -15,6 +15,10 @@
 | n8n | PROJECT · 기존 로컬 흐름 | 실제 반복 workflow에 한정. 과거 localhost bridge 검증 ≠ 현재 health/workflow 성공 |
 | Supabase · Drive/OAuth · SDK/Blender 연동 | PROJECT · 대상별 | 실제 해당 프로젝트에서 필요·연결이 확인된 경우만 |
 
+## 별도 추가 사진 · T3 Code
+
+**T3 Code 0.1.6 Windows CLI/desktop 실제 설치**. 기존 Codex 0.160.1은 공식 최소 0.156/권장 0.159이상 조건에 맞고 업그레이드하지 않았습니다. CLI 서명·hash/버전·help는 확인했습니다. Supervised/`gpt-6.1-sol` 설정은 다음 수동 시작용으로 준비했지만 **서버 시작이 도구 정책에서 실행 전에 거부되어 runtime/Codex 인증/모델/GUI/폰 연결은 미검증**입니다. 정확한 거부규칙은 미제공, malware/UAC/AV판정 아님. 기존 도구 대체/자동승인/새서비스로 채택하지 않습니다. [실행 입구와 한계](../000_사용자용/02_프로그램/T3_Code_설치와_사용.md).
+
 ## 후속 지시로 실제 추가한 사진 속 도구
 
 사용자의 후속 **설치 지시**를 반영했습니다. 이전 선별 조사에서의 “Replica 참고만/Apify 미연결/OpenMaus 미도입”은 이 상태로 대체합니다.

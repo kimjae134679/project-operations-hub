@@ -2,7 +2,24 @@
 
 확인 **2026-11-03 KST** (PC 증거 생성 UTC 2026-11-02 16:37:01). 정책 루트 `D:/A_KJ/AI`를 유지하며 기존 안정 설치·사용자 자료는 이동/교체하지 않았습니다. 새 작은 CLI는 `Tools/<도구>/<버전>`, 사용자 입구는 `Launchers`로 분리했습니다. npm/공식 updater 환경은 기본 위치를 유지합니다.
 
-## 최신 추가 설치 · 후속 “설치” 지시 반영
+## 최신 추가 도구 · T3 Code 0.1.6 (이전 사진7장과 별개)
+
+새 이미지의 공식 `pingdotgg/t3code`를 검토하고 Windows CLI와 데스크톱 프로그램을 실제 설치했습니다. 고정source `2359643cffa6ba9ee84d6f2694b935de54a8013e`/tagv0.1.6, MIT. [공식 release](https://github.com/pingdotgg/t3code/releases/tag/v0.1.6) · [한글 실행/거부사유 안내](../000_사용자용/02_프로그램/T3_Code_설치와_사용.md).
+
+- CLI: `D:/A_KJ/AI/Applications/T3Code/cli/0.1.6/t3-0.1.6-win32-x64/t3.exe`. 공식 WindowsZIP SHA256 `486604df780a72273fac94506e21edda6cab762cd4417393007c2953a44e609f`를 [SHA256SUMS](https://github.com/pingdotgg/t3code/releases/download/v0.1.6/SHA256SUMS)/assetdigest와 대조. EXE SHA256 `00144af15877882de94dc6eb431c63c40d6e6af54d543abd2ba40dbadbdd5010`, Authenticode **Valid/T3 Tools Inc**. 실제 hidden `--version`=`t3 v0.1.6`/`--help` exit0.
+- GUI: `D:/A_KJ/AI/Applications/T3Code/desktop/0.1.6/T3 Code (Beta).exe`, FileVersion0.1.6, AuthenticodeValid. 공식 [Windows NSIS](https://github.com/pingdotgg/t3code/releases/download/v0.1.6/T3-Code-0.1.6-x64.exe) SHA256 `8cff5c90fdc976c0bdef86074a8cde9c3784af8de2091759514cd9f8f1457405`와 GitHubdigest/SHA512latest.yml을 대조했습니다. 전체 payload53개 파일/704710031 bytes를 기존7-Zip으로 추출했고 installer·GUI는 실행하지 않았습니다. 이름이 비슷한 macOS x64ZIP은 쓰지 않았습니다.
+- 수동 입구: `D:/A_KJ/AI/Applications/T3Code/T3Code.lnk`/`T3Code.vbs`, `T3Code_CLI.lnk`/`T3Code_CLI.vbs`. 전용 D 데이터를 고르는 준비물이며 **미실행**입니다. 기존 거부를 우회하려 실행하지 않았습니다.
+- staged 설정: `D:/A_KJ/AI/Applications/T3Code/data/userdata/settings.json`. 공식 초기 Full access 대신 **defaultRuntimeMode=approval-required(Supervised)**, 기본/텍스트모델 `gpt-6.1-sol`/codex, fallback=null, 기존 native Codex 경로/HOME을 준비했습니다. 기존 인증 복사/새 thread/model호출0. source-schema/정적 검사만이며 실제 T3 runtime readback은 없습니다. `status --json`의 CLI 설정 출력은 provider연결/서버권한 적용 확인이 아닙니다.
+- Codex 호환: [공식 고정 manifest](https://github.com/pingdotgg/t3code/blob/v0.1.6/apps/server/src/provider/model-manifest.json)의 최소 0.156.0/권장 0.159.0이상에 기존 0.160.1이 맞습니다. **버전 조건 적합이지 T3의 실제provider인증/모델 응답 성공이 아닙니다.**
+- 실행 제한: 일반 공식 `serve --host127.0.0.1 --port37731 --base-dir<전용D> --no-browser` 시작은 execution tool이 **CreateProcess 전에 거부**했습니다. PID/포트/서버 health/인증/GUI/폰 연결 없음, 다른 경로 재시도 없음. 다운로드만 하려던 install.ps1 검사도 거부돼 다른 방식으로 그 스크립트를 가져오지 않았습니다. 별도 사전선택한 공식 portable 설치와 구분합니다.
+
+수동 래퍼는 process-only `T3CODE_TELEMETRY_ENABLED=false`, `OTEL_SDK_DISABLED=true`를 설정하도록 준비했고 source/정적·합성 검사 **3/3**을 통과했습니다. ClaudeAgent 기본 항목은 명시적으로 disabled하여 Codex-only 구성을 준비했습니다. wrapper/설정은 실제로 실행·readback하지 않았습니다. 최종 SHA256: GUI wrapper `f0543489f525d45a901794605b932f6c8ae987ffcfa49a0e6c167bc41ec008a8`, CLI wrapper `b7a5b1c8f5e110117e8844e9a22b226e3deb3ce5745c161a7549f1c0a34cd4ba`, 전용 settings `97c008314a18d5aaee8a9df01b53b6cbfba329cda56c67b09ad7aba6db92d719`.
+
+읽기 전용 `t3 status --json --base-dir <전용D>` exit0에서 serviceInstalled=false/connectEnabled=false/lanEnabled=false를 확인했습니다. 이 명령은 DB/연결 검사를 하지 않는 CLI 설정 조회이며 **서버 health·Supervised/model설정 적용·Codexprovider 감지/인증·모델 가용성의 증거가 아닙니다**. raw 출력/연결 정보는 비공개로 보존했습니다.
+
+정확한 내부 거부 규칙은 미제공이며 malware/UAC/AV 판정은 관찰되지 않았습니다. 서명·hash확인은 손상/발행자 확인이지 전체 안전·동작보증이 아닙니다. 전역 CLI/Node/서비스/autostart/firewall/tunnel/보안 정책·키/계정/결제 변경과 model호출0. `t3 doctor`는 DB유지보수 명령으로 health검사에 쓰지 않았습니다.
+
+## 이전 추가 설치 · 후속 “설치” 지시 반영
 
 이 표가 초기 조사/1차 CLI 정리 때의 미도입 상태보다 우선합니다. 설치·Codex 인식·MCP 연결·정상 앱 시작·사용자 흐름 완료를 구분합니다. [사용자 실행 안내](../000_사용자용/02_프로그램/사진도구_설치와_실행.md).
 
@@ -19,7 +36,7 @@ Replica 11개개와 Windows 1개개를 `skills/list(forceReload)`에서 **12개 
 
 ### Apify: 문서 모드는 연결됨, Actor 모드는 인증 대기
 
-공식 `@apify/actors-mcp-server@0.20.0`을 `--ignore-scripts --no-audit --no-fund --save-exact`로 설치했습니다. lifecycle/build script0, 게시된 dist로 실행했습니다. Node24.16.0 재사용(요구>=22). tokenless **`search-apify-docs`, `fetch-apify-docs` 두 개만** 등록했습니다. root가 기존 MCP 11개와 동등한 구성을 보존하고 private backup 후 `apify-docs`를 추가했습니다. CLI 직렬화에서 default true/빈 args가 생략된 것 외 의미 차이가 없음을 확인했고 backup/비밀값은 공개 저장소에 넣지 않았습니다.
+공식 `@apify/actors-mcp-server@0.20.0`을 `--ignore-scripts --no-audit --no-fund --save-exact`로 설치했습니다. lifecycle/build script0, 게시된 dist로 실행했습니다. Node 24.16.0 재사용(요구>=22). tokenless **`search-apify-docs`, `fetch-apify-docs` 두 개만** 등록했습니다. root가 기존 MCP 11개와 동등한 구성을 보존하고 private backup 후 `apify-docs`를 추가했습니다. CLI 직렬화에서 default true/빈 args가 생략된 것 외 의미 차이가 없음을 확인했고 backup/비밀값은 공개 저장소에 넣지 않았습니다.
 
 Docs child는 APIFY_TOKEN을 비우고 `NoAuthHome`을 사용해 기존 CLI auth파일 자동 fallback을 막으며 telemetry/Sentry는 false입니다. stdio initialize/tools-list는 outbound 차단 guard에서0시도/exit0, 실제 PS launcher도 성공했습니다. 공식 `https://docs.apify.com/actors/running` 조회6,456자, SHA256 `3eaf92e8c2eccb457438b69008a5e2b9fd4ce5903851e3eddb196c09101e738d`. 첫 구형URL의301은 테스트 guard가 막았으며 같은 공식 host의 canonical 경로를 확인해 성공했습니다. Actor/데이터셋/유료 model 호출0. Discovery는 세션APIFY_TOKEN 없으면 launcher exit3; default Actor server는 missing-auth exit1로 종료합니다. account/OAuth/결제 없이 임의 수집을 켜지 않았습니다.
 
@@ -76,7 +93,7 @@ Docs child는 APIFY_TOKEN을 비우고 `NoAuthHome`을 사용해 기존 CLI auth
 
 ## 재사용한 환경
 
-Codex 0.160.1, Git2.50.0.windows.1, gh2.100.0, Node24.16.0/npm11.13.0, rg15.2.0, uv0.12.13, .NET SDK9.0.306, Python `py -3.13` (`C:/TempPy13/python.exe`), 기존 Python Playwright1.63.0/npm Playwright MCP0.0.80/Chromium cache1234를 확인·재사용했습니다. fd/Gitleaks도 기존 PATH에서 발견해 재설치하지 않았으며 이번 전체 기능 재검증은 아닙니다. Codex 업그레이드 없음.
+Codex 0.160.1, Git2.50.0.windows.1, gh2.100.0, Node 24.16.0/npm11.13.0, rg15.2.0, uv0.12.13, .NET SDK9.0.306, Python `py -3.13` (`C:/TempPy13/python.exe`), 기존 Python Playwright1.63.0/npm Playwright MCP0.0.80/Chromium cache1234를 확인·재사용했습니다. fd/Gitleaks도 기존 PATH에서 발견해 재설치하지 않았으며 이번 전체 기능 재검증은 아닙니다. Codex 업그레이드 없음.
 
 ## 1차 안전 경계와 후속 변경 구분
 

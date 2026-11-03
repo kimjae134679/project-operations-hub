@@ -2,7 +2,13 @@
 
 공식 확인/후속 설치 **2026-11-03 KST**. 이미지2·6은 같은 도구입니다. 스크린샷 자체는 외부 참고자료이며, **후속 사용자 설치 지시**로 실제 설치를 진행했습니다. [사용자 실행 입구](../../../000_사용자용/02_프로그램/사진도구_설치와_실행.md) · [설치 원본](../../../01_CONTROL/AI_INSTALLATIONS.md).
 
-## 최신 실제 상태
+## 별도 새 이미지 · T3 Code (앞선7장/6저장소와 합산하지 않음)
+
+새로 전달된 [pingdotgg/t3code v0.1.6](https://github.com/pingdotgg/t3code/releases/tag/v0.1.6)은 Codex를 지원하는 별도 Agent관리면입니다. [고정 호환manifest](https://github.com/pingdotgg/t3code/blob/v0.1.6/apps/server/src/provider/model-manifest.json)의 최소 0.156/권장 0.159이상에 현재0.160.1이 맞습니다. 공식 signed WindowsCLI/NSISpayload로 CLI·GUI파일을 설치했고 CLI버전/help exit0. 스크린샷의 비슷한 x64ZIP은 macOS용이라 사용하지 않았습니다.
+
+공식 초기 Full access를 그대로 쓰지 않고 Supervised/`gpt-6.1-sol`을 offline설정에 준비했으나 **서버 시작이 도구 정책에서 실행 전에 거부**됐습니다. 서버 health/T3 provider 인증/모델 응답/GUI/폰 연결을 확인하지 못했고 우회·다른 실행 경로 재시도 없음. 이것은 malware/UAC/AV판정이 아니며 정확한 내부규칙은 미제공입니다. [한글 안내/설치 증거/원격·비용 경계](../../../000_사용자용/02_프로그램/T3_Code_설치와_사용.md)를 따릅니다. 아래 표는 기존7장만의 상태를 보존합니다.
+
+## 이전7장 · 최신 실제 상태
 
 | 사진 | 공식 원본·버전·라이선스 | 설치/검증 상태 |
 |---|---|---|
@@ -27,7 +33,7 @@ Windows Skill은 [v1.0.2 고정지침](https://github.com/vercel-labs/agent-desk
 
 ## Apify · 문서 연결과 Actor 인증을 분리
 
-npm실명 `@apify/actors-mcp-server@0.20.0`을 D의 독립runtime에 lockfile과 설치했습니다. Node24.16.0재사용(요구>=22), npm `--ignore-scripts`로 lifecycle0, 게시dist로 시작했습니다. root가 기존MCP 11개와 동등한 설정을 보존/비공개백업한 뒤 **apify-docs**를 추가했습니다. 공개repo에 개인config/backup/키값 없음.
+npm실명 `@apify/actors-mcp-server@0.20.0`을 D의 독립runtime에 lockfile과 설치했습니다. Node 24.16.0재사용(요구>=22), npm `--ignore-scripts`로 lifecycle0, 게시dist로 시작했습니다. root가 기존MCP 11개와 동등한 설정을 보존/비공개백업한 뒤 **apify-docs**를 추가했습니다. 공개repo에 개인config/backup/키값 없음.
 
 Docs는 APIFY_TOKEN을 비우고 NoAuthHome으로 기존CLI인증파일 fallback을 막으며 telemetry/Sentryoff입니다. 네트워크차단하 stdioinitialize/tools-list 성공, 도구는 `search-apify-docs`, `fetch-apify-docs`뿐입니다. 공식 [실행문서](https://docs.apify.com/actors/running)6456자 실제조회 성공. 구형/platform주소301을 guard가 막았으나 같은 공식 host의 canonical경로로 승인된조회에 성공했습니다. Actor/cloudcompute/dataset호출0입니다.
 
@@ -37,7 +43,7 @@ Docs는 APIFY_TOKEN을 비우고 NoAuthHome으로 기존CLI인증파일 fallback
 
 공식NSISpayload를 D의버전폴더에 추출한 portable 전체Electron설치(970272192bytes)입니다. SHA256/GitHubassetdigest와 SHA512/latest.yml·EXE버전 확인. unsigned이며 installer실행/uninstall등록/autostart없음. 주바로가기 `D:/A_KJ/AI/Applications/OpenMausBot/OpenMausBot.lnk`는 문서화된 process-only OMB_DATA_DIR로 정상EXE를 다음사용자수동 시작 때 여는 래퍼를 가리킵니다. D 데이터의 기존 Codex/ChatGPT-plan/gpt-6.1-sol설정은 staged·미활성이고 추가로그인이 필요할수있습니다. 래퍼정적/합성 검사 3/3일뿐 실제실행하지 않았습니다.
 
-별도 동봉CLIhelp의 상대모듈누락exit1은 특정packaging문제이며 정상 GUI/번들backend고장증거가 아닙니다. hiddenbackend시도는 도구정책에서 **실행 전에 거부**되어 실행/포트 개방/우회 재시도 없음. 정상앱 첫시작의 CUAdriver·Composio익명 설치 등록은 무단실행하지 않았습니다. 문서의host-control인증대상은 macOS/UbuntuXorg이며 Windows패키지가 Windows실제제어검증을 뜻하지 않습니다. Boat는체험후유료, Composio등은별도계정/약관입니다. cloud/OAuth/model응답은미실행입니다.
+별도 동봉CLIhelp의 상대모듈누락exit1은 특정packaging문제이며 정상 GUI/번들backend고장증거가 아닙니다. hiddenbackend시도는 도구 정책에서 **실행 전에 거부**되어 실행/포트 개방/우회 재시도 없음. 정상앱 첫시작의 CUAdriver·Composio익명 설치 등록은 무단실행하지 않았습니다. 문서의host-control인증대상은 macOS/UbuntuXorg이며 Windows패키지가 Windows실제제어검증을 뜻하지 않습니다. Boat는체험후유료, Composio등은별도계정/약관입니다. cloud/OAuth/model응답은미실행입니다.
 
 ## Bytebot와 Codex
 
