@@ -154,3 +154,9 @@ SceneAI와 비슷하게 설치형 개발도구라기보다 **AI가 만든 웹이
 ### 알아둘 점
 무료와 Premium 템플릿이 섞여 있고 사이트는 one-time lifetime access 상품도 판매합니다.
 시각적으로 멋진 scroll effect가 UX를 자동으로 좋게 만드는 것은 아니므로 장식보다 사용성/성능을 우선합니다.
+
+## 6. COREVIS Library
+
+- [COREVIS Library 한국어](https://lib.corevisos.com/ko/) — 웹 UI·모션 코드, SVG 아이콘, 영상 프롬프트, 일부 3D 파일을 찾는 자료실.
+- 우선 참고할 분야는 [UI](https://lib.corevisos.com/ko/c/ui/)·[모션](https://lib.corevisos.com/ko/c/motion/)·[아이콘](https://lib.corevisos.com/ko/c/icon/). 게임 이펙트의 도트 시안은 공통 시각 선호에 따라 기본 후보에서 제외하고, 필요한 경우 연출 동작만 참고.
+- 공개 페이지와 예시 확인. 프로젝트 적용 및 실제 파일 가져오기 검증은 미실행. 직접 다운로드 무료 범위와 유료 MCP는 구분. 자료별 [라이선스](https://lib.corevisos.com/ko/license/)와 [이용 범위](https://lib.corevisos.com/ko/card/) 확인.
