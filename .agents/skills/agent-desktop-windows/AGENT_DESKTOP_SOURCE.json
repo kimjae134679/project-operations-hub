@@ -1,0 +1,51 @@
+{
+  "repository": "https://github.com/vercel-labs/agent-desktop",
+  "tag": "v1.0.2",
+  "commit": "a47ed664e0db00d1d4df364eb3fe8a5599882f3c",
+  "path": "skills/agent-desktop-windows",
+  "license": "Apache-2.0",
+  "binary": "<verified-agent-desktop-binary>",
+  "upstreamFiles": [
+    {
+      "path": "SKILL.md",
+      "sha256": "e5de7258fa63ce082d7c4b822e7330f7a07d5d53ee368e76c87038e96ca694dd"
+    },
+    {
+      "path": "references/chromium-and-electron.md",
+      "sha256": "a636cf25a52bd25abe287f714137dfb6e77b6604ca4101965e67e71a2b5d4718"
+    },
+    {
+      "path": "references/permissions-and-elevation.md",
+      "sha256": "1ae422d682a4ed48025b5f17c2ce8a37e830b8d86b0a18f3f4d725fc74ada733"
+    },
+    {
+      "path": "references/shell-and-overlay.md",
+      "sha256": "d53fc399a168165b09fb930b9f525228c0d46bcad0aa9cc8af775cc01d18898f"
+    },
+    {
+      "path": "references/troubleshooting.md",
+      "sha256": "8f6115c920495f84f7ef866750d50e789c3a9efac84ed7b4c337f1e116ecc923"
+    }
+  ],
+  "adaptations": [
+    "SKILL.md: scoped permissions, absolute binary, native frontmatter, blocked-shortcut no-bypass",
+    "permissions: replaced escalation and force-override advice with stop/report",
+    "troubleshooting: removed Run-anyway/AV-restore-allowlist/SmartAppControl-disable advice",
+    "SKILL.md: bind verified local nofocus variant by absolute path/hash, retain original and permission boundaries; scoped foreground evidence not universal guarantee",
+    "Public export: PC-specific paths generalized; no executable, credential, account configuration or local provenance payload distributed."
+  ],
+  "excludedRootContent": [
+    "All other skills,plugins,hooks,harness/config files"
+  ],
+  "localPatch": {
+    "variant": "1.0.2-local.nofocus.1",
+    "officialUpstreamRelease": false,
+    "sha256": "5d097726cac87ce6f4779129e76064d423c39ac11cffcd7b8030eb51006c8933",
+    "originalBinary": "<retained-original-binary>",
+    "originalSha256": "409e58cbdd6aed47e29771ffa60bc122a9843505a227af488cded85215943988",
+    "provenance": "Retained in the local installation; not included in this public source export.",
+    "change": "SetAutoSetFocus(false) on UIA client with error propagation; no OS/global COM/security policy change",
+    "verificationScope": "Real COM getter RED to GREEN; focused regression10 PASS; fresh owned Korean SetValue+Invoke result with foreground false and zero Activated/GotFocus events; exact owned cleanup PASS",
+    "limitations": "Not an all-app/provider/command guarantee; version reports upstream1.0.2; denied apps not retried"
+  }
+}

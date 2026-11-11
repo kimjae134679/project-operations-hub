@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/obra/superpowers",
+  "upstreamSkill": "skills/systematic-debugging",
+  "license": "MIT",
+  "licenseSource": "https://raw.githubusercontent.com/obra/superpowers/main/LICENSE",
+  "installedRevision": "unrecorded",
+  "notice": "Derived installed skill; exact installed upstream commit was not recorded. No commit is invented. The public export may contain scoped local adaptations.",
+  "localAdaptations": [
+    "Current host authorization and permitted tools remain authoritative.",
+    "No mandatory invocation of separately archived TDD/SDD/review workflows."
+  ]
+}

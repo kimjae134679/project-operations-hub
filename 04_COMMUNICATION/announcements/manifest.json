@@ -213,15 +213,17 @@
     },
     {
       "id": "N-0006",
-      "revision": 1,
+      "revision": 2,
       "title": "멀티의 신 서버 연결과 운영 구분",
       "path": "notices/N-0006.md",
       "targets": [
-        "*"
+        "PhoneLOL",
+        "PhoneLOL-Server",
+        "Control-Tower"
       ],
       "required": true,
       "active": true,
-      "contentSha256": "394fca842722c639b3d995a862b4c4d5e259a3949dd04f596f70fd9385d4674d"
+      "contentSha256": "80b05ed805641b3e8fc06ccc1f33b287a56c999ce2b9e8d5f2de8d1104d242cf"
     },
     {
       "id": "N-0007",

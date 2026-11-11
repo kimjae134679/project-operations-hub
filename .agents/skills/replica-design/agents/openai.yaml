@@ -1,0 +1,7 @@
+interface:
+  display_name: "앱 재현 디자인 설계"
+  short_description: "기존 앱 재현을 요청한 작업에서만 재현 앱의 색·간격·구성 요소 설계을 진행합니다."
+  default_prompt: "$replica-design으로 승인된 앱 재현 작업의 재현 앱의 색·간격·구성 요소 설계을 진행해줘."
+
+policy:
+  allow_implicit_invocation: true

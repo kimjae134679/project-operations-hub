@@ -1,0 +1,124 @@
+{
+  "repo": "https://github.com/heydamir/unslop",
+  "commit": "97daa3eb365670ea3f87ed85356cbfcee18105a5",
+  "author": "Damir Sokolovsky (@heydamir)",
+  "license": "CC-BY-4.0",
+  "upstream_file_count": 14,
+  "upstream": [
+    {
+      "path": "SKILL.md",
+      "upstream_git_blob_sha1": "e743184011b0fbde978d88d04340ae12dc355997",
+      "upstream_sha256": "19afd7f1841316ddff3f854ea8ead675c738e08b30c41e51a8f1822fa0111947",
+      "installed_sha256": "2c5496ab0dae229305415a6981d19568777ec2d8245733e6932856d4e58f9f4f",
+      "unchanged": false
+    },
+    {
+      "path": "agents/openai.yaml",
+      "upstream_git_blob_sha1": "cfecf69e9d784ae3b2edee8efc4a20eb4eb89370",
+      "upstream_sha256": "170d0b33a418d9d82beb7d15f8a91e314adef2edf53a81c37155b6f40dd52f06",
+      "installed_sha256": "170d0b33a418d9d82beb7d15f8a91e314adef2edf53a81c37155b6f40dd52f06",
+      "unchanged": true
+    },
+    {
+      "path": "references/effects.md",
+      "upstream_git_blob_sha1": "621f8ec43153d396d7e2cd7c4309a00d4aa27d32",
+      "upstream_sha256": "ded4f679e22843a8f68860e6cda0396fa8b8fa27202400e08337143b485c86a4",
+      "installed_sha256": "ded4f679e22843a8f68860e6cda0396fa8b8fa27202400e08337143b485c86a4",
+      "unchanged": true
+    },
+    {
+      "path": "references/refs.md",
+      "upstream_git_blob_sha1": "e6c23aa433b9ef191a75f16a65ce1b4b1a2a8505",
+      "upstream_sha256": "12a70ce17d574914ea69eb0809e5a9605de044df1b66619159c6d0b38d6b8353",
+      "installed_sha256": "12a70ce17d574914ea69eb0809e5a9605de044df1b66619159c6d0b38d6b8353",
+      "unchanged": true
+    },
+    {
+      "path": "references/refs/beacon-engraving.webp",
+      "upstream_git_blob_sha1": "cf8af41fa080808a3f715e8f3d7d58ea789abd1e",
+      "upstream_sha256": "44e7680e9c944f03c8fe45df999bdf74077a106925a8189eebf89e751e306e5b",
+      "installed_sha256": "44e7680e9c944f03c8fe45df999bdf74077a106925a8189eebf89e751e306e5b",
+      "unchanged": true
+    },
+    {
+      "path": "references/refs/meadow-3d.webp",
+      "upstream_git_blob_sha1": "d8284c8d16fb3fd5f4436adbb04e8119819e36f1",
+      "upstream_sha256": "84f526b68021a06fc6d32f162406fab6cc8074da1ef76d2ae4530e1b58219b14",
+      "installed_sha256": "84f526b68021a06fc6d32f162406fab6cc8074da1ef76d2ae4530e1b58219b14",
+      "unchanged": true
+    },
+    {
+      "path": "references/refs/story-dashboard-frames.webp",
+      "upstream_git_blob_sha1": "b9a08721f366269b234727d4f6eddc403a85fc21",
+      "upstream_sha256": "cfbf837e40b7626d5a5789dbce54f5c197aab303aa350d13a042048310717137",
+      "installed_sha256": "cfbf837e40b7626d5a5789dbce54f5c197aab303aa350d13a042048310717137",
+      "unchanged": true
+    },
+    {
+      "path": "references/refs/unslop-dashboard-after.webp",
+      "upstream_git_blob_sha1": "9836639938830aac335963b8d1536178bc107fce",
+      "upstream_sha256": "48067794f86b43dab20515b3810f245d67bff05d10bfa83c0f5885bee93cea52",
+      "installed_sha256": "48067794f86b43dab20515b3810f245d67bff05d10bfa83c0f5885bee93cea52",
+      "unchanged": true
+    },
+    {
+      "path": "references/refs/unslop-hero-after.webp",
+      "upstream_git_blob_sha1": "ad9059318bd3ca85b008a622090f495ad42cf12e",
+      "upstream_sha256": "92b2d796c5b6116a2039f5ca2b0f3edf700c92b41846b11b9501a4e32f72af6e",
+      "installed_sha256": "92b2d796c5b6116a2039f5ca2b0f3edf700c92b41846b11b9501a4e32f72af6e",
+      "unchanged": true
+    },
+    {
+      "path": "references/signs.md",
+      "upstream_git_blob_sha1": "e9bae0369394d56ed080ef8a7e3d15bd4ec70a7f",
+      "upstream_sha256": "6250d3c222c2aaa4ef4f31557d99d249e5be86d8720cd1157df14798caf1c8c4",
+      "installed_sha256": "6250d3c222c2aaa4ef4f31557d99d249e5be86d8720cd1157df14798caf1c8c4",
+      "unchanged": true
+    },
+    {
+      "path": "references/tokens.md",
+      "upstream_git_blob_sha1": "431cdc3f68650819274b22b91df9764d8f0a64d6",
+      "upstream_sha256": "988b754612b3e2d42d87b1bbaca0b4a61f3e07a2b2eef782d3614e8fdb6db5b0",
+      "installed_sha256": "988b754612b3e2d42d87b1bbaca0b4a61f3e07a2b2eef782d3614e8fdb6db5b0",
+      "unchanged": true
+    },
+    {
+      "path": "references/visuals.md",
+      "upstream_git_blob_sha1": "d7e89c14ddc675def22a46435ef1f2053d8d9362",
+      "upstream_sha256": "7247da579d2d95ace1e051b867c757bd1e05aa02f3ab8dea0ead4cd4bf14d7d7",
+      "installed_sha256": "7247da579d2d95ace1e051b867c757bd1e05aa02f3ab8dea0ead4cd4bf14d7d7",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/snapshot.mjs",
+      "upstream_git_blob_sha1": "ef226aa4650fb84d238d434035d73606abdcb88a",
+      "upstream_sha256": "4b0c3639bd1c052fa1968c4bbe1b17acb5b108fd22ec70518628d9a4dbd5d6fa",
+      "installed_sha256": "4b0c3639bd1c052fa1968c4bbe1b17acb5b108fd22ec70518628d9a4dbd5d6fa",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/story.mjs",
+      "upstream_git_blob_sha1": "a9565db068e28d9d9a89309898da00b66654b719",
+      "upstream_sha256": "daef4d8eceb267535ef8db9964519154183234715a86bc2aa888ede0bd82ee72",
+      "installed_sha256": "daef4d8eceb267535ef8db9964519154183234715a86bc2aa888ede0bd82ee72",
+      "unchanged": true
+    }
+  ],
+  "added_files": [
+    {
+      "path": "LICENSE",
+      "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+    },
+    {
+      "path": "CITATION.cff",
+      "sha256": "05a1d33a8c94660a6240afa2adf2e0331abeccf178bf00827b8ebd7a4796fb11"
+    },
+    {
+      "path": "PROVENANCE.md",
+      "sha256": "0f2f9dcae6bb59e46604d260546db72bfe6a766f559e952c56d048569d6af23d"
+    }
+  ],
+  "local_modified": [
+    "SKILL.md"
+  ]
+}
