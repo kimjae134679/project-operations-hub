@@ -1,0 +1,1155 @@
+{
+  "date": "2026-11-12",
+  "sourceRemoteCommit": "b9ce237209a2fb0207914a7a30943983dc3e8e13",
+  "scope": "15 selected skills plus portable current rules and source-distinguished historical explanations",
+  "skillCount": 15,
+  "coreSkills": [
+    "agent-desktop-windows",
+    "systematic-debugging",
+    "verification-before-completion",
+    "unslop"
+  ],
+  "replicaSkills": [
+    "replica-architect",
+    "replica-backend",
+    "replica-brand",
+    "replica-build",
+    "replica-deploy",
+    "replica-design",
+    "replica-diff",
+    "replica-entrepreneur",
+    "replica-launch",
+    "replica-recon",
+    "replica-test"
+  ],
+  "implicitReplicaScope": "existing-app recreation context only; no generic URL/development activation",
+  "originalDescriptionAndImagesPreserved": true,
+  "imageFiles": {
+    ".agents/skills/unslop/references/refs/beacon-engraving.webp": "44e7680e9c944f03c8fe45df999bdf74077a106925a8189eebf89e751e306e5b",
+    ".agents/skills/unslop/references/refs/meadow-3d.webp": "84f526b68021a06fc6d32f162406fab6cc8074da1ef76d2ae4530e1b58219b14",
+    ".agents/skills/unslop/references/refs/story-dashboard-frames.webp": "cfbf837e40b7626d5a5789dbce54f5c197aab303aa350d13a042048310717137",
+    ".agents/skills/unslop/references/refs/unslop-dashboard-after.webp": "48067794f86b43dab20515b3810f245d67bff05d10bfa83c0f5885bee93cea52",
+    ".agents/skills/unslop/references/refs/unslop-hero-after.webp": "92b2d796c5b6116a2039f5ca2b0f3edf700c92b41846b11b9501a4e32f72af6e"
+  },
+  "files": {
+    ".agents/skills/agent-desktop-windows/AGENT_DESKTOP_SOURCE.json": {
+      "source": "installed-user-skill/agent-desktop-windows/AGENT_DESKTOP_SOURCE.json",
+      "originalSourceSha256": "3d2ea17e8eec900c017f0bdba3eeaed7b31bab64383efa5308eede3a9c0318aa",
+      "exportSha256": "011653b468b2a89cd0e0915f0702bfd67156cf75c6ebe5c92edd9aa3c7d7125a",
+      "bytes": 2572,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "011653b468b2a89cd0e0915f0702bfd67156cf75c6ebe5c92edd9aa3c7d7125a"
+    },
+    ".agents/skills/agent-desktop-windows/LICENSE": {
+      "source": "installed-user-skill/agent-desktop-windows/LICENSE",
+      "originalSourceSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "exportSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    ".agents/skills/agent-desktop-windows/references/chromium-and-electron.md": {
+      "source": "installed-user-skill/agent-desktop-windows/references/chromium-and-electron.md",
+      "originalSourceSha256": "a636cf25a52bd25abe287f714137dfb6e77b6604ca4101965e67e71a2b5d4718",
+      "exportSha256": "a636cf25a52bd25abe287f714137dfb6e77b6604ca4101965e67e71a2b5d4718",
+      "bytes": 3536,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "a636cf25a52bd25abe287f714137dfb6e77b6604ca4101965e67e71a2b5d4718"
+    },
+    ".agents/skills/agent-desktop-windows/references/permissions-and-elevation.md": {
+      "source": "installed-user-skill/agent-desktop-windows/references/permissions-and-elevation.md",
+      "originalSourceSha256": "b339246b2c9c199df81376cb37fb507eb3ea4c81e145d621389bb0a970f48e00",
+      "exportSha256": "b339246b2c9c199df81376cb37fb507eb3ea4c81e145d621389bb0a970f48e00",
+      "bytes": 5520,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "b339246b2c9c199df81376cb37fb507eb3ea4c81e145d621389bb0a970f48e00"
+    },
+    ".agents/skills/agent-desktop-windows/references/shell-and-overlay.md": {
+      "source": "installed-user-skill/agent-desktop-windows/references/shell-and-overlay.md",
+      "originalSourceSha256": "d53fc399a168165b09fb930b9f525228c0d46bcad0aa9cc8af775cc01d18898f",
+      "exportSha256": "d53fc399a168165b09fb930b9f525228c0d46bcad0aa9cc8af775cc01d18898f",
+      "bytes": 8744,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "d53fc399a168165b09fb930b9f525228c0d46bcad0aa9cc8af775cc01d18898f"
+    },
+    ".agents/skills/agent-desktop-windows/references/troubleshooting.md": {
+      "source": "installed-user-skill/agent-desktop-windows/references/troubleshooting.md",
+      "originalSourceSha256": "e7f297880a363f1a99dc9cf725834498d5909408642e2478603952d7314c0644",
+      "exportSha256": "e7f297880a363f1a99dc9cf725834498d5909408642e2478603952d7314c0644",
+      "bytes": 10320,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "e7f297880a363f1a99dc9cf725834498d5909408642e2478603952d7314c0644"
+    },
+    ".agents/skills/agent-desktop-windows/SKILL.md": {
+      "source": "installed-user-skill/agent-desktop-windows/SKILL.md",
+      "originalSourceSha256": "5ddddec1f8090b6e191863fbd538a932ed791de01ad8305cd684e3b3e2a76d14",
+      "exportSha256": "74a0f5bc35661cf3ba8a42c8c097251b490f9526e9d0e95ee2d77e784e4a4a12",
+      "bytes": 10026,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "74a0f5bc35661cf3ba8a42c8c097251b490f9526e9d0e95ee2d77e784e4a4a12"
+    },
+    ".agents/skills/systematic-debugging/condition-based-waiting-example.ts": {
+      "source": "installed-user-skill/systematic-debugging/condition-based-waiting-example.ts",
+      "originalSourceSha256": "40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e",
+      "exportSha256": "40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e",
+      "bytes": 5054,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "40ae5ebe497fdf310200e43fe986552546d0a22837c0d39e855db1cfd33eb88e"
+    },
+    ".agents/skills/systematic-debugging/condition-based-waiting.md": {
+      "source": "installed-user-skill/systematic-debugging/condition-based-waiting.md",
+      "originalSourceSha256": "e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26",
+      "exportSha256": "e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26",
+      "bytes": 3516,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26"
+    },
+    ".agents/skills/systematic-debugging/CREATION-LOG.md": {
+      "source": "installed-user-skill/systematic-debugging/CREATION-LOG.md",
+      "originalSourceSha256": "c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789",
+      "exportSha256": "c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789",
+      "bytes": 4257,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "c24733a5b1821bd6bed1fc950261f0b9f4e90097e0bbb96459d8179713730789"
+    },
+    ".agents/skills/systematic-debugging/defense-in-depth.md": {
+      "source": "installed-user-skill/systematic-debugging/defense-in-depth.md",
+      "originalSourceSha256": "1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7",
+      "exportSha256": "1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7",
+      "bytes": 3650,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "1e175fb86fc357e58c6aebf5441e481e1b7868b4380c0456b63a17eefbd18ba7"
+    },
+    ".agents/skills/systematic-debugging/find-polluter.sh": {
+      "source": "installed-user-skill/systematic-debugging/find-polluter.sh",
+      "originalSourceSha256": "dd7b8f13c4cc2a24b33ff87b18da9248f3e1c80a085c3316224f69ff0fa5c43c",
+      "exportSha256": "dd7b8f13c4cc2a24b33ff87b18da9248f3e1c80a085c3316224f69ff0fa5c43c",
+      "bytes": 1986,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "dd7b8f13c4cc2a24b33ff87b18da9248f3e1c80a085c3316224f69ff0fa5c43c"
+    },
+    ".agents/skills/systematic-debugging/root-cause-tracing.md": {
+      "source": "installed-user-skill/systematic-debugging/root-cause-tracing.md",
+      "originalSourceSha256": "6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b",
+      "exportSha256": "6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b",
+      "bytes": 5316,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "6b0622269e098ca1399e123e553fd385f0b6412d88ef0e9c4f5a8ea9cf1cec7b"
+    },
+    ".agents/skills/systematic-debugging/SKILL.md": {
+      "source": "installed-user-skill/systematic-debugging/SKILL.md",
+      "originalSourceSha256": "cf798bc6b4dab0e03e4904e5c7671b26e96e80b7fc9f50211cf6156e758b19d1",
+      "exportSha256": "cf798bc6b4dab0e03e4904e5c7671b26e96e80b7fc9f50211cf6156e758b19d1",
+      "bytes": 9494,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "cf798bc6b4dab0e03e4904e5c7671b26e96e80b7fc9f50211cf6156e758b19d1"
+    },
+    ".agents/skills/systematic-debugging/test-academic.md": {
+      "source": "installed-user-skill/systematic-debugging/test-academic.md",
+      "originalSourceSha256": "fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486",
+      "exportSha256": "fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486",
+      "bytes": 653,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "fe2ba480d78ac0d686dc025f41c2a32a43d642bf533f91b0c6053a04d35d6486"
+    },
+    ".agents/skills/systematic-debugging/test-pressure-1.md": {
+      "source": "installed-user-skill/systematic-debugging/test-pressure-1.md",
+      "originalSourceSha256": "0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a",
+      "exportSha256": "0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a",
+      "bytes": 1900,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "0b6a915db0054577819834c79be9eb614e97bddba10d73768e1fbe91cfed048a"
+    },
+    ".agents/skills/systematic-debugging/test-pressure-2.md": {
+      "source": "installed-user-skill/systematic-debugging/test-pressure-2.md",
+      "originalSourceSha256": "b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016",
+      "exportSha256": "b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016",
+      "bytes": 2283,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "b2030aeffba07050e8ad573ddf87486457c4a016a786bb326235bebd856f2016"
+    },
+    ".agents/skills/systematic-debugging/test-pressure-3.md": {
+      "source": "installed-user-skill/systematic-debugging/test-pressure-3.md",
+      "originalSourceSha256": "96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708",
+      "exportSha256": "96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708",
+      "bytes": 2692,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "96b50a52e2c7989c9cf20fb752c47c1e9a3a70dc362f8f7989f8f5b64dac7708"
+    },
+    ".agents/skills/verification-before-completion/SKILL.md": {
+      "source": "installed-user-skill/verification-before-completion/SKILL.md",
+      "originalSourceSha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+      "exportSha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+      "bytes": 3646,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3"
+    },
+    ".agents/skills/unslop/agents/openai.yaml": {
+      "source": "installed-user-skill/unslop/agents/openai.yaml",
+      "originalSourceSha256": "170d0b33a418d9d82beb7d15f8a91e314adef2edf53a81c37155b6f40dd52f06",
+      "exportSha256": "170d0b33a418d9d82beb7d15f8a91e314adef2edf53a81c37155b6f40dd52f06",
+      "bytes": 196,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "170d0b33a418d9d82beb7d15f8a91e314adef2edf53a81c37155b6f40dd52f06"
+    },
+    ".agents/skills/unslop/CITATION.cff": {
+      "source": "installed-user-skill/unslop/CITATION.cff",
+      "originalSourceSha256": "05a1d33a8c94660a6240afa2adf2e0331abeccf178bf00827b8ebd7a4796fb11",
+      "exportSha256": "05a1d33a8c94660a6240afa2adf2e0331abeccf178bf00827b8ebd7a4796fb11",
+      "bytes": 546,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "05a1d33a8c94660a6240afa2adf2e0331abeccf178bf00827b8ebd7a4796fb11"
+    },
+    ".agents/skills/unslop/LICENSE": {
+      "source": "installed-user-skill/unslop/LICENSE",
+      "originalSourceSha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+      "exportSha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+      "bytes": 18657,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+    },
+    ".agents/skills/unslop/PROVENANCE.md": {
+      "source": "installed-user-skill/unslop/PROVENANCE.md",
+      "originalSourceSha256": "0f2f9dcae6bb59e46604d260546db72bfe6a766f559e952c56d048569d6af23d",
+      "exportSha256": "7cdf8b89958da48f645f0fa580a8b77ea91129479a41e027e5b4a5e4711ceb12",
+      "bytes": 1915,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "7cdf8b89958da48f645f0fa580a8b77ea91129479a41e027e5b4a5e4711ceb12"
+    },
+    ".agents/skills/unslop/references/effects.md": {
+      "source": "installed-user-skill/unslop/references/effects.md",
+      "originalSourceSha256": "ded4f679e22843a8f68860e6cda0396fa8b8fa27202400e08337143b485c86a4",
+      "exportSha256": "ded4f679e22843a8f68860e6cda0396fa8b8fa27202400e08337143b485c86a4",
+      "bytes": 4864,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "ded4f679e22843a8f68860e6cda0396fa8b8fa27202400e08337143b485c86a4"
+    },
+    ".agents/skills/unslop/references/refs/beacon-engraving.webp": {
+      "source": "installed-user-skill/unslop/references/refs/beacon-engraving.webp",
+      "originalSourceSha256": "44e7680e9c944f03c8fe45df999bdf74077a106925a8189eebf89e751e306e5b",
+      "exportSha256": "44e7680e9c944f03c8fe45df999bdf74077a106925a8189eebf89e751e306e5b",
+      "bytes": 569124,
+      "kind": "portable_export",
+      "generalized": false
+    },
+    ".agents/skills/unslop/references/refs/meadow-3d.webp": {
+      "source": "installed-user-skill/unslop/references/refs/meadow-3d.webp",
+      "originalSourceSha256": "84f526b68021a06fc6d32f162406fab6cc8074da1ef76d2ae4530e1b58219b14",
+      "exportSha256": "84f526b68021a06fc6d32f162406fab6cc8074da1ef76d2ae4530e1b58219b14",
+      "bytes": 286608,
+      "kind": "portable_export",
+      "generalized": false
+    },
+    ".agents/skills/unslop/references/refs/story-dashboard-frames.webp": {
+      "source": "installed-user-skill/unslop/references/refs/story-dashboard-frames.webp",
+      "originalSourceSha256": "cfbf837e40b7626d5a5789dbce54f5c197aab303aa350d13a042048310717137",
+      "exportSha256": "cfbf837e40b7626d5a5789dbce54f5c197aab303aa350d13a042048310717137",
+      "bytes": 187334,
+      "kind": "portable_export",
+      "generalized": false
+    },
+    ".agents/skills/unslop/references/refs/unslop-dashboard-after.webp": {
+      "source": "installed-user-skill/unslop/references/refs/unslop-dashboard-after.webp",
+      "originalSourceSha256": "48067794f86b43dab20515b3810f245d67bff05d10bfa83c0f5885bee93cea52",
+      "exportSha256": "48067794f86b43dab20515b3810f245d67bff05d10bfa83c0f5885bee93cea52",
+      "bytes": 74724,
+      "kind": "portable_export",
+      "generalized": false
+    },
+    ".agents/skills/unslop/references/refs/unslop-hero-after.webp": {
+      "source": "installed-user-skill/unslop/references/refs/unslop-hero-after.webp",
+      "originalSourceSha256": "92b2d796c5b6116a2039f5ca2b0f3edf700c92b41846b11b9501a4e32f72af6e",
+      "exportSha256": "92b2d796c5b6116a2039f5ca2b0f3edf700c92b41846b11b9501a4e32f72af6e",
+      "bytes": 223664,
+      "kind": "portable_export",
+      "generalized": false
+    },
+    ".agents/skills/unslop/references/refs.md": {
+      "source": "installed-user-skill/unslop/references/refs.md",
+      "originalSourceSha256": "12a70ce17d574914ea69eb0809e5a9605de044df1b66619159c6d0b38d6b8353",
+      "exportSha256": "12a70ce17d574914ea69eb0809e5a9605de044df1b66619159c6d0b38d6b8353",
+      "bytes": 2458,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "12a70ce17d574914ea69eb0809e5a9605de044df1b66619159c6d0b38d6b8353"
+    },
+    ".agents/skills/unslop/references/signs.md": {
+      "source": "installed-user-skill/unslop/references/signs.md",
+      "originalSourceSha256": "6250d3c222c2aaa4ef4f31557d99d249e5be86d8720cd1157df14798caf1c8c4",
+      "exportSha256": "6250d3c222c2aaa4ef4f31557d99d249e5be86d8720cd1157df14798caf1c8c4",
+      "bytes": 7038,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "6250d3c222c2aaa4ef4f31557d99d249e5be86d8720cd1157df14798caf1c8c4"
+    },
+    ".agents/skills/unslop/references/tokens.md": {
+      "source": "installed-user-skill/unslop/references/tokens.md",
+      "originalSourceSha256": "988b754612b3e2d42d87b1bbaca0b4a61f3e07a2b2eef782d3614e8fdb6db5b0",
+      "exportSha256": "988b754612b3e2d42d87b1bbaca0b4a61f3e07a2b2eef782d3614e8fdb6db5b0",
+      "bytes": 6494,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "988b754612b3e2d42d87b1bbaca0b4a61f3e07a2b2eef782d3614e8fdb6db5b0"
+    },
+    ".agents/skills/unslop/references/visuals.md": {
+      "source": "installed-user-skill/unslop/references/visuals.md",
+      "originalSourceSha256": "7247da579d2d95ace1e051b867c757bd1e05aa02f3ab8dea0ead4cd4bf14d7d7",
+      "exportSha256": "7247da579d2d95ace1e051b867c757bd1e05aa02f3ab8dea0ead4cd4bf14d7d7",
+      "bytes": 8306,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "7247da579d2d95ace1e051b867c757bd1e05aa02f3ab8dea0ead4cd4bf14d7d7"
+    },
+    ".agents/skills/unslop/scripts/snapshot.mjs": {
+      "source": "installed-user-skill/unslop/scripts/snapshot.mjs",
+      "originalSourceSha256": "4b0c3639bd1c052fa1968c4bbe1b17acb5b108fd22ec70518628d9a4dbd5d6fa",
+      "exportSha256": "4b0c3639bd1c052fa1968c4bbe1b17acb5b108fd22ec70518628d9a4dbd5d6fa",
+      "bytes": 8271,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "4b0c3639bd1c052fa1968c4bbe1b17acb5b108fd22ec70518628d9a4dbd5d6fa"
+    },
+    ".agents/skills/unslop/scripts/story.mjs": {
+      "source": "installed-user-skill/unslop/scripts/story.mjs",
+      "originalSourceSha256": "daef4d8eceb267535ef8db9964519154183234715a86bc2aa888ede0bd82ee72",
+      "exportSha256": "daef4d8eceb267535ef8db9964519154183234715a86bc2aa888ede0bd82ee72",
+      "bytes": 25382,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "daef4d8eceb267535ef8db9964519154183234715a86bc2aa888ede0bd82ee72"
+    },
+    ".agents/skills/unslop/SKILL.md": {
+      "source": "installed-user-skill/unslop/SKILL.md",
+      "originalSourceSha256": "2c5496ab0dae229305415a6981d19568777ec2d8245733e6932856d4e58f9f4f",
+      "exportSha256": "2c5496ab0dae229305415a6981d19568777ec2d8245733e6932856d4e58f9f4f",
+      "bytes": 32651,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "2c5496ab0dae229305415a6981d19568777ec2d8245733e6932856d4e58f9f4f"
+    },
+    ".agents/skills/unslop/SOURCE-MANIFEST.json": {
+      "source": "installed-user-skill/unslop/SOURCE-MANIFEST.json",
+      "originalSourceSha256": "3d47b7ea7142d1d3551c2dbe4ddb86336b9c38203f1080d01eee18454f947c36",
+      "exportSha256": "4d569d0d511a002a2c3ac7b716a523d462e0cd4d4246336c6886ff87a3046249",
+      "bytes": 5470,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "4d569d0d511a002a2c3ac7b716a523d462e0cd4d4246336c6886ff87a3046249"
+    },
+    ".agents/skills/replica-architect/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-architect/agents/openai.yaml",
+      "originalSourceSha256": "f80d70d001d19c3375251e915fbf73ad6ecdc784cfa5a61f3ea093029ec88705",
+      "exportSha256": "f80d70d001d19c3375251e915fbf73ad6ecdc784cfa5a61f3ea093029ec88705",
+      "bytes": 368,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "f80d70d001d19c3375251e915fbf73ad6ecdc784cfa5a61f3ea093029ec88705"
+    },
+    ".agents/skills/replica-architect/architecture.md": {
+      "source": "installed-user-skill/replica-architect/architecture.md",
+      "originalSourceSha256": "3e45dc5523f00448d78853ece7d0c5240c1a35f2300c0d9511001b24d9e61460",
+      "exportSha256": "3e45dc5523f00448d78853ece7d0c5240c1a35f2300c0d9511001b24d9e61460",
+      "bytes": 716,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "3e45dc5523f00448d78853ece7d0c5240c1a35f2300c0d9511001b24d9e61460"
+    },
+    ".agents/skills/replica-architect/LICENSE": {
+      "source": "installed-user-skill/replica-architect/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-architect/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-architect/REPLICA_SOURCE.json",
+      "originalSourceSha256": "4b1ef159a473548e82ea97f7125756779f3d2c30651632fc21fe7c3176a9bd10",
+      "exportSha256": "cae413b7ceb61fc5ef570ec1f8a86a88c043df2d60de1f01542440282ff21a46",
+      "bytes": 560,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "cae413b7ceb61fc5ef570ec1f8a86a88c043df2d60de1f01542440282ff21a46"
+    },
+    ".agents/skills/replica-architect/SKILL.md": {
+      "source": "installed-user-skill/replica-architect/SKILL.md",
+      "originalSourceSha256": "f2b550a09bb20749076b6835153a346678a9f7981be814bc04f6fc3ce26fe6b0",
+      "exportSha256": "4821bdfa6034fb1effd3cdc4fbbc8427a9c362f9765178cb29bac9f0a11e83ad",
+      "bytes": 6318,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "4821bdfa6034fb1effd3cdc4fbbc8427a9c362f9765178cb29bac9f0a11e83ad"
+    },
+    ".agents/skills/replica-backend/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-backend/agents/openai.yaml",
+      "originalSourceSha256": "eb778e34a8614bc58b8c2cbe3b9c09f77d0ac4433a5d970941c09c887226f757",
+      "exportSha256": "eb778e34a8614bc58b8c2cbe3b9c09f77d0ac4433a5d970941c09c887226f757",
+      "bytes": 386,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "eb778e34a8614bc58b8c2cbe3b9c09f77d0ac4433a5d970941c09c887226f757"
+    },
+    ".agents/skills/replica-backend/LICENSE": {
+      "source": "installed-user-skill/replica-backend/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-backend/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-backend/REPLICA_SOURCE.json",
+      "originalSourceSha256": "8dc56cec86ff04062d9754c8c787a89d6dee72a4f209ba96c01293283a5d74c0",
+      "exportSha256": "e85499fd2381ada469e13f4ef0037015756d01d3f07da0f11fddaeacea422fda",
+      "bytes": 558,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "e85499fd2381ada469e13f4ef0037015756d01d3f07da0f11fddaeacea422fda"
+    },
+    ".agents/skills/replica-backend/SKILL.md": {
+      "source": "installed-user-skill/replica-backend/SKILL.md",
+      "originalSourceSha256": "fbb817868c492675d4132b9904abc22e1f5d9a2c07b6114e396177d0208f251a",
+      "exportSha256": "5095509b828f21c0275570119237077eeb9aaee5aff668a079d7694dce2591f9",
+      "bytes": 5778,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "5095509b828f21c0275570119237077eeb9aaee5aff668a079d7694dce2591f9"
+    },
+    ".agents/skills/replica-brand/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-brand/agents/openai.yaml",
+      "originalSourceSha256": "7138d93570eb3ca40d95ba83ad131500e37ca7ef384a578afbdb04f6ff151b84",
+      "exportSha256": "7138d93570eb3ca40d95ba83ad131500e37ca7ef384a578afbdb04f6ff151b84",
+      "bytes": 371,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "7138d93570eb3ca40d95ba83ad131500e37ca7ef384a578afbdb04f6ff151b84"
+    },
+    ".agents/skills/replica-brand/LICENSE": {
+      "source": "installed-user-skill/replica-brand/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-brand/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-brand/REPLICA_SOURCE.json",
+      "originalSourceSha256": "a2c04c3518d30433c69b914090b3c2469bf8b3e420b57def6ca4ea007da4a7a0",
+      "exportSha256": "1092e9fc0abf2a639eca2c426c9ad39677e6cf26949571c0aa228712f8422078",
+      "bytes": 556,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "1092e9fc0abf2a639eca2c426c9ad39677e6cf26949571c0aa228712f8422078"
+    },
+    ".agents/skills/replica-brand/SKILL.md": {
+      "source": "installed-user-skill/replica-brand/SKILL.md",
+      "originalSourceSha256": "b2659f50215683934a566dad557a1a3503538ece92eaa89d348d156b1c1ae955",
+      "exportSha256": "239a66030ffc7b266c2d6432de696f579d6dac4a0f2195d6e260a09e3b80e708",
+      "bytes": 6046,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "239a66030ffc7b266c2d6432de696f579d6dac4a0f2195d6e260a09e3b80e708"
+    },
+    ".agents/skills/replica-brand/sweep.py": {
+      "source": "installed-user-skill/replica-brand/sweep.py",
+      "originalSourceSha256": "e70165b721ff19465a820dfdb1fab5f8604ff7fed9515c245703ba21a707330d",
+      "exportSha256": "e70165b721ff19465a820dfdb1fab5f8604ff7fed9515c245703ba21a707330d",
+      "bytes": 7386,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "e70165b721ff19465a820dfdb1fab5f8604ff7fed9515c245703ba21a707330d"
+    },
+    ".agents/skills/replica-build/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-build/agents/openai.yaml",
+      "originalSourceSha256": "863f7f3152c4e927fa48b214535d9f31f6fdcd3ece03f7020471b9e91347eb95",
+      "exportSha256": "863f7f3152c4e927fa48b214535d9f31f6fdcd3ece03f7020471b9e91347eb95",
+      "bytes": 372,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "863f7f3152c4e927fa48b214535d9f31f6fdcd3ece03f7020471b9e91347eb95"
+    },
+    ".agents/skills/replica-build/LICENSE": {
+      "source": "installed-user-skill/replica-build/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-build/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-build/REPLICA_SOURCE.json",
+      "originalSourceSha256": "bac1192eb7b33c1914233803bb0a03dedcc92df03f6ca0266513f797e07307a3",
+      "exportSha256": "2962c0e6200e5ff0ed37ff8959160becde8d3f9af47cb2370207860daa910f2a",
+      "bytes": 556,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "2962c0e6200e5ff0ed37ff8959160becde8d3f9af47cb2370207860daa910f2a"
+    },
+    ".agents/skills/replica-build/SKILL.md": {
+      "source": "installed-user-skill/replica-build/SKILL.md",
+      "originalSourceSha256": "970a4498b145db7830e762dd8828032301ce329bbac43ae8b31f1981a865f947",
+      "exportSha256": "607b5b15bf7f2fef07ba3ebcf699678c2aeb42a7dd0da2fe771d855c694618ae",
+      "bytes": 5508,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "607b5b15bf7f2fef07ba3ebcf699678c2aeb42a7dd0da2fe771d855c694618ae"
+    },
+    ".agents/skills/replica-deploy/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-deploy/agents/openai.yaml",
+      "originalSourceSha256": "6606c28cea5036c3208b1b25e75f27e0afb8fb1851d73801beb427bad6311ac3",
+      "exportSha256": "6606c28cea5036c3208b1b25e75f27e0afb8fb1851d73801beb427bad6311ac3",
+      "bytes": 367,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "6606c28cea5036c3208b1b25e75f27e0afb8fb1851d73801beb427bad6311ac3"
+    },
+    ".agents/skills/replica-deploy/LICENSE": {
+      "source": "installed-user-skill/replica-deploy/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-deploy/preflight.md": {
+      "source": "installed-user-skill/replica-deploy/preflight.md",
+      "originalSourceSha256": "9b29bbfe6ba7c9343ab45c22de0a51e75064c1e9828d42ded61cbbd926ca82aa",
+      "exportSha256": "9b29bbfe6ba7c9343ab45c22de0a51e75064c1e9828d42ded61cbbd926ca82aa",
+      "bytes": 1292,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "9b29bbfe6ba7c9343ab45c22de0a51e75064c1e9828d42ded61cbbd926ca82aa"
+    },
+    ".agents/skills/replica-deploy/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-deploy/REPLICA_SOURCE.json",
+      "originalSourceSha256": "bb64100c43ee9b8118b4e9b0e93ef55cd2891509041c6881816dcd26f54a1fd3",
+      "exportSha256": "6477ccde32e66091a02d92c99f27b140e7e565c927b79ac7f38e6a645aa3fc0d",
+      "bytes": 639,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "6477ccde32e66091a02d92c99f27b140e7e565c927b79ac7f38e6a645aa3fc0d"
+    },
+    ".agents/skills/replica-deploy/SKILL.md": {
+      "source": "installed-user-skill/replica-deploy/SKILL.md",
+      "originalSourceSha256": "2ca6b19ef7a1f1cf726f1751a4a005083bcd5b6bab8a7b862b2445e626375502",
+      "exportSha256": "e4dced73e17550e4f88a544fda5a867c8a552923b50de4d607a014439acabbd0",
+      "bytes": 6278,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "e4dced73e17550e4f88a544fda5a867c8a552923b50de4d607a014439acabbd0"
+    },
+    ".agents/skills/replica-design/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-design/agents/openai.yaml",
+      "originalSourceSha256": "6475b01fe2ea209546c7b74338c06bca86b11cd07140e11ddc05b5b2b4b6f4f0",
+      "exportSha256": "6475b01fe2ea209546c7b74338c06bca86b11cd07140e11ddc05b5b2b4b6f4f0",
+      "bytes": 376,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "6475b01fe2ea209546c7b74338c06bca86b11cd07140e11ddc05b5b2b4b6f4f0"
+    },
+    ".agents/skills/replica-design/contrast.py": {
+      "source": "installed-user-skill/replica-design/contrast.py",
+      "originalSourceSha256": "2c4b57890fddb799d227cef5cbd9f92f11580376c161f99bf08c86517599101f",
+      "exportSha256": "2c4b57890fddb799d227cef5cbd9f92f11580376c161f99bf08c86517599101f",
+      "bytes": 5373,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "2c4b57890fddb799d227cef5cbd9f92f11580376c161f99bf08c86517599101f"
+    },
+    ".agents/skills/replica-design/LICENSE": {
+      "source": "installed-user-skill/replica-design/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-design/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-design/REPLICA_SOURCE.json",
+      "originalSourceSha256": "01432843ca12c8c9047bbda2188dedfa9c0712717a12261f1f77f4417881902f",
+      "exportSha256": "f487ef6a5c9af2160733b97057b19797854ce3ac7e5a66ae2d9b487c34d8d886",
+      "bytes": 557,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "f487ef6a5c9af2160733b97057b19797854ce3ac7e5a66ae2d9b487c34d8d886"
+    },
+    ".agents/skills/replica-design/SKILL.md": {
+      "source": "installed-user-skill/replica-design/SKILL.md",
+      "originalSourceSha256": "35b7bf2c5e8d53a87f4b78100d7d0abc7bcbd6e014ea131cbf89932ba8b8db7f",
+      "exportSha256": "f153185a3bcaf543e83026dbc6443a352dff9a758f33618147a5817aca2a5213",
+      "bytes": 5708,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "f153185a3bcaf543e83026dbc6443a352dff9a758f33618147a5817aca2a5213"
+    },
+    ".agents/skills/replica-design/tokens.json": {
+      "source": "installed-user-skill/replica-design/tokens.json",
+      "originalSourceSha256": "1dc9afb9f860ab9089ed7ad762878d9e5754570d081a0d2f2cb63382260ec63e",
+      "exportSha256": "1dc9afb9f860ab9089ed7ad762878d9e5754570d081a0d2f2cb63382260ec63e",
+      "bytes": 1613,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "1dc9afb9f860ab9089ed7ad762878d9e5754570d081a0d2f2cb63382260ec63e"
+    },
+    ".agents/skills/replica-diff/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-diff/agents/openai.yaml",
+      "originalSourceSha256": "409b3d557c1e5fc8662b409cf19d4dc83cf31a848b4c06a88a2730ebf10f9c74",
+      "exportSha256": "409b3d557c1e5fc8662b409cf19d4dc83cf31a848b4c06a88a2730ebf10f9c74",
+      "bytes": 365,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "409b3d557c1e5fc8662b409cf19d4dc83cf31a848b4c06a88a2730ebf10f9c74"
+    },
+    ".agents/skills/replica-diff/imgdiff.py": {
+      "source": "installed-user-skill/replica-diff/imgdiff.py",
+      "originalSourceSha256": "ee939cddf30c8fb95eb32461131c7cb4eeb58806e3f86a44d1a872ad84eb6a26",
+      "exportSha256": "ee939cddf30c8fb95eb32461131c7cb4eeb58806e3f86a44d1a872ad84eb6a26",
+      "bytes": 16557,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "ee939cddf30c8fb95eb32461131c7cb4eeb58806e3f86a44d1a872ad84eb6a26"
+    },
+    ".agents/skills/replica-diff/LICENSE": {
+      "source": "installed-user-skill/replica-diff/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-diff/parity.py": {
+      "source": "installed-user-skill/replica-diff/parity.py",
+      "originalSourceSha256": "208a2bd1d4168da24ddc1c29d5d011a8a22a90587cb0d430bd442165fe3c9c28",
+      "exportSha256": "208a2bd1d4168da24ddc1c29d5d011a8a22a90587cb0d430bd442165fe3c9c28",
+      "bytes": 8943,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "208a2bd1d4168da24ddc1c29d5d011a8a22a90587cb0d430bd442165fe3c9c28"
+    },
+    ".agents/skills/replica-diff/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-diff/REPLICA_SOURCE.json",
+      "originalSourceSha256": "15c5b8e8f307a4c822ef4ac504a189281c9d94e8beb8dc8a25fb7cd3a2e3500e",
+      "exportSha256": "44d40aac48e598397fda0e4d0d42dc17955454c095ba17d8ef39375ac4c5a7db",
+      "bytes": 555,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "44d40aac48e598397fda0e4d0d42dc17955454c095ba17d8ef39375ac4c5a7db"
+    },
+    ".agents/skills/replica-diff/SKILL.md": {
+      "source": "installed-user-skill/replica-diff/SKILL.md",
+      "originalSourceSha256": "44584f6b6186e5e75f14faa167ffd7fb02a17e6ac9c5bdc763a40117b529f9a0",
+      "exportSha256": "9e35d64ef28abf6baaf7fd501649caaea9d3a44fc55b5e10fe57eb6b19024851",
+      "bytes": 5851,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "9e35d64ef28abf6baaf7fd501649caaea9d3a44fc55b5e10fe57eb6b19024851"
+    },
+    ".agents/skills/replica-entrepreneur/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-entrepreneur/agents/openai.yaml",
+      "originalSourceSha256": "36a51625c00b90feecd8ac950162b36dc12a4666a8ac1b5e9e716612f78488ae",
+      "exportSha256": "36a51625c00b90feecd8ac950162b36dc12a4666a8ac1b5e9e716612f78488ae",
+      "bytes": 384,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "36a51625c00b90feecd8ac950162b36dc12a4666a8ac1b5e9e716612f78488ae"
+    },
+    ".agents/skills/replica-entrepreneur/LICENSE": {
+      "source": "installed-user-skill/replica-entrepreneur/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-entrepreneur/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-entrepreneur/REPLICA_SOURCE.json",
+      "originalSourceSha256": "62845e4a9a9608129bbf7ec367da067059a5b2b319a2b3520c26fd8dbe7702fd",
+      "exportSha256": "4e0392c07a860967853c6690f03627e90703441b28adb1c438d45c66a0980641",
+      "bytes": 563,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "4e0392c07a860967853c6690f03627e90703441b28adb1c438d45c66a0980641"
+    },
+    ".agents/skills/replica-entrepreneur/reviews.py": {
+      "source": "installed-user-skill/replica-entrepreneur/reviews.py",
+      "originalSourceSha256": "4e48d770727d6229ebdc398824bb947b919b5e267c5fcc23a11ab1be63995beb",
+      "exportSha256": "4e48d770727d6229ebdc398824bb947b919b5e267c5fcc23a11ab1be63995beb",
+      "bytes": 12372,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "4e48d770727d6229ebdc398824bb947b919b5e267c5fcc23a11ab1be63995beb"
+    },
+    ".agents/skills/replica-entrepreneur/SKILL.md": {
+      "source": "installed-user-skill/replica-entrepreneur/SKILL.md",
+      "originalSourceSha256": "4b4da0fc3aa32c36e3ef3f1207cfc20d7287c70c242b9df86c70c739317b909f",
+      "exportSha256": "7440b81a5af5d04c8f13d0261eb517702debb1baa71886530bfa272a1d735f9a",
+      "bytes": 6487,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "7440b81a5af5d04c8f13d0261eb517702debb1baa71886530bfa272a1d735f9a"
+    },
+    ".agents/skills/replica-entrepreneur/themes.json": {
+      "source": "installed-user-skill/replica-entrepreneur/themes.json",
+      "originalSourceSha256": "008d337c9dd3c33adb1aad24bb4c35feed776c5370b6b295cd67f306aaa3d754",
+      "exportSha256": "008d337c9dd3c33adb1aad24bb4c35feed776c5370b6b295cd67f306aaa3d754",
+      "bytes": 4944,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "008d337c9dd3c33adb1aad24bb4c35feed776c5370b6b295cd67f306aaa3d754"
+    },
+    ".agents/skills/replica-launch/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-launch/agents/openai.yaml",
+      "originalSourceSha256": "6ee3e66ef71fde0cdf17d8c8b9d51e03780f38e9dbb14feb70ba8a8f9ce343c7",
+      "exportSha256": "6ee3e66ef71fde0cdf17d8c8b9d51e03780f38e9dbb14feb70ba8a8f9ce343c7",
+      "bytes": 363,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "6ee3e66ef71fde0cdf17d8c8b9d51e03780f38e9dbb14feb70ba8a8f9ce343c7"
+    },
+    ".agents/skills/replica-launch/LICENSE": {
+      "source": "installed-user-skill/replica-launch/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-launch/listing.example.json": {
+      "source": "installed-user-skill/replica-launch/listing.example.json",
+      "originalSourceSha256": "2fb3ba9613c4f1d7946cd71ca9e6ab1e5d322804b1d1b2f388ded846bfc1375b",
+      "exportSha256": "2fb3ba9613c4f1d7946cd71ca9e6ab1e5d322804b1d1b2f388ded846bfc1375b",
+      "bytes": 1223,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "2fb3ba9613c4f1d7946cd71ca9e6ab1e5d322804b1d1b2f388ded846bfc1375b"
+    },
+    ".agents/skills/replica-launch/listing.py": {
+      "source": "installed-user-skill/replica-launch/listing.py",
+      "originalSourceSha256": "eca5669a355f6b155f18e0430921341ccd6e7613f6cf2fdb904f1a1bf36721d8",
+      "exportSha256": "eca5669a355f6b155f18e0430921341ccd6e7613f6cf2fdb904f1a1bf36721d8",
+      "bytes": 7345,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "eca5669a355f6b155f18e0430921341ccd6e7613f6cf2fdb904f1a1bf36721d8"
+    },
+    ".agents/skills/replica-launch/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-launch/REPLICA_SOURCE.json",
+      "originalSourceSha256": "c8cf9584d2921837c7c28621a165740e367052b88fe3a4bca7a4ed40235f9718",
+      "exportSha256": "c2b8ec4504c3e23dc27046b78be1747ffc73826ad536a0d87ebbafd68a223f48",
+      "bytes": 557,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "c2b8ec4504c3e23dc27046b78be1747ffc73826ad536a0d87ebbafd68a223f48"
+    },
+    ".agents/skills/replica-launch/SKILL.md": {
+      "source": "installed-user-skill/replica-launch/SKILL.md",
+      "originalSourceSha256": "cad0bd11143e39cf0e0aad90911be5a84fdee31e2e1cec4ef0e764714e0c50c5",
+      "exportSha256": "85fa53a1a4edccd61b34e041ae71222b7ea7e1dabbac9aa23aa0c09cc0d93f0b",
+      "bytes": 5905,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "85fa53a1a4edccd61b34e041ae71222b7ea7e1dabbac9aa23aa0c09cc0d93f0b"
+    },
+    ".agents/skills/replica-recon/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-recon/agents/openai.yaml",
+      "originalSourceSha256": "5de9abbf6d2eb774412aa26ebd99a072efc7afa9a7427bef93ac98410a035dac",
+      "exportSha256": "5de9abbf6d2eb774412aa26ebd99a072efc7afa9a7427bef93ac98410a035dac",
+      "bytes": 364,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "5de9abbf6d2eb774412aa26ebd99a072efc7afa9a7427bef93ac98410a035dac"
+    },
+    ".agents/skills/replica-recon/features.csv": {
+      "source": "installed-user-skill/replica-recon/features.csv",
+      "originalSourceSha256": "7903cc4887fc8f8a3b5d47de5d038b3fd05e79f2d990527b9d3b6123c3985ab0",
+      "exportSha256": "7903cc4887fc8f8a3b5d47de5d038b3fd05e79f2d990527b9d3b6123c3985ab0",
+      "bytes": 1169,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "7903cc4887fc8f8a3b5d47de5d038b3fd05e79f2d990527b9d3b6123c3985ab0"
+    },
+    ".agents/skills/replica-recon/LICENSE": {
+      "source": "installed-user-skill/replica-recon/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-recon/recon-map.md": {
+      "source": "installed-user-skill/replica-recon/recon-map.md",
+      "originalSourceSha256": "5864395958d147ef8a9b96019591fdd3943a230e7ee4d977e7a7b053728b4d3e",
+      "exportSha256": "5864395958d147ef8a9b96019591fdd3943a230e7ee4d977e7a7b053728b4d3e",
+      "bytes": 1245,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "5864395958d147ef8a9b96019591fdd3943a230e7ee4d977e7a7b053728b4d3e"
+    },
+    ".agents/skills/replica-recon/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-recon/REPLICA_SOURCE.json",
+      "originalSourceSha256": "d71060e4b07e716091ac7485add53e9e0ca411b25e562705bfd07d6598db221a",
+      "exportSha256": "d9770ea617d8a65b04fec39976ae5bcf86117593f0b6e2ca9ab8222fe867e33d",
+      "bytes": 556,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "d9770ea617d8a65b04fec39976ae5bcf86117593f0b6e2ca9ab8222fe867e33d"
+    },
+    ".agents/skills/replica-recon/SKILL.md": {
+      "source": "installed-user-skill/replica-recon/SKILL.md",
+      "originalSourceSha256": "14961151d577a07b18435876e1b40dcc225a20bb8b002c983fc2ff275b20a8e2",
+      "exportSha256": "6ccce7b13a79c9ccfd463cf39cbd68bc3d7d56354e1e7c476dcbbcf30e40b02a",
+      "bytes": 7205,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "6ccce7b13a79c9ccfd463cf39cbd68bc3d7d56354e1e7c476dcbbcf30e40b02a"
+    },
+    ".agents/skills/replica-test/agents/openai.yaml": {
+      "source": "installed-user-skill/replica-test/agents/openai.yaml",
+      "originalSourceSha256": "b23c24200476d5a403a5a5cee116d832356bf94f3fd9a835d0fec22588db9447",
+      "exportSha256": "b23c24200476d5a403a5a5cee116d832356bf94f3fd9a835d0fec22588db9447",
+      "bytes": 363,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "b23c24200476d5a403a5a5cee116d832356bf94f3fd9a835d0fec22588db9447"
+    },
+    ".agents/skills/replica-test/bug-report.md": {
+      "source": "installed-user-skill/replica-test/bug-report.md",
+      "originalSourceSha256": "53572b3a7b09914644903f982f8206fb667be41095601507e26238f59d9e25c3",
+      "exportSha256": "53572b3a7b09914644903f982f8206fb667be41095601507e26238f59d9e25c3",
+      "bytes": 462,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "53572b3a7b09914644903f982f8206fb667be41095601507e26238f59d9e25c3"
+    },
+    ".agents/skills/replica-test/e2e.example.spec.ts": {
+      "source": "installed-user-skill/replica-test/e2e.example.spec.ts",
+      "originalSourceSha256": "20f2c1778027d0c5d42bf6017392701e0e6ce628c170dad1fc14599c99c5ac6c",
+      "exportSha256": "20f2c1778027d0c5d42bf6017392701e0e6ce628c170dad1fc14599c99c5ac6c",
+      "bytes": 1882,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "20f2c1778027d0c5d42bf6017392701e0e6ce628c170dad1fc14599c99c5ac6c"
+    },
+    ".agents/skills/replica-test/LICENSE": {
+      "source": "installed-user-skill/replica-test/LICENSE",
+      "originalSourceSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "exportSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c",
+      "bytes": 1073,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "857c8d5276809c8196b3cd7cb3300324768bfc562b2b6281b06d6865058e186c"
+    },
+    ".agents/skills/replica-test/REPLICA_SOURCE.json": {
+      "source": "installed-user-skill/replica-test/REPLICA_SOURCE.json",
+      "originalSourceSha256": "663b9c0d7a410dd0be3e5fb907a6380100001761cee6ecec0268c9c5c4103691",
+      "exportSha256": "d4927ef5b4dc0ca4e26f212965bf68308a05ce9fb25503873166ff700b70c7d2",
+      "bytes": 555,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "d4927ef5b4dc0ca4e26f212965bf68308a05ce9fb25503873166ff700b70c7d2"
+    },
+    ".agents/skills/replica-test/SKILL.md": {
+      "source": "installed-user-skill/replica-test/SKILL.md",
+      "originalSourceSha256": "3d4671b248f7f2979a789c7b4f1fa89c0718c51ecda781f4ad1a03f3dd937079",
+      "exportSha256": "fc646d9e695fe3d6721b41990be4e55a1da27020f4de036b60cc63a357233f4d",
+      "bytes": 5023,
+      "kind": "portable_export",
+      "generalized": true,
+      "normalizedTextSha256": "fc646d9e695fe3d6721b41990be4e55a1da27020f4de036b60cc63a357233f4d"
+    },
+    ".agents/skills/replica-test/test-plan.md": {
+      "source": "installed-user-skill/replica-test/test-plan.md",
+      "originalSourceSha256": "284ff8b60ebc86c3ab0e797c628cb5d0f870ca1e4bdba02ba53853d83b32dc26",
+      "exportSha256": "284ff8b60ebc86c3ab0e797c628cb5d0f870ca1e4bdba02ba53853d83b32dc26",
+      "bytes": 671,
+      "kind": "portable_export",
+      "generalized": false,
+      "normalizedTextSha256": "284ff8b60ebc86c3ab0e797c628cb5d0f870ca1e4bdba02ba53853d83b32dc26"
+    },
+    ".agents/skills/systematic-debugging/LICENSE": {
+      "source": "official upstream MIT license https://raw.githubusercontent.com/obra/superpowers/main/LICENSE",
+      "originalSourceSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400",
+      "exportSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400",
+      "bytes": 1070,
+      "kind": "license",
+      "generalized": false,
+      "normalizedTextSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    ".agents/skills/systematic-debugging/SOURCE.json": {
+      "source": "generated source attribution",
+      "originalSourceSha256": "9032ac7431f4d79583343a1f97304686b2d07beb35cff14e4a2e77645462275e",
+      "exportSha256": "9032ac7431f4d79583343a1f97304686b2d07beb35cff14e4a2e77645462275e",
+      "bytes": 604,
+      "kind": "provenance",
+      "generalized": false,
+      "normalizedTextSha256": "9032ac7431f4d79583343a1f97304686b2d07beb35cff14e4a2e77645462275e"
+    },
+    ".agents/skills/verification-before-completion/LICENSE": {
+      "source": "official upstream MIT license https://raw.githubusercontent.com/obra/superpowers/main/LICENSE",
+      "originalSourceSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400",
+      "exportSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400",
+      "bytes": 1070,
+      "kind": "license",
+      "generalized": false,
+      "normalizedTextSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    ".agents/skills/verification-before-completion/SOURCE.json": {
+      "source": "generated source attribution",
+      "originalSourceSha256": "4c200bf1f86e71b732e528c32f253f96c20b4193ccf180b76ab724f18953eae2",
+      "exportSha256": "4c200bf1f86e71b732e528c32f253f96c20b4193ccf180b76ab724f18953eae2",
+      "bytes": 614,
+      "kind": "provenance",
+      "generalized": false,
+      "normalizedTextSha256": "4c200bf1f86e71b732e528c32f253f96c20b4193ccf180b76ab724f18953eae2"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/AGENTS.md": {
+      "source": "local pre-cleanup snapshot/AGENTS.md",
+      "originalSourceSha256": "034674cd7c128f08f805eab1c34082302a7c034ef198d19ae344d80b85ec35e1",
+      "exportSha256": "aa2b69613c525a5d34b84f75650824776350e874282ca54bbf62d1243b76acaa",
+      "bytes": 14318,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "aa2b69613c525a5d34b84f75650824776350e874282ca54bbf62d1243b76acaa"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/remote-main-before/AGENTS.md": {
+      "source": "GitHub main b9ce237209a2fb0207914a7a30943983dc3e8e13/AGENTS.md",
+      "originalSourceSha256": "ab1fb14fd5421ee60cf356257b016ecd33031c6d62838cbb2041146d9bcb5349",
+      "exportSha256": "4e531c4a9a3d31c7e68c5a00c1c2e1ae7b0617ae81361fb9485d8161b5a101fb",
+      "bytes": 23052,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "4e531c4a9a3d31c7e68c5a00c1c2e1ae7b0617ae81361fb9485d8161b5a101fb"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/01_CONTROL/USER_POLICIES.md": {
+      "source": "local pre-cleanup snapshot/01_CONTROL/USER_POLICIES.md",
+      "originalSourceSha256": "728e2ec367f40cbb0fc88613fae11ca0af715f530ae3663c934855e665f1c93b",
+      "exportSha256": "c48dea045569dd9a1efda9da98e02612af2852b104d2546970d16ffa4a66dba9",
+      "bytes": 23233,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "c48dea045569dd9a1efda9da98e02612af2852b104d2546970d16ffa4a66dba9"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/remote-main-before/01_CONTROL/USER_POLICIES.md": {
+      "source": "GitHub main b9ce237209a2fb0207914a7a30943983dc3e8e13/01_CONTROL/USER_POLICIES.md",
+      "originalSourceSha256": "f606fe5f6c934b1a8761db54e4cd08b4120e67e7f7099e59be12f640019db9ea",
+      "exportSha256": "8ac6d1f3e7710d7987e0dd4b426a40294d4586d18717f484e002469783790945",
+      "bytes": 25905,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "8ac6d1f3e7710d7987e0dd4b426a40294d4586d18717f484e002469783790945"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/01_CONTROL/WORK_PRIORITIES.md": {
+      "source": "local pre-cleanup snapshot/01_CONTROL/WORK_PRIORITIES.md",
+      "originalSourceSha256": "7c44786400c073ebb9359478c925497d05fd481b1b91d5ac5c3feb8c03748634",
+      "exportSha256": "5e2ee1b1b9155651e56f159afbbe0266c80117383eecb4a3d5ffef2b1028ea5f",
+      "bytes": 33228,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "5e2ee1b1b9155651e56f159afbbe0266c80117383eecb4a3d5ffef2b1028ea5f"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/remote-main-before/01_CONTROL/WORK_PRIORITIES.md": {
+      "source": "GitHub main b9ce237209a2fb0207914a7a30943983dc3e8e13/01_CONTROL/WORK_PRIORITIES.md",
+      "originalSourceSha256": "185489bf8b0773c2d9b4eee67b6305f02a3a0816f0251cdab6517bad0ed84ace",
+      "exportSha256": "9d7aa6741c1868bc15d967fd6c416f75d1388c1331d5363771d2306fecd59676",
+      "bytes": 44222,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "9d7aa6741c1868bc15d967fd6c416f75d1388c1331d5363771d2306fecd59676"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/01_CONTROL/AI_INSTALLATIONS.md": {
+      "source": "local pre-cleanup snapshot/01_CONTROL/AI_INSTALLATIONS.md",
+      "originalSourceSha256": "d072513341e0dd0d65eff704293ee680f071c5177ce3a0cfecfcb56a8eea301f",
+      "exportSha256": "f6cbe966e7495083e1868a379c6e18cfded8fb5c8d40307003fa6b812892bf4f",
+      "bytes": 7431,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "f6cbe966e7495083e1868a379c6e18cfded8fb5c8d40307003fa6b812892bf4f"
+    },
+    "99_ARCHIVE/2026-11-12/rules-before-034346/remote-main-before/01_CONTROL/AI_INSTALLATIONS.md": {
+      "source": "GitHub main b9ce237209a2fb0207914a7a30943983dc3e8e13/01_CONTROL/AI_INSTALLATIONS.md",
+      "originalSourceSha256": "47ad6117af49da80b0bca4d1a3401c288ae8af447677e55b8dcfeff4f5dae734",
+      "exportSha256": "3a6a0eab0618319f16fa862415f2b0563cb95c64d64a2d5161d576dc9434d9a9",
+      "bytes": 22117,
+      "kind": "public_generalized_archive",
+      "generalized": true,
+      "normalizedTextSha256": "3a6a0eab0618319f16fa862415f2b0563cb95c64d64a2d5161d576dc9434d9a9"
+    },
+    "AGENTS.md": {
+      "source": "current-local-policy/AGENTS.md",
+      "originalSourceSha256": "b34f477484fac9719554b7bba9ebaba616f755cc22a3304996965dc1ac6e4114",
+      "exportSha256": "20e07237e5f1c6c1f51d28dbf7d8ba27c1430d09ab84fa14f792ce1692fadfd4",
+      "bytes": 3020,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "20e07237e5f1c6c1f51d28dbf7d8ba27c1430d09ab84fa14f792ce1692fadfd4",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "01_CONTROL/USER_POLICIES.md": {
+      "source": "current-local-policy/01_CONTROL/USER_POLICIES.md",
+      "originalSourceSha256": "d6e3829a88a9fe88e3539ee73244f1b3b3aa60ff41b147f9ebe8ec129964f666",
+      "exportSha256": "612818f05165fb50ecc2bd059b35eaf80d133918845bb8e7fba2d816829871ff",
+      "bytes": 5674,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "612818f05165fb50ecc2bd059b35eaf80d133918845bb8e7fba2d816829871ff",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "01_CONTROL/WORK_PRIORITIES.md": {
+      "source": "current-local-policy/01_CONTROL/WORK_PRIORITIES.md",
+      "originalSourceSha256": "9c2caafa7227740136578a0fe63082d71526f153830910e4bdc0d8b4148271f1",
+      "exportSha256": "1d98a6d0bf1bc7a5b141ecd7688ec31108886181dd50bcbf92ed04a48254aade",
+      "bytes": 1751,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "1d98a6d0bf1bc7a5b141ecd7688ec31108886181dd50bcbf92ed04a48254aade",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "01_CONTROL/AI_INSTALLATIONS.md": {
+      "source": "current-local-policy/01_CONTROL/AI_INSTALLATIONS.md",
+      "originalSourceSha256": "76d444f0d1c11d253c418820e61fe017274c39b7ad73e07b8df284cbc4cb89e3",
+      "exportSha256": "3b0c595266984a36b884a3e143f436ff995c95226e7c832dbc5bd33da95da8ba",
+      "bytes": 3774,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "3b0c595266984a36b884a3e143f436ff995c95226e7c832dbc5bd33da95da8ba",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "04_COMMUNICATION/README.md": {
+      "source": "remote structural document + scoped current transfer clarification",
+      "originalSourceSha256": "1b4e42c6e354e3b4cd010efbd8b6bb2a274a4687318d8fa1f159f2662a628f76",
+      "exportSha256": "3614b81a0b40e247eded5dc265a20b2bc426f5c695337f5ad6e1b1a681a3b009",
+      "bytes": 4060,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "3614b81a0b40e247eded5dc265a20b2bc426f5c695337f5ad6e1b1a681a3b009",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "04_COMMUNICATION/announcements/PROTOCOL.md": {
+      "source": "remote structural document + scoped current transfer clarification",
+      "originalSourceSha256": "7eeeb2d8e4ff797a60c1a044156bdb8ff507debe8f5d2e131006a06775cbfaf2",
+      "exportSha256": "64e94d0a9c5e53dc0b7d315744584bba3652c852044a876e5daa22658f9d115f",
+      "bytes": 13098,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "64e94d0a9c5e53dc0b7d315744584bba3652c852044a876e5daa22658f9d115f"
+    },
+    "00_SYSTEM/GOVERNANCE.md": {
+      "source": "remote governance + scoped storage clarification",
+      "originalSourceSha256": "54b2fbc565ea16750b9df84007f34800a595c19d67a455275472407d314e07ee",
+      "exportSha256": "7dcf3f1bd45aa899b353ccceae563e0fd738b493507340f27c4289a0dd0e7d58",
+      "bytes": 2769,
+      "kind": "current_policy",
+      "generalized": true,
+      "normalizedTextSha256": "7dcf3f1bd45aa899b353ccceae563e0fd738b493507340f27c4289a0dd0e7d58"
+    },
+    "04_COMMUNICATION/announcements/notices/N-0006.md": {
+      "source": "local canonical N6r2; preserved existing public historical PC paths",
+      "originalSourceSha256": "80b05ed805641b3e8fc06ccc1f33b287a56c999ce2b9e8d5f2de8d1104d242cf",
+      "exportSha256": "80b05ed805641b3e8fc06ccc1f33b287a56c999ce2b9e8d5f2de8d1104d242cf",
+      "bytes": 3121,
+      "kind": "canonical_notice",
+      "generalized": false,
+      "normalizedTextSha256": "80b05ed805641b3e8fc06ccc1f33b287a56c999ce2b9e8d5f2de8d1104d242cf"
+    },
+    "04_COMMUNICATION/announcements/manifest.json": {
+      "source": "remote latest 11-entry manifest + N6r2 scoped fields",
+      "originalSourceSha256": "70b37f5018ace1b197ad5c04a49d49a7683e24d1763f29bcdb7ccc8b12ca4cb5",
+      "exportSha256": "f97a9805c136b72d10766401ef5d951967995d895e061fd5545655e456e47aa5",
+      "bytes": 7085,
+      "kind": "canonical_manifest",
+      "generalized": true,
+      "normalizedTextSha256": "f97a9805c136b72d10766401ef5d951967995d895e061fd5545655e456e47aa5"
+    },
+    "tools/agent-setup/README.md": {
+      "source": "generated concise bundle entry guide",
+      "originalSourceSha256": "5151c89d5211b535732609f9617ae9af945fc1179878f5efcb1c9fd5d6e6be45",
+      "exportSha256": "43a2fd412e15ec06ed8351d9634bc3f104ed27f31cede1e382570a7a530cfab2",
+      "bytes": 5456,
+      "kind": "bundle_guide",
+      "generalized": false,
+      "normalizedTextSha256": "43a2fd412e15ec06ed8351d9634bc3f104ed27f31cede1e382570a7a530cfab2",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "tools/agent-setup/global-AGENTS.md": {
+      "source": "generated portable policy without local memory/account configuration",
+      "originalSourceSha256": "ec0dca06cfd006a16ad935df16230e181f7c27d5ca9d35c99a0a10b2f5a84df4",
+      "exportSha256": "a4ad83906323c7ca89f157fce03bd8a42c07048ee3c3dac7f8d223273128dd4a",
+      "bytes": 1612,
+      "kind": "portable_policy",
+      "generalized": false,
+      "normalizedTextSha256": "a4ad83906323c7ca89f157fce03bd8a42c07048ee3c3dac7f8d223273128dd4a",
+      "adaptationNote": "Current recording pointers and 4-core/11-recreation/10-archived/one-off publication policy; public paths generalized."
+    },
+    "04_COMMUNICATION/RECORDING_RULES.md": {
+      "source": "current recording policy, identical meaning on local PC and repository",
+      "originalSourceSha256": "6b04b6d88a47762253a9a0877311fc0b52a6d6ee75f04693021a9cb151ba3e16",
+      "exportSha256": "6b04b6d88a47762253a9a0877311fc0b52a6d6ee75f04693021a9cb151ba3e16",
+      "bytes": 5895,
+      "kind": "current_recording_policy",
+      "generalized": false,
+      "normalizedTextSha256": "6b04b6d88a47762253a9a0877311fc0b52a6d6ee75f04693021a9cb151ba3e16"
+    }
+  },
+  "manifestSelfExcluded": true,
+  "excluded": [
+    "PC configuration and auth",
+    "API tokens and account state",
+    "memory/conversation databases",
+    "user private attachments",
+    "models and environments",
+    "native executables",
+    "MCP connection credentials"
+  ],
+  "sourceHistories": [
+    "local pre-cleanup snapshot; exact original hashes recorded",
+    "remote-main-before snapshot at b9ce237209a2fb0207914a7a30943983dc3e8e13"
+  ],
+  "privatePathPolicy": "PC-specific export paths generalized; N6 existing-public historical paths retained by baseline comparison only",
+  "unresolvedHistoricalReferencesRenderedInactive": [],
+  "canonicalNoticePolicy": "remote latest 11 entries retained; only N6 r2 revision/targets/normalized hash updated",
+  "cloudSetupClaim": "Repository skill discovery only; no account-wide installation or Windows binary distribution",
+  "publicationPolicy": "user-authorized one-off; Git commit/PR is publication receipt; no always-on sync",
+  "exportFormat": {
+    "textEncoding": "UTF-8 without BOM",
+    "textLineEndings": "LF",
+    "sourceOriginalSha256": "raw source bytes before public adaptation",
+    "exportSha256": "raw exported bytes; UTF-8/LF for text, unchanged raw bytes for images",
+    "normalizedTextSha256": "UTF-8 without BOM with LF; equal to exported text SHA",
+    "manifestSelfExcluded": true
+  },
+  "recordingPolicy": "04_COMMUNICATION/RECORDING_RULES.md is the single scoped recording standard; existing task_exchange schema unchanged"
+}

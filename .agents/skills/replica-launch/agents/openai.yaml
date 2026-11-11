@@ -1,0 +1,7 @@
+interface:
+  display_name: "앱 재현 출시 준비"
+  short_description: "기존 앱 재현을 요청한 작업에서만 재현 앱의 소개·출시 자료 준비을 진행합니다."
+  default_prompt: "$replica-launch으로 승인된 앱 재현 작업의 재현 앱의 소개·출시 자료 준비을 진행해줘."
+
+policy:
+  allow_implicit_invocation: true

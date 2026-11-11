@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/Jakeschincariol/replica-skill",
+  "commit": "77c9436fb3d18c3d58169efb8caf4fe906b0dc51",
+  "upstreamSkill": "replica-recon",
+  "license": "MIT",
+  "upstreamSkillSha256": "b1fd6a60cf0bcd481f6828453da24b9d9f0935ec6e883741e5f620259f13ff40",
+  "localAdapters": [
+    "Scoped Codex authorization guard; stages do not self-authorize following work",
+    "Windows interpreter and absolute helper-path resolution",
+    "Owned local input/output and symlink/resource caution",
+    "Claude wording converted where present"
+  ]
+}
