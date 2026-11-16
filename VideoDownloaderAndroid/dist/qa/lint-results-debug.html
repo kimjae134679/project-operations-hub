@@ -177,9 +177,9 @@ document.getElementById(id).style.display = 'none';
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
-      <span class="mdl-layout-title">Lint Report: 7 warnings</span>
+      <span class="mdl-layout-title">Lint Report: 8 warnings</span>
       <div class="mdl-layout-spacer"></div>
-      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Wed Oct 07 01:45:08 UTC 2026 by AGP (8.10.0)</nav>
+      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Mon Nov 16 14:25:54 UTC 2026 by AGP (8.10.0)</nav>
     </div>
   </header>
   <div class="mdl-layout__drawer">
@@ -191,6 +191,7 @@ document.getElementById(id).style.display = 'none';
       <a class="mdl-navigation__link" href="#SetJavaScriptEnabled"><i class="material-icons warning-icon">warning</i>Using <code>setJavaScriptEnabled</code> (2)</a>
       <a class="mdl-navigation__link" href="#DataExtractionRules"><i class="material-icons warning-icon">warning</i>Missing data extraction rules (1)</a>
       <a class="mdl-navigation__link" href="#StaticFieldLeak"><i class="material-icons warning-icon">warning</i>Static Field Leaks (1)</a>
+      <a class="mdl-navigation__link" href="#RtlHardcoded"><i class="material-icons warning-icon">warning</i>Using left/right instead of start/end attributes (1)</a>
     </nav>
   </div>
   <main class="mdl-layout__content">
@@ -224,6 +225,11 @@ document.getElementById(id).style.display = 'none';
 <tr>
 <td class="countColumn">1</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#StaticFieldLeak">StaticFieldLeak</a>: Static Field Leaks</td></tr>
+<tr><td class="countColumn"></td><td class="categoryColumn"><a href="#Internationalization:Bidirectional Text">Internationalization:Bidirectional Text</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
+<a href="#RtlHardcoded">RtlHardcoded</a>: Using left/right instead of start/end attributes</td></tr>
 <tr><td></td><td class="categoryColumn"><a href="#ExtraIssues">Included Additional Checks (19)</a>
 </td></tr>
 <tr><td></td><td class="categoryColumn"><a href="#MissingIssues">Disabled Checks (39)</a>
@@ -255,14 +261,14 @@ Dismiss</button>            </div>
 <span class="lineno"> 18 </span>  require(<span class="string">"true"</span>.equals(js(a,<span class="string">"!!document.querySelector('#addTop')"</span>)),<span class="string">"App UI loaded"</span>);
 </pre>
 
-<span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/Store.java">../../src/main/java/kr/co/kjw/videodownloader/Store.java</a>:21</span>: <span class="message">Consider using <code>apply()</code> instead; <code>commit</code> writes its data to persistent storage immediately, whereas <code>apply</code> will handle it in the background</span><br /><pre class="errorlines">
-<span class="lineno"> 18 </span>  <span class="keyword">public</span> <span class="keyword">static</span> JSONObject obj(Object... values) { JSONObject o = <span class="keyword">new</span> JSONObject(); <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;values.length;i+=<span class="number">2</span>) put(o,values[i].toString(),values[i+<span class="number">1</span>]); <span class="keyword">return</span> o; }
-<span class="lineno"> 19 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> put(JSONObject o,String k,Object v) { <span class="keyword">try</span> { o.put(k,v); } <span class="keyword">catch</span> (Exception ignored) {} }
-<span class="lineno"> 20 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> JSONObject state() { <span class="keyword">try</span> { <span class="keyword">return</span> <span class="keyword">new</span> JSONObject(data.toString()); } <span class="keyword">catch</span>(Exception e){<span class="keyword">return</span> <span class="keyword">new</span> JSONObject();} }
-<span class="caretline"><span class="lineno"> 21 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> save() { <span class="keyword">if</span>(context!=<span class="keyword">null</span>) context.getSharedPreferences(<span class="string">"library"</span>,<span class="number">0</span>).edit().putString(<span class="string">"data"</span>,data.toString()).<span class="warning">commit()</span>; }</span>
-<span class="lineno"> 22 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> JSONObject task(String id) {
-<span class="lineno"> 23 </span>      JSONArray a=data.optJSONArray(<span class="string">"tasks"</span>); <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;a.length();i++) { JSONObject o=a.optJSONObject(i); <span class="keyword">if</span>(id.equals(o.optString(<span class="string">"id"</span>))) { <span class="keyword">try</span>{<span class="keyword">return</span> <span class="keyword">new</span> JSONObject(o.toString());}<span class="keyword">catch</span>(Exception ignored){} } } <span class="keyword">return</span> <span class="keyword">null</span>;
-<span class="lineno"> 24 </span>  }
+<span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/Store.java">../../src/main/java/kr/co/kjw/videodownloader/Store.java</a>:24</span>: <span class="message">Consider using <code>apply()</code> instead; <code>commit</code> writes its data to persistent storage immediately, whereas <code>apply</code> will handle it in the background</span><br /><pre class="errorlines">
+<span class="lineno">  21 </span>  <span class="keyword">public</span> <span class="keyword">static</span> JSONObject obj(Object... values) { JSONObject o = <span class="keyword">new</span> JSONObject(); <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;values.length;i+=<span class="number">2</span>) put(o,values[i].toString(),values[i+<span class="number">1</span>]); <span class="keyword">return</span> o; }
+<span class="lineno">  22 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> put(JSONObject o,String k,Object v) { <span class="keyword">try</span> { o.put(k,v); } <span class="keyword">catch</span> (Exception ignored) {} }
+<span class="lineno">  23 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> JSONObject state() { pruneCompleted(); <span class="keyword">try</span> { <span class="keyword">return</span> <span class="keyword">new</span> JSONObject(data.toString()); } <span class="keyword">catch</span>(Exception e){<span class="keyword">return</span> <span class="keyword">new</span> JSONObject();} }
+<span class="caretline"><span class="lineno">  24 </span>  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> save() { <span class="keyword">if</span>(context!=<span class="keyword">null</span>) context.getSharedPreferences(<span class="string">"library"</span>,<span class="number">0</span>).edit().putString(<span class="string">"data"</span>,data.toString()).<span class="warning">commit()</span>; }</span>
+<span class="lineno">  25 </span>  <span class="comment">// Clean up completed HISTORY only. Never delete the downloaded MediaStore files.</span>
+<span class="lineno">  26 </span>  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> pruneCompleted() {
+<span class="lineno">  27 </span>      <span class="keyword">if</span>(data==<span class="keyword">null</span>)<span class="keyword">return</span>;
 </pre>
 
 </div>
@@ -306,8 +312,8 @@ Dismiss</button>            </div>
 <span class="lineno">  7 </span>        applicationId <span class="string">'kr.co.kjw.videodownloader'</span>
 <span class="lineno">  8 </span>        minSdk <span class="number">29</span>
 <span class="caretline"><span class="lineno">  9 </span>        <span class="warning">targetSdk <span class="number">35</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 10 </span>        versionCode <span class="number">4</span>
-<span class="lineno"> 11 </span>        versionName <span class="string">'1.1.0'</span>
+<span class="lineno"> 10 </span>        versionCode <span class="number">5</span>
+<span class="lineno"> 11 </span>        versionName <span class="string">'1.2.0'</span>
 <span class="lineno"> 12 </span>    }
 </pre>
 
@@ -354,14 +360,14 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/BrowserActivity.java">../../src/main/java/kr/co/kjw/videodownloader/BrowserActivity.java</a>:42</span>: <span class="message">Using <code>setJavaScriptEnabled</code> can introduce XSS vulnerabilities into your application, review carefully</span><br /><pre class="errorlines">
-<span class="lineno"> 39 </span>  Button go=button(<span class="string">"이동"</span>,<span class="keyword">true</span>);go.setOnClickListener(v->navigate());LinearLayout.LayoutParams goParams=<span class="keyword">new</span> LinearLayout.LayoutParams(dp(<span class="number">64</span>),dp(<span class="number">48</span>));goParams.leftMargin=dp(<span class="number">8</span>);top.addView(go,goParams);chrome.addView(top);
-<span class="lineno"> 40 </span>  status=<span class="keyword">new</span> TextView(<span class="keyword">this</span>);status.setText(<span class="string">"영상을 재생하면 저장할 미디어를 찾습니다."</span>);status.setTextColor(muted);status.setTextSize(<span class="number">12</span>);status.setPadding(dp(<span class="number">2</span>),dp(<span class="number">10</span>),<span class="number">0</span>,dp(<span class="number">2</span>));chrome.addView(status);root.addView(chrome);
-<span class="lineno"> 41 </span>  progress=<span class="keyword">new</span> ProgressBar(<span class="keyword">this</span>,<span class="keyword">null</span>,android.R.attr.progressBarStyleHorizontal);progress.setMax(<span class="number">100</span>);progress.setProgressTintList(android.content.res.ColorStateList.valueOf(brand));root.addView(progress,<span class="keyword">new</span> LinearLayout.LayoutParams(-<span class="number">1</span>,dp(<span class="number">2</span>)));progress.setVisibility(View.INVISIBLE);
-<span class="caretline"><span class="lineno"> 42 </span>  web=<span class="keyword">new</span> WebView(<span class="keyword">this</span>);web.setBackgroundColor(<span class="number">0xffffffff</span>);<span class="warning">web.getSettings().setJavaScriptEnabled(<span class="keyword">true</span>)</span>;web.getSettings().setDomStorageEnabled(<span class="keyword">true</span>);web.getSettings().setMediaPlaybackRequiresUserGesture(<span class="keyword">true</span>);web.getSettings().setAllowFileAccess(<span class="keyword">false</span>);web.getSettings().setAllowContentAccess(<span class="keyword">false</span>);web.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);CookieManager.getInstance().setAcceptCookie(<span class="keyword">true</span>);CookieManager.getInstance().setAcceptThirdPartyCookies(web,<span class="keyword">true</span>);</span>
-<span class="lineno"> 43 </span>  <span class="comment">// No privileged JavaScript bridge is exposed to website content.</span>
-<span class="lineno"> 44 </span>  web.setWebChromeClient(<span class="keyword">new</span> WebChromeClient(){<span class="annotation">@Override</span> <span class="keyword">public</span> <span class="keyword">void</span> onProgressChanged(WebView view,<span class="keyword">int</span> value){progress.setProgress(value);progress.setVisibility(value&lt;<span class="number">100</span>?View.VISIBLE:View.INVISIBLE);}});
-<span class="lineno"> 45 </span>  web.setWebViewClient(<span class="keyword">new</span> WebViewClient(){
+<span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/BrowserActivity.java">../../src/main/java/kr/co/kjw/videodownloader/BrowserActivity.java</a>:45</span>: <span class="message">Using <code>setJavaScriptEnabled</code> can introduce XSS vulnerabilities into your application, review carefully</span><br /><pre class="errorlines">
+<span class="lineno">  42 </span>  Button go=button(<span class="string">"이동"</span>,<span class="keyword">true</span>);go.setOnClickListener(v->navigate());LinearLayout.LayoutParams goParams=<span class="keyword">new</span> LinearLayout.LayoutParams(dp(<span class="number">64</span>),dp(<span class="number">48</span>));goParams.leftMargin=dp(<span class="number">8</span>);top.addView(go,goParams);chrome.addView(top);
+<span class="lineno">  43 </span>  status=<span class="keyword">new</span> TextView(<span class="keyword">this</span>);status.setText(<span class="string">"영상을 재생하면 저장할 미디어를 찾습니다."</span>);status.setTextColor(muted);status.setTextSize(<span class="number">12</span>);status.setPadding(dp(<span class="number">2</span>),dp(<span class="number">10</span>),<span class="number">0</span>,dp(<span class="number">2</span>));chrome.addView(status);chrome.setVisibility(View.GONE);root.addView(chrome);
+<span class="lineno">  44 </span>  progress=<span class="keyword">new</span> ProgressBar(<span class="keyword">this</span>,<span class="keyword">null</span>,android.R.attr.progressBarStyleHorizontal);progress.setMax(<span class="number">100</span>);progress.setProgressTintList(android.content.res.ColorStateList.valueOf(brand));root.addView(progress,<span class="keyword">new</span> LinearLayout.LayoutParams(-<span class="number">1</span>,dp(<span class="number">2</span>)));progress.setVisibility(View.INVISIBLE);
+<span class="caretline"><span class="lineno">  45 </span>  web=<span class="keyword">new</span> WebView(<span class="keyword">this</span>);web.setBackgroundColor(<span class="number">0xffffffff</span>);<span class="warning">web.getSettings().setJavaScriptEnabled(<span class="keyword">true</span>)</span>;web.getSettings().setDomStorageEnabled(<span class="keyword">true</span>);web.getSettings().setMediaPlaybackRequiresUserGesture(<span class="keyword">true</span>);web.getSettings().setAllowFileAccess(<span class="keyword">false</span>);web.getSettings().setAllowContentAccess(<span class="keyword">false</span>);web.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);CookieManager.getInstance().setAcceptCookie(<span class="keyword">true</span>);CookieManager.getInstance().setAcceptThirdPartyCookies(web,<span class="keyword">true</span>);</span>
+<span class="lineno">  46 </span>  <span class="comment">// No privileged JavaScript bridge is exposed to website content.</span>
+<span class="lineno">  47 </span>  web.setWebChromeClient(<span class="keyword">new</span> WebChromeClient(){<span class="annotation">@Override</span> <span class="keyword">public</span> <span class="keyword">void</span> onProgressChanged(WebView view,<span class="keyword">int</span> value){progress.setProgress(value);progress.setVisibility(value&lt;<span class="number">100</span>?View.VISIBLE:View.INVISIBLE);}});
+<span class="lineno">  48 </span>  web.setWebViewClient(<span class="keyword">new</span> WebViewClient(){
 </pre>
 
 <span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/MainActivity.java">../../src/main/java/kr/co/kjw/videodownloader/MainActivity.java</a>:34</span>: <span class="message">Using <code>setJavaScriptEnabled</code> can introduce XSS vulnerabilities into your application, review carefully</span><br /><pre class="errorlines">
@@ -463,13 +469,13 @@ Dismiss</button>            </div>
 <div class="issue">
 <div class="warningslist">
 <span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/Store.java">../../src/main/java/kr/co/kjw/videodownloader/Store.java</a>:9</span>: <span class="message">Do not place Android context classes in static fields; this is a memory leak</span><br /><pre class="errorlines">
-<span class="lineno">  6 </span>
-<span class="lineno">  7 </span><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> Store {
-<span class="lineno">  8 </span>    <span class="keyword">private</span> <span class="keyword">static</span> JSONObject data;
-<span class="caretline"><span class="lineno">  9 </span>    <span class="keyword">private</span> <span class="warning"><span class="keyword">static</span></span> Context context;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 10 </span>    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Set&lt;String> deletingFiles = <span class="keyword">new</span> HashSet&lt;>();
-<span class="lineno"> 11 </span>    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> init(Context c) {
-<span class="lineno"> 12 </span>        context = c.getApplicationContext();
+<span class="lineno">   6 </span>
+<span class="lineno">   7 </span><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> Store {
+<span class="lineno">   8 </span>    <span class="keyword">private</span> <span class="keyword">static</span> JSONObject data;
+<span class="caretline"><span class="lineno">   9 </span>    <span class="keyword">private</span> <span class="warning"><span class="keyword">static</span></span> Context context;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  10 </span>    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Set&lt;String> deletingFiles = <span class="keyword">new</span> HashSet&lt;>();
+<span class="lineno">  11 </span>    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> lastPruneMs=<span class="number">0</span>;
+<span class="lineno">  12 </span>    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> init(Context c) {
 </pre>
 
 </div>
@@ -502,6 +508,61 @@ ViewModel classes should never point to Views or non-application Contexts.<br/>T
               <div class="mdl-card__actions mdl-card--border">
 <button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="explanationStaticFieldLeakLink" onclick="reveal('explanationStaticFieldLeak');">
 Explain</button><button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="StaticFieldLeakCardLink" onclick="hideid('StaticFieldLeakCard');">
+Dismiss</button>            </div>
+            </div>
+          </section>
+<a name="Internationalization:Bidirectional Text"></a>
+<a name="RtlHardcoded"></a>
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" id="RtlHardcodedCard" style="display: block;">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+  <div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">Using left/right instead of start/end attributes</h2>
+  </div>
+              <div class="mdl-card__supporting-text">
+<div class="issue">
+<div class="warningslist">
+<span class="location"><a href="../../src/main/java/kr/co/kjw/videodownloader/BrowserActivity.java">../../src/main/java/kr/co/kjw/videodownloader/BrowserActivity.java</a>:65</span>: <span class="message">Use "<code>Gravity.END</code>" instead of "<code>Gravity.RIGHT</code>" to ensure correct behavior in right-to-left locales</span><br /><pre class="errorlines">
+<span class="lineno">  62 </span>  quickMedia=button(<span class="string">"↓"</span>,<span class="keyword">true</span>);quickMedia.setContentDescription(<span class="string">"발견된 미디어 다운로드"</span>);
+<span class="lineno">  63 </span>  quickMedia.setOnClickListener(v->collect(<span class="keyword">true</span>));
+<span class="lineno">  64 </span>  LinearLayout.LayoutParams quickLp=<span class="keyword">new</span> LinearLayout.LayoutParams(dp(<span class="number">52</span>),dp(<span class="number">48</span>));quickLp.leftMargin=dp(<span class="number">4</span>);floating.addView(quickMedia,quickLp);
+<span class="caretline"><span class="lineno">  65 </span>  FrameLayout.LayoutParams floatingParams=<span class="keyword">new</span> FrameLayout.LayoutParams(dp(<span class="number">104</span>),dp(<span class="number">48</span>),Gravity.TOP|Gravity.<span class="warning">RIGHT</span>);</span>
+<span class="lineno">  66 </span>  floatingParams.topMargin=dp(<span class="number">10</span>);floatingParams.rightMargin=dp(<span class="number">10</span>);
+<span class="lineno">  67 </span>  browserFrame.addView(floating,floatingParams);root.addView(browserFrame,<span class="keyword">new</span> LinearLayout.LayoutParams(-<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>));
+<span class="lineno">  68 </span>  LinearLayout footer=<span class="keyword">new</span> LinearLayout(<span class="keyword">this</span>);footer.setOrientation(LinearLayout.VERTICAL);footer.setPadding(dp(<span class="number">16</span>),dp(<span class="number">8</span>),dp(<span class="number">16</span>),dp(<span class="number">10</span>));footer.setBackgroundColor(surface);
+</pre>
+
+</div>
+<div class="metadata"><div class="explanation" id="explanationRtlHardcoded" style="display: none;">
+Using <code>Gravity#LEFT</code> and <code>Gravity#RIGHT</code> can lead to problems when a layout is rendered in locales where text flows from right to left. Use <code>Gravity#START</code> and <code>Gravity#END</code> instead. Similarly, in XML <code>gravity</code> and <code>layout_gravity</code> attributes, use <code>start</code> rather than <code>left</code>.<br/>
+<br/>
+For XML attributes such as paddingLeft and <code>layout_marginLeft</code>, use <code>paddingStart</code> and <code>layout_marginStart</code>. <b>NOTE</b>: If your <code>minSdkVersion</code> is less than 17, you should add <b>both</b> the older left/right attributes <b>as well as</b> the new start/end attributes. On older platforms, where RTL is not supported and the start/end attributes are unknown and therefore ignored, you need the older left/right attributes. There is a separate lint check which catches that type of error.<br/>
+<br/>
+(Note: For <code>Gravity#LEFT</code> and <code>Gravity#START</code>, you can use these constants even when targeting older platforms, because the <code>start</code> bitmask is a superset of the <code>left</code> bitmask. Therefore, you can use <code>gravity="start"</code> rather than <code>gravity="left|start"</code>.)<br/>Note: This issue has an associated quickfix operation in Android Studio and IntelliJ IDEA.<br>
+To suppress this error, use the issue id "RtlHardcoded" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+<br/></div>
+</div>
+</div>
+<div class="chips">
+<span class="mdl-chip">
+    <span class="mdl-chip__text">RtlHardcoded</span>
+</span>
+<span class="mdl-chip">
+    <span class="mdl-chip__text">Bidirectional Text</span>
+</span>
+<span class="mdl-chip">
+    <span class="mdl-chip__text">Internationalization</span>
+</span>
+<span class="mdl-chip">
+    <span class="mdl-chip__text">Warning</span>
+</span>
+<span class="mdl-chip">
+    <span class="mdl-chip__text">Priority 5/10</span>
+</span>
+</div>
+              </div>
+              <div class="mdl-card__actions mdl-card--border">
+<button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="explanationRtlHardcodedLink" onclick="reveal('explanationRtlHardcoded');">
+Explain</button><button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="RtlHardcodedCardLink" onclick="hideid('RtlHardcodedCard');">
 Dismiss</button>            </div>
             </div>
           </section>

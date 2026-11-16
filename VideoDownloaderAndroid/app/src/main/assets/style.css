@@ -27,3 +27,77 @@ dialog{border-radius:26px;max-height:88dvh;animation:sheetIn .21s ease-out}dialo
 @media(min-width:700px){main{padding:10px 32px 128px}header{padding:28px 32px 18px}.quickLink{max-width:620px}.collections{flex-wrap:wrap}.titleRow h2{font-size:32px}}
 @media(max-width:375px){header{padding:20px 16px 14px}.brand h1{font-size:17px}.brand p{max-width:145px}main{padding:0 16px 128px}.quickLink{padding:14px}.quickLink p{max-width:150px}.card{padding:15px}.cardActions button{padding:9px 10px}.cardActions>.primary,.cardActions>.soft{min-width:105px}.dialogBody{padding:8px 18px 22px}.dialogHead{padding:18px 18px 10px}#selectBar{padding:9px;gap:5px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* v1.2 compact phone-first layout: information in one line, thumbnails and 44dp touch controls. */
+header{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 12px!important;min-height:55px}
+header .brand{min-width:0;gap:7px}
+header .brand h1{font-size:16px!important;white-space:nowrap;letter-spacing:-.4px}
+header .logo{width:30px;height:30px;border-radius:9px;font-size:16px;flex-shrink:0}
+header .brand p{display:none}
+.headerActions{display:flex;align-items:center;gap:5px}
+.headerActions button{min-height:44px;height:44px;padding:5px 11px;font-size:12px;white-space:nowrap;border-radius:10px}
+#addTop{width:44px;padding:0;font-size:24px}
+main{padding:1px 12px 83px!important}
+.titleRow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:5px 0 6px}
+.titleRow>div:first-child{flex:1;min-width:85px}
+.titleRow h2{font-size:17px!important;line-height:1.25;letter-spacing:-.3px}
+.titleRow p{display:block;margin:1px 0 0;font-size:10px;line-height:1.2}
+.titleActions{display:flex;align-items:center;gap:4px}
+.titleActions button{min-height:44px;font-size:11px;padding:5px 8px;border-radius:9px;white-space:nowrap}
+.titleActions #listMenu{width:44px!important;height:44px!important;font-size:18px}
+.collections{display:flex;flex-wrap:nowrap!important;overflow-x:auto;gap:5px;margin:0 0 6px;padding:0 0 4px;scrollbar-width:thin}
+.collection{min-height:44px;max-width:155px;white-space:nowrap;padding:6px 9px;font-size:11px;border-radius:10px;flex-shrink:0}
+.collection .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.collection b{font-size:10px;margin-left:3px}
+.compactTools{display:flex;flex-direction:column;gap:1px;margin:0 0 6px}
+.tools{display:flex;align-items:center;gap:5px;margin:0!important}
+.tools input{width:100%;min-width:0;min-height:44px;height:44px;font-size:12px;border-radius:10px;padding:8px 10px}
+.tools button{flex-shrink:0;min-height:44px;height:44px;padding:6px 11px;font-size:11px;border-radius:10px}
+.filters{display:flex;gap:2px;padding:1px 0 3px;overflow-x:auto;scrollbar-width:none}
+.filters button{flex:1;min-width:52px;min-height:44px;padding:5px 8px;font-size:11px;white-space:nowrap;border-radius:8px}
+.cards{gap:6px}
+.card{padding:8px!important;border-radius:12px!important}
+.cardTop{display:flex;align-items:center;gap:8px}
+.card .thumb{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:83px;height:53px;min-height:53px;margin:0;border:0;border-radius:9px;overflow:hidden;background:var(--soft);padding:0;color:var(--brand)}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.thumbFallback{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.thumbFallback .icon{margin:0}
+.cardText{min-width:0;flex:1}
+.card h3{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-clamp:2;overflow:hidden;font-size:13px;line-height:1.3;word-break:break-word}
+.card .source{font-size:10px;line-height:1.35;letter-spacing:0;margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.selectTask{flex-shrink:0;width:44px;height:44px;min-height:44px;border-radius:9px;font-size:20px;padding:0}
+.cardActions{display:flex;gap:4px;justify-content:flex-end;align-items:center;border-top:0;padding:3px 0 0;margin:0}
+.cardActions button{min-height:44px;height:44px;padding:6px 10px;font-size:11px;border-radius:8px}
+.cardActions>.primary,.cardActions>.soft{min-width:85px;flex:0}
+.cardActions .ghost{flex:0}
+.cardActions .iconButton{width:44px;min-width:44px;padding:0}
+.card .progress{height:3px;margin:5px 0 0}
+.card .meta,.card .message,.card .urlLink{display:none}
+nav{padding:2px 7px max(5px,env(safe-area-inset-bottom));box-shadow:none}
+nav button{min-height:48px;gap:1px;padding:2px 6px;font-size:10px}
+nav button>span{width:48px;padding:2px 0}
+nav button svg{width:19px;height:19px}
+#selectBar{bottom:62px;padding:6px 9px;border-radius:12px}
+#selectBar button{min-height:44px;font-size:11px;padding:5px 7px}
+#toast{bottom:115px}
+.empty{padding:20px 12px;border-radius:12px}
+.emptyIcon{width:44px;height:44px}
+.empty h3{font-size:15px}
+.empty p{font-size:12px}
+dialog{border-radius:16px;max-height:91dvh}
+.dialogHead{padding:12px 14px 4px}
+.dialogHead h2{font-size:17px}
+.dialogBody{padding:6px 14px 14px}
+.dialogBody>p{margin:0 0 8px}
+label.field{margin-bottom:8px}
+textarea{min-height:72px;height:84px}
+.checkRow{margin:4px 0 8px}
+.dialogFooter{margin-top:8px}
+.linkPreview{margin:0 0 8px;padding:8px}
+.group{margin:8px 0}
+.setting{padding:9px 12px}
+.setting h3{font-size:13px}
+.setting p{font-size:11px}
+.setting select{max-width:112px}
+@media(min-width:700px){main{padding:5px 18px 86px!important}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+@media(max-width:375px){.titleRow{align-items:flex-start}.titleActions{width:100%;justify-content:flex-end}.headerActions button{padding:5px 8px}.filters button{min-width:50px}.card .thumb{width:72px}.card h3{font-size:12px}.cardActions button{font-size:10px}}

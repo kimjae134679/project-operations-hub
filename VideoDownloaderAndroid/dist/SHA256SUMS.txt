@@ -1,2 +1,2 @@
-51b4750c64a4ce47158e9dea220fbb303b2becd3be39fdf95d95060291968516  VideoDownloader-1.1.0-arm64-v8a.apk
-0190ce18499b44bd317f8220d52b96184843d98f910a92f3ebb1bd71100f7ead  VideoDownloader-1.1.0-armeabi-v7a.apk
+3b3704a7a2ed9c34b8600f5d5817fc4d2050ab32b5f47ddfff1a7cfc48518981  VideoDownloader-1.2.0-arm64-v8a.apk
+5d6ad4d541bf191a41362b13124c2c8152fbdcb0faaf013e49fe6c2e9631f9f7  VideoDownloader-1.2.0-armeabi-v7a.apk
