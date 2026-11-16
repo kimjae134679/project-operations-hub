@@ -161,7 +161,7 @@ public class DownloadService extends Service {
     private void deleteStage(File file){if(file.isDirectory()){File[] all=file.listFiles();if(all!=null)for(File f:all)deleteStage(f);}file.delete();}
     public static String redact(String detail){String s=detail==null?"":detail;s=s.replaceAll("(?i)(cookie|authorization|token|signature|password)([^\\s]*)([=:])[^\\s]+","$1=[숨김]").replaceAll("https?://[^\\s]+","[미디어 주소]");return s.length()>3000?s.substring(s.length()-3000):s;}
     private String friendly(Exception e){String s=e.toString().toLowerCase(Locale.ROOT);if(s.contains("drm"))return "이 영상은 DRM으로 보호되어 저장할 수 없습니다.";if(s.contains("sign in")||s.contains("login")||s.contains("403")||s.contains("cookies"))return "로그인 또는 사이트 확인이 필요합니다. 브라우저에서 재생 후 미디어를 선택해 주세요.";if(s.contains("space")||s.contains("enospc"))return "휴대폰 저장 공간이 부족합니다.";if(s.contains("timed out")||s.contains("network")||s.contains("resolve"))return "네트워크 연결을 확인한 뒤 재시도해 주세요.";return "다운로드 실패 · 재시도하거나 브라우저에서 미디어를 찾아 주세요.";}
-    @Override public void onTimeout(int id,int type){for(String id:new ArrayList<>(activeIds))cancel(id);if(worker!=null)worker.interrupt();stopSelf();}
+    @Override public void onTimeout(int id,int type){for(String taskId:new ArrayList<>(activeIds))cancel(taskId);if(worker!=null)worker.interrupt();stopSelf();}
     @Override public void onDestroy(){running=false;if(worker!=null)worker.interrupt();for(String id:new ArrayList<>(activeIds))cancel(id);if(downloads!=null)downloads.shutdownNow();if(wake!=null&&wake.isHeld())wake.release();super.onDestroy();}
     @Override public IBinder onBind(Intent intent){return null;}
 }
