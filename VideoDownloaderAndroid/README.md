@@ -1,6 +1,6 @@
 # 영상다운로더 Android
 
-설치파일: [Galaxy S22·64비트 Android용 APK 1.1.0](https://github.com/kimjae134679/project-operations-hub/releases/download/video-downloader-android-v1.1.0/VideoDownloader-1.1.0-arm64-v8a.apk). [전체 배포 파일](https://github.com/kimjae134679/project-operations-hub/releases/tag/video-downloader-android-v1.1.0)에서 32비트 APK와 SHA256 체크섬도 확인할 수 있습니다.
+설치파일: [Galaxy S22·64비트 Android용 APK 1.1.0](https://github.com/kimjae134679/project-operations-hub/releases/download/video-downloader-android-v1.2.0/VideoDownloader-1.2.0-arm64-v8a.apk). [전체 배포 파일](https://github.com/kimjae134679/project-operations-hub/releases/tag/video-downloader-android-v1.2.0)에서 32비트 APK와 SHA256 체크섬도 확인할 수 있습니다.
 
 휴대폰에서 링크를 입력하고 이름 있는 목록으로 관리한 뒤 영상·음원을 직접 저장하는 앱입니다. PC 서버가 필요 없습니다. Android 10 이상이며 Galaxy S22는 arm64-v8a 설치파일을 사용합니다.
 
@@ -47,3 +47,14 @@ GitHub Actions는 컴파일·단위 검사·Android lint, 360/412/800px UI·다�
 이전 1.0.2 빌드는 서명키를 보존하지 않았습니다. 업데이트가 거절되면 기존 앱에서 설정 → 목록 백업 → 내보내기를 먼저 하고, 기존 앱 삭제 후 1.1.0을 설치해 백업을 가져오세요. 공개 다운로드 파일은 유지되지만 삭제/재설치 전 백업은 필요합니다. 이번 버전부터 빌드 서명키를 캐시합니다.
 
 빌드·검증 완료 여부는 `task-ui-progress.json`과 해당 Actions 결과가 원본입니다. 실기기 Galaxy S22 테스트는 별도입니다.
+
+
+## 1.2.0 · 전체화면·간결한 화면·동시 다운로드
+
+- 사이트는 **브라우저 전체화면**으로 열립니다. 오른쪽 위의 작은 '⋮'에서 주소·이동 도구를 펼치거나 닫고, '↓'에서 발견한 미디어를 봅니다.
+- 발견한 미디어는 항목을 누르자마자 **다운로드 대기열에 넣고 자동 시작**합니다. **전체 받기**는 발견한 미디어를 모두 추가합니다.
+- **최대 3개를 동시에 내려받으며**, 남은 항목은 자동으로 이어집니다. 목록의 **모두 받기**는 다운로드가 안 된 나머지 항목을 일괄 대기열에 넣습니다.
+- 일반 영상 카드에는 추출기가 제공한 **썸네일**이 표시됩니다. 썸네일이 없거나 만료된 경우 기본 아이콘을 보여줍니다.
+- 카드, 상단 메뉴, 검색, 상태 필터를 **좁은 화면에 맞게 압축**했습니다. 목록 선택·개별 일시정지·상세 메뉴는 유지합니다.
+- **완료 기록은 기본 7일 뒤 목록에서만 자동 정리**됩니다. 설정에서 3일 / 7일 / 30일 / 정리 안 함을 선택합니다. **실제 저장한 영상 파일은 자동 삭제하지 않습니다.** 삭제하려면 상세 → 삭제 방법 선택에서 명시적으로 저장 파일 삭제를 선택합니다.
+- 새 버전 빌드와 검증은 GitHub Actions 결과를 기준으로 합니다. 실기기에서의 모든 사이트 다운로드는 개별 검증이 필요합니다.
