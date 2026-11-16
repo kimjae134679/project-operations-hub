@@ -53,7 +53,7 @@ public class BrowserActivity extends Activity {
             @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){if(request.isForMainFrame())status.setText("페이지를 열지 못했습니다. 주소와 연결을 확인해 주세요.");}
             @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){String url=request.getUrl().toString();if(url.matches("(?i).*\\.(m3u8|mpd|mp4|webm|mov|mkv|mp3|m4a|aac|ogg|wav|flac)([?].*)?$"))add(url,page);return null;}
         });
-        web.setDownloadListener((url,agent,disposition,mime,length)->{if(mime!=null&&(mime.startsWith("video/")||mime.startsWith("audio/")||mime.contains("mpegurl")||mime.contains("dash")))add(url,page);});
+        web.setDownloadListener((url,agent,disposition,mime,length)->{if(LinkParser.valid(url)&&mime!=null&&(mime.startsWith("video/")||mime.startsWith("audio/")||mime.contains("mpegurl")||mime.contains("dash"))){add(url,page);runOnUiThread(()->addSelected(url,page));}});
         FrameLayout browserFrame=new FrameLayout(this);
         browserFrame.addView(web,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout floating=new LinearLayout(this);floating.setOrientation(LinearLayout.HORIZONTAL);floating.setGravity(Gravity.CENTER);
