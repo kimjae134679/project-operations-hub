@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 3,
+  "version": "3.2.2",
+  "sourceBaseline": "installed runtime 3.2.0; upstream monitoring/quarantine from hub 08ca25ead0ab567ac0ad119f876862d93f4f882d",
+  "files": [
+    {
+      "path": "bridge_mcp.py",
+      "sha256": "daaaf65783acea4dc6702e128d7ace53c30c8f0dd2817d55b55eb8714e7694bd"
+    },
+    {
+      "path": "bridge_worker.py",
+      "sha256": "1cdd6b5489df63815d6d9f200d2c8dc3a8b15bf1c1dd7047631b646faafb4aac"
+    },
+    {
+      "path": "BridgeLauncher.cs",
+      "sha256": "3911d459b7d0347d6c4afabfed445828e26fd7ada6e014c54d33c303945e0c12"
+    },
+    {
+      "path": "control_plane.py",
+      "sha256": "d448eff7f3bf465022cef3bc39002787f8e8ed19f515ae3f499a264d98b44c80"
+    },
+    {
+      "path": "DesktopAutomation.cs",
+      "sha256": "c5bb4c39e9a8ff65f6b59d00c3104704341d784429a481478f35b17903d711e5"
+    },
+    {
+      "path": "file_search.py",
+      "sha256": "4b34008498120419bc3d380160aa797b2d87bf416e81f9dde5e959f32f72db62"
+    },
+    {
+      "path": "file_transfer.py",
+      "sha256": "2ae950b37c4cb488836582da2ab9d0ddcbe52d0eb67f51ddbed784e71635d251"
+    },
+    {
+      "path": "local_api.py",
+      "sha256": "b3646850b37b810ebd300c9f8844f3a8b3f9bd8b5d50a0d6fbfbf7a0f945b51a"
+    },
+    {
+      "path": "process_runner.py",
+      "sha256": "2abac65608e8d45eb81467fc196273d7c1cbe23dde47e522dd7f5982cbda4ced"
+    },
+    {
+      "path": "README.md",
+      "sha256": "4a9f5cbfe6c3b4f3e14aaccd7453cc92ed86eacd45810545a28a40b12bcd60c4"
+    },
+    {
+      "path": "tests/test_bridge.py",
+      "sha256": "0aa4be65d6d75740775a65091c24fa274b5873af452cdc3352139e02de07a4b0"
+    },
+    {
+      "path": "tests/test_control_plane.py",
+      "sha256": "7a7b1973e0931111ce35ba56275a3fcbc8fb040ccef698fed11d8ceb2533edba"
+    },
+    {
+      "path": "tests/test_file_crud.py",
+      "sha256": "1aaf49d064fd49b3930e5692f7f3f3c3645450bf5c8864490c0ac38b60812757"
+    },
+    {
+      "path": "tests/test_focus_diagnostics.py",
+      "sha256": "a7a3f095d6203421eeba0fe65c68709adc85a69999c42d656f9888203f81d94d"
+    },
+    {
+      "path": "tests/test_github_client.py",
+      "sha256": "33039048d313fff501a9c4dbc226d6372ecce6d683aaca4b5c5478384f1bacb6"
+    },
+    {
+      "path": "tests/test_local_api.py",
+      "sha256": "ba13bff248cb8222cda721418870d4d77940a119149922e0b1b1fde535b16170"
+    },
+    {
+      "path": "tests/test_mcp_control.py",
+      "sha256": "22b4ae94e8a4e782c75b3c83988597e4e997430e3952202ebc274108bd39cba8"
+    },
+    {
+      "path": "tests/test_monitoring_regressions.py",
+      "sha256": "f8cb91fa21d38ea07f7dd0a7db6d3de1b7a11eff8eea46667590225ea666fe85"
+    },
+    {
+      "path": "tests/test_shared_scheduler.py",
+      "sha256": "74cfebac2141d22b9c4ca4109bf92db67e859bf6848385bcbf7ef651dd0bc3e1"
+    },
+    {
+      "path": "tests/test_transfer_extensions.py",
+      "sha256": "294ea4fcf5de366db100a68b214ff6a3dc251ae1d2773f7aa187c05454ebdc33"
+    },
+    {
+      "path": "tests/test_universal_actions.py",
+      "sha256": "963bf5edfdf03a7b02a9cdc7c46d4d6937582fed640d77694a14b793836819fe"
+    },
+    {
+      "path": "tests/test_universal_worker.py",
+      "sha256": "cf56e1c3597f4b8f12b40b1044b792c558cd69c6fdeb6ad79c28c1749bb40715"
+    },
+    {
+      "path": "tool_catalog.py",
+      "sha256": "fc4e6624969677ccf654090985934e165a072d6d76c18e7f7eac59d8747a9c72"
+    },
+    {
+      "path": "universal_actions.py",
+      "sha256": "3dd6e3a52c61104acfc96840cb34b22c1ce22bc3b701fa91f26a8c99a4fd3b33"
+    },
+    {
+      "path": "UNIVERSAL_PROTOCOL.md",
+      "sha256": "22f844775ab1d1b6df6be1f08c331248bdd0f1e0eb96fc0aa04f12c646adfa55"
+    },
+    {
+      "path": "universal_worker.py",
+      "sha256": "5427ed05b9a6d84574f6ad73b6c7f9c6f8fc3aeb2fc237cc3bb48c6067084c98"
+    },
+    {
+      "path": "update_installed.py",
+      "sha256": "24bbe904b0235c936db11015c107232ab7232d392ca73d69c4d9b3c9ce2a5fb4"
+    },
+    {
+      "path": "version.py",
+      "sha256": "9b63f999df0ebe24c9307ef1ade143f2980516406f39cd00bdfb56b61f20571c"
+    },
+    {
+      "path": "프로젝트_사용안내.md",
+      "sha256": "bf70fa9a28dd6e095159efea97ba5bd62786dfffa302f613c0adf0606dd85f33"
+    }
+  ]
+}

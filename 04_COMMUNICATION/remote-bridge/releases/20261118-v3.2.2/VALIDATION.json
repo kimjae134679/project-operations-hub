@@ -1,0 +1,68 @@
+{
+  "version": "3.2.2",
+  "checkedAt": "2026-11-18T04:50:10.183655+09:00",
+  "fullSuite": {
+    "tests": 166,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 228.911
+  },
+  "operating": {
+    "localReady": true,
+    "relayConnected": true,
+    "relayCode": null,
+    "publicationConflictCount": 55,
+    "pendingPublicationCount": 0,
+    "invalidPublicationConflictCount": 0,
+    "activeJobCount": 0,
+    "pendingJobsPreserved": 1,
+    "configSha256Unchanged": true
+  },
+  "smoke": {
+    "version": "3.2.2",
+    "localReady": true,
+    "priorWriteRecoveredBySameId": true,
+    "writeVerified": true,
+    "fileInfoSeconds": 0.016,
+    "fileInfoVerified": true,
+    "probeRemoved": true,
+    "recoverableCleanup": true,
+    "relayConnected": true,
+    "relayCode": null,
+    "publicationConflictCount": 55,
+    "pendingPublicationCount": 0,
+    "invalidPublicationConflictCount": 0,
+    "activeJobCount": 0,
+    "pendingJobs": 1,
+    "archivedHistoryCount": 3207,
+    "journalIndexBytes": 10774538,
+    "archivedResultReadbackVerified": true
+  },
+  "historicalIndex": {
+    "beforeBytes": 119347596,
+    "afterBytes": 10774538,
+    "archivedRecords": 3207,
+    "fullResultChecksumAndReadbackVerified": true
+  },
+  "layout": {
+    "archivedEntries": 31,
+    "pluginSourceVersion": "3.2.2",
+    "backupsRetained": true
+  },
+  "permission": {
+    "windowsSecurityRestrictionsChanged": false,
+    "chatgptPluginLookup": "not_installed_in_current_account",
+    "globalAppPermissionChanged": false
+  },
+  "notRun": [
+    "Real Chrome/YouTube upload end-to-end",
+    "Other ChatGPT account plugin settings",
+    "All GUI applications"
+  ],
+  "history": [
+    "Initial full suite 162 PASS before history-index changes",
+    "Later full suite 166: one fixture assumed a runner status file existed immediately after acceptance; corrected to wait, module 23 PASS",
+    "Final full suite result above is authoritative",
+    "Only this task pre-service initialization workers were stopped during startup corrections; existing job processes and launcher were preserved"
+  ]
+}

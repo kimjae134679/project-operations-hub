@@ -1,0 +1,2 @@
+# Manifest digests bind exact payload bytes on every platform.
+* -text whitespace=cr-at-eol

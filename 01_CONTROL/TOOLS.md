@@ -12,7 +12,7 @@
 |---|---|---|
 | Codex | ACTIVE · 코딩 | 기존 공식 환경/CLI0.160.1 유지. 실제 응답/exit0확인과 별개로 한글 파일 과제는policy BLOCKED, 실제반환modelID미확인. 한도와 API과금 구분 |
 | GitHub | ACTIVE · 원본/협업 | 저장소·commit·Issue·PR·Actions. 현재 계정 권한·원격 반영 성공은 작업별 확인 |
-| ProjectBridge / 프로젝트 연결 | PROJECT · PC 연결 | 최신 사용자 원격 경로. 현재 장치 응답으로 연결·파일·명령을 확인; 과거 버전/왕복을 현재 정상으로 복제하지 않음 |
+| ProjectBridge / 프로젝트 연결 | PROJECT · PC 연결 | [3.2.2 현재 안내](../04_COMMUNICATION/remote-bridge/README.md). 2026-11-18 로컬·비공개 중계와 파일 왕복 확인. 다른 계정·모든 UI 성공과 구분 |
 | AI Control Tower | PROJECT · 프로젝트 운영 | 설치 앱 0.9.18.0 보존. 개발 소스·설치 버전·실행을 구분하며 낮은 버전으로 덮지 않음 |
 | Engram · 현재 AGENTS/Skill | ACTIVE · 기억/기준 | 기존 구성 유지. 중복 기억 서버·대형 harness 추가 안 함 |
 | 현재 파일/문서/브라우저 도구 | 작업별 | 현재 세션 도구·실제 파일/계정 권한 범위만 사용 |
